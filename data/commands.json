@@ -830,4 +830,199 @@
       {"flag": "--assignee", "description": "Filter by assignee"}
     ]
   }
+  ,
+  {
+    "id": 46,
+    "name": "mongosh connect (URI)",
+    "category": "MongoDB",
+    "workflow": "Connection",
+    "description": "Connect to MongoDB using a connection string",
+    "command": "mongosh [OPTIONS] \"mongodb://[USER[:PASSWORD]@]HOST[:PORT]/[DB][?PARAMS]\"",
+    "examples": [
+      "mongosh \"mongodb://localhost:27017\"",
+      "mongosh \"mongodb://user:pass@db.example.com:27017/mydb\"",
+      "mongosh \"mongodb+srv://user:pass@cluster0.abcde.mongodb.net/mydb?retryWrites=true&w=majority\""
+    ],
+    "tags": ["connect", "auth"],
+    "flags": [
+      {"flag": "--host", "description": "Hostname of the server"},
+      {"flag": "--port", "description": "Port number"},
+      {"flag": "-u", "description": "Username"},
+      {"flag": "-p", "description": "Prompt for password"},
+      {"flag": "--tls", "description": "Enable TLS/SSL"}
+    ]
+  },
+  {
+    "id": 47,
+    "name": "mongosh connect (host/port)",
+    "category": "MongoDB",
+    "workflow": "Connection",
+    "description": "Connect specifying host and port with optional credentials",
+    "command": "mongosh [OPTIONS] --host HOST --port PORT [-u USER -p]",
+    "examples": [
+      "mongosh --host localhost --port 27017",
+      "mongosh --host db.example.com --port 27017 -u admin -p",
+      "mongosh --host localhost --port 27017 --tls"
+    ],
+    "tags": ["connect", "basic"],
+    "flags": [
+      {"flag": "--host", "description": "Hostname of the server"},
+      {"flag": "--port", "description": "Port number (default 27017)"},
+      {"flag": "-u", "description": "Username"},
+      {"flag": "-p", "description": "Prompt for password"},
+      {"flag": "--tls", "description": "Enable TLS/SSL"}
+    ]
+  },
+  {
+    "id": 48,
+    "name": "mongosh find documents",
+    "category": "MongoDB",
+    "workflow": "CRUD",
+    "description": "Query a collection with an optional filter and limit",
+    "command": "mongosh [OPTIONS] \"CONNECTION\" --eval 'db.COLLECTION.find([QUERY]).limit([N])'",
+    "examples": [
+      "mongosh \"mongodb://localhost:27017/mydb\" --eval 'db.users.find().limit(5)'",
+      "mongosh \"mongodb://localhost:27017/mydb\" --eval 'db.logs.find({ level: \"error\" })'",
+      "mongosh \"mongodb://localhost:27017/mydb\" --eval 'db.orders.find({ total: { $gt: 100 } }).limit(10)'"
+    ],
+    "tags": ["query", "read"],
+    "flags": [
+      {"flag": "--eval", "description": "Evaluate JavaScript expression"}
+    ]
+  },
+  {
+    "id": 49,
+    "name": "mongosh insertOne",
+    "category": "MongoDB",
+    "workflow": "CRUD",
+    "description": "Insert a single document into a collection",
+    "command": "mongosh [OPTIONS] \"CONNECTION\" --eval 'db.COLLECTION.insertOne(DOC)'",
+    "examples": [
+      "mongosh \"mongodb://localhost:27017/mydb\" --eval 'db.users.insertOne({ name: \"Alice\", role: \"admin\" })'",
+      "mongosh \"mongodb://localhost:27017/mydb\" --eval 'db.events.insertOne({ type: \"login\", ok: true, ts: new Date() })'"
+    ],
+    "tags": ["insert", "write"],
+    "flags": [
+      {"flag": "--eval", "description": "Evaluate JavaScript expression"}
+    ]
+  },
+  {
+    "id": 50,
+    "name": "mongosh updateOne",
+    "category": "MongoDB",
+    "workflow": "CRUD",
+    "description": "Update fields on a single matching document",
+    "command": "mongosh [OPTIONS] \"CONNECTION\" --eval 'db.COLLECTION.updateOne(FILTER, { $set: UPDATE })'",
+    "examples": [
+      "mongosh \"mongodb://localhost:27017/mydb\" --eval 'db.users.updateOne({ name: \"Alice\" }, { $set: { role: \"user\" } })'"
+    ],
+    "tags": ["update", "write"],
+    "flags": [
+      {"flag": "--eval", "description": "Evaluate JavaScript expression"}
+    ]
+  },
+  {
+    "id": 51,
+    "name": "mongosh deleteOne",
+    "category": "MongoDB",
+    "workflow": "CRUD",
+    "description": "Delete a single matching document",
+    "command": "mongosh [OPTIONS] \"CONNECTION\" --eval 'db.COLLECTION.deleteOne(FILTER)'",
+    "examples": [
+      "mongosh \"mongodb://localhost:27017/mydb\" --eval 'db.users.deleteOne({ name: \"Alice\" })'"
+    ],
+    "tags": ["delete", "write"],
+    "flags": [
+      {"flag": "--eval", "description": "Evaluate JavaScript expression"}
+    ]
+  },
+  {
+    "id": 52,
+    "name": "mongodump",
+    "category": "MongoDB",
+    "workflow": "Backup / Import-Export",
+    "description": "Back up database or collection to BSON files",
+    "command": "mongodump [OPTIONS] [--db DB] [--collection COLLECTION] [--out PATH]",
+    "examples": [
+      "mongodump --uri=\"mongodb://localhost:27017\" --out ./backup",
+      "mongodump --uri=\"mongodb://localhost:27017/mydb\" --gzip --archive=./mydb.archive",
+      "mongodump --uri=\"mongodb://user:pass@host:27017/mydb\" --collection users --out ./backup"
+    ],
+    "tags": ["backup", "bson"],
+    "flags": [
+      {"flag": "--uri", "description": "MongoDB connection URI"},
+      {"flag": "--db", "description": "Database name"},
+      {"flag": "--collection", "description": "Collection name"},
+      {"flag": "--out", "description": "Output directory"},
+      {"flag": "--archive", "description": "Output to a single archive file"},
+      {"flag": "--gzip", "description": "Compress archive or dump files"}
+    ]
+  },
+  {
+    "id": 53,
+    "name": "mongorestore",
+    "category": "MongoDB",
+    "workflow": "Backup / Import-Export",
+    "description": "Restore from BSON dump directory or archive",
+    "command": "mongorestore [OPTIONS] [PATH|--archive] [--db DB] [--collection COLLECTION]",
+    "examples": [
+      "mongorestore --uri=\"mongodb://localhost:27017\" ./backup",
+      "mongorestore --uri=\"mongodb://localhost:27017\" --archive=./mydb.archive --gzip",
+      "mongorestore --uri=\"mongodb://localhost:27017\" --db mydb --collection users ./backup/mydb/users.bson"
+    ],
+    "tags": ["restore", "bson"],
+    "flags": [
+      {"flag": "--uri", "description": "MongoDB connection URI"},
+      {"flag": "--db", "description": "Database name"},
+      {"flag": "--collection", "description": "Collection name"},
+      {"flag": "--archive", "description": "Read from archive file"},
+      {"flag": "--gzip", "description": "Input is gzip-compressed"},
+      {"flag": "--drop", "description": "Drop collections before restoring"}
+    ]
+  },
+  {
+    "id": 54,
+    "name": "mongoexport",
+    "category": "MongoDB",
+    "workflow": "Backup / Import-Export",
+    "description": "Export collection data to JSON or CSV",
+    "command": "mongoexport [OPTIONS] --db DB --collection COLLECTION [--out FILE] [--query JSON] [--type json|csv]",
+    "examples": [
+      "mongoexport --uri=\"mongodb://localhost:27017/mydb\" --collection users --out users.json --type json",
+      "mongoexport --uri=\"mongodb://localhost:27017/mydb\" --collection users --type=csv --fields name,email --out users.csv",
+      "mongoexport --uri=\"mongodb://localhost:27017/mydb\" --collection logs --query '{ level: \"error\" }' --out errors.json"
+    ],
+    "tags": ["export", "json", "csv"],
+    "flags": [
+      {"flag": "--uri", "description": "MongoDB connection URI"},
+      {"flag": "--db", "description": "Database name"},
+      {"flag": "--collection", "description": "Collection name"},
+      {"flag": "--out", "description": "Output file path"},
+      {"flag": "--type", "description": "Export format (json, csv)"},
+      {"flag": "--fields", "description": "Comma-separated field list for CSV"},
+      {"flag": "--query", "description": "Filter query as JSON"}
+    ]
+  },
+  {
+    "id": 55,
+    "name": "mongoimport",
+    "category": "MongoDB",
+    "workflow": "Backup / Import-Export",
+    "description": "Import data from JSON/CSV/TSV into a collection",
+    "command": "mongoimport [OPTIONS] --db DB --collection COLLECTION --file FILE [--jsonArray] [--type json|csv|tsv]",
+    "examples": [
+      "mongoimport --uri=\"mongodb://localhost:27017/mydb\" --collection users --file users.json --jsonArray",
+      "mongoimport --uri=\"mongodb://localhost:27017/mydb\" --collection users --type csv --headerline --file users.csv"
+    ],
+    "tags": ["import", "json", "csv"],
+    "flags": [
+      {"flag": "--uri", "description": "MongoDB connection URI"},
+      {"flag": "--db", "description": "Database name"},
+      {"flag": "--collection", "description": "Collection name"},
+      {"flag": "--file", "description": "Input file path"},
+      {"flag": "--type", "description": "Input type (json, csv, tsv)"},
+      {"flag": "--jsonArray", "description": "Treat input as a JSON array"},
+      {"flag": "--headerline", "description": "Use first line of CSV as field names"}
+    ]
+  }
 ]

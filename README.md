@@ -4,7 +4,7 @@ Security-first DevOps cheatsheet + a correlation-and risk-scoring log analyzer. 
 
 ## Highlights
 
-- Command Guide: 45+ Docker, Git, and GitHub CLI commands with usage tips
+- Command Guide: 55+ Docker, Git, GitHub CLI, and MongoDB commands with usage tips
 - Risk-scored Log Analyzer (English + Swedish)
 - Deterministic normalization (priority-based), allowlists, and single-escaped log lines
 - Correlation rules: brute-force, password spraying, fail→success, WAF+auth, multi-port scans
@@ -45,6 +45,11 @@ Open http://localhost:5000
 ```bash
 pytest -q
 ```
+
+## What’s New
+
+- MongoDB tab with practical connection, CRUD, and backup/import-export commands
+- Minimal usage line for each command using clear placeholders like <image>, <container>, <repo> and [options]
 
 ## License
 
