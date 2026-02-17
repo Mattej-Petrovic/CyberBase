@@ -4,3 +4,13 @@ __pycache__/
 .coverage
 htmlcov/
 .git/
+node_modules/
+**/node_modules/
+secrets/
+*.json
+__pycache__/
+**/__pycache__/
+.venv/
+venv/
+.env
+.git/

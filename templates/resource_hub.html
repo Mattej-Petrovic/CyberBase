@@ -1,0 +1,234 @@
+{# templates/resource_hub.html v2 bygger vidare på v1 #}
+{% extends "base.html" %}
+
+{% block title %}Resource Hub · CyberBase{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+  <section class="rounded-2xl border border-slate-700/60 bg-slate-900/40 p-6 md:p-8 shadow-xl">
+    <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="text-xs uppercase tracking-widest text-slate-400">Resource Hub</p>
+        <h1 class="mt-2 text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-200 via-cyan-200 to-blue-200 bg-clip-text text-transparent">Resource Hub</h1>
+        <p class="mt-4 text-slate-200/90 leading-relaxed">Curated references for incident response, governance, standards, and hands on learning.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div class="rounded-2xl border border-slate-700/60 bg-slate-950/30 p-6 shadow-lg">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="text-lg font-semibold text-slate-100">Sweden: Authorities &amp; National Capabilities</h2>
+        <span class="text-xs rounded-full bg-slate-800/70 px-3 py-1 text-slate-300">Public sector</span>
+      </div>
+      <p class="mt-2 text-sm text-slate-300">Official sources for incident reporting, national guidance, resilience and privacy regulation.</p>
+      <div class="mt-4 space-y-3">
+        <a href="https://cert.se/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">CERT SE</p>
+              <p class="mt-1 text-sm text-slate-300">Sweden's national CSIRT. Support, alerts, incident handling and guidance.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+
+        <a href="https://www.ncsc.se/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">NCSC Sweden</p>
+              <p class="mt-1 text-sm text-slate-300">National Cyber Security Centre. Coordination, guidance and threat handling capabilities.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+
+        <a href="https://www.msb.se/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">MSB</p>
+              <p class="mt-1 text-sm text-slate-300">Civil defence and resilience agency. Crisis preparedness, guidance and coordination.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+
+        <a href="https://www.imy.se/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">IMY</p>
+              <p class="mt-1 text-sm text-slate-300">Authority for Privacy Protection. GDPR oversight, guidance and enforcement.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-700/60 bg-slate-950/30 p-6 shadow-lg">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="text-lg font-semibold text-slate-100">Frameworks, Standards &amp; Best Practices</h2>
+        <span class="text-xs rounded-full bg-slate-800/70 px-3 py-1 text-slate-300">Build your baseline</span>
+      </div>
+      <p class="mt-2 text-sm text-slate-300">Well known references for governance, risk management and secure development.</p>
+      <div class="mt-4 space-y-3">
+        <a href="https://www.nist.gov/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">NIST</p>
+              <p class="mt-1 text-sm text-slate-300">Standards and guidance, including the NIST Cybersecurity Framework (CSF).</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+
+        <a href="https://www.owasp.org/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">OWASP</p>
+              <p class="mt-1 text-sm text-slate-300">Open source community improving software security. Includes Top 10 and testing guides.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+
+        <a href="https://www.inuit.se/cis-controls" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">CIS Controls (overview)</p>
+              <p class="mt-1 text-sm text-slate-300">Practical, prioritized security safeguards. Good starting point for security hygiene.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-700/60 bg-slate-950/30 p-6 shadow-lg">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="text-lg font-semibold text-slate-100">Incident Response &amp; Communities</h2>
+        <span class="text-xs rounded-full bg-slate-800/70 px-3 py-1 text-slate-300">Coordination</span>
+      </div>
+      <p class="mt-2 text-sm text-slate-300">Where responders share practices, coordinate and strengthen global collaboration.</p>
+      <div class="mt-4 space-y-3">
+        <a href="https://www.first.org/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">FIRST</p>
+              <p class="mt-1 text-sm text-slate-300">Global forum for incident response and security teams focused on cooperation and sharing.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-700/60 bg-slate-950/30 p-6 shadow-lg">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="text-lg font-semibold text-slate-100">Security News &amp; Threat Monitoring</h2>
+        <span class="text-xs rounded-full bg-slate-800/70 px-3 py-1 text-slate-300">Stay current</span>
+      </div>
+      <p class="mt-2 text-sm text-slate-300">Daily news, advisories and incident coverage for quick situational awareness.</p>
+      <div class="mt-4 space-y-3">
+        <a href="https://www.bleepingcomputer.com/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">BleepingComputer</p>
+              <p class="mt-1 text-sm text-slate-300">Security and tech news publication with frequent coverage of active threats and breaches.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-700/60 bg-slate-950/30 p-6 shadow-lg">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="text-lg font-semibold text-slate-100">Learning Platforms</h2>
+        <span class="text-xs rounded-full bg-slate-800/70 px-3 py-1 text-slate-300">Courses</span>
+      </div>
+      <p class="mt-2 text-sm text-slate-300">Structured courses, tutorials and bundles for building technical fundamentals.</p>
+      <div class="mt-4 space-y-3">
+        <a href="https://www.w3schools.com/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">W3Schools</p>
+              <p class="mt-1 text-sm text-slate-300">Fast, example driven tutorials for web technologies and programming basics.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+
+        <a href="https://www.udemy.com/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">Udemy</p>
+              <p class="mt-1 text-sm text-slate-300">Large course marketplace covering IT, security, programming and certifications.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+
+        <a href="https://www.netacad.com/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">Cisco Networking Academy</p>
+              <p class="mt-1 text-sm text-slate-300">Free and structured training in networking, security and IT skills.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+
+        <a href="https://www.humblebundle.com/software" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">Humble Bundle (Software)</p>
+              <p class="mt-1 text-sm text-slate-300">Time limited discounted software bundles, often useful for tools and learning material.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-700/60 bg-slate-950/30 p-6 shadow-lg">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="text-lg font-semibold text-slate-100">Hands on Practice</h2>
+        <span class="text-xs rounded-full bg-slate-800/70 px-3 py-1 text-slate-300">Do the work</span>
+      </div>
+      <p class="mt-2 text-sm text-slate-300">Practice platforms for real skill building: labs, exercises, and interactive training.</p>
+      <div class="mt-4 space-y-3">
+        <a href="https://exercism.org/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">Exercism</p>
+              <p class="mt-1 text-sm text-slate-300">Free coding practice across many languages with optional mentor feedback.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+
+        <a href="https://overthewire.org/wargames/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">OverTheWire Wargames</p>
+              <p class="mt-1 text-sm text-slate-300">CTF style wargames to learn Linux, security concepts and practical exploitation basics.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+
+        <a href="https://learngitbranching.js.org/" target="_blank" rel="noopener" class="group block rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 hover:border-cyan-400/50 hover:bg-slate-900/60 smooth-hover">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-slate-100 group-hover:text-cyan-200">Learn Git Branching</p>
+              <p class="mt-1 text-sm text-slate-300">Interactive browser based simulator to practice git commands and branching workflows.</p>
+            </div>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Open</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

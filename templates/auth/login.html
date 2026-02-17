@@ -1,0 +1,450 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="cb-card p-6">
+    <div class="mb-4">
+      <h1 class="text-2xl font-bold">Welcome back</h1>
+      <p class="text-sm text-gray-400">Sign in or create your account.</p>
+    </div>
+
+    <div id="status" class="hidden mb-3"></div>
+
+    <div class="mb-3">
+      <button id="btnGoogle" class="cb-btn cb-btn-secondary w-full flex items-center justify-center gap-2" data-loading="0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-5 h-5"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12 c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20 s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,16.108,18.961,13,24,13c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657 C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.197l-6.19-5.238C29.211,35.091,26.715,36,24,36 c-5.202,0-9.619-3.317-11.283-7.946l-6.536,5.036C9.494,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-3.994,5.565c0.001-0.001,0.002-0.001,0.003-0.002 l6.19,5.238C36.951,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+        Continue with Google
+      </button>
+    </div>
+
+    <div class="grid gap-3">
+      <label class="block">
+        <span class="text-sm text-gray-300">Email</span>
+        <input id="email" type="email" autocomplete="email" class="cb-input mt-1" placeholder="you@example.com" />
+      </label>
+
+      <label class="block">
+        <span class="text-sm text-gray-300">Password</span>
+        <div class="relative mt-1">
+          <input id="password" type="password" autocomplete="current-password" class="cb-input pr-10" placeholder="••••••••" />
+          <button type="button" id="togglePw" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-200">Show</button>
+        </div>
+      </label>
+
+      <div class="flex gap-3 mt-1">
+        <button id="btnLogin" class="cb-btn cb-btn-primary w-full" data-loading="0">Login</button>
+        <button id="btnSignup" class="cb-btn cb-btn-secondary w-full" data-loading="0">Create account</button>
+      </div>
+
+      <div class="mt-1 text-right">
+        <a href="#" id="forgotPw" class="text-xs text-blue-300 hover:text-blue-200">Forgot password?</a>
+      </div>
+
+      <p class="text-xs text-gray-500 mt-2">By continuing you accept our basic usage and privacy terms.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Server can inject Firebase config to avoid hardcoding
+  window.__FIREBASE_CONFIG__ = {{ firebase_config_json|default('null')|safe }};
+</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
+    onAuthStateChanged,
+    setPersistence,
+    browserLocalPersistence,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+    sendPasswordResetEmail,
+    fetchSignInMethodsForEmail,
+    linkWithCredential
+  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+  import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js";
+
+
+  // Use injected config if present, else fallback to current defaults
+  const firebaseConfig = (window.__FIREBASE_CONFIG__ && Object.keys(window.__FIREBASE_CONFIG__).length)
+    ? window.__FIREBASE_CONFIG__
+    : {
+        apiKey: "AIzaSyAC0ROfyN42GCi4l5xzW4gNo4lZFr9-0KM",
+        authDomain: "projectcyberbase.firebaseapp.com",
+        projectId: "projectcyberbase",
+        storageBucket: "projectcyberbase.firebasestorage.app",
+        messagingSenderId: "768796628048",
+        appId: "1:768796628048:web:55ae8f0061a30fc7962d55",
+        measurementId: "G-T23SVTL5DK"
+      };
+
+  const SITE_URL = window.location.origin;
+  const IS_DEV = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const googleProvider = new GoogleAuthProvider();
+  googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+  isSupported()
+    .then((ok) => { if (ok) getAnalytics(app); })
+    .catch(() => {});
+
+
+  const statusEl = document.getElementById("status");
+  const emailEl = document.getElementById("email");
+  const passEl = document.getElementById("password");
+  const btnGoogle = document.getElementById('btnGoogle');
+  const verifyCard = document.createElement('div');
+  // Insert a verify UI block after the buttons container
+  (function initVerifyUI(){
+    const grid = document.querySelector('.cb-card .grid');
+    verifyCard.id = 'verifyCard';
+    verifyCard.className = 'hidden mt-4 p-4 rounded border border-slate-700 bg-slate-900';
+    verifyCard.innerHTML = `
+      <div class="mb-2 text-sm text-gray-300">We sent a verification email to <span id="verifyEmailValue" class="font-semibold text-gray-100"></span>. Verify it to continue.</div>
+      <div class="verify-actions">
+        <button id="resendBtn" class="verify-btn cb-btn cb-btn-secondary" data-cd="0">Resend <span id="resendCountdown" class="ml-1 text-xs text-gray-400"></span></button>
+        <button id="verifyContinueBtn" class="verify-btn cb-btn cb-btn-primary">I verified</button>
+      </div>`;
+    grid.parentNode.appendChild(verifyCard);
+  })();
+
+  const PW_POLICY_MSG = "Password must be 12 to 30 characters and include uppercase, lowercase, a number, and a special character.";
+
+  function validatePassword(pw) {
+    if (typeof pw !== 'string') return false;
+    if (pw.length < 12 || pw.length > 30) return false;
+    const hasUpper = /[A-Z]/.test(pw);
+    const hasLower = /[a-z]/.test(pw);
+    const hasNum = /[0-9]/.test(pw);
+    const hasSpec = /[^A-Za-z0-9]/.test(pw);
+    return hasUpper && hasLower && hasNum && hasSpec;
+  }
+
+  function mapAuthError(err, context) {
+    const code = (err && err.code) || '';
+    const byCode = {
+      'auth/invalid-email': 'Please enter a valid email address.',
+      'auth/missing-password': 'Please enter your password.',
+      'auth/invalid-credential': 'Incorrect email or password.',
+      'auth/wrong-password': 'Incorrect email or password.',
+      'auth/user-not-found': 'No account found with that email.',
+      'auth/too-many-requests': 'Too many attempts. Please try again later.',
+      'auth/network-request-failed': 'Network error. Check your connection and try again.',
+      'auth/weak-password': PW_POLICY_MSG,
+      'auth/password-does-not-meet-requirements': PW_POLICY_MSG,
+      'auth/email-already-in-use': 'An account with this email already exists.',
+      'auth/unauthorized-domain': 'Sign-in is not enabled for this domain.',
+      'auth/operation-not-allowed': 'This sign-in method is not enabled.',
+      'auth/invalid-api-key': 'Configuration error. Please contact support.'
+    };
+
+    // Force-upgrade message on sign-in only
+    if (context === 'login' && (code === 'auth/password-does-not-meet-requirements' || code === 'auth/weak-password')) {
+      return 'Your password no longer meets the security requirements. Please reset your password to continue.';
+    }
+    return byCode[code] || 'Something went wrong. Please try again.';
+  }
+
+  function setStatus(type, msg) {
+    statusEl.classList.remove('hidden', 'cb-alert-success', 'cb-alert-error');
+    statusEl.classList.add('cb-alert', type === 'error' ? 'cb-alert-error' : 'cb-alert-success');
+    statusEl.innerHTML = '';
+    const p = document.createElement('div');
+    p.textContent = msg;
+    statusEl.appendChild(p);
+  }
+
+  function showDevErrorDetails(err, flow) {
+    try {
+      if (!IS_DEV) return;
+      const small = document.createElement('div');
+      small.className = 'mt-1 text-xs text-gray-400';
+      const code = err?.code || 'unknown';
+      const msg = err?.message || '';
+      const cd = err?.customData ? JSON.stringify(err.customData) : '';
+      small.textContent = `[dev] flow=${flow} code=${code} message=${msg}${cd ? ' customData='+cd : ''}`;
+      statusEl.appendChild(small);
+      // Console logging full object for development
+      console.groupCollapsed('Firebase Auth Error');
+      console.log('flow:', flow);
+      console.error(err);
+      console.log('code:', err?.code);
+      console.log('message:', err?.message);
+      console.log('customData:', err?.customData);
+      console.groupEnd();
+    } catch {}
+  }
+
+  function mapGoogleError(err) {
+    const code = (err && err.code) || '';
+    const byCode = {
+      'auth/unauthorized-domain': 'Sign-in is not enabled for this domain.',
+      'auth/operation-not-allowed': 'Google sign-in is not enabled for this project.',
+      'auth/popup-blocked': 'Your browser blocked the sign-in popup. We’ll use a redirect instead.',
+      'auth/popup-closed-by-user': 'The sign-in window was closed. Please try again.',
+      'auth/cancelled-popup-request': 'Another sign-in attempt was canceled. Please try again.',
+      'auth/network-request-failed': 'Network error. Check your connection and try again.',
+      'auth/invalid-api-key': 'Configuration error. Please contact support.',
+      'auth/invalid-credential': 'Could not use the provided Google credential. Try again.',
+      'auth/account-exists-with-different-credential': 'An account with this email already exists. Sign in with your password to link Google.'
+    };
+    return byCode[code] || 'Google sign-in failed. Please try again.';
+  }
+
+  function setLoading(button, loading) {
+    button.disabled = !!loading;
+    button.dataset.loading = loading ? '1' : '0';
+    if (loading) {
+      button.dataset.label = button.textContent;
+      button.textContent = 'Loading...';
+    } else if (button.dataset.label) {
+      button.textContent = button.dataset.label;
+      delete button.dataset.label;
+    }
+  }
+
+  document.getElementById('togglePw').addEventListener('click', () => {
+    const el = document.getElementById('password');
+    const isPw = el.getAttribute('type') === 'password';
+    el.setAttribute('type', isPw ? 'text' : 'password');
+    document.getElementById('togglePw').textContent = isPw ? 'Hide' : 'Show';
+  });
+
+  // Auth persistence best practice: prefer local persistence for full web apps
+  try { await setPersistence(auth, browserLocalPersistence); } catch {}
+
+  // Gracefully complete redirect flow if we came back from Google
+  try {
+    const redirectResult = await getRedirectResult(auth);
+    if (redirectResult && redirectResult.user) {
+      if (IS_DEV) console.info('[auth] redirect result user obtained');
+      await exchangeForSession(redirectResult.user, 'redirect');
+      window.location.assign(getNextUrl());
+      // stop further handlers
+    }
+  } catch (e) {
+    showDevErrorDetails(e, 'redirect');
+    if (e && e.code === 'auth/account-exists-with-different-credential') {
+      const email = e.customData?.email;
+      setStatus('error', `An account already exists for ${email}. Sign in with your password to link Google.`);
+      window.__PENDING_LINK__ = { email, credential: GoogleAuthProvider.credentialFromError(e) };
+    } else {
+      setStatus('error', mapGoogleError(e));
+    }
+  }
+
+  function getNextUrl() {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      const n = p.get('next');
+      return (n && n.startsWith('/')) ? n : '/dashboard';
+    } catch { return '/dashboard'; }
+  }
+
+  async function exchangeForSession(user, reason = 'unknown') {
+    const idToken = await user.getIdToken(true); // force refresh claims
+    const res = await fetch("/sessionLogin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: 'same-origin',
+      body: JSON.stringify({ idToken })
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (IS_DEV) console.info('[auth] sessionLogin', { reason, status: res.status, ok: data?.ok });
+    if (!res.ok || !data.ok) {
+      const err = new Error(data.error || "Session login failed");
+      err.status = res.status;
+      throw err;
+    }
+  }
+
+  // Helper to decide popup vs redirect: mobile or popup-blocked => redirect
+  function shouldUseRedirect() {
+    return /Mobi|Android/i.test(navigator.userAgent);
+  }
+
+  btnGoogle.addEventListener('click', async (e) => {
+    const btn = e.currentTarget; setLoading(btn, true);
+    try {
+      if (shouldUseRedirect()) {
+        if (IS_DEV) console.info('[auth] using redirect on mobile');
+        await signInWithRedirect(auth, googleProvider);
+        return; // browser navigates away
+      }
+      let usedFlow = 'popup';
+      const result = await signInWithPopup(auth, googleProvider).catch(async (err) => {
+        showDevErrorDetails(err, 'popup');
+        if (err && (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request')) {
+          usedFlow = 'redirect-fallback';
+          if (IS_DEV) console.info('[auth] popup issue, falling back to redirect');
+          await signInWithRedirect(auth, googleProvider);
+          return null;
+        }
+        if (err && err.code === 'auth/popup-closed-by-user') {
+          // Do not auto-redirect; user explicitly closed
+          setStatus('error', mapGoogleError(err));
+          return null;
+        }
+        throw err;
+      });
+      if (!result) return; // redirect path already taken
+
+      // For Google provider, email is verified by provider
+      await exchangeForSession(result.user, 'popup');
+      window.location.assign(getNextUrl());
+    } catch (e) {
+      showDevErrorDetails(e, 'popup');
+      if (e && e.code === 'auth/account-exists-with-different-credential') {
+        const email = e.customData?.email;
+        setStatus('error', `An account already exists for ${email}. Sign in with your password to link Google.`);
+        window.__PENDING_LINK__ = {
+          email,
+          credential: GoogleAuthProvider.credentialFromError(e)
+        };
+      } else {
+        setStatus('error', mapGoogleError(e));
+      }
+    }
+    setLoading(btn, false);
+  });
+
+  document.getElementById("btnLogin").addEventListener("click", async (e) => {
+    const btn = e.currentTarget; setLoading(btn, true);
+    try {
+      const cred = await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
+      // If a Google link is pending for this email, link now then proceed
+      if (window.__PENDING_LINK__ && window.__PENDING_LINK__.email && window.__PENDING_LINK__.credential) {
+        try {
+          if ((cred.user.email || '').toLowerCase() === (window.__PENDING_LINK__.email || '').toLowerCase()) {
+            await linkWithCredential(cred.user, window.__PENDING_LINK__.credential);
+            window.__PENDING_LINK__ = null;
+          }
+        } catch (linkErr) {
+          showDevErrorDetails(linkErr, 'link');
+          setStatus('error', 'Account linking failed. You can reset your password and try again.');
+          setLoading(btn, false);
+          return;
+        }
+      }
+      if (!cred.user.emailVerified) {
+        // Show verify UI and sign out; block session exchange
+        document.getElementById('verifyEmailValue').textContent = cred.user.email || emailEl.value.trim();
+        verifyCard.classList.remove('hidden');
+        await auth.signOut();
+      } else {
+        await exchangeForSession(cred.user, 'password');
+        setStatus('success', 'Logged in. Redirecting...');
+        window.location.assign(getNextUrl());
+      }
+    } catch (e) {
+      showDevErrorDetails(e, 'password');
+      setStatus('error', mapAuthError(e, 'login'));
+    }
+    setLoading(btn, false);
+  });
+
+  document.getElementById("btnSignup").addEventListener("click", async (e) => {
+    const btn = e.currentTarget; setLoading(btn, true);
+    try {
+      // Client-side password policy enforcement before hitting Firebase
+      const pw = passEl.value || '';
+      if (!validatePassword(pw)) {
+        setStatus('error', PW_POLICY_MSG);
+        setLoading(btn, false);
+        return;
+      }
+      const cred = await createUserWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
+      // Send verify email and show verify UI; do NOT exchange session yet
+      await sendEmailVerification(cred.user, { url: `${SITE_URL}/login` });
+      document.getElementById('verifyEmailValue').textContent = cred.user.email || emailEl.value.trim();
+      verifyCard.classList.remove('hidden');
+      setStatus('success', 'We sent a verification email. Please verify to continue.');
+    } catch (e) {
+      setStatus('error', mapAuthError(e, 'signup'));
+    }
+    setLoading(btn, false);
+  });
+
+  // Resend verification with 30s cooldown
+  document.addEventListener('click', async (ev) => {
+    const btn = ev.target.closest('#resendBtn');
+    if (!btn) return;
+    if (btn.dataset.cd === '1') return; // in cooldown
+    try {
+      const email = emailEl.value.trim();
+      const pw = passEl.value || '';
+      let u = auth.currentUser;
+      if (!u && email && pw) {
+        try { u = (await signInWithEmailAndPassword(auth, email, pw)).user; } catch {}
+      }
+      if (!u) { setStatus('error', 'Please enter your email and password to resend the verification.'); return; }
+      await sendEmailVerification(u, { url: `${SITE_URL}/login` });
+      setStatus('success', 'Verification email resent.');
+      // Start cooldown
+      btn.dataset.cd = '1';
+      const cd = document.getElementById('resendCountdown');
+      let t = 30; cd.textContent = `(${t}s)`;
+      const iv = setInterval(() => { t -= 1; cd.textContent = t>0 ? `(${t}s)` : ''; if (t<=0) { clearInterval(iv); btn.dataset.cd='0'; } }, 1000);
+      try { await auth.signOut(); } catch {}
+    } catch (e) {
+      setStatus('error', mapAuthError(e, 'verify'));
+    }
+  });
+
+  // I verified, continue: try sign-in again and proceed if verified
+  document.addEventListener('click', async (ev) => {
+    const btn = ev.target.closest('#verifyContinueBtn');
+    if (!btn) return;
+    try {
+      const email = emailEl.value.trim();
+      const pw = passEl.value || '';
+      const cred = await signInWithEmailAndPassword(auth, email, pw);
+      await cred.user.reload();
+      if (cred.user.emailVerified) {
+        await exchangeForSession(cred.user, 'verify-continue');
+        window.location.assign(getNextUrl());
+      } else {
+        setStatus('error', 'Still not verified yet. Please check your inbox.');
+        await auth.signOut();
+      }
+    } catch (e) {
+      setStatus('error', mapAuthError(e, 'login'));
+    }
+  });
+
+  // Forgot password
+  document.addEventListener('click', async (ev) => {
+    const a = ev.target.closest('#forgotPw');
+    if (!a) return;
+    ev.preventDefault();
+    const email = emailEl.value.trim();
+    if (!email) { setStatus('error', 'Please enter your email to reset your password.'); return; }
+    try {
+      await sendPasswordResetEmail(auth, email, { url: `${SITE_URL}/login?reset=1` });
+      setStatus('success', 'Password reset email sent. Check your inbox.');
+    } catch (e) {
+      setStatus('error', mapAuthError(e, 'reset'));
+    }
+  });
+
+  // If already authenticated (e.g., coming back or cached), ensure session cookie then redirect
+  try {
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+      try {
+        await exchangeForSession(user, 'authstate');
+        window.location.assign(getNextUrl());
+      } catch (e) {
+        showDevErrorDetails(e, 'authstate');
+      }
+    });
+  } catch {}
+</script>
+{% endblock %}

@@ -1,0 +1,467 @@
+<!-- templates/home.html v10 bygger vidare på v9 -->
+{% extends "base.html" %}
+
+{% block title %}CyberBase{% endblock %}
+
+{% block content %}
+<style>
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translate3d(0,14px,0); }
+    to { opacity: 1; transform: translate3d(0,0,0); }
+  }
+  @keyframes floatSoft {
+    0%, 100% { transform: translate3d(0,0,0); opacity: .55; }
+    50% { transform: translate3d(0,-18px,0); opacity: .85; }
+  }
+  @keyframes floatSoft2 {
+    0%, 100% { transform: translate3d(0,0,0); opacity: .45; }
+    50% { transform: translate3d(0,22px,0); opacity: .75; }
+  }
+
+  /* Home lokala ytnivåer */
+  .home-surface {
+    /* Theme aware surfaces, Dark baseline preserved via palette mapping */
+    --hs-section: rgb(var(--slate-950-rgb) / 0.30);
+    --hs-card: rgb(var(--slate-900-rgb) / 0.22);
+    --hs-raised: rgb(var(--slate-950-rgb) / 0.44);
+
+    --hs-border: rgb(var(--slate-400-rgb) / 0.22);
+    --hs-border-strong: rgb(var(--slate-400-rgb) / 0.30);
+
+    --hs-text: rgb(var(--slate-100-rgb) / 0.94);
+    --hs-muted: rgb(var(--slate-200-rgb) / 0.76);
+    --hs-dim: rgb(var(--slate-200-rgb) / 0.68);
+
+    --hs-shadow-strong: rgb(var(--black-rgb) / 0.35);
+    --hs-shadow: rgb(var(--black-rgb) / 0.28);
+    --hs-shadow-mid: rgb(var(--black-rgb) / 0.26);
+    --hs-shadow-soft: rgb(var(--black-rgb) / 0.22);
+  }
+
+  html[data-theme="light"] .home-surface {
+    /* Lift contrast and depth in Light mode */
+    --hs-section: rgb(var(--slate-950-rgb) / 0.78);
+    --hs-card: rgb(var(--slate-900-rgb) / 0.62);
+    --hs-raised: rgb(var(--slate-950-rgb) / 0.95);
+
+    --hs-border: rgb(var(--slate-500-rgb) / 0.26);
+    --hs-border-strong: rgb(var(--slate-500-rgb) / 0.36);
+
+    --hs-text: rgb(var(--slate-100-rgb) / 0.96);
+    --hs-muted: rgb(var(--slate-500-rgb) / 0.92);
+    --hs-dim: rgb(var(--slate-500-rgb) / 0.84);
+
+    --hs-shadow-strong: rgb(var(--slate-100-rgb) / 0.14);
+    --hs-shadow: rgb(var(--slate-100-rgb) / 0.10);
+    --hs-shadow-mid: rgb(var(--slate-100-rgb) / 0.10);
+    --hs-shadow-soft: rgb(var(--slate-100-rgb) / 0.08);
+  }
+
+  .fade-up { opacity: 0; animation: fadeUp .75s ease forwards; }
+
+  .card-pro {
+    transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, border-color .18s ease;
+    will-change: transform;
+  }
+  .card-pro:hover {
+    transform: translate3d(0,-2px,0);
+    box-shadow: 0 16px 40px var(--hs-shadow-strong);
+  }
+
+  .stat-tile {
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, background-color .16s ease;
+    will-change: transform;
+  }
+  .stat-tile:hover {
+    transform: scale(1.02);
+    box-shadow: 0 14px 32px var(--hs-shadow);
+    border-color: var(--hs-border-strong);
+    background-color: rgb(var(--slate-950-rgb) / 0.20);
+  }
+
+  /* Clamp helpers */
+  .clamp-1 {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Recently used: mask fade på scroll containern, ingen overlay */
+  .recent-wrap {
+    overflow: hidden;
+    border-radius: 1rem;
+  }
+  .recent-scroll {
+    display: flex;
+    gap: .6rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: .25rem .25rem .35rem .25rem;
+    scroll-snap-type: x proximity;
+    mask-mode: alpha;
+    mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
+    mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    -webkit-mask-mode: alpha;
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
+    -webkit-mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+  }
+  .recent-scroll::-webkit-scrollbar { height: 10px; }
+  .recent-scroll::-webkit-scrollbar-thumb {
+    background: rgb(var(--slate-400-rgb) / 0.22);
+    border-radius: 999px;
+  }
+  .recent-scroll::-webkit-scrollbar-track { background: transparent; }
+  .recent-pill {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+    min-width: 180px;
+  }
+
+  /* Learn Reference Practice: ikon badge */
+  .lrp-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: rgb(var(--slate-200-rgb) / 0.08);
+    transition: transform .16s ease, background-color .16s ease, box-shadow .16s ease;
+  }
+
+  html[data-theme="light"] .lrp-icon {
+    background: rgb(var(--slate-100-rgb) / 0.06);
+    border-color: rgb(var(--slate-500-rgb) / 0.24);
+  }
+
+  html[data-theme="light"] .ct-home .bg-slate-900\/18 { background-color: rgb(var(--slate-900-rgb) / 0.68) !important; }
+  html[data-theme="light"] .ct-home .bg-slate-900\/22 { background-color: rgb(var(--slate-900-rgb) / 0.72) !important; }
+  html[data-theme="light"] .ct-home .bg-slate-900\/28 { background-color: rgb(var(--slate-900-rgb) / 0.76) !important; }
+
+  html[data-theme="light"] .ct-home .hover\:bg-slate-800\/35:hover { background-color: rgb(var(--slate-800-rgb) / 0.80) !important; }
+  html[data-theme="light"] .ct-home .hover\:bg-slate-800\/38:hover { background-color: rgb(var(--slate-800-rgb) / 0.82) !important; }
+  html[data-theme="light"] .ct-home .hover\:bg-slate-800\/40:hover { background-color: rgb(var(--slate-800-rgb) / 0.84) !important; }
+
+  .lrp-card:hover .lrp-icon {
+    transform: translate3d(0,-1px,0);
+    background: rgb(var(--slate-200-rgb) / 0.10);
+    box-shadow: 0 10px 26px var(--hs-shadow-soft);
+  }
+  .lrp-emoji { font-size: 22px; line-height: 1; }
+
+  /* Overview tiles */
+  .ov-tile {
+    transition: transform .16s ease, box-shadow .16s ease, background-color .16s ease, border-color .16s ease;
+    will-change: transform;
+  }
+  .ov-tile:hover {
+    transform: translate3d(0,-2px,0);
+    border-color: var(--hs-border-strong);
+    background-color: rgb(var(--slate-900-rgb) / 0.30);
+    box-shadow: 0 16px 38px var(--hs-shadow-mid);
+  }
+  .ov-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: rgb(var(--slate-200-rgb) / 0.08);
+  }
+  .ov-emoji { font-size: 20px; line-height: 1; }
+
+  .ov-desc {
+    font-size: 13.5px;
+    line-height: 1.35;
+    color: var(--hs-muted);
+    white-space: normal;
+    height: auto;
+    overflow: visible;
+    overflow-wrap: break-word;
+    max-width: 56ch;
+  }
+
+  /* Quick pick micro variation */
+  .qp-card:nth-child(1) {
+    border-color: rgba(56, 189, 248, .22);
+    box-shadow: 0 18px 44px var(--hs-shadow-mid), 0 0 0 1px rgba(56, 189, 248, .08) inset;
+  }
+
+
+  /* Light mode specific fixes for Home hero and Recently used */
+  html[data-theme="light"] .cb-hero-title {
+    background-image: linear-gradient(to right, rgb(var(--slate-100-rgb)), rgb(var(--cyan-700-rgb)), rgb(var(--blue-700-rgb)));
+  }
+
+  html[data-theme="light"] .cb-recent-container {
+    background: linear-gradient(180deg, var(--surface), var(--surface2)) !important;
+    border-color: var(--border) !important;
+    box-shadow: 0 14px 34px var(--shadowSoft);
+  }
+  html[data-theme="light"] .cb-recent-pill {
+    background-color: var(--chip-bg) !important;
+  }
+  html[data-theme="light"] .cb-recent-pill:hover {
+    background-color: rgb(var(--slate-700-rgb) / 0.45) !important;
+  }
+</style>
+
+<div class="home-surface relative overflow-hidden rounded-3xl border border-slate-700/60 bg-slate-950/30 shadow-2xl">
+  <div class="absolute inset-0 -z-10">
+    <div class="absolute -top-16 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-cyan-500/20 blur-3xl" style="animation: floatSoft 7s ease-in-out infinite;"></div>
+    <div class="absolute -bottom-20 -left-20 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl" style="animation: floatSoft2 8.5s ease-in-out infinite;"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.10),transparent_55%),radial-gradient(circle_at_bottom,rgba(59,130,246,0.10),transparent_55%)]"></div>
+  </div>
+
+  <div class="px-6 sm:px-10 py-10 sm:py-12 space-y-10">
+
+    <section class="space-y-5">
+
+      <h1 class="cb-hero-title fade-up text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight bg-gradient-to-r from-blue-200 via-cyan-200 to-blue-100 bg-clip-text text-transparent"
+          style="animation-delay:.12s;">
+        Train. Defend. Execute.
+      </h1>
+
+      <p class="fade-up max-w-3xl text-slate-200/90 text-lg leading-relaxed" style="animation-delay:.18s;">
+        Your personal cybersecurity command center.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent p-5 shadow-none">
+          <div class="text-xs uppercase tracking-widest text-slate-400">Commands</div>
+          <div class="mt-2 text-3xl font-bold text-white">{{ commands_count }}</div>
+          <div class="mt-1 text-sm text-slate-200/85">Syntax and examples</div>
+        </div>
+
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent p-5 shadow-none">
+          <div class="text-xs uppercase tracking-widest text-slate-400">Tools</div>
+          <div class="mt-2 text-3xl font-bold text-white">{{ tools_count }}</div>
+          <div class="mt-1 text-sm text-slate-200/85">CLI, GUI, detection</div>
+        </div>
+
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent p-5 shadow-none">
+          <div class="text-xs uppercase tracking-widest text-slate-400">Concepts</div>
+          <div class="mt-2 text-3xl font-bold text-white">{{ concepts_count }}</div>
+          <div class="mt-1 text-sm text-slate-200/85">Models and foundations</div>
+        </div>
+
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent p-5 shadow-none">
+          <div class="text-xs uppercase tracking-widest text-slate-400">Defend topics</div>
+          <div class="mt-2 text-3xl font-bold text-white">{{ defend_count }}</div>
+          <div class="mt-1 text-sm text-slate-200/85">Hardening and detection</div>
+        </div>
+      </div>
+
+      <section
+        x-data="ctRecentHome()"
+        x-init="init()"
+        x-show="items.length > 0"
+        x-cloak
+        class="fade-up rounded-2xl border border-slate-700/60 bg-gradient-to-b from-slate-950/55 to-slate-950/25 p-6 md:p-7 shadow-lg"
+        style="animation-delay:.30s;"
+      >
+        <div class="flex items-center justify-between gap-4">
+          <h2 class="text-lg md:text-xl font-bold text-white">Recently used</h2>
+        </div>
+
+        <div class="mt-4 recent-wrap">
+          <div class="recent-scroll">
+            <template x-for="item in items" :key="item.href">
+              <a
+                :href="item.href"
+                class="recent-pill card-pro block rounded-xl border border-slate-700/55 bg-slate-900/24 px-4 py-3 hover:bg-slate-800/32"
+              >
+                <div class="text-[10px] uppercase tracking-widest text-slate-300/75" x-text="item.kind"></div>
+                <div class="mt-1 text-white font-semibold text-sm clamp-1" :title="item.title" x-text="item.title"></div>
+              </a>
+            </template>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div class="lrp-card fade-up card-pro rounded-2xl border border-slate-700/60 bg-slate-900/22 p-6 shadow-xl hover:bg-slate-800/35" style="animation-delay:.06s;">
+        <div class="lrp-icon">
+          <span class="lrp-emoji">📚</span>
+        </div>
+        <h2 class="mt-4 text-xl font-semibold text-white">Learn</h2>
+        <p class="mt-2 text-slate-200/85 leading-relaxed clamp-2">
+          Build a mental map that makes everything else easier.
+        </p>
+      </div>
+
+      <div class="lrp-card fade-up card-pro rounded-2xl border border-slate-700/60 bg-slate-900/22 p-6 shadow-xl hover:bg-slate-800/35" style="animation-delay:.12s;">
+        <div class="lrp-icon">
+          <span class="lrp-emoji">🧠</span>
+        </div>
+        <h2 class="mt-4 text-xl font-semibold text-white">Reference</h2>
+        <p class="mt-2 text-slate-200/85 leading-relaxed clamp-2">
+          Consistent formats so you can apply knowledge quickly.
+        </p>
+      </div>
+
+      <div class="lrp-card fade-up card-pro rounded-2xl border border-slate-700/60 bg-slate-900/22 p-6 shadow-xl hover:bg-slate-800/35" style="animation-delay:.18s;">
+        <div class="lrp-icon">
+          <span class="lrp-emoji">🎯</span>
+        </div>
+        <h2 class="mt-4 text-xl font-semibold text-white">Practice</h2>
+        <p class="mt-2 text-slate-200/85 leading-relaxed clamp-2">
+          Use repetition and pressure testing to make it stick.
+        </p>
+      </div>
+    </section>
+
+    <section class="fade-up rounded-2xl border border-slate-700/55 bg-slate-950/18 px-6 md:px-8 py-6 md:py-7" style="animation-delay:.22s;">
+      <div class="flex items-center justify-between gap-4">
+        <h2 class="text-2xl font-bold text-white">Overview</h2>
+      </div>
+
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <div class="ov-tile rounded-2xl border border-slate-700/55 bg-slate-900/18 p-5">
+          <div class="flex items-start gap-4">
+            <div class="ov-icon"><span class="ov-emoji">⌨️</span></div>
+            <div class="min-w-0">
+              <div class="text-white font-semibold text-base">Command Library</div>
+              <p class="mt-1 ov-desc">
+                Learn commands with clear syntax, flags, and examples you can apply while working.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ov-tile rounded-2xl border border-slate-700/55 bg-slate-900/18 p-5">
+          <div class="flex items-start gap-4">
+            <div class="ov-icon"><span class="ov-emoji">🧰</span></div>
+            <div class="min-w-0">
+              <div class="text-white font-semibold text-base">Toolbox</div>
+              <p class="mt-1 ov-desc">
+                Practical tool guides that explain what each tool does, how to use it, and when it matters.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ov-tile rounded-2xl border border-slate-700/55 bg-slate-900/18 p-5">
+          <div class="flex items-start gap-4">
+            <div class="ov-icon"><span class="ov-emoji">🧩</span></div>
+            <div class="min-w-0">
+              <div class="text-white font-semibold text-base">Concepts</div>
+              <p class="mt-1 ov-desc">
+                Clear fundamentals across networking, protocols, identity, and core security principles.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ov-tile rounded-2xl border border-slate-700/55 bg-slate-900/18 p-5">
+          <div class="flex items-start gap-4">
+            <div class="ov-icon"><span class="ov-emoji">🛡️</span></div>
+            <div class="min-w-0">
+              <div class="text-white font-semibold text-base">Defend</div>
+              <p class="mt-1 ov-desc">
+                Action driven checklists for logging, detection, and hardening in real environments.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ov-tile rounded-2xl border border-slate-700/55 bg-slate-900/18 p-5">
+          <div class="flex items-start gap-4">
+            <div class="ov-icon"><span class="ov-emoji">🗂️</span></div>
+            <div class="min-w-0">
+              <div class="text-white font-semibold text-base">Resource Hub</div>
+              <p class="mt-1 ov-desc">
+                Curated resources for deeper learning, trusted guidance, and continued study.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ov-tile rounded-2xl border border-slate-700/55 bg-slate-900/18 p-5">
+          <div class="flex items-start gap-4">
+            <div class="ov-icon"><span class="ov-emoji">❓</span></div>
+            <div class="min-w-0">
+              <div class="text-white font-semibold text-base">Quiz</div>
+              <p class="mt-1 ov-desc">
+                Quick topic quizzes to test understanding and improve long term retention.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ov-tile rounded-2xl border border-slate-700/55 bg-slate-900/18 p-5">
+          <div class="flex items-start gap-4">
+            <div class="ov-icon"><span class="ov-emoji">📊</span></div>
+            <div class="min-w-0">
+              <div class="text-white font-semibold text-base">Log Analyzer</div>
+              <p class="mt-1 ov-desc">
+                Paste or upload logs to review events, spot anomalies, and flag suspicious activity.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ov-tile rounded-2xl border border-slate-700/55 bg-slate-900/18 p-5">
+          <div class="flex items-start gap-4">
+            <div class="ov-icon"><span class="ov-emoji">✨</span></div>
+            <div class="min-w-0">
+              <div class="text-white font-semibold text-base">AI Assistant</div>
+              <p class="mt-1 ov-desc">
+                Built in AI support to explain cybersecurity topics and help you learn faster.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="fade-up rounded-2xl border border-slate-700/60 bg-slate-950/26 px-6 md:px-8 py-6 md:py-7 shadow-lg" style="animation-delay:.26s;">
+      <div class="rounded-2xl border border-slate-700/55 bg-slate-950/40 px-6 md:px-8 py-6 md:py-7" style="background-color: var(--hs-raised);">
+        <div class="flex items-center justify-between gap-4">
+          <h2 class="text-2xl font-bold text-white">Quick pick</h2>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          {% for item in quick_picks %}
+            <a href="{{ item.href }}" class="qp-card card-pro block rounded-2xl border border-slate-700/60 bg-slate-900/28 p-5 hover:bg-slate-800/38">
+              <div class="text-xs uppercase tracking-widest text-slate-300/75">{{ item.kind }}</div>
+              <div class="mt-2 text-white font-semibold">{{ item.title }}</div>
+              <p class="mt-2 text-sm text-slate-200/85 leading-relaxed">
+                {{ item.desc }}
+              </p>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+function ctRecentHome() {
+  return {
+    items: [],
+    init() {
+      try {
+        if (window.ctRecentlyUsed && typeof window.ctRecentlyUsed.read === "function") {
+          const arr = window.ctRecentlyUsed.read();
+          this.items = Array.isArray(arr) ? arr.slice(0, 5) : [];
+        }
+      } catch (e) {
+        this.items = [];
+      }
+    }
+  }
+}
+</script>
+{% endblock %}

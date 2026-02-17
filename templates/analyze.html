@@ -1,6 +1,9 @@
+{# analyze.html v6
+   analyze.html v6 builds on v5 #}
+
 {% extends "base.html" %}
 
-{% block title %}Log Analyzer - SecureOps Toolkit{% endblock %}
+{% block title %}Log Analyzer - CyberBase{% endblock %}
 
 {% block content %}
 <div x-data="analyzerApp()" class="space-y-6">
@@ -24,32 +27,32 @@
     <!-- How Analysis Works Section -->
     <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-6 mb-8">
         <h2 class="text-xl font-bold text-gray-200 mb-4">How Analysis Works</h2>
-        <ul class="space-y-2 text-sm text-gray-400">
+                <ul class="space-y-2 text-sm text-gray-400">
             <li class="flex items-start space-x-3">
                 <span class="text-blue-400 font-bold">•</span>
-                <span><strong>Event Parsing:</strong> Extracts timestamp, level, service, and key=value fields, including quoted values like key="value with spaces". Remaining text is kept as message.</span>
+                <span><strong>Parsing and normalization:</strong> Attempts to extract timestamp, host, service, level, IP, and username. For web logs, it also extracts method, path, and status. Every line is always preserved as raw text.</span>
             </li>
             <li class="flex items-start space-x-3">
                 <span class="text-blue-400 font-bold">•</span>
-                <span><strong>Deterministic Normalization:</strong> Maps Swedish and English phrases to event types using a fixed priority (e.g. privilege_change > account_lockout > WAF > auth_fail > ...).</span>
+                <span><strong>Rule based detection:</strong> Runs a deterministic set of rules covering authentication attacks, web probing, privilege escalation, persistence, malware indicators, and scanning patterns.</span>
             </li>
             <li class="flex items-start space-x-3">
                 <span class="text-blue-400 font-bold">•</span>
-                <span><strong>Risk Scoring per Entity:</strong> Scores are accumulated per IP and per user from atomic indicators and correlations.</span>
+                <span><strong>Correlation windows:</strong> Detects bursts over short time windows, such as SSH brute force per IP, password spraying across many users, many 404 responses across many paths, and fail then success sequences.</span>
             </li>
             <li class="flex items-start space-x-3">
                 <span class="text-blue-400 font-bold">•</span>
-                <span><strong>Correlation Windows:</strong> Time-based rules relate events within minutes (e.g. brute-force, spraying, fail→success, WAF+auth, multi-port scans).</span>
+                <span><strong>Evidence in matched lines:</strong> Every finding includes the real log lines that matched the rule, so you can triage quickly with concrete evidence.</span>
             </li>
             <li class="flex items-start space-x-3">
                 <span class="text-blue-400 font-bold">•</span>
-                <span><strong>Allowlists & Tuning:</strong> Localhost, health endpoints, and optional internal ranges can be allowlisted. Thresholds and scores are configurable.</span>
+                <span><strong>Tuning and allowlisting:</strong> Thresholds and allowlists reduce false positives, for example localhost and common health endpoints.</span>
             </li>
             <li class="flex items-start space-x-3">
                 <span class="text-blue-400 font-bold">•</span>
-                <span><strong>Privacy:</strong> Uploaded files are analyzed in memory and never stored on disk.</span>
+                <span><strong>Privacy:</strong> Analysis runs in memory. Logs are not stored and are not forwarded.</span>
             </li>
-        </ul>
+</ul>
     </div>
 
     <!-- Upload Section (Tab: Upload File) -->
@@ -76,8 +79,7 @@
         <label for="logTextArea" class="block text-sm font-medium text-gray-300 mb-2">Paste log text</label>
         <textarea id="logTextArea" x-model="textInput" placeholder="Paste log lines here..." class="w-full h-64 p-4 bg-slate-900 text-gray-100 border border-slate-700 rounded font-mono resize-y placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
         <div class="flex items-center justify-between mt-3">
-            <p class="text-xs text-gray-400">Tip: You can paste mixed English/Swedish logs.</p>
-            <button @click="analyzeText()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded text-sm smooth-hover">Analyze Text</button>
+                        <button @click="analyzeText()" :disabled="loading" :class="loading ? 'opacity-60 cursor-not-allowed' : ''" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded text-sm smooth-hover">Analyze Text</button>
         </div>
     </div>
 
@@ -183,7 +185,7 @@
                                     x-text="finding.severity.toUpperCase()"
                                 ></span>
                                 <div>
-                                    <p class="font-semibold text-white" style="text-shadow: 0 1px 3px rgba(0,0,0,0.55);" x-text="finding.display_name ? finding.display_name : finding.rule_name"></p>
+                                    <p class="font-semibold text-white" style="text-shadow: 0 1px 3px rgb(var(--black-rgb) / 0.55);" x-text="finding.display_name ? finding.display_name : finding.rule_name"></p>
                                     <p class="text-sm text-white" x-text="finding.summary ? finding.summary : finding.description"></p>
                                 </div>
                             </div>
@@ -261,6 +263,13 @@ function analyzerApp() {
         textInput: '',
         severityFilter: null,
 
+        makeRequestId() {
+            if (window.crypto && typeof crypto.randomUUID === 'function') {
+                return crypto.randomUUID();
+            }
+            return String(Date.now()) + '_' + Math.random().toString(16).slice(2);
+        },
+
         get findingsByType() {
             return {
                 critical: this.findings.filter(f => f.severity === 'critical'),
@@ -303,6 +312,7 @@ function analyzerApp() {
         },
 
         async analyzeFile(file) {
+            if (this.loading) return;
             const allowedExtensions = ['log', 'txt'];
             const extension = file.name.split('.').pop().toLowerCase();
             
@@ -320,12 +330,15 @@ function analyzerApp() {
             this.error = '';
             this.uploadSuccess = false;
 
+            const requestId = this.makeRequestId();
+
             const formData = new FormData();
             formData.append('file', file);
 
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
+                    headers: { 'X-LogAnalyzer-Request-ID': requestId },
                     body: formData
                 });
 
@@ -349,6 +362,7 @@ function analyzerApp() {
         },
 
         async analyzeText() {
+            if (this.loading) return;
             const raw = this.textInput || '';
             const trimmed = raw.trim();
             this.error = '';
@@ -365,10 +379,11 @@ function analyzerApp() {
             this.loading = true;
             this.uploadSuccess = false;
             try {
+                const requestId = this.makeRequestId();
                 const response = await fetch('/analyze-text', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ log_text: raw })
+                    headers: { 'Content-Type': 'application/json', 'X-LogAnalyzer-Request-ID': requestId },
+                    body: JSON.stringify({ log_text: raw, request_id: requestId })
                 });
                 const data = await response.json();
                 if (!response.ok) {
@@ -420,17 +435,17 @@ function analyzerApp() {
 
         getSeverityTagStyle(severity) {
             if ((severity || '').toLowerCase() === 'critical') {
-                return 'background-color:#B71C1C;border:1px solid #B71C1C;color:#FFFFFF;';
+                return 'background-color:var(--dangerCritical);border:1px solid var(--dangerCritical);color:rgb(var(--white-rgb));';
             }
             if ((severity || '').toLowerCase() === 'high') {
-                return 'background-color:#D32F2F;color:#FFFFFF;';
+                return 'background-color:var(--dangerHigh);color:rgb(var(--white-rgb));';
             }
             return '';
         },
 
         getSeverityCardStyle(severity) {
             if ((severity || '').toLowerCase() === 'critical') {
-                return 'border-left: 6px solid #B71C1C;';
+                return 'border-left: 6px solid var(--dangerCritical);';
             }
             return '';
         },

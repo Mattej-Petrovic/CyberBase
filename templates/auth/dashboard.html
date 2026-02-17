@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold mb-1">Dashboard</h1>
+      <div class="text-sm text-gray-400">
+        Logged in as {{ user.email or user.uid }}
+      </div>
+    </div>
+
+    <button id="btnLogout" class="cb-btn cb-btn-secondary">Logout</button>
+  </div>
+  <div class="mt-5 space-y-4">
+      <div class="cb-card p-4">
+        <h2 class="text-lg font-semibold mb-3">Your profile</h2>
+        <div class="flex items-center gap-4 mb-3">
+          <img src="/static/avatars/{{ profile.avatar_key }}.png" alt="avatar" class="w-16 h-16 rounded-full object-cover"/>
+          <div class="min-w-0">
+            {% from '_macros.html' import user_name %}
+            <div class="text-base font-semibold truncate" id="currentDisplayName">{{ user_name((profile.display_name or user.email or user.uid), (g.user and g.user.get('admin'))) }}</div>
+            <div class="text-sm text-gray-400 truncate">{{ user.email or '' }}</div>
+            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="streak-stat">
+                <div class="streak-label">Current login streak</div>
+                <div class="streak-value">🔥 {{ profile.streak or 0 }}</div>
+              </div>
+              <div class="streak-stat">
+                <div class="streak-label">Best login streak</div>
+                <div class="streak-value">🔥 {{ profile.best_streak or 0 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label class="block text-sm text-gray-300 mb-1">Display name</label>
+          <div class="flex gap-2">
+            <input id="displayNameInput" type="text" value="{{ profile.display_name or '' }}" class="cb-input w-full"/>
+            <button id="saveDisplayName" class="cb-btn cb-btn-primary">Save</button>
+          </div>
+          <div id="dnStatus" class="mt-2 hidden"></div>
+        </div>
+
+        <div class="mt-5">
+          <label class="block text-sm text-gray-300 mb-2">Choose avatar</label>
+          <div id="avatarGrid" class="grid grid-cols-8 gap-2">
+            {% for i in range(1,9) %}
+              {% set key = 'avatar_%02d' % i %}
+              <img data-key="{{ key }}" src="/static/avatars/{{ key }}.png" alt="{{ key }}" class="h-12 w-12 rounded-full object-cover border {{ 'border-cyan-400 ring-2 ring-cyan-400' if key == profile.avatar_key else 'border-slate-600 hover:border-slate-400' }} cursor-pointer transition" />
+            {% endfor %}
+          </div>
+          <button id="saveAvatar" class="mt-3 cb-btn cb-btn-secondary">Save Avatar</button>
+          <div id="avStatus" class="mt-2 hidden"></div>
+        </div>
+      </div>
+
+      <div class="cb-card p-4 lb-card">
+        <h2 class="text-lg font-semibold mb-2">Leaderboard</h2>
+        <ol class="text-sm text-gray-300">
+          {% for u in leaderboard %}
+            <li class="lb-row cb-row-hover">
+              <span class="w-8 text-center text-gray-200">
+                {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}#{{ loop.index }}{% endif %}
+              </span>
+              <img src="/static/avatars/{{ u.avatar_key }}.png" class="lb-avatar" alt="av"/>
+              {% from '_macros.html' import user_name %}
+              <span class="truncate">{{ user_name(u.display_name, u.is_admin) }}{% if u.uid == user.uid %} <span class="lb-chip">You</span>{% endif %}</span>
+              <span class="ml-auto text-gray-300">Best 🔥 {{ u.best_streak }}</span>
+            </li>
+          {% else %}
+            <li class="text-gray-400">No entries yet.</li>
+          {% endfor %}
+        </ol>
+
+        {% set in_top = False %}
+        {% for u in leaderboard %}
+          {% if u.uid == user.uid %}{% set in_top = True %}{% endif %}
+        {% endfor %}
+
+        {% if not in_top %}
+          <div class="mt-4 border-t border-slate-700 pt-3 text-sm text-gray-300">
+            <div class="lb-row cb-row-hover">
+              <span class="w-8 text-center text-gray-400">#{{ user_rank.rank }}</span>
+              <img src="/static/avatars/{{ user_rank.avatar_key }}.png" class="lb-avatar" alt="av"/>
+              {% from '_macros.html' import user_name %}
+              <span class="truncate">{{ user_name(user_rank.display_name, user_rank.is_admin) }}</span>
+              <span class="ml-auto text-gray-300">Best 🔥 {{ user_rank.best_streak }}</span>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById("btnLogout").addEventListener("click", async () => {
+    await fetch("/logout", { method: "POST" });
+    window.location.href = "/login";
+  });
+
+  // Display name save
+  document.getElementById("saveDisplayName").addEventListener("click", async () => {
+    const v = (document.getElementById("displayNameInput").value || "").trim();
+    const r = await fetch("/profile/display-name", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ display_name: v })});
+    const d = await r.json().catch(() => ({}));
+    const el = document.getElementById("dnStatus");
+    el.classList.remove('hidden','cb-alert-success','cb-alert-error','cb-alert');
+    if (r.ok && d.ok) {
+      el.classList.add('cb-alert','cb-alert-success');
+      el.textContent = "Saved.";
+      document.getElementById("currentDisplayName").textContent = v;
+    } else {
+      el.classList.add('cb-alert','cb-alert-error');
+      el.textContent = d.error || "Failed.";
+    }
+  });
+
+  // Avatar selection and save
+  let selectedAvatar = "{{ profile.avatar_key }}";
+  const grid = document.getElementById("avatarGrid");
+  grid.addEventListener("click", (e) => {
+    const t = e.target;
+    if (t && t.dataset && t.dataset.key) {
+      selectedAvatar = t.dataset.key;
+      [...grid.querySelectorAll('img')].forEach(img => img.classList.remove('border-blue-400'));
+      t.classList.add('border-blue-400');
+    }
+  });
+  document.getElementById("saveAvatar").addEventListener("click", async () => {
+    const r = await fetch("/profile/avatar", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ avatar_key: selectedAvatar })});
+    const d = await r.json().catch(() => ({}));
+    const el = document.getElementById("avStatus");
+    el.classList.remove('hidden','cb-alert-success','cb-alert-error','cb-alert');
+    if (r.ok && d.ok) {
+      el.classList.add('cb-alert','cb-alert-success');
+      el.textContent = "Saved.";
+      const imgs = document.querySelectorAll('img[alt="avatar"]');
+      imgs.forEach(img => img.src = `/static/avatars/${selectedAvatar}.png`);
+    } else {
+      el.classList.add('cb-alert','cb-alert-error');
+      el.textContent = d.error || "Failed.";
+    }
+  });
+</script>
+{% endblock %}

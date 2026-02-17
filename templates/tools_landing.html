@@ -1,0 +1,132 @@
+{# templates/tools_landing.html v5 (builds on v4) #}
+{% extends "base.html" %}
+
+{% block title %}Toolbox · CyberBase{% endblock %}
+
+{% block search_placeholder %}Search CyberBase...{% endblock %}
+
+{% block content %}
+<div x-data='{"tools": {{ tools|tojson }} }' class="space-y-10">
+
+  <!-- Header -->
+  <header class="max-w-4xl mx-auto text-center space-y-4">
+    <h1 class="text-4xl md:text-5xl font-bold tracking-tight">Toolbox</h1>
+
+  </header>
+
+  <!-- Cards -->
+  <div class="min-h-[30vh] md:min-h-[40vh] lg:min-h-[45vh] flex items-center">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full mt-6 md:mt-10">
+
+    <!-- CLI -->
+    <section class="rounded-2xl border border-slate-700/70 bg-slate-900/45 shadow-lg shadow-black/10 hover:shadow-black/20 smooth-hover overflow-hidden h-full flex flex-col text-[15px]">
+      <div class="p-7 flex-1 flex flex-col gap-4">
+        <div class="flex items-start justify-between gap-4">
+          <div class="space-y-1">
+            <h2 class="text-2xl font-semibold">CLI Tools</h2>
+            <p class="text-base text-gray-400">
+              Terminal utilities with clear syntax, flags, and examples.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">⌨️</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <template x-for="t in (tools.cliTools || [])" :key="t.id">
+            <a :href="'/tools/' + t.id"
+               class="px-3 py-2 rounded-xl bg-slate-950/70 border border-slate-700/80 text-[15px] text-gray-200 hover:border-blue-400/80 hover:bg-slate-950 hover:text-white smooth-hover font-mono">
+              <span x-text="t.name"></span>
+            </a>
+          </template>
+        </div>
+
+        <template x-if="!(tools.cliTools || []).length">
+          <div class="text-sm text-gray-500">No CLI tools added yet.</div>
+        </template>
+      </div>
+
+      <div class="px-6 py-4 border-t border-slate-700/60 bg-slate-950/25 text-sm text-slate-400">
+        Quick usage patterns and examples inside each tool page.
+      </div>
+    </section>
+
+    <!-- GUI -->
+    <section class="rounded-2xl border border-slate-700/70 bg-slate-900/45 shadow-lg shadow-black/10 hover:shadow-black/20 smooth-hover overflow-hidden h-full flex flex-col text-[15px]">
+      <div class="p-7 flex-1 flex flex-col gap-4">
+        <div class="flex items-start justify-between gap-4">
+          <div class="space-y-1">
+            <h2 class="text-2xl font-semibold">GUI Tools</h2>
+            <p class="text-base text-gray-400">
+              Visual tools and analyzers with what to look for and how to use them.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🖥️</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <template x-for="g in (tools.guiTools || [])" :key="g.id">
+            <a :href="'/tools/' + g.id"
+               class="px-3 py-2 rounded-xl bg-slate-950/70 border border-slate-700/80 text-[15px] text-gray-200 hover:border-blue-400/80 hover:bg-slate-950 hover:text-white smooth-hover">
+              <span x-text="g.name"></span>
+            </a>
+          </template>
+        </div>
+
+        <template x-if="!(tools.guiTools || []).length">
+          <div class="text-sm text-gray-500">No GUI tools added yet.</div>
+        </template>
+      </div>
+
+      <div class="px-6 py-4 border-t border-slate-700/60 bg-slate-950/25 text-sm text-slate-400">
+        Focus on what to capture, filter, and verify, then document findings.
+      </div>
+    </section>
+
+    <!-- Detection -->
+    <section class="rounded-2xl border border-slate-700/70 bg-slate-900/45 shadow-lg shadow-black/10 hover:shadow-black/20 smooth-hover overflow-hidden h-full flex flex-col text-[15px]">
+      <div class="p-7 flex-1 flex flex-col gap-4">
+        <div class="flex items-start justify-between gap-4">
+          <div class="space-y-1">
+            <h2 class="text-2xl font-semibold">Detection Tools</h2>
+            <p class="text-base text-gray-400">
+              IDS and monitoring tools with quick actions you actually use.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🛰️</span>
+          </div>
+        </div>
+
+        <template x-if="!tools.detectionTool && !(tools.detectionTools || []).length">
+          <div class="text-sm text-gray-500">No detection tools added yet.</div>
+        </template>
+
+        <div class="grid grid-cols-2 gap-2">
+          <template x-if="tools.detectionTool && tools.detectionTool.id">
+            <a :href="'/tools/' + tools.detectionTool.id"
+               class="px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-700/80 text-[15px] text-gray-200 hover:border-blue-400/80 hover:bg-slate-950 hover:text-white smooth-hover">
+              <span class="font-medium" x-text="tools.detectionTool.name"></span>
+            </a>
+          </template>
+
+          <template x-for="d in (tools.detectionTools || [])" :key="d.id">
+            <a :href="'/tools/' + d.id"
+               class="px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-700/80 text-[15px] text-gray-200 hover:border-blue-400/80 hover:bg-slate-950 hover:text-white smooth-hover">
+              <span class="font-medium" x-text="d.name"></span>
+            </a>
+          </template>
+        </div>
+      </div>
+
+      <div class="px-6 py-4 border-t border-slate-700/60 bg-slate-950/25 text-sm text-slate-400">
+        Use alerts as signals, then validate with logs and packet context.
+      </div>
+    </section>
+    </div>
+  </div>
+</div>
+{% endblock %}

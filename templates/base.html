@@ -1,164 +1,1172 @@
+<!-- templates/base.html v29 bygger vidare på v28 -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SecureOps Toolkit{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{% block title %}CyberBase{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
+    <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') {
+          document.documentElement.setAttribute('data-theme', t);
+        } else {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <style>
-        /* Prevent Alpine.js FOUC (content flashing before Alpine initializes). */
         [x-cloak] { display: none !important; }
 
+
+  /* =========================
+     CyberBase Theme Tokens
+     Dark is default baseline
+  ========================== */
+
+  :root {
+    color-scheme: dark;
+
+    /* Palette (RGB triplets) */
+    --slate-950-rgb: 2 6 23;
+    --slate-900-rgb: 15 23 42;
+    --slate-800-rgb: 30 41 59;
+    --slate-750-rgb: 36 51 70;
+    --slate-700-rgb: 51 65 85;
+    --slate-600-rgb: 71 85 105;
+    --slate-500-rgb: 100 116 139;
+    --slate-400-rgb: 148 163 184;
+    --slate-300-rgb: 203 213 225;
+    --slate-200-rgb: 226 232 240;
+    --slate-100-rgb: 241 245 249;
+
+    --gray-100-rgb: 243 244 246;
+    --gray-200-rgb: 229 231 235;
+    --gray-300-rgb: 209 213 219;
+    --gray-400-rgb: 156 163 175;
+    --gray-500-rgb: 107 114 128;
+    --gray-600-rgb: 75 85 99;
+    --gray-700-rgb: 55 65 81;
+
+    --blue-200-rgb: 191 219 254;
+    --blue-300-rgb: 147 197 253;
+    --blue-400-rgb: 96 165 250;
+    --blue-500-rgb: 59 130 246;
+    --blue-600-rgb: 37 99 235;
+    --blue-700-rgb: 29 78 216;
+
+    --cyan-200-rgb: 165 243 252;
+    --cyan-300-rgb: 103 232 249;
+    --cyan-400-rgb: 34 211 238;
+    --cyan-500-rgb: 6 182 212;
+    --cyan-600-rgb: 8 145 178;
+    --cyan-700-rgb: 14 116 144;
+
+    --amber-300-rgb: 252 211 77;
+    --amber-400-rgb: 251 191 36;
+    --amber-500-rgb: 245 158 11;
+    --amber-600-rgb: 217 119 6;
+
+    --green-300-rgb: 134 239 172;
+    --green-500-rgb: 34 197 94;
+    --green-600-rgb: 22 163 74;
+
+    --red-300-rgb: 252 165 165;
+    --red-400-rgb: 248 113 113;
+    --red-500-rgb: 239 68 68;
+    --red-600-rgb: 220 38 38;
+    --red-700-rgb: 185 28 28;
+    --red-900-rgb: 127 29 29;
+
+    --indigo-400-rgb: 129 140 248;
+    --indigo-500-rgb: 99 102 241;
+    --indigo-600-rgb: 79 70 229;
+    --indigo-900-rgb: 49 46 129;
+
+    --emerald-300-rgb: 110 231 183;
+
+    --emerald-500-rgb: 16 185 129;
+
+    --sky-300-rgb: 125 211 252;
+    --sky-400-rgb: 56 189 248;
+
+    --yellow-200-rgb: 254 240 138;
+    --yellow-300-rgb: 253 224 71;
+    --yellow-400-rgb: 250 204 21;
+
+    --critical-glow1-rgb: 255 60 60;
+    --critical-glow2-rgb: 255 90 90;
+
+    --white-rgb: 255 255 255;
+    --black-rgb: 0 0 0;
+
+    /* Custom vibe colors (kept identical in Dark Mode) */
+    --ink-rgb: 11 18 32;
+    --void-rgb: 4 11 23;
+    --frost-rgb: 232 238 245;
+
+    --chip-bg-rgb: 21 32 53;
+    --streak-label-rgb: 147 162 185;
+    --streak-num-rgb: 229 238 247;
+
+    /* Theme tokens (minimum set + a few extras) */
+    --background: rgb(var(--slate-900-rgb));
+    --surface: rgb(var(--slate-950-rgb));
+    --surface2: rgb(var(--slate-800-rgb));
+
+    --border: rgb(var(--slate-700-rgb) / 0.60);
+    --text: rgb(var(--gray-100-rgb));
+    --textMuted: rgb(var(--gray-400-rgb));
+
+    --accent: rgb(var(--cyan-400-rgb));
+    --accentMuted: rgb(var(--cyan-400-rgb) / 0.16);
+
+    --success: rgb(var(--green-500-rgb));
+    --warning: rgb(var(--amber-500-rgb));
+    --danger: rgb(var(--red-500-rgb));
+
+    --shadowSoft: rgb(var(--black-rgb) / 0.35);
+
+    --inputBg: rgb(var(--ink-rgb));
+    --inputBorder: rgb(var(--slate-400-rgb) / 0.22);
+    --focusRing: rgb(var(--blue-400-rgb) / 0.22);
+
+    --tagBg: rgb(var(--cyan-400-rgb) / 0.12);
+    --tagText: rgb(var(--cyan-200-rgb));
+
+    /* Semantic tokens for Light mode polish */
+    --code-surface: var(--black-rgb);
+    --code-text: var(--slate-100-rgb);
+
+    --chip-bg: rgb(var(--slate-800-rgb) / 0.50);
+    --chip-text: rgb(var(--slate-300-rgb) / 0.80);
+
+    --ai-cta-bg: rgb(var(--slate-900-rgb));
+    --ai-cta-text: rgb(var(--cyan-200-rgb));
+    --ai-cta-border: rgb(var(--cyan-700-rgb));
+
+
+    --overlay02: rgb(var(--white-rgb) / 0.02);
+    --overlay03: rgb(var(--white-rgb) / 0.03);
+    --overlay06: rgb(var(--white-rgb) / 0.06);
+    --overlay10: rgb(var(--white-rgb) / 0.10);
+    --overlay12: rgb(var(--white-rgb) / 0.12);
+    --overlay30: rgb(var(--white-rgb) / 0.30);
+
+    --dangerHigh-rgb: 211 47 47;
+    --dangerCritical-rgb: 183 28 28;
+    --dangerHigh: rgb(var(--dangerHigh-rgb));
+    --dangerCritical: rgb(var(--dangerCritical-rgb));
+    --onAccent: rgb(var(--white-rgb));
+  }
+
+  html[data-theme="light"] {
+    color-scheme: light;
+
+    --slate-950-rgb: 244 247 252;
+    --slate-900-rgb: 238 243 250;
+    --slate-800-rgb: 228 234 244;
+    --slate-750-rgb: 214 222 234;
+    --slate-700-rgb: 194 204 220;
+    --slate-600-rgb: 148 163 184;
+    --slate-500-rgb: 100 116 139;
+    --slate-400-rgb: 71 85 105;
+    --slate-300-rgb: 51 65 85;
+    --slate-200-rgb: 30 41 59;
+    --slate-100-rgb: 15 23 42;
+
+    --gray-100-rgb: 15 23 42;
+    --gray-200-rgb: 30 41 59;
+    --gray-300-rgb: 51 65 85;
+    --gray-400-rgb: 71 85 105;
+    --gray-500-rgb: 100 116 139;
+    --gray-600-rgb: 148 163 184;
+    --gray-700-rgb: 203 213 225;
+
+    --ink-rgb: 226 234 246;
+    --void-rgb: 236 242 250;
+    --frost-rgb: 15 23 42;
+
+    --chip-bg-rgb: 232 238 248;
+    --streak-label-rgb: 71 85 105;
+    --streak-num-rgb: 15 23 42;
+
+    --background: rgb(var(--slate-800-rgb));
+    --surface: rgb(var(--slate-950-rgb));
+    --surface2: rgb(var(--slate-900-rgb));
+
+    --border: rgb(var(--slate-500-rgb) / 0.42);
+    --text: rgb(var(--slate-100-rgb));
+    --textMuted: rgb(var(--slate-400-rgb) / 0.92);
+
+    --shadowSoft: rgb(15 23 42 / 0.10);
+
+  /* Tailwind shadow color base for Light mode */
+  --tw-shadow-color: rgb(15 23 42 / 0.14);
+
+    --inputBg: rgb(var(--slate-950-rgb));
+    --inputBorder: rgb(var(--slate-500-rgb) / 0.40);
+    --focusRing: rgb(var(--cyan-500-rgb) / 0.22);
+
+    --tagBg: rgb(var(--cyan-500-rgb) / 0.14);
+    --tagText: rgb(var(--cyan-700-rgb));
+
+    --code-surface: var(--slate-750-rgb);
+    --code-text: var(--slate-100-rgb);
+
+    --chip-bg: rgb(var(--slate-750-rgb));
+    --chip-text: rgb(var(--slate-100-rgb));
+
+    --ai-cta-bg: rgb(var(--cyan-500-rgb) / 0.12);
+    --ai-cta-text: rgb(var(--cyan-700-rgb));
+    --ai-cta-border: rgb(var(--cyan-600-rgb) / 0.35);
+
+
+    --overlay02: rgb(15 23 42 / 0.02);
+    --overlay03: rgb(15 23 42 / 0.03);
+    --overlay06: rgb(15 23 42 / 0.06);
+    --overlay10: rgb(15 23 42 / 0.10);
+    --overlay12: rgb(15 23 42 / 0.12);
+    --overlay30: rgb(15 23 42 / 0.30);
+  }
+
+  body {
+    background: linear-gradient(135deg, var(--background), var(--surface2), var(--background)) !important;
+    color: var(--text);
+  }
+
+  .cb-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cb-theme-toggle .cb-icon { display: none; }
+  html[data-theme="dark"] .cb-theme-toggle .cb-icon-sun { display: block; }
+  html[data-theme="light"] .cb-theme-toggle .cb-icon-moon { display: block; }
+
+  html[data-theme="light"] .text-white,
+  html[data-theme="light"] .hover\:text-white:hover {
+    color: var(--text) !important;
+  }
+
+  html[data-theme="light"] .bg-blue-600.text-white,
+  html[data-theme="light"] .bg-blue-500.text-white,
+  html[data-theme="light"] .bg-blue-700.text-white,
+  html[data-theme="light"] .bg-cyan-600.text-white,
+  html[data-theme="light"] .bg-cyan-500.text-white,
+  html[data-theme="light"] .bg-red-600.text-white,
+  html[data-theme="light"] .bg-red-700.text-white {
+    color: rgb(var(--white-rgb)) !important;
+  }
+
+  /* Light mode readability polish for chips, AI CTA, and code slabs */
+  html[data-theme="light"] .cb-chip {
+    background-color: var(--chip-bg) !important;
+    color: var(--chip-text) !important;
+    border-color: var(--border) !important;
+  }
+
+  html[data-theme="light"] .cb-ai-cta {
+    background-color: var(--ai-cta-bg) !important;
+    border-color: var(--ai-cta-border) !important;
+    color: var(--ai-cta-text) !important;
+    --tw-ring-color: var(--focusRing) !important;
+  }
+  html[data-theme="light"] .cb-ai-cta:hover {
+    background-color: rgb(var(--cyan-500-rgb) / 0.18) !important;
+  }
+  html[data-theme="light"] .cb-ai-cta:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--focusRing);
+  }
+
+  html[data-theme="light"] .cb-code-text {
+    color: rgb(var(--code-text)) !important;
+  }
+  html[data-theme="light"] .cb-code-slab {
+    background-color: rgb(var(--code-surface)) !important;
+    --tw-ring-color: var(--overlay12) !important;
+  }
+  html[data-theme="light"] .cb-code-slab-soft {
+    background-color: rgb(var(--code-surface) / 0.70) !important;
+    --tw-ring-color: var(--overlay10) !important;
+  }
+
+  .bg-white\/\[0\.02\] { background-color: var(--overlay02) !important; }
+  .bg-white\/\[0\.03\] { background-color: var(--overlay03) !important; }
+  .bg-white\/\[0\.06\] { background-color: var(--overlay06) !important; }
+
+  .bg-white\/10 { background-color: var(--overlay10) !important; }
+  .bg-white\/30 { background-color: var(--overlay30) !important; }
+  .border-white\/10 { border-color: var(--overlay10) !important; }
+  .border-white\/12 { border-color: var(--overlay12) !important; }
+
+  .bg-amber-300\/80 { background-color: rgb(var(--amber-300-rgb) / 0.8) !important; }
+  .bg-amber-500 { background-color: rgb(var(--amber-500-rgb)) !important; }
+  .bg-amber-500\/10 { background-color: rgb(var(--amber-500-rgb) / 0.1) !important; }
+  .bg-amber-600 { background-color: rgb(var(--amber-600-rgb)) !important; }
+  .bg-black\/30 { background-color: rgb(var(--black-rgb) / 0.3) !important; }
+  .bg-black\/45 { background-color: rgb(var(--black-rgb) / 0.45) !important; }
+  .bg-black\/50 { background-color: rgb(var(--black-rgb) / 0.5) !important; }
+  .bg-black\/60 { background-color: rgb(var(--black-rgb) / 0.6) !important; }
+  .bg-blue-300\/80 { background-color: rgb(var(--blue-300-rgb) / 0.8) !important; }
+  .bg-blue-500\/10 { background-color: rgb(var(--blue-500-rgb) / 0.1) !important; }
+  .bg-blue-500\/20 { background-color: rgb(var(--blue-500-rgb) / 0.2) !important; }
+  .bg-blue-600 { background-color: rgb(var(--blue-600-rgb)) !important; }
+  .bg-cyan-300\/80 { background-color: rgb(var(--cyan-300-rgb) / 0.8) !important; }
+  .bg-cyan-500\/10 { background-color: rgb(var(--cyan-500-rgb) / 0.1) !important; }
+  .bg-cyan-500\/15 { background-color: rgb(var(--cyan-500-rgb) / 0.15) !important; }
+  .bg-cyan-500\/20 { background-color: rgb(var(--cyan-500-rgb) / 0.2) !important; }
+  .bg-cyan-600 { background-color: rgb(var(--cyan-600-rgb)) !important; }
+  .bg-gray-500 { background-color: rgb(var(--gray-500-rgb)) !important; }
+  .bg-gray-700 { background-color: rgb(var(--gray-700-rgb)) !important; }
+  .bg-gray-800 { background-color: rgb(var(--gray-800-rgb)) !important; }
+  .bg-green-500 { background-color: rgb(var(--green-500-rgb)) !important; }
+  .bg-green-500\/10 { background-color: rgb(var(--green-500-rgb) / 0.1) !important; }
+  .bg-green-600 { background-color: rgb(var(--green-600-rgb)) !important; }
+  .bg-green-700 { background-color: rgb(var(--green-700-rgb)) !important; }
+  .bg-indigo-600 { background-color: rgb(var(--indigo-600-rgb)) !important; }
+  .bg-indigo-900\/20 { background-color: rgb(var(--indigo-900-rgb) / 0.2) !important; }
+  .bg-red-500\/10 { background-color: rgb(var(--red-500-rgb) / 0.1) !important; }
+  .bg-red-600 { background-color: rgb(var(--red-600-rgb)) !important; }
+  .bg-red-700 { background-color: rgb(var(--red-700-rgb)) !important; }
+  .bg-red-900 { background-color: rgb(var(--red-900-rgb)) !important; }
+  .bg-slate-700 { background-color: rgb(var(--slate-700-rgb)) !important; }
+  .bg-slate-700\/30 { background-color: rgb(var(--slate-700-rgb) / 0.3) !important; }
+  .bg-slate-700\/40 { background-color: rgb(var(--slate-700-rgb) / 0.4) !important; }
+  .bg-slate-750 { background-color: rgb(var(--slate-750-rgb)) !important; }
+  .bg-slate-800 { background-color: rgb(var(--slate-800-rgb)) !important; }
+  .bg-slate-800\/40 { background-color: rgb(var(--slate-800-rgb) / 0.4) !important; }
+  .bg-slate-800\/50 { background-color: rgb(var(--slate-800-rgb) / 0.5) !important; }
+  .bg-slate-800\/60 { background-color: rgb(var(--slate-800-rgb) / 0.6) !important; }
+  .bg-slate-800\/70 { background-color: rgb(var(--slate-800-rgb) / 0.7) !important; }
+  .bg-slate-900 { background-color: rgb(var(--slate-900-rgb)) !important; }
+  .bg-slate-900\/18 { background-color: rgb(var(--slate-900-rgb) / 0.18) !important; }
+  .bg-slate-900\/20 { background-color: rgb(var(--slate-900-rgb) / 0.2) !important; }
+  .bg-slate-900\/22 { background-color: rgb(var(--slate-900-rgb) / 0.22) !important; }
+  .bg-slate-900\/24 { background-color: rgb(var(--slate-900-rgb) / 0.24) !important; }
+  .bg-slate-900\/28 { background-color: rgb(var(--slate-900-rgb) / 0.28) !important; }
+  .bg-slate-900\/30 { background-color: rgb(var(--slate-900-rgb) / 0.3) !important; }
+  .bg-slate-900\/40 { background-color: rgb(var(--slate-900-rgb) / 0.4) !important; }
+  .bg-slate-900\/45 { background-color: rgb(var(--slate-900-rgb) / 0.45) !important; }
+  .bg-slate-900\/60 { background-color: rgb(var(--slate-900-rgb) / 0.6) !important; }
+  .bg-slate-900\/70 { background-color: rgb(var(--slate-900-rgb) / 0.7) !important; }
+  .bg-slate-900\/75 { background-color: rgb(var(--slate-900-rgb) / 0.75) !important; }
+  .bg-slate-900\/95 { background-color: rgb(var(--slate-900-rgb) / 0.95) !important; }
+  .bg-slate-950 { background-color: rgb(var(--slate-950-rgb)) !important; }
+  .bg-slate-950\/18 { background-color: rgb(var(--slate-950-rgb) / 0.18) !important; }
+  .bg-slate-950\/25 { background-color: rgb(var(--slate-950-rgb) / 0.25) !important; }
+  .bg-slate-950\/26 { background-color: rgb(var(--slate-950-rgb) / 0.26) !important; }
+  .bg-slate-950\/30 { background-color: rgb(var(--slate-950-rgb) / 0.3) !important; }
+  .bg-slate-950\/40 { background-color: rgb(var(--slate-950-rgb) / 0.4) !important; }
+  .bg-slate-950\/50 { background-color: rgb(var(--slate-950-rgb) / 0.5) !important; }
+  .bg-slate-950\/70 { background-color: rgb(var(--slate-950-rgb) / 0.7) !important; }
+  .bg-slate-950\/95 { background-color: rgb(var(--slate-950-rgb) / 0.95) !important; }
+  .bg-white\/10 { background-color: rgb(var(--white-rgb) / 0.1) !important; }
+  .bg-white\/\[0\.03\] { background-color: rgb(var(--white-rgb) / 0.03) !important; }
+  .border-amber-400\/60 { border-color: rgb(var(--amber-400-rgb) / 0.6) !important; }
+  .border-amber-500\/30 { border-color: rgb(var(--amber-500-rgb) / 0.3) !important; }
+  .border-blue-400 { border-color: rgb(var(--blue-400-rgb)) !important; }
+  .border-blue-500 { border-color: rgb(var(--blue-500-rgb)) !important; }
+  .border-cyan-300 { border-color: rgb(var(--cyan-300-rgb)) !important; }
+  .border-cyan-400 { border-color: rgb(var(--cyan-400-rgb)) !important; }
+  .border-cyan-400\/60 { border-color: rgb(var(--cyan-400-rgb) / 0.6) !important; }
+  .border-cyan-700 { border-color: rgb(var(--cyan-700-rgb)) !important; }
+  .border-gray-500\/30 { border-color: rgb(var(--gray-500-rgb) / 0.3) !important; }
+  .border-gray-700 { border-color: rgb(var(--gray-700-rgb)) !important; }
+  .border-green-500 { border-color: rgb(var(--green-500-rgb)) !important; }
+  .border-green-500\/30 { border-color: rgb(var(--green-500-rgb) / 0.3) !important; }
+  .border-indigo-400 { border-color: rgb(var(--indigo-400-rgb)) !important; }
+  .border-red-500 { border-color: rgb(var(--red-500-rgb)) !important; }
+  .border-red-500\/30 { border-color: rgb(var(--red-500-rgb) / 0.3) !important; }
+  .border-slate-600 { border-color: rgb(var(--slate-600-rgb)) !important; }
+  .border-slate-600\/60 { border-color: rgb(var(--slate-600-rgb) / 0.6) !important; }
+  .border-slate-700 { border-color: rgb(var(--slate-700-rgb)) !important; }
+  .border-slate-700\/50 { border-color: rgb(var(--slate-700-rgb) / 0.5) !important; }
+  .border-slate-700\/55 { border-color: rgb(var(--slate-700-rgb) / 0.55) !important; }
+  .border-slate-700\/60 { border-color: rgb(var(--slate-700-rgb) / 0.6) !important; }
+  .border-slate-700\/70 { border-color: rgb(var(--slate-700-rgb) / 0.7) !important; }
+  .border-slate-700\/80 { border-color: rgb(var(--slate-700-rgb) / 0.8) !important; }
+  .border-slate-800 { border-color: rgb(var(--slate-800-rgb)) !important; }
+  .border-white\/10 { border-color: rgb(var(--white-rgb) / 0.1) !important; }
+  .hover\:bg-blue-500:hover { background-color: rgb(var(--blue-500-rgb)) !important; }
+  .hover\:bg-blue-600:hover { background-color: rgb(var(--blue-600-rgb)) !important; }
+  .hover\:bg-gray-600:hover { background-color: rgb(var(--gray-600-rgb)) !important; }
+  .hover\:bg-gray-700:hover { background-color: rgb(var(--gray-700-rgb)) !important; }
+  .hover\:bg-indigo-500:hover { background-color: rgb(var(--indigo-500-rgb)) !important; }
+  .hover\:bg-red-700\/60:hover { background-color: rgb(var(--red-700-rgb) / 0.6) !important; }
+  .hover\:bg-slate-600:hover { background-color: rgb(var(--slate-600-rgb)) !important; }
+  .hover\:bg-slate-700:hover { background-color: rgb(var(--slate-700-rgb)) !important; }
+  .hover\:bg-slate-800:hover { background-color: rgb(var(--slate-800-rgb)) !important; }
+  .hover\:bg-slate-800\/32:hover { background-color: rgb(var(--slate-800-rgb) / 0.32) !important; }
+  .hover\:bg-slate-800\/35:hover { background-color: rgb(var(--slate-800-rgb) / 0.35) !important; }
+  .hover\:bg-slate-800\/38:hover { background-color: rgb(var(--slate-800-rgb) / 0.38) !important; }
+  .hover\:bg-slate-800\/50:hover { background-color: rgb(var(--slate-800-rgb) / 0.5) !important; }
+  .hover\:bg-slate-800\/60:hover { background-color: rgb(var(--slate-800-rgb) / 0.6) !important; }
+  .hover\:bg-slate-900:hover { background-color: rgb(var(--slate-900-rgb)) !important; }
+  .hover\:bg-slate-900\/60:hover { background-color: rgb(var(--slate-900-rgb) / 0.6) !important; }
+  .hover\:bg-slate-950:hover { background-color: rgb(var(--slate-950-rgb)) !important; }
+  .hover\:bg-white\/\[0\.02\]:hover { background-color: rgb(var(--white-rgb) / 0.02) !important; }
+  .hover\:border-blue-400:hover { border-color: rgb(var(--blue-400-rgb)) !important; }
+  .hover\:border-blue-400\/80:hover { border-color: rgb(var(--blue-400-rgb) / 0.8) !important; }
+  .hover\:border-cyan-400\/50:hover { border-color: rgb(var(--cyan-400-rgb) / 0.5) !important; }
+  .hover\:border-gray-500:hover { border-color: rgb(var(--gray-500-rgb)) !important; }
+  .hover\:border-slate-400:hover { border-color: rgb(var(--slate-400-rgb)) !important; }
+  .hover\:border-slate-500:hover { border-color: rgb(var(--slate-500-rgb)) !important; }
+  .hover\:border-slate-600:hover { border-color: rgb(var(--slate-600-rgb)) !important; }
+  .hover\:text-blue-200:hover { color: rgb(var(--blue-200-rgb)) !important; }
+  .hover\:text-blue-300:hover { color: rgb(var(--blue-300-rgb)) !important; }
+  .hover\:text-cyan-200:hover { color: rgb(var(--cyan-200-rgb)) !important; }
+  .hover\:text-gray-100:hover { color: rgb(var(--gray-100-rgb)) !important; }
+  .hover\:text-gray-200:hover { color: rgb(var(--gray-200-rgb)) !important; }
+  .hover\:text-gray-300:hover { color: rgb(var(--gray-300-rgb)) !important; }
+  .hover\:text-slate-200:hover { color: rgb(var(--slate-200-rgb)) !important; }
+  .hover\:text-white:hover { color: rgb(var(--white-rgb)) !important; }
+  .placeholder\:text-slate-500::placeholder { color: rgb(var(--slate-500-rgb)) !important; }
+  .text-amber-300 { color: rgb(var(--amber-300-rgb)) !important; }
+  .text-blue-300 { color: rgb(var(--blue-300-rgb)) !important; }
+  .text-blue-400 { color: rgb(var(--blue-400-rgb)) !important; }
+  .text-cyan-200 { color: rgb(var(--cyan-200-rgb)) !important; }
+  .text-cyan-300 { color: rgb(var(--cyan-300-rgb)) !important; }
+  .text-cyan-300\/80 { color: rgb(var(--cyan-300-rgb) / 0.8) !important; }
+  .text-cyan-300\/90 { color: rgb(var(--cyan-300-rgb) / 0.9) !important; }
+  .text-emerald-300 { color: rgb(var(--emerald-300-rgb)) !important; }
+  .text-gray-100 { color: rgb(var(--gray-100-rgb)) !important; }
+  .text-gray-200 { color: rgb(var(--gray-200-rgb)) !important; }
+  .text-gray-300 { color: rgb(var(--gray-300-rgb)) !important; }
+  .text-gray-400 { color: rgb(var(--gray-400-rgb)) !important; }
+  .text-gray-500 { color: rgb(var(--gray-500-rgb)) !important; }
+  .text-green-300 { color: rgb(var(--green-300-rgb)) !important; }
+  .text-red-300 { color: rgb(var(--red-300-rgb)) !important; }
+  .text-red-400 { color: rgb(var(--red-400-rgb)) !important; }
+  .text-slate-100 { color: rgb(var(--slate-100-rgb)) !important; }
+  .text-slate-200 { color: rgb(var(--slate-200-rgb)) !important; }
+  .text-slate-200\/85 { color: rgb(var(--slate-200-rgb) / 0.85) !important; }
+  .text-slate-200\/90 { color: rgb(var(--slate-200-rgb) / 0.9) !important; }
+  .text-slate-300 { color: rgb(var(--slate-300-rgb)) !important; }
+  .text-slate-300\/75 { color: rgb(var(--slate-300-rgb) / 0.75) !important; }
+  .text-slate-300\/80 { color: rgb(var(--slate-300-rgb) / 0.8) !important; }
+  .text-slate-300\/90 { color: rgb(var(--slate-300-rgb) / 0.9) !important; }
+  .text-slate-400 { color: rgb(var(--slate-400-rgb)) !important; }
+  .text-slate-400\/90 { color: rgb(var(--slate-400-rgb) / 0.9) !important; }
+  .text-slate-500 { color: rgb(var(--slate-500-rgb)) !important; }
+  .text-white { color: rgb(var(--white-rgb)) !important; }
+
+
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                max-height: 0;
-                overflow: hidden;
-            }
-            to {
-                opacity: 1;
-                max-height: 500px;
-            }
+            from { opacity: 0; max-height: 0; overflow: hidden; }
+            to { opacity: 1; max-height: 500px; }
         }
-        
         @keyframes slideUp {
-            from {
-                opacity: 1;
-                max-height: 500px;
-            }
-            to {
-                opacity: 0;
-                max-height: 0;
-                overflow: hidden;
-            }
+            from { opacity: 1; max-height: 500px; }
+            to { opacity: 0; max-height: 0; overflow: hidden; }
         }
-        
-        .slide-enter {
-            animation: slideDown 0.3s ease-out;
-        }
-        
-        .slide-exit {
-            animation: slideUp 0.3s ease-out;
-        }
-        
-        .smooth-hover {
-            transition: all 0.2s ease;
-        }
-        
-        /* Severity card text shadow for contrast improvement */
-        .severity-card-header {
-            text-shadow: none;
-        }
-        
-        .severity-card-header p {
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-        }
-        
-        .severity-card-header svg {
-            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
-        }
-        
-        .severity-badge {
-            text-shadow: none;
-        }
+        .slide-enter { animation: slideDown 0.3s ease-out; }
+        .slide-exit { animation: slideUp 0.3s ease-out; }
+        .smooth-hover { transition: all 0.2s ease; }
 
-        /* CRITICAL badge stripes pulse (always visible difference) */
-        @keyframes criticalStripesMove {
-            from { background-position: 0 0; }
-            to { background-position: 24px 24px; }
-        }
-
-        .critical-badge-pulse {
-            display: inline-block;
-            position: relative;
-
-            /* Always visible stripes */
-            background-image: repeating-linear-gradient(
-                135deg,
-                rgba(255,255,255,0.22) 0px,
-                rgba(255,255,255,0.22) 6px,
-                rgba(255,255,255,0.08) 6px,
-                rgba(255,255,255,0.08) 12px
-            );
-            background-size: 24px 24px;
-
-            /* Subtle premium look */
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22);
-            padding-right: 1.1rem;
-
-            /* Optional motion */
-            animation: criticalStripesMove 3.0s linear infinite;
-        }
-
-        .critical-badge-pulse::after {
-            content: "";
-            position: absolute;
-            right: 6px;
-            top: 50%;
-            width: 6px;
-            height: 6px;
-            margin-top: -3px;
-            border-radius: 9999px;
-            background: rgba(255,255,255,0.95);
-            opacity: 0.85;
-        }
-
-        /* (old glow styles removed to avoid conflicts) */
-
-        /* CRITICAL: tydlig halo runt hela kortet (subtil, långsam puls) */
         @keyframes criticalHaloPulse {
-            0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 60, 60, 0.20)) drop-shadow(0 0 0px rgba(255, 60, 60, 0.00)); }
-            50%      { filter: drop-shadow(0 0 18px rgba(255, 60, 60, 0.38)) drop-shadow(0 0 6px rgba(255, 60, 60, 0.18)); }
+            0%, 100% { filter: drop-shadow(0 0 8px rgb(var(--critical-glow1-rgb) / 0.20)) drop-shadow(0 0 0px rgb(var(--critical-glow1-rgb) / 0.00)); }
+            50%      { filter: drop-shadow(0 0 18px rgb(var(--critical-glow1-rgb) / 0.38)) drop-shadow(0 0 6px rgb(var(--critical-glow1-rgb) / 0.18)); }
+        }
+        .critical-halo { will-change: filter; animation: criticalHaloPulse 3.6s ease-in-out infinite; }
+        .critical-badge-solid { background-image: none !important; box-shadow: 0 0 0 1px rgb(var(--critical-glow2-rgb) / 0.35), 0 0 10px rgb(var(--critical-glow1-rgb) / 0.22); }
+        .critical-badge-pulse, .critical-badge-glow, .critical-attention { background-image: none !important; }
+
+        /* Navbar grid zones (v18) */
+        .ct-navbar-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            align-items: center;
+        }
+        .ct-navbar-left {
+            justify-self: start;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+        }
+        .ct-navbar-center {
+            justify-self: center;
+            min-width: 0;
         }
 
-        .critical-halo {
-            will-change: filter;
-            animation: criticalHaloPulse 3.6s ease-in-out infinite;
+        /* Desktop: true horizontal centering for nav links (md and up) */
+        @media (min-width: 768px) {
+            .ct-navbar-grid { position: relative; }
+            .ct-navbar-center {
+                position: absolute;
+                left: 40%;
+                top: 0;
+                bottom: 0;
+                transform: translateX(-50%);
+            }
         }
 
-        /* CRITICAL badge ska vara solid, aldrig randig */
-        .critical-badge-solid {
-            background-image: none !important;
-            box-shadow: 0 0 0 1px rgba(255, 90, 90, 0.35), 0 0 10px rgba(255, 60, 60, 0.22);
+        .ct-navbar-right {
+            justify-self: end;
+            min-width: 0;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .ct-search-wrap {
+            width: 100%;
+            max-width: 24rem; /* noticeably longer on desktop */
+            min-width: 0;
+        }
+        .ct-search-wrap input {
+            width: 100%;
+            min-width: 0;
         }
 
-        /* Neutralize older experimental classes so they don't affect the badge */
-        .critical-badge-pulse,
-        .critical-badge-glow,
-        .critical-attention {
-            background-image: none !important;
+        /* Make the search wider on large screens */
+        @media (min-width: 1024px) {
+          .ct-search-wrap { max-width: 28rem; }
         }
+
+
+
+        /* Tool detail page refinements (scoped) */
+        .ct-tool-page .ct-hero-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .ct-tool-page .ct-card-footer {
+            margin-top: auto;
+            padding-top: 0.95rem;
+            border-top: 1px solid var(--overlay10);
+        }
+        .ct-tool-page .ct-card-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            color: rgb(var(--slate-400-rgb) / 0.82);
+        }
+        .ct-tool-page .ct-card-value {
+            margin-top: 0.25rem;
+            font-size: 0.92rem;
+            line-height: 1.55;
+            letter-spacing: 0.01em;
+            color: rgb(var(--slate-200-rgb) / 0.92);
+        }
+        /* Prevent gradient page headings from clipping descenders (g, y, p, etc). */
+        h1.bg-clip-text.text-transparent {
+            line-height: 1.15;
+            padding-bottom: 0.12em;
+            overflow: visible;
+        }
+
+        /* Deep dive readability improvements (apply to Tool + Concept + Defend pages) */
+        .ct-tool-page .ct-deepdive .px-6.pb-6 > *,
+        .ct-concept-page .ct-deepdive .px-6.pb-6 > *,
+        .ct-defend-page .ct-deepdive .px-6.pb-6 > * {
+            max-width: 78ch; /* limit line length to ~70–80ch */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .ct-tool-page .ct-deepdive h2,
+        .ct-concept-page .ct-deepdive h2,
+        .ct-defend-page .ct-deepdive h2 {
+            color: rgb(var(--slate-100-rgb) / 0.96); /* slightly brighter than body */
+        }
+        .ct-tool-page .ct-deepdive h3,
+        .ct-concept-page .ct-deepdive h3,
+        .ct-defend-page .ct-deepdive h3 {
+            color: rgb(var(--slate-100-rgb) / 0.94);
+            letter-spacing: 0.01em;
+            margin-top: 0.15rem;
+            margin-bottom: 0.6rem; /* more space before text */
+        }
+        .ct-tool-page .ct-deepdive p,
+        .ct-concept-page .ct-deepdive p,
+        .ct-defend-page .ct-deepdive p {
+            color: rgb(var(--slate-200-rgb) / 0.92); /* lighter than before, not pure white */
+            line-height: 1.7; /* ~1.65–1.8 */
+            margin-top: 0.9rem; /* more space between paragraphs */
+        }
+        .ct-tool-page .ct-deepdive h3 + p,
+        .ct-concept-page .ct-deepdive h3 + p,
+        .ct-defend-page .ct-deepdive h3 + p {
+            margin-top: 1rem; /* extra spacing from heading to first paragraph */
+        }
+        .ct-tool-page .ct-deepdive ul,
+        .ct-tool-page .ct-deepdive ol,
+        .ct-concept-page .ct-deepdive ul,
+        .ct-concept-page .ct-deepdive ol,
+        .ct-defend-page .ct-deepdive ul,
+        .ct-defend-page .ct-deepdive ol {
+            max-width: 78ch;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Quick panel container: lighten overlay and reduce contrast */
+        .ct-tool-page .ct-quick-panel {
+            background: var(--overlay02) !important; /* lighter wash */
+            border-color: var(--overlay06) !important; /* softer edge */
+            box-shadow: none;
+            backdrop-filter: none;
+        }
+
+        /* Quick panel readability and grouping (scoped to CLI tool view) */
+        .ct-tool-page .ct-quick-panel .ct-qp-section {
+            max-width: 70ch; /* limit text width */
+            margin: 0.75rem auto 0; /* space between sections, centered */
+            padding: 0.85rem 1rem; /* comfortable reading padding */
+            border-radius: 0.75rem;
+            background: linear-gradient(to bottom, rgb(var(--slate-900-rgb) / 0.08), rgb(var(--slate-900-rgb) / 0.04)); /* subtler panel */
+            border: 1px solid var(--overlay02);
+            backdrop-filter: blur(0px);
+            box-shadow: none;
+        }
+        .ct-tool-page .ct-quick-panel .ct-qp-section p,
+        .ct-tool-page .ct-quick-panel .ct-qp-section li {
+            color: rgb(var(--frost-rgb) / 0.92); /* lighter, not pure white */
+        }
+
+        /* Quick panel lists: tighter hanging indent, compact bullets */
+        .ct-tool-page .ct-quick-panel .ct-qp-list {
+            list-style: none; /* custom bullets */
+            padding-left: 0.25rem; /* reduce overall left indent */
+            margin: 0;
+        }
+        .ct-tool-page .ct-quick-panel .ct-qp-list li {
+            position: relative;
+            padding-left: 1.05rem; /* space for custom bullet */
+        }
+        .ct-tool-page .ct-quick-panel .ct-qp-list li::before {
+            content: '';
+            position: absolute;
+            left: 0.25rem; /* align inside reduced indent */
+            top: 0.72em; /* vertically centers with typical line-height */
+            width: 0.35rem;
+            height: 0.35rem;
+            border-radius: 9999px;
+            background-color: rgb(var(--slate-400-rgb) / 0.62); /* subtle bullet */
+        }
+
+        /* Deep dive header: reduce vertical height, keep chevron large without affecting layout height */
+        .ct-tool-page .ct-deepdive summary,
+        .ct-concept-page .ct-deepdive summary,
+        .ct-defend-page .ct-deepdive summary {
+            padding-top: 0.5rem; /* lower vertical padding */
+            padding-bottom: 0.5rem;
+            min-height: 0; /* ensure no enforced min height */
+        }
+        .ct-tool-page .ct-deepdive .ct-dd-chevron,
+        .ct-concept-page .ct-deepdive .ct-dd-chevron,
+        .ct-defend-page .ct-deepdive .ct-dd-chevron {
+            position: relative;
+            height: 0; /* large icon should not add layout height */
+            line-height: 0; /* collapse inline height */
+            display: flex;
+            justify-content: center;
+        }
+        .ct-tool-page .ct-deepdive .ct-dd-chevron .ct-dd-icon,
+        .ct-concept-page .ct-deepdive .ct-dd-chevron .ct-dd-icon,
+        .ct-defend-page .ct-deepdive .ct-dd-chevron .ct-dd-icon {
+            position: relative; /* keep in flow for summary click target */
+            display: inline-block;
+            line-height: 0;
+            transform: translateY(0); /* no vertical nudge */
+            color: rgb(var(--slate-200-rgb) / 0.94); /* slightly higher contrast */
+        }
+
+        /* Concept page: visual hierarchy for top section cards (solid colors, no transparency) */
+        /* Borders/radius/layout remain from element classes; background only adjusted. */
+        .ct-concept-page .ct-maincard {
+            background-color: rgb(var(--slate-900-rgb)) !important; /* slate-800: subtly lighter primary surface */
+        }
+        .ct-concept-page .ct-sidecard {
+            background-color: rgb(var(--chip-bg-rgb)) !important; /* slate-900: slightly darker supporting surface */
+        }
+
+        /* AI Drawer */
+        #cb-ai-drawer {
+            transform: translateX(100%);
+        }
+        #cb-ai-drawer.cb-ai-open {
+            transform: translateX(0);
+        }
+        #cb-ai-output {
+            min-height: 120px;
+        }
+
+        .cb-ai-fab {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 40;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgb(var(--slate-950-rgb) / 0.96);
+            border: 1px solid rgb(var(--cyan-600-rgb) / 0.65);
+            color: var(--tagText);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            box-shadow: 0 12px 28px rgb(var(--black-rgb) / 0.45);
+        }
+
+  html[data-theme="light"] .cb-ai-fab {
+    box-shadow: 0 12px 28px rgb(15 23 42 / 0.14);
+  }
+        .cb-ai-fab:hover {
+            background: rgb(var(--slate-900-rgb) / 0.96);
+            border-color: rgb(var(--cyan-400-rgb) / 0.75);
+        }
+        .cb-ai-fab:active {
+            transform: translateY(1px);
+        }
+
+        /* --- Auth UI components (lightweight, dark-friendly) --- */
+        .cb-card { background-color: rgb(var(--slate-950-rgb) / 0.96); border: 1px solid var(--border); border-radius: 0.75rem; box-shadow: 0 10px 30px rgb(var(--black-rgb) / 0.35); transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+        .cb-card:hover { border-color: rgb(var(--slate-400-rgb) / 0.22); box-shadow: 0 14px 34px rgb(var(--black-rgb) / 0.45); }
+
+        .cb-input { background-color: var(--inputBg); border: 1px solid var(--inputBorder); color: rgb(var(--slate-200-rgb)); border-radius: 0.5rem; height: 2.75rem; padding: 0 0.9rem; outline: none; transition: border-color .2s ease, box-shadow .2s ease; width: 100%; }
+        .cb-input::placeholder { color: rgb(var(--slate-400-rgb) / 0.6); }
+        .cb-input:hover { border-color: rgb(var(--slate-400-rgb) / 0.36); }
+        .cb-input:focus { border-color: rgb(var(--sky-400-rgb) / 0.65); box-shadow: 0 0 0 3px rgb(var(--sky-400-rgb) / 0.18); }
+        .cb-input.cb-input-error { border-color: rgb(var(--red-400-rgb) / 0.75); box-shadow: 0 0 0 3px rgb(var(--red-400-rgb) / 0.18); }
+
+        .cb-btn { display: inline-flex; align-items: center; justify-content: center; height: 2.5rem; padding: 0 1rem; border-radius: 0.5rem; font-weight: 600; transition: transform .05s ease, box-shadow .2s ease, background-color .2s ease; box-shadow: 0 6px 18px rgb(var(--black-rgb) / 0.25); }
+        .cb-btn:active { transform: translateY(1px); }
+        .cb-btn-primary { background: linear-gradient(to right, rgb(var(--blue-600-rgb)), rgb(var(--cyan-500-rgb))); color: white; }
+        .cb-btn-primary:hover { filter: brightness(1.06); }
+        .cb-btn-primary[disabled] { opacity: .65; cursor: not-allowed; }
+        .cb-btn-secondary { background: var(--inputBg); border: 1px solid rgb(var(--slate-400-rgb) / 0.25); color: rgb(var(--slate-200-rgb)); }
+        .cb-btn-secondary:hover { border-color: rgb(var(--slate-400-rgb) / 0.4); }
+
+        .cb-alert { border-radius: 0.5rem; padding: 0.75rem 0.9rem; border: 1px solid; font-size: .9rem; }
+        .cb-alert-success { border-color: rgb(var(--green-500-rgb) / 0.35); background: rgb(var(--emerald-500-rgb) / 0.08); color: rgb(var(--green-300-rgb)); }
+        .cb-alert-error { border-color: rgb(var(--red-400-rgb) / 0.35); background: rgb(var(--red-500-rgb) / 0.08); color: rgb(var(--red-300-rgb)); }
+
+        .cb-chip {}
+        .cb-chip-accent { border-color: rgb(var(--sky-400-rgb) / 0.45); background: rgb(var(--sky-400-rgb) / 0.12); color: rgb(var(--sky-300-rgb)); }
+
+        .cb-streak-badge { display:inline-flex; align-items:center; gap:.4rem; font-weight:700; font-size:.85rem; padding:.35rem .6rem; border-radius:.65rem; border:1px solid rgb(var(--yellow-400-rgb) / 0.35); background: linear-gradient(to right, rgb(var(--yellow-400-rgb) / 0.10), rgb(var(--amber-400-rgb) / 0.08)); color: rgb(var(--yellow-200-rgb)); }
+        .cb-streak-badge .spark { width:.65rem; height:.65rem; border-radius:999px; background: radial-gradient(circle at 35% 35%, rgb(var(--yellow-300-rgb)), rgb(var(--amber-500-rgb))); box-shadow:0 0 10px rgb(var(--amber-500-rgb) / 0.35); }
+
+        .cb-row-hover:hover { background: rgb(var(--slate-800-rgb) / 0.55); }
+        .cb-focus { outline: 2px solid transparent; outline-offset: 2px; }
+        .cb-focus:focus-visible { box-shadow: 0 0 0 3px rgb(var(--sky-400-rgb) / 0.25); }
+
     </style>
+    <style>
+        /* Auth polish helpers */
+        .verify-actions { display: grid; grid-template-columns: 1fr; gap: .5rem; }
+        @media (min-width: 640px) { .verify-actions { grid-template-columns: 1fr 1fr; } }
+        .verify-btn { width: 100%; min-height: 2.75rem; padding: 0 .9rem; font-size: .95rem; }
+
+        .lb-card {}
+        .lb-row { display:flex; align-items:center; gap:.5rem; padding:.5rem .5rem; border-radius:.5rem; }
+        .lb-avatar { width: 1.75rem; height: 1.75rem; border-radius:999px; object-fit:cover; }
+        .lb-chip { display:inline-block; font-size:.7rem; padding:.1rem .45rem; border-radius:999px; border:1px solid rgb(var(--sky-400-rgb) / 0.45); background: rgb(var(--sky-400-rgb) / 0.12); color: rgb(var(--sky-300-rgb)); }
+
+        .streak-stat { border:1px solid rgb(var(--slate-400-rgb) / 0.18); background: rgb(var(--slate-900-rgb) / 0.5); border-radius:.65rem; padding:.6rem .8rem; }
+        .streak-label { font-size:.8rem; color:rgb(var(--streak-label-rgb)); }
+        .streak-value { margin-top:.1rem; font-weight:700; color:rgb(var(--streak-num-rgb)); }
+
+        /* Navbar search sizing */
+        .cb-nav-search { 
+            flex: 1 1 18rem; /* allow shrink/grow with a sensible basis */
+            width: 100%;
+            max-width: 24rem; /* cap width so it doesn’t push layout */
+            min-width: 0; /* allow maximum shrink before wrapping */
+            margin-left: 10px; /* small visual gap from center content */
+            margin-right: clamp(24px, 10vw, 220px); /* push search even further left on wider screens */
+        }
+        .ct-navbar-center { display: flex; align-items: center; gap: 18px; flex: 0 1 auto; position: relative; }
+        @media (min-width: 768px) { .ct-navbar-center { justify-self: center; width: max-content; } }
+        .ct-links-inner { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 18px; }
+        .ct-navbar-right { margin-left: auto; display: flex; align-items: center; justify-content: flex-end; gap: clamp(12px, 2vw, 24px); min-width: 0; }
+.ct-navbar-actions { display: flex; align-items: center; }
+    /* Auth actions must not shrink and always stay visible on the far right */
+    .ct-navbar-actions { flex: 0 0 auto; white-space: nowrap; }
+@media (max-width: 480px) { .cb-nav-search { width: 100%; max-width: 100%; } }
+    </style>
+        <script>
+            window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+        </script>
+        <script defer src="/_vercel/insights/script.js"></script>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-gray-100 min-h-screen">
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-gray-100">
+    <div id="app" class="min-h-screen flex flex-col">
     <nav class="bg-slate-950 border-b border-slate-700 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <a href="/" class="flex items-center space-x-2">
-                    <span class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">SecureOps</span>
-                    <span class="text-sm text-gray-400">Toolkit</span>
+        <div class="w-full px-3 sm:px-4 lg:px-5">
+            <div class="ct-navbar-grid h-16">
+                <div class="ct-navbar-left">
+                    <a href="/" class="flex items-center space-x-2 shrink-0">
+                    <span class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">CyberBase</span>
+                    <span class="text-sm text-gray-400"></span>
                 </a>
-                <div class="flex space-x-4">
-                    <a href="/" class="{% if request.path == '/' %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover">
-                        Command Guide
-                    </a>
-                    <a href="/analyze" class="{% if request.path == '/analyze' %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover">
-                        Log Analyzer
-                    </a>
                 </div>
-            </div>
-        </div>
+
+                <div class="ct-navbar-center hidden md:flex items-center justify-center gap-4 text-[15px] font-medium">
+                    <a href="/" class="{% if request.path == '/' %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">Home</a>
+                    <a href="/command-library" class="{% if request.path.startswith('/command-library') %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">Command Library</a>
+                    <a href="/toolbox" class="{% if request.path.startswith('/toolbox') %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">Toolbox</a>
+                    <a href="/concepts" class="{% if request.path.startswith('/concepts') %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">Concepts</a>
+                    <a href="/defend" class="{% if request.path.startswith('/defend') and request.path == '/defend' %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">Defend</a>
+                    <a href="{{ url_for('resource_hub') }}" class="{% if request.path.startswith(url_for('resource_hub')) %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">Resource Hub</a>
+                    <a href="/quiz" class="{% if request.path.startswith('/quiz') %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">Quiz</a>
+                    <a href="/analyze" class="{% if request.path == '/analyze' %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">Log Analyzer</a>
+                </div>
+
+                <div class="ct-navbar-right">
+                    <div class="cb-nav-search hidden md:block" x-data="globalSearch()" @keydown.window.escape="open=false; query=''">
+                        <div class="relative w-full min-w-0">
+                            <input
+                                type="text"
+                                x-model="query"
+                                @input.debounce.250ms="search()"
+                                @focus="open=true"
+                                placeholder="{% block search_placeholder %}Search...{% endblock %}"
+                                class="w-full min-w-0 h-11 pl-4 pr-10 py-0 text-[14px] leading-normal rounded-lg bg-slate-800 border border-slate-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
+                            />
+                            <svg class="absolute right-3 top-1/2 -translate-y-1/2 transform h-5 w-5 text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+
+                            <div x-show="open && (hasResults || query.length > 0)" x-cloak class="absolute z-50 mt-2 w-full bg-slate-900 border border-slate-700 rounded-lg shadow-xl max-h-96 overflow-auto">
+                                <template x-for="section in sections" :key="section.key">
+                                    <div x-show="results[section.key] && results[section.key].length" class="py-2">
+                                        <div class="px-3 text-xs uppercase text-gray-500"><span x-text="section.label"></span></div>
+                                        <template x-for="item in results[section.key]" :key="item.href + item.title">
+                                            <a
+                                                :href="item.href"
+                                                @click="open=false; remember(item)"
+                                                class="block px-3 py-2 hover:bg-slate-800 smooth-hover"
+                                            >
+                                                <div class="text-sm text-blue-300" x-text="item.title"></div>
+                                                <div class="text-xs text-gray-400" x-text="item.category + ' • ' + (item.snippet || '')"></div>
+                                            </a>
+                                        </template>
+                                    </div>
+                                </template>
+
+                                <div x-show="open && !hasResults && query.length > 0" class="px-3 py-2 text-sm text-gray-400">No results</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ct-navbar-actions">
+
+      <button id="cb-theme-toggle" type="button"
+              class="cb-theme-toggle smooth-hover rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 px-2 py-2"
+              aria-label="Toggle theme">
+        <svg class="cb-icon cb-icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+        </svg>
+        <svg class="cb-icon cb-icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"></path>
+        </svg>
+      </button>
+
+                        {% if not g.user %}
+                            <a href="/login" class="h-10 px-3 rounded bg-blue-600 hover:bg-blue-500 text-white text-sm flex items-center">Login</a>
+                        {% else %}
+                            <a href="/dashboard" class="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-slate-800">
+                                {% if profile is defined and profile.avatar_key is defined and profile.avatar_key %}
+                                    <img src="/static/avatars/{{ profile.avatar_key }}.png" class="w-8 h-8 rounded-full object-cover" alt="avatar"/>
+                                {% else %}
+                                    <span class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-sm text-gray-300">A</span>
+                                {% endif %}
+                                {% from '_macros.html' import user_name %}
+                                {% set _label = (profile.display_name if (profile is defined and profile.display_name is defined and profile.display_name) else (g.user.get('email') if g.user and g.user.get('email') else 'Account')) %}
+                                {{ user_name(_label, (g.user and g.user.get('admin')), 'hidden sm:block max-w-[10rem] truncate text-sm') }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="{% block main_classes %}flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8{% endblock %}">
         {% block content %}{% endblock %}
     </main>
 
     <footer class="bg-slate-950 border-t border-slate-700 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-400 text-sm">
-            <p>SecureOps Toolkit &copy; 2026 | Command guide and security analysis</p>
+            <p>CyberBase &copy; 2026 • Learn • Reference • Practice</p>
         </div>
     </footer>
+
+    <script>
+    function globalSearch() {
+        return {
+            query: '',
+            open: false,
+            results: { commands: [], tools: [], concepts: [], ports: [], defend: [] },
+            sections: [
+                { key: 'commands', label: 'Command Library' },
+                { key: 'tools', label: 'Toolbox' },
+                { key: 'concepts', label: 'Concepts' },
+                { key: 'ports', label: 'Ports' },
+                { key: 'defend', label: 'Defend' }
+            ],
+            get hasResults() {
+                return Object.values(this.results).some(arr => (arr || []).length > 0);
+            },
+            remember(item) {
+                try {
+                    if (!item || !item.href || !window.ctRecentlyUsed) return;
+
+                    const raw = (item.category || '').toString();
+                    const kind = raw.split('•')[0].trim() || 'Item';
+
+                    window.ctRecentlyUsed.add({
+                        href: item.href,
+                        title: (item.title || '').toString().trim() || 'Item',
+                        kind: kind
+                    });
+                } catch (e) {}
+            },
+            async search() {
+                if (!this.query || this.query.trim().length === 0) {
+                    this.results = { commands: [], tools: [], concepts: [], ports: [], defend: [] };
+                    return;
+                }
+                try {
+                    const r = await fetch(`/api/search?q=${encodeURIComponent(this.query)}`);
+                    const data = await r.json();
+                    this.results = data || this.results;
+                } catch(e) {
+                }
+            }
+        }
+    }
+    </script>
+
+    <script>
+    (function () {
+        const KEY = "ct_recently_used_v1";
+        const MAX = 5;
+
+        function canUseStorage() {
+            try {
+                return typeof window !== "undefined" && "localStorage" in window && window.localStorage !== null;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function safeParse(raw) {
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function read() {
+            if (!canUseStorage()) return [];
+            const raw = window.localStorage.getItem(KEY);
+            const parsed = safeParse(raw || "[]");
+            return Array.isArray(parsed) ? parsed : [];
+        }
+
+        function write(items) {
+            if (!canUseStorage()) return;
+            try {
+                window.localStorage.setItem(KEY, JSON.stringify(items));
+            } catch (e) {}
+        }
+
+        function normalize(item) {
+            const href = (item && item.href ? String(item.href) : "").trim();
+            const title = (item && item.title ? String(item.title) : "").trim();
+            const kind = (item && item.kind ? String(item.kind) : "").trim();
+
+            if (!href) return null;
+
+            return {
+                href: href,
+                title: title || "Item",
+                kind: kind || "Item"
+            };
+        }
+
+        function add(item) {
+            const n = normalize(item);
+            if (!n) return;
+
+            const items = read();
+
+            const filtered = items.filter(x => x && x.href && String(x.href) !== n.href);
+            filtered.unshift(n);
+
+            write(filtered.slice(0, MAX));
+        }
+
+        function firstH1Text() {
+            try {
+                const h1 = document.querySelector("h1");
+                if (!h1) return "";
+                return (h1.textContent || "").trim();
+            } catch (e) {
+                return "";
+            }
+        }
+
+        function guessKind(pathname) {
+            if (pathname.startsWith("/tools/")) return "Tool";
+            if (pathname.startsWith("/concepts/")) return "Concept";
+            if (pathname.startsWith("/defend/")) return "Defend";
+            if (pathname === "/command-library" && window.location.hash && window.location.hash.startsWith("#cmd-")) return "Command";
+            return "Item";
+        }
+
+        function isDetailPage(pathname) {
+            if (pathname.startsWith("/tools/") && pathname !== "/tools" && pathname !== "/tools/") return true;
+
+            if (pathname.startsWith("/concepts/")) {
+                const parts = pathname.split("/").filter(Boolean);
+                return parts.length >= 3;
+            }
+
+            if (pathname.startsWith("/defend/")) {
+                const parts = pathname.split("/").filter(Boolean);
+                return parts.length >= 3;
+            }
+
+            if (pathname === "/command-library" && window.location.hash && window.location.hash.startsWith("#cmd-")) {
+                return true;
+            }
+
+            return false;
+        }
+
+        function addFromCurrentPage() {
+            const pathname = window.location.pathname || "/";
+            if (!isDetailPage(pathname)) return;
+
+            const href = (window.location.pathname || "/") + (window.location.hash || "");
+            const kind = guessKind(pathname);
+
+            let title = firstH1Text();
+            if (!title) title = (document.title || "").trim();
+            if (title) title = title.replace(/\s+/g, " ").trim();
+
+            add({ href, title, kind });
+        }
+
+        function trackCommandCardClick(e) {
+            try {
+                if ((window.location.pathname || "/") !== "/command-library") return;
+
+                const card = e.target && e.target.closest ? e.target.closest('[id^="cmd-"]') : null;
+                if (!card || !card.id) return;
+
+                const h3 = card.querySelector("h3");
+                const title = h3 ? (h3.textContent || "").trim() : card.id;
+
+                add({
+                    href: "/command-library#" + card.id,
+                    title: title || "Command",
+                    kind: "Command"
+                });
+            } catch (err) {}
+        }
+
+        window.ctRecentlyUsed = {
+            key: KEY,
+            read: read,
+            add: add
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+            addFromCurrentPage();
+        });
+
+        document.addEventListener("click", function (e) {
+            trackCommandCardClick(e);
+        });
+    })();
+    </script>
+
+    </div>
+
+    <button id="cb-ai-fab" type="button" class="cb-ai-fab" aria-label="Open AI Assistant">AI</button>
+
+    <!-- AI Drawer -->
+    <div id="cb-ai-overlay" class="hidden fixed inset-0 bg-black/60 z-50"></div>
+
+    <aside id="cb-ai-drawer" aria-hidden="true"
+           class="fixed top-0 right-0 z-50 h-full w-[420px] max-w-[92vw] transition-transform duration-200 ease-out shadow-2xl">
+        <div class="h-full flex flex-col bg-slate-950 border-l border-slate-800">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+                <div class="flex flex-col">
+                    <span class="text-slate-200 text-sm font-semibold tracking-wide">AI Assistant</span>
+                    <span id="cb-ai-context" class="text-slate-400 text-xs font-mono">CyberBase</span>
+                </div>
+                <button id="cb-ai-close"
+                        class="text-slate-300 hover:text-white font-mono text-sm px-2 py-1 rounded border border-slate-700 hover:border-slate-500">
+                    Close
+                </button>
+            </div>
+
+            <div class="flex-1 p-4 overflow-y-auto">
+                <pre id="cb-ai-output" class="whitespace-pre-wrap break-words text-slate-200 font-mono text-sm leading-relaxed"></pre>
+            </div>
+
+            <div class="p-3 border-t border-slate-800">
+                <div class="flex gap-2">
+                    <input id="cb-ai-input" type="text" placeholder="Ask a follow-up…"
+                           class="flex-1 bg-slate-900 text-slate-100 placeholder:text-slate-500 border border-slate-700 rounded px-3 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-cyan-700"/>
+                    <button id="cb-ai-send"
+                            class="bg-slate-900 border border-cyan-700 text-cyan-200 hover:bg-slate-800 rounded px-3 py-2 font-mono text-sm">
+                        Send
+                    </button>
+                </div>
+                <div class="mt-2 text-[11px] text-slate-500 font-mono">Enter sends. Esc closes.</div>
+                
+            </div>
+        </div>
+    </aside>
+
+    <!-- Selection Explain Button (Toolbox, Concepts, Defend) -->
+    <div id="cb-ai-selection-wrap" class="hidden fixed z-50">
+        <button id="cb-ai-selection-btn"
+                class="bg-slate-950/95 border border-cyan-700 text-cyan-200 hover:bg-slate-900 rounded px-3 py-2 font-mono text-xs shadow-lg">
+            Explain with AI
+        </button>
+    </div>
+
+    <script src="{{ url_for('static', filename='ai_drawer.js') }}" defer></script>
+
+
+  <script>
+    (function() {
+      var KEY = 'theme';
+
+      function setTheme(t) {
+        document.documentElement.setAttribute('data-theme', t);
+        try { localStorage.setItem(KEY, t); } catch (e) {}
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('cb-theme-toggle');
+        if (!btn) return;
+
+        btn.addEventListener('click', function() {
+          var cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+          setTheme(cur === 'dark' ? 'light' : 'dark');
+        });
+      });
+    })();
+  </script>
+
 </body>
 </html>

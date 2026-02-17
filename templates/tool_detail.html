@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Toolbox · CyberBase{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+
+  <section class="rounded-2xl border border-slate-700/60 bg-slate-900/40 p-6 md:p-8 shadow-xl">
+    <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-200 via-cyan-200 to-blue-200 bg-clip-text text-transparent">
+      Toolbox
+    </h1>
+    <p class="mt-3 text-slate-300 max-w-3xl">
+      Practical tools grouped by category. Click any tool to open its dedicated page.
+    </p>
+  </section>
+
+  <section class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-semibold text-white">CLI Tools</h2>
+        <p class="mt-1 text-sm text-slate-300">Terminal based utilities with clear syntax, flags, and examples.</p>
+      </div>
+      <div class="text-2xl opacity-80">⌨️</div>
+    </div>
+
+    <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {% for t in tools.cliTools %}
+        <a href="{{ url_for('tool_detail', tool_id=t.id) }}"
+           class="rounded-xl border border-slate-700/60 bg-slate-900/40 p-4 hover:bg-slate-800/60 hover:border-slate-600 transition">
+          <div class="text-white font-semibold">{{ t.name }}</div>
+          <div class="mt-1 text-sm text-slate-300">{{ t.description }}</div>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-semibold text-white">GUI Tools</h2>
+        <p class="mt-1 text-sm text-slate-300">Desktop apps for inspection, testing, and visibility.</p>
+      </div>
+      <div class="text-2xl opacity-80">🖥️</div>
+    </div>
+
+    <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {% for g in tools.guiTools %}
+        <a href="{{ url_for('tool_detail', tool_id=g.id) }}"
+           class="rounded-xl border border-slate-700/60 bg-slate-900/40 p-4 hover:bg-slate-800/60 hover:border-slate-600 transition">
+          <div class="text-white font-semibold">{{ g.name }}</div>
+          <div class="mt-1 text-sm text-slate-300">{{ g.description }}</div>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-semibold text-white">Detection Tool</h2>
+        <p class="mt-1 text-sm text-slate-300">A focused detection and telemetry tool with quick setup and actions.</p>
+      </div>
+      <div class="text-2xl opacity-80">🛰️</div>
+    </div>
+
+    {% if tools.detectionTool %}
+      <div class="mt-5">
+        <a href="{{ url_for('tool_detail', tool_id=tools.detectionTool.id) }}"
+           class="block rounded-xl border border-slate-700/60 bg-slate-900/40 p-4 hover:bg-slate-800/60 hover:border-slate-600 transition">
+          <div class="text-white font-semibold">{{ tools.detectionTool.name }}</div>
+          <div class="mt-1 text-sm text-slate-300">{{ tools.detectionTool.desc }}</div>
+        </a>
+      </div>
+    {% else %}
+      <div class="mt-5 text-sm text-slate-400">No detection tool configured yet.</div>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}
