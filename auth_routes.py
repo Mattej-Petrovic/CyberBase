@@ -1,5 +1,3 @@
-import os
-import json
 import re
 from datetime import datetime, timezone
 from functools import wraps
@@ -140,27 +138,10 @@ def login_required(view_func):
 @auth_bp.get("/login")
 @auth_bp.get("/login/")
 def login_page():
-    # Optionally supply Firebase Web config via environment to avoid hardcoding
-    # These should be set in Vercel Project Settings → Environment Variables
-    cfg = {
-        k: os.environ.get(v, "").strip()
-        for k, v in {
-            "apiKey": "FIREBASE_API_KEY",
-            "authDomain": "FIREBASE_AUTH_DOMAIN",
-            "projectId": "FIREBASE_PROJECT_ID",
-            "storageBucket": "FIREBASE_STORAGE_BUCKET",
-            "messagingSenderId": "FIREBASE_MESSAGING_SENDER_ID",
-            "appId": "FIREBASE_APP_ID",
-            "measurementId": "FIREBASE_MEASUREMENT_ID",
-        }.items()
-    }
-    # Only pass non-empty values; client falls back to inline defaults when missing
-    cfg = {k: v for k, v in cfg.items() if v}
     next_path = (request.args.get("next") or "").strip()
     safe_next = next_path if _is_safe_internal_next(next_path) else "/dashboard"
     return render_template(
         "auth/login.html",
-        firebase_config_json=json.dumps(cfg),
         login_next=safe_next,
     )
 

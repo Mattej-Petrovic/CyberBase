@@ -46,6 +46,15 @@ _SUPPORTED_LOCALES = ("en", "sv")
 _LANG_COOKIE_NAME = "cb_lang"
 _LANG_SESSION_KEY = "cb_lang"
 _PORT_DETAILS_SV_CACHE: Optional[dict[int, dict[str, Any]]] = None
+_FIREBASE_WEB_ENV_MAP = {
+    "apiKey": "FIREBASE_API_KEY",
+    "authDomain": "FIREBASE_AUTH_DOMAIN",
+    "projectId": "FIREBASE_PROJECT_ID",
+    "storageBucket": "FIREBASE_STORAGE_BUCKET",
+    "messagingSenderId": "FIREBASE_MESSAGING_SENDER_ID",
+    "appId": "FIREBASE_APP_ID",
+    "measurementId": "FIREBASE_MEASUREMENT_ID",
+}
 
 
 def _normalize_locale_code(raw: str) -> str:
@@ -55,6 +64,15 @@ def _normalize_locale_code(raw: str) -> str:
     if code.startswith("en"):
         return "en"
     return ""
+
+
+def _firebase_web_config() -> dict[str, str]:
+    cfg: dict[str, str] = {}
+    for key, env_name in _FIREBASE_WEB_ENV_MAP.items():
+        value = (os.environ.get(env_name) or "").strip()
+        if value:
+            cfg[key] = value
+    return cfg
 
 
 def _select_locale() -> str:
@@ -113,6 +131,7 @@ def _inject_profile():
     return {
         "profile": getattr(g, "profile", None),
         "current_locale_code": locale_code,
+        "firebase_config_json": json.dumps(_firebase_web_config()),
     }
 
 

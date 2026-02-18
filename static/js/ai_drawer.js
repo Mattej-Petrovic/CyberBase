@@ -278,15 +278,8 @@ Key changes
       ]);
       const conf = (window.__FIREBASE_CONFIG__ && Object.keys(window.__FIREBASE_CONFIG__).length)
         ? window.__FIREBASE_CONFIG__
-        : {
-            apiKey: "AIzaSyAC0ROfyN42GCi4l5xzW4gNo4lZFr9-0KM",
-            authDomain: "projectcyberbase.firebaseapp.com",
-            projectId: "projectcyberbase",
-            storageBucket: "projectcyberbase.firebasestorage.app",
-            messagingSenderId: "768796628048",
-            appId: "1:768796628048:web:55ae8f0061a30fc7962d55",
-            measurementId: "G-T23SVTL5DK"
-          };
+        : null;
+      if (!conf) return null;
       const app = initializeApp(conf);
       const auth = getAuth(app);
       firebaseAuthCache = { auth, onAuthStateChanged };

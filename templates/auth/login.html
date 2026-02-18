@@ -49,8 +49,6 @@
 </div>
 
 <script>
-  // Server can inject Firebase config to avoid hardcoding
-  window.__FIREBASE_CONFIG__ = {{ firebase_config_json|default('null')|safe }};
   window.__LOGIN_NEXT__ = {{ login_next|default('/dashboard')|tojson }};
 </script>
 <script type="module">
@@ -75,18 +73,10 @@
   import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js";
 
 
-  // Use injected config if present, else fallback to current defaults
+  // Use server-injected Firebase config only.
   const firebaseConfig = (window.__FIREBASE_CONFIG__ && Object.keys(window.__FIREBASE_CONFIG__).length)
     ? window.__FIREBASE_CONFIG__
-    : {
-        apiKey: "AIzaSyAC0ROfyN42GCi4l5xzW4gNo4lZFr9-0KM",
-        authDomain: "projectcyberbase.firebaseapp.com",
-        projectId: "projectcyberbase",
-        storageBucket: "projectcyberbase.firebasestorage.app",
-        messagingSenderId: "768796628048",
-        appId: "1:768796628048:web:55ae8f0061a30fc7962d55",
-        measurementId: "G-T23SVTL5DK"
-      };
+    : {};
 
   const SITE_URL = window.location.origin;
   const IS_DEV = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
