@@ -1,6 +1,14 @@
+# requirements.txt v5
+# requirements.txt v5 bygger vidare på v4
+
 Flask==3.0.0
+Flask-Babel==4.0.0
 Werkzeug==3.0.1
+google-genai==1.63.0
 Jinja2==3.1.2
-gunicorn==21.2.0
+gunicorn==23.0.0
+
 pytest==7.4.3
 pytest-cov==4.1.0
+firebase-admin
+pymongo[srv]

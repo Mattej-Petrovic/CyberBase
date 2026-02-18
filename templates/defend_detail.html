@@ -1,0 +1,314 @@
+{# defend_detail.html v6 (bygger vidare på v5) #}
+{% extends "base.html" %}
+
+{% block title %}{{ title }} · {{ _('Defend') }}{% endblock %}
+
+{% macro bullet_list(items, dot_color) -%}
+  <ul class="mt-4 space-y-2">
+    {% for it in items or [] %}
+      {% if it %}
+        <li class="flex gap-2 text-slate-200/90">
+          <span class="mt-1 inline-block h-2 w-2 rounded-full {{ dot_color }}"></span>
+          <span class="leading-relaxed">{{ it }}</span>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{%- endmacro %}
+
+{% macro callout_box(callout) -%}
+  {% if callout %}
+    {% if callout is mapping %}
+      {% set kind = callout.get('type', 'tip') %}
+      {% if kind == 'warn' %}
+        {% set border = 'border-amber-400/60' %}
+        {% set bg = 'bg-amber-500/10' %}
+        {% set label = _('Watch out') %}
+      {% else %}
+        {% set border = 'border-cyan-400/60' %}
+        {% set bg = 'bg-cyan-500/10' %}
+        {% set label = _('Tip') %}
+      {% endif %}
+
+      <div class="mt-5 rounded-xl border {{ border }} {{ bg }} p-4">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <div class="text-xs uppercase tracking-widest text-slate-300">{{ label }}</div>
+            {% if callout.title %}
+              <div class="mt-1 font-semibold text-white">{{ callout.title }}</div>
+            {% endif %}
+            {% if callout.text %}
+              <div class="mt-2 text-sm text-slate-200/90 leading-relaxed">{{ callout.text }}</div>
+            {% endif %}
+          </div>
+          <div class="text-xl opacity-80">{% if kind == 'warn' %}⚠️{% else %}💡{% endif %}</div>
+        </div>
+      </div>
+
+    {% elif callout is string %}
+      <div class="mt-5 rounded-xl border border-cyan-400/60 bg-cyan-500/10 p-4">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <div class="text-xs uppercase tracking-widest text-slate-300">{{ _('Tip') }}</div>
+            <div class="mt-2 text-sm text-slate-200/90 leading-relaxed">{{ callout }}</div>
+          </div>
+          <div class="text-xl opacity-80">💡</div>
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+{%- endmacro %}
+
+{% macro render_table(tbl) -%}
+  {% if tbl and (tbl is mapping) %}
+    {% set headers = tbl.get('headers') %}
+    {% set rows = tbl.get('rows') %}
+    {% if headers and rows %}
+      <div class="mt-5 overflow-x-auto rounded-xl border border-slate-700/60">
+        <table class="min-w-full text-sm">
+          <thead class="bg-slate-900/60">
+            <tr>
+              {% for h in headers %}
+                <th class="px-4 py-3 text-left font-semibold text-slate-200 whitespace-nowrap">{{ h }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800">
+            {% for row in rows %}
+              <tr class="bg-slate-900/20">
+                {% for cell in row %}
+                  <td class="px-4 py-3 text-slate-200/90 align-top leading-relaxed">{{ cell }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  {% endif %}
+{%- endmacro %}
+
+
+{% macro deep_dive_card(item, extra_classes='') %}
+  {% set sections = item.deepDive.sections if item.deepDive and item.deepDive.sections else [] %}
+  {% if sections %}
+  <details class="group rounded-2xl border border-white/10 bg-white/[0.03] ct-deepdive {{ extra_classes }}">
+    <summary class="cursor-pointer list-none p-6 hover:bg-white/[0.02] transition rounded-2xl">
+      <div class="flex flex-col items-center text-center gap-1">
+        <h2 class="text-xl font-semibold text-white uppercase tracking-[0.08em]">{{ _('Deep Dive') | upper }}</h2>
+        <div class="ct-dd-chevron">
+          <span class="ct-dd-icon text-slate-200 text-2xl transition-transform duration-200 group-open:rotate-180">▾</span>
+        </div>
+      </div>
+    </summary>
+
+    <div class="px-6 pb-6">
+      <div class="space-y-10">
+        {% for section in sections %}
+          {% if section.title and section.paragraphs %}
+          <div>
+            <h3 class="text-base font-semibold text-slate-100">{{ section.title }}</h3>
+            <div class="mt-1 h-px w-10 bg-white/10"></div>
+            <div class="mt-4 space-y-4">
+              {% for p in section.paragraphs %}
+              {% if loop.index0 == 0 %}
+              <p class="text-sm text-slate-300/90 leading-7 tracking-[0.01em]">{{ p }}</p>
+              {% else %}
+              <p class="text-sm text-slate-200/90 leading-7 tracking-[0.01em]">{{ p }}</p>
+              {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </details>
+  {% endif %}
+{% endmacro %}
+
+
+{% block content %}
+<div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 space-y-6 ct-defend-page" data-ai-explain-scope="true">
+
+  <div class="flex items-center justify-between">
+    <a href="{{ url_for('defend_hub') }}" class="text-sm text-slate-300 hover:text-white">← {{ _('Back to Defend') }}</a>
+  </div>
+
+  {% if not_found %}
+    <section class="rounded-2xl border border-slate-700/60 bg-slate-900/40 p-6 md:p-8 shadow-xl">
+      <h1 class="text-2xl md:text-3xl font-bold text-white">{{ _('Not found') }}</h1>
+      <p class="mt-2 text-slate-300">{{ _('This topic does not exist.') }}</p>
+    </section>
+  {% else %}
+
+    <section class="rounded-2xl border border-slate-700/60 bg-slate-900/40 p-6 md:p-8 shadow-xl">
+      <p class="text-xs uppercase tracking-widest text-slate-400">{{ category }}</p>
+      <h1 class="mt-2 text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-200 via-cyan-200 to-blue-200 bg-clip-text text-transparent">
+        {{ title }}
+      </h1>
+
+      {% if item.intro %}
+        <p class="mt-4 text-slate-200/90 leading-relaxed">{{ item.intro }}</p>
+      {% endif %}
+    </section>
+
+    {% if item.objectives or item.atAGlance %}
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {% if item.objectives %}
+          <div class="lg:col-span-1 rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
+            <h2 class="text-lg font-semibold text-white">{{ _('Learning objectives') }}</h2>
+            <div class="text-sm text-slate-300 mt-2">{{ _('What you should be able to do after reading.') }}</div>
+            <ul class="mt-4 space-y-2">
+              {% for o in item.objectives or [] %}
+                {% if o %}
+                  <li class="flex gap-2 text-slate-200/90">
+                    <span class="mt-1 inline-block h-2 w-2 rounded-full bg-cyan-300/80"></span>
+                    <span class="leading-relaxed">{{ o }}</span>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        {% if item.atAGlance %}
+          <div class="{% if item.objectives %}lg:col-span-2{% else %}lg:col-span-3{% endif %} rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h2 class="text-lg font-semibold text-white">{{ _('At a glance') }}</h2>
+                <div class="text-sm text-slate-300 mt-2">{{ _('Fast mental model before you dive in.') }}</div>
+              </div>
+              <div class="text-2xl opacity-80">🧠</div>
+            </div>
+
+            <div class="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {% for g in item.atAGlance or [] %}
+                {% if g is mapping %}
+                  {% set g_items = g.get('items') %}
+                  <div class="rounded-xl border border-slate-700/60 bg-slate-900/40 p-4">
+                    <div class="text-white font-semibold">{{ g.get('title', '') }}</div>
+                    <ul class="mt-3 space-y-2 text-sm text-slate-200/90">
+                      {% for gi in g_items or [] %}
+                        {% if gi %}
+                          <li class="flex gap-2">
+                            <span class="mt-1 inline-block h-2 w-2 rounded-full bg-blue-300/80"></span>
+                            <span class="leading-relaxed">{{ gi }}</span>
+                          </li>
+                        {% endif %}
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </section>
+    {% endif %}
+
+    {% if item.sections and (item.sections|length) %}
+      <section class="space-y-6">
+        {% for s in item.sections or [] %}
+          {% if s is mapping %}
+            {% set toggle = s.get('toggle') %}
+            <div class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl" {% if toggle %}x-data="{ mode: '{{ toggle.get('default', 'home') }}' }"{% endif %}>
+              {% if toggle %}
+                <div class="flex items-start justify-between gap-4">
+                  <h2 class="text-xl font-semibold text-white">{{ s.get('title', '') }}</h2>
+                  <div class="flex flex-wrap items-center gap-2">
+                    {% for opt in toggle.get('options', []) %}
+                      {% if opt %}
+                        <button
+                          type="button"
+                          class="px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] border-b-2 transition"
+                          :class="mode === '{{ opt.get('key') }}' ? 'border-cyan-300 text-cyan-200 bg-slate-900/30' : 'border-transparent text-slate-300/80 hover:text-white hover:border-slate-600'"
+                          @click="mode = '{{ opt.get('key') }}'">
+                          {{ opt.get('label', '') }}
+                        </button>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+              {% else %}
+                <h2 class="text-xl font-semibold text-white">{{ s.get('title', '') }}</h2>
+              {% endif %}
+
+              {% set paragraphs = s.get('paragraphs') %}
+              {% if paragraphs and (paragraphs|length) %}
+                <div class="mt-4 space-y-3 text-slate-200/90 leading-relaxed">
+                  {% for para in paragraphs %}
+                    {% if para %}
+                      <p>{{ para }}</p>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              {% set bullets = s.get('bullets') %}
+              {% if bullets and (bullets|length) %}
+                {{ bullet_list(bullets, 'bg-cyan-300/80') }}
+              {% endif %}
+
+              {% if toggle %}
+                {% set views = toggle.get('views', {}) %}
+                {% for opt in toggle.get('options', []) %}
+                  {% if opt %}
+                    {% set key = opt.get('key') %}
+                    {% set view = (views.get(key) if views is mapping else {}) %}
+                    <div x-show="mode === '{{ key }}'" x-cloak>
+                      {{ render_table(view.get('table')) }}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                {{ render_table(s.get('table')) }}
+              {% endif %}
+
+              {{ callout_box(s.get('callout')) }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </section>
+    {% else %}
+
+      {% if item.points and item.points|length %}
+        <section class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
+          <h2 class="text-xl font-semibold text-white">{{ _('Key points') }}</h2>
+          {{ bullet_list(item.points, 'bg-cyan-300/80') }}
+        </section>
+      {% endif %}
+
+      {% set checklist = (item.get('items', []) if item is mapping else []) %}
+      {% if checklist and checklist|length %}
+        <section class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
+          <h2 class="text-xl font-semibold text-white">{{ _('Checklist') }}</h2>
+          {{ bullet_list(checklist, 'bg-blue-300/80') }}
+        </section>
+      {% endif %}
+
+    {% endif %}
+
+    {% if item.signals and item.signals|length %}
+      <section class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-semibold text-white">{{ _('Signals to watch for') }}</h2>
+            <div class="mt-2 text-sm text-slate-300">{{ _('Patterns worth investigating further.') }}</div>
+          </div>
+          <div class="text-2xl opacity-80">📡</div>
+        </div>
+        {{ bullet_list(item.signals, 'bg-amber-300/80') }}
+      </section>
+    {% endif %}
+
+
+    {% if item.deepDive is defined and item.deepDive and item.deepDive.sections %}
+      {{ deep_dive_card(item) }}
+    {% endif %}
+
+
+  {% endif %}
+
+</div>
+{% endblock %}

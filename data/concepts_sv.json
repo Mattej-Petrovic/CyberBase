@@ -1,0 +1,2138 @@
+{
+  "_fileVersion": {
+    "version": 3,
+    "buildsOn": 2,
+    "updated": "2026-02-12",
+    "notes": "Removed Quick self test blocks from Networking and Protocols concepts and expanded Deep Dive sections for each page."
+  },
+  "frameworksAndStandards": [
+    {
+      "id": "dora",
+      "name": "DORA",
+      "summary": "EU-förordning som fastställer enhetliga krav för IKT-riskhantering, incidentrapportering, resiliensprovning och tredjepartsstyrning i finanssektorn.",
+      "intro": "DORA (förordning (EU) 2022/2554) ska göra finansiella aktörer i EU operativt resilienta mot IKT-störningar som driftavbrott, cyberangrepp och leverantörsfel.",
+      "bullets": [
+        "Gäller många finansiella aktörer i EU och inför tillsyn på EU-nivå för kritiska tredjepartsleverantörer av IKT-tjänster.",
+        "Kräver ett ramverk för IKT-riskhantering som omfattar förebyggande, detektion, respons, återhämtning och kommunikation.",
+        "Kräver rapportering av större IKT-relaterade incidenter till behöriga myndigheter och uppmuntrar strukturerat lärande efter incidenter.",
+        "Kräver tester av digital operativ resiliens, inklusive avancerad hotdriven penetrationstestning för vissa verksamheter.",
+        "Skärper tredjepartsriskhantering för IKT genom due diligence, avtalskrav, löpande uppföljning och exitplanering."
+      ],
+      "references": [
+        "EUR Lex: Regulation (EU) 2022/2554 (DORA) https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng",
+        "European Supervisory Authorities (ESAs) DORA resources https://www.esma.europa.eu/esmas-activities/digital-finance-and-innovation/digital-operational-resilience-act-dora",
+        "EIOPA DORA overview https://www.eiopa.europa.eu/digital-operational-resilience-act-dora_en"
+      ],
+      "learn": {
+        "what": "En bindande EU-förordning som standardiserar hur finansiella aktörer hanterar IKT-risk, incidenter, resiliensprovning och beroenden till externa IKT-leverantörer.",
+        "why": "Finansiella tjänster är starkt sammankopplade. Ett enskilt IKT-avbrott eller leverantörsfel kan få följdeffekter mellan flera aktörer. DORA harmoniserar förväntningarna i EU och flyttar fokus från dokumentation till bevisad motståndskraft.",
+        "how": [
+          "Avgränsa kritiska tjänster och IKT-tillgångar, och etablera styrning samt ansvar på ledningsnivå.",
+          "Bygg ett ramverk för IKT-riskhantering med policyer, kontroller, övervakning och dokumenterade resiliensmål för kritiska tjänster.",
+          "Definiera klassificering och rapporteringsflöden för incidenter, inklusive playbooks, kommunikationsplaner och lärdomar.",
+          "Driv ett testprogram för resiliens som matchar riskbilden, från grundläggande kontrolltester till hotdriven penetrationstestning där det krävs.",
+          "Hantera tredjepartsrisk i IKT med strukturerad due diligence, avtalsklausuler, kontinuerlig uppföljning och realistiska exitplaner."
+        ],
+        "security": [
+          "Behandla operativ resiliens som en livscykel: designa för fel, upptäck snabbt, agera beslutsamt, återställ stabilt och förbättra löpande.",
+          "Använd samma kritikalitetsbedömning för leverantörer som för interna system: tjänstekartläggning, koncentrationsrisk och delade beroenden.",
+          "Gör testning evidensdriven: testresultat ska påverka riskbeslut, investeringar och rapportering till styrelse/ledning."
+        ],
+        "pitfalls": [
+          "Att behandla DORA som ren dokumentation utan att höja mognaden i övervakning, testning och återställning.",
+          "Svag tjänstekartläggning som döljer kritiska beroenden och gör exitplaner orealistiska.",
+          "Övertro på moln- eller MSP-avtal utan verifierad observerbarhet, incidentstöd och återställningsförmåga.",
+          "Incidentrapportering som stannar vid administration i stället för att förbättra detektion, begränsning och återhämtningstid.",
+          "Generiska årliga tester som inte speglar verkliga angreppsvägar eller operativa felmoder."
+        ],
+        "example": "Ett betalningsbolag migrerar centrala arbetslaster till en molnleverantör. Under DORA behöver bolaget bedöma koncentrationsrisk, stärka identitet och loggning, avtala incidentstöd, testa återställning med realistiska övningar och ha en faktisk exitväg om leverantören blir en kritisk beroendepunkt."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Resiliens ska bevisas, inte beskrivas",
+            "paragraphs": [
+              "DORA kräver att finansiella aktörer kan visa att kritiska tjänster står emot verkliga IKT-störningar, inte bara att policyer finns. Ett välfungerande DORA-program behandlar driftavbrott, cyberincidenter och leverantörsstörningar som normala lägen som måste kunna hanteras tekniskt och organisatoriskt.",
+              "I praktiken blir kärnfrågan enkel: när något går fel, kan ni upptäcka snabbt, fatta korrekta beslut under press och återställa inom satta mål. Sådan evidens kommer från övervakning, övade runbooks, testade backuper och tydliga eskaleringsvägar, inte från en engångsinsats inför revision.",
+              "Eftersom förordningen gäller hela EU:s finanssektor är förväntan jämförbarhet och konsekvens. Om två aktörer hävdar samma resiliensmål behöver de också kunna visa likvärdig kvalitet i underlaget."
+            ]
+          },
+          {
+            "title": "De fem pelarna i praktiskt arbete",
+            "paragraphs": [
+              "DORA samlar kraven i fem områden: IKT-riskhantering, incidenthantering och rapportering, resiliensprovning, tredjepartsrisk i IKT samt informationsdelning. I praktiken implementeras detta genom styrning på ledningsnivå och en återkommande cykel av kartlägg, skydda, övervaka, testa och förbättra.",
+              "Den tydligaste förändringen är tjänstecentrerat arbete. I stället för att börja med verktyg och plattformar börjar du med kritiska tjänster, deras återhämtningsmål samt de IKT-komponenter och leverantörer som bär tjänsten.",
+              "Mogna program knyter ihop pelarna. Avtalskrav påverkar loggåtkomst, loggkvalitet påverkar incidentdetektion, detektion påverkar rapportering och rapporteringslärdomar påverkar nästa testcykel."
+            ]
+          },
+          {
+            "title": "Incidentrapportering som lärandeloop",
+            "paragraphs": [
+              "Incidentrapportering enligt DORA missförstås ofta som administrativ rapportering. Den egentliga avsikten är robust klassificering, snabb intern beslutsförmåga och tillförlitlig extern kommunikation när incidenter är väsentliga.",
+              "Högpresterande team designar rapportering inifrån och ut. De definierar vilken evidens som behövs under respons, hur den säkras, vem som beslutar allvarlighetsgrad och hur myndigheter samt kunder uppdateras utan gissningar.",
+              "Den snabbaste mognadsökningen kommer efter incidenten. Varje större händelse bör bli en kort förbättringscykel som skärper detektion, respons och återhämtning och sedan matas tillbaka till testscenarier."
+            ]
+          },
+          {
+            "title": "Tredjepartsrisk, koncentration och verklig exitförmåga",
+            "paragraphs": [
+              "DORA är tydlig med att outsourcat ansvar fortfarande är eget ansvar. En molnleverantör, MSP eller SaaS-tjänst kan bli en single point of failure, vilket gör leverantörsstyrning till en teknisk och operativ fråga, inte bara en juridisk.",
+              "Praktiskt fokus ligger på observerbarhet, incidentstöd och återställbarhet. Avtal är bara värdefulla om du faktiskt kan få ut loggar, eskalera snabbt och genomföra en realistisk exit under tidspress.",
+              "Koncentrationsrisk är ofta den tysta utmaningen. Även om varje leverantör ser acceptabel ut var för sig kan delade beroenden skapa systemrisk över tjänster, regioner eller hela portföljer."
+            ]
+          },
+          {
+            "title": "Så börjar du på ett sätt som håller i drift och revision",
+            "paragraphs": [
+              "Börja med att kartlägga ett begränsat antal kritiska tjänster end-to-end, inklusive system, dataflöden, identiteter och leverantörer. Sätt tydliga återhämtningsmål och verifiera att de kan uppnås med nuvarande backuper och runbooks.",
+              "Bygg därefter ett evidenspaket per tjänst: övervakningssignaler, responsplaybooks, återställningstest och tredjepartsvillkor som säkerställer tillgång och stöd. Då blir gapen synliga och efterlevnad kan översättas till konkret ingenjörsarbete.",
+              "Iterera sedan med realistiska övningar. Välj scenarier som speglar verkliga felmoder, mät detektions- och återhämtningstid, åtgärda brister och skala metoden till nästa tjänstegrupp."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "nist",
+      "name": "NIST CSF",
+      "summary": "Ett riskbaserat ramverk för cybersäkerhet som använder gemensamma utfall för att koppla styrning, kontroller och mätning.",
+      "intro": "NIST Cybersecurity Framework (CSF) hjälper organisationer att beskriva nuläge, sätta målläge och prioritera förbättringar. CSF 2.0 strukturerar utfall i sex funktioner: Govern, Identify, Protect, Detect, Respond och Recover.",
+      "bullets": [
+        "Använder sex funktioner för att strukturera cybersäkerhetsutfall: Govern, Identify, Protect, Detect, Respond, Recover.",
+        "Profiler jämför nuläge med målläge och gör strategi till en genomförbar förbättringsplan.",
+        "Tiers hjälper till att kommunicera hur väl riskhantering är integrerad i verksamheten.",
+        "Fungerar tillsammans med andra standarder och kontrolluppsättningar genom att utfall mappas till policyer och tekniska skydd."
+      ],
+      "references": [
+        "NIST CSF 2.0 Core (CSWP 29) https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+        "NIST CSF 2.0 Resource and Overview Guide (SP 1299) https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.1299.pdf"
+      ],
+      "learn": {
+        "what": "Ett flexibelt ramverk av cybersäkerhetsutfall som hjälper dig att hantera risk, kommunicera prioriteringar och bygga en mätbar förbättringsplan.",
+        "why": "De flesta säkerhetsmisslyckanden beror inte på avsaknad av verktyg, utan på otydliga prioriteringar och svag styrning. CSF ger ett gemensamt språk mellan verksamhetsrisk, säkerhetsbeslut och mätbara resultat.",
+        "how": [
+          "Definiera scope och intressenter: vilka tjänster eller miljöer som omfattas.",
+          "Skapa en Current Profile genom att bedöma vilka CSF-utfall ni redan uppnår och var gap finns.",
+          "Definiera en Target Profile som speglar riskaptit, regulatoriska behov och operativa förutsättningar.",
+          "Prioritera gap till en roadmap med ansvariga, tidplan och mätetal, och genomför förbättringarna.",
+          "Mät utveckling över tid och uppdatera profiler när miljö, hot och verksamhet förändras."
+        ],
+        "security": [
+          "Använd funktionen Govern för att förankra ansvar, riskaptit och mandat i beslutsfattandet.",
+          "Översätt CSF-gap till kontrollförändringar genom att mappa utfall mot ISO 27001, CIS Controls eller interna standarder.",
+          "Följ ett litet antal utfallsnära mätetal, till exempel tid till detektion, patch-efterlevnad och lyckad återläsning av backup."
+        ],
+        "pitfalls": [
+          "Att behandla CSF som en checklista i stället för att använda profiler för prioritering och avvägningar.",
+          "Att hoppa över styrningsfrågorna, vilket ger inkonsekventa beslut och en backlogg som aldrig minskar.",
+          "Att försöka bedöma hela organisationen i ett steg, vilket ger ytligt underlag och otydligt ägarskap.",
+          "Att mäta aktivitet i stället för utfall, till exempel antal utbildningar i stället för minskad phishingframgång."
+        ],
+        "example": "Ett SaaS-bolag använder CSF-profiler för att jämföra nuläge med det målläge som krävs av enterprise-kunder. Roadmapen prioriterar identitetshärdning, bättre loggtäckning och återställningstest innan mer avancerad detektion byggs ut."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "CSF som utfallskarta",
+            "paragraphs": [
+              "NIST CSF fungerar bäst när det används som en karta över utfall, inte som en lista över kontroller. Ramverket ger ett gemensamt språk för vad som ska vara sant i säkerhetsarbetet, även när team använder olika tekniker och verktyg.",
+              "I CSF 2.0 organiseras utfallen i sex funktioner: Govern, Identify, Protect, Detect, Respond och Recover. Strukturen hjälper dig att hålla ihop styrning och riskbeslut med det operativa arbetet, i stället för att säkerhet reduceras till teknikdrift.",
+              "Eftersom utfallen är teknikneutrala kan CSF ligga ovanpå flera kontrollramverk. Det blir lagret som knyter samman strategi, prioritering och mätning."
+            ]
+          },
+          {
+            "title": "Profiler: från riskaptit till faktisk roadmap",
+            "paragraphs": [
+              "Profiler är det som gör CSF praktiskt. En Current Profile beskriver evidensbaserat vilka utfall ni redan uppnår. En Target Profile beskriver vilka utfall som krävs utifrån riskaptit, kundkrav och regulatoriska förväntningar.",
+              "Gapet mellan dem blir en roadmap med tydligt ägarskap och milstolpar. Därför överträffar CSF ofta generella mognadsmodeller: du tvingas välja vad som är viktigast nu, i stället för att förbättra allt samtidigt.",
+              "Välfungerande program hanterar profiler som en produktplan: scope uppdateras, prioriteringar justeras efter incidenter eller affärsförändringar, och framsteg används för att förklara riskreduktion på begripligt språk."
+            ]
+          },
+          {
+            "title": "Govern och mätning i verkliga organisationer",
+            "paragraphs": [
+              "Funktionen Govern är den största praktiska förankringen i CSF 2.0. Den tydliggör beslutsrätt, riskaptit, policyansvar och hur cybersäkerhetsrisk kopplas till övergripande verksamhetsrisk.",
+              "Mätning ska följa utfall, inte aktivitet. I stället för att räkna verktyg eller ärenden följer team om utfallet nås konsekvent, till exempel tillförlitlig tillgångsinventering, tid till detektion eller återställning mot satta mål.",
+              "När CSF används rätt skapas en återkopplingsloop: styrning sätter riktning, driften genomför, mätning visar verkligheten och ledningen justerar strategin baserat på evidens."
+            ]
+          },
+          {
+            "title": "Vanliga missförstånd som kostar månader",
+            "paragraphs": [
+              "Det vanligaste misstaget är att poängsätta varje punkt som en checklista utan att fatta prioriterade beslut. Resultatet blir en tjock rapport men en tunn handlingsplan.",
+              "En annan fälla är att försöka täcka hela företaget direkt. Då blir evidensen ytlig och ägarskapet oklart. CSF fungerar bättre när du börjar med en tjänst, en affärsenhet eller ett risktema som ledningen redan prioriterar.",
+              "Många team missar också att mappa utfall till konkreta kontroller och projekt. CSF beskriver vad som behöver vara sant, men ni måste själva besluta hur det ska uppnås i er miljö."
+            ]
+          },
+          {
+            "title": "Så kommer du igång utan att koka havet",
+            "paragraphs": [
+              "Välj ett scope som är tillräckligt litet för att kunna bedömas ärligt, men tillräckligt viktigt för att beslut faktiskt ska tas. En kritisk kundnära tjänst är ofta en bra start eftersom påverkan är tydlig.",
+              "Bygg en Current Profile baserad på evidens, inte antaganden, och definiera en Target Profile som speglar faktisk riskaptit. Omvandla gapen till en kort roadmap med ett fåtal initiativ som snabbt reducerar risk.",
+              "Upprepa cykeln kvartalsvis eller efter större förändringar. Med tiden blir CSF organisationens arbetsspråk för cybersäkerhetsrisk i stället för ett dokument som ligger i en mapp."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cis",
+      "name": "CIS Controls",
+      "summary": "En prioriterad uppsättning av 18 Controls och tillhörande Safeguards som hjälper dig att sekvensera praktiska försvar mot vanliga angrepp.",
+      "intro": "CIS Critical Security Controls är utformade för att vara handlingsbara. Version 8.1 innehåller 18 Controls med totalt 153 Safeguards och använder Implementation Groups (IG1–IG3) för att hjälpa organisationer att prioritera rätt ordning i arbetet.",
+      "bullets": [
+        "18 Controls med 153 Safeguards i version 8.1, utformade som en praktisk defensiv baslinje.",
+        "Implementation Groups IG1 till IG3 hjälper team att sekvensera arbete utifrån risk, resurser och operativ komplexitet.",
+        "Tydligt fokus på tillgångsinventering, säker konfiguration, sårbarhetshantering, identitet, loggning och återhämtning.",
+        "Mappad mot andra ramverk, vilket förenklar översättning mellan strategi och tekniskt genomförande."
+      ],
+      "references": [
+        "CIS Critical Security Controls v8.1 https://www.cisecurity.org/controls/v8-1",
+        "CIS Controls Implementation Groups https://www.cisecurity.org/controls/implementation-groups"
+      ],
+      "learn": {
+        "what": "En styrande och prioriterad uppsättning säkerhetspraktiker som gör breda säkerhetsmål till en ordnad backlogg som faktiskt går att genomföra.",
+        "why": "Säkerhetsteam lägger ofta tid på arbete med låg riskreduktion. CIS Controls hjälper dig börja med åtgärder som mest tillförlitligt minskar vanliga angreppsvägar.",
+        "how": [
+          "Inventera vad ni har: enheter, programvara, identiteter, molnresurser och dataflöden.",
+          "Välj Implementation Group utifrån er miljö och era resurser, oftast med start i IG1.",
+          "Inför Safeguards i prioriterad ordning med fokus på jämn täckning före maximal djupnivå.",
+          "Automatisera mätning där det går, till exempel konfigurations-efterlevnad, patchstatus och loggtäckning.",
+          "Bygg ut från IG1 till IG2 och IG3 när grunderna är stabila och driftsatta över tid."
+        ],
+        "security": [
+          "Använd CIS som tekniskt exekveringslager under ett överordnat ramverk som NIST CSF eller ISO 27001.",
+          "Knyt varje Control till en tydlig ägare och ett mätbart utfall, inte bara en policyrad.",
+          "Behandla loggning och backup som förstklassiga safeguards eftersom de avgör detektion och återställningsförmåga."
+        ],
+        "pitfalls": [
+          "Att försöka införa IG3 först, vilket oftast kollapsar under operativ belastning.",
+          "Att göra inventering en gång och sedan låta den driva iväg, vilket bryter många efterföljande safeguards.",
+          "Att fokusera på verktyg i stället för täckning, till exempel köpa EDR utan att säkerställa full klientanslutning.",
+          "Att införa kontroller utan mätning, så att ni inte kan bevisa att de fungerar över tid."
+        ],
+        "example": "En mindre organisation börjar med IG1: tillgångsinventering, standarder för säker konfiguration, MFA för administrativ åtkomst, patchrutiner, central loggning och testade backuper. När detta är stabilt byggs djupare övervakning och härdning i IG2."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Controls och Safeguards: vad ni faktiskt implementerar",
+            "paragraphs": [
+              "CIS Controls är en prioriterad uppsättning Safeguards som ska minska de vanligaste angreppsvägarna. Modellen är medvetet praktisk: implementera specifika safeguards, mät dem och bygg ut kapaciteten stegvis.",
+              "Kärnan är fokus. Många program misslyckas när arbetet sprids över för många initiativ. CIS hjälper team att hålla sig till en avgränsad uppsättning åtgärder som ger pålitlig riskreduktion, särskilt i tidiga faser.",
+              "I mogna organisationer blir CIS Controls ofta baslinjen som härdningsstandarder, konfigurationsstyrning och säkerhetsdrift mäts mot."
+            ]
+          },
+          {
+            "title": "Implementation Groups: prioritering som matchar verkligheten",
+            "paragraphs": [
+              "Implementation Groups gör CIS Controls till en faktisk införandeväg i stället för ett stort bibliotek. IG1 är tänkt som grundläggande cyberhygien, en miniminivå som de flesta organisationer bör nå innan mer avancerat arbete tar vid.",
+              "IG2 och IG3 ger större djup för organisationer med högre komplexitet, känsligare data eller mer riktade hot. Därmed undviker team den vanliga fällan att jaga avancerad detektion innan fundamenten sitter.",
+              "Den praktiska vinsten är planering. Ni kan lägga ett årsarbete runt en IG-nivå, tydliggöra förväntningar och mäta progression utan att fastna i diskussion om varje enskild safeguard."
+            ]
+          },
+          {
+            "title": "Hur CIS Controls fungerar i verkliga program",
+            "paragraphs": [
+              "De flesta organisationer inför CIS via en gap-analys med evidenskrav. För varje safeguard definieras vad acceptabel implementation är, var den är konfigurerad och hur den verifieras över tid.",
+              "Kontroller blir operativa först när de vävs in i ordinarie processer. Tillgångsinventering måste kopplas till onboarding/offboarding, konfigurationshärdning till bygg- och deployflöden, och loggning till incidentresponsens arbetssätt.",
+              "Ett starkt program behandlar undantag som explicita riskbeslut. Om en safeguard inte kan införas måste skäl, kompenserande kontroller och datum för omprövning vara tydliga."
+            ]
+          },
+          {
+            "title": "Missförstånd som skapar checkbox-säkerhet",
+            "paragraphs": [
+              "Ett vanligt missförstånd är att se CIS Controls som en certifieringsstämpel. Värdet ligger i konsekvent tillämpning och verifiering. En safeguard som bara finns på papper är inte en kontroll, utan en berättelse.",
+              "En annan fälla är att införa verktyg utan operativt ägarskap. Ett inköpt system implementerar inte en safeguard förrän någon förvaltar det, tolkar signalerna och agerar på utfallet.",
+              "Team underskattar också beroenden. Många safeguards förutsätter fungerande tillgångsinventering, identitetshantering och ändringsstyrning. Utan de grunderna blir arbetet ryckigt och svårt att hålla ihop."
+            ]
+          },
+          {
+            "title": "Så börjar du: bygg momentum med IG1",
+            "paragraphs": [
+              "Börja med att välja IG-nivå, oftast IG1, och gör den till baslinje för kommande period. Etablera ett fåtal tydliga verifieringssignaler, till exempel täckningsdashboards, konfigurationskontroller och revisionsbar evidens.",
+              "Leverera tidiga resultat som minskar vanliga angrepp, till exempel starkare identitetsskydd, bättre patchdisciplin och robust backupåterställning. Använd dessa resultat för att bygga förtroende och finansiering för nästa nivå.",
+              "Utöka mot IG2 först när grunderna är stabila. Målet är inte att bocka av en lista, utan att nå ett tillförlitligt driftsläge som håller månad efter månad."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cia",
+      "name": "CIA Triad",
+      "summary": "En grundläggande modell som definierar säkerhetsmål som konfidentialitet, integritet och tillgänglighet.",
+      "intro": "CIA Triad är ett enkelt sätt att beskriva vad som ska skyddas och varför. Modellen hjälper dig välja kontroller, göra avvägningar och förklara risk på ett tydligt språk.",
+      "bullets": [
+        "Confidentiality: förhindra obehörig åtkomst till eller exponering av information.",
+        "Integrity: förhindra obehörig ändring och stödja autenticitet och oavvislighet.",
+        "Availability: säkerställa snabb och tillförlitlig åtkomst till system och information.",
+        "Verkligt säkerhetsarbete handlar om att balansera dessa mål utifrån uppdrag och risk."
+      ],
+      "references": [
+        "NIST SP 800-12 Rev.1, An Introduction to Information Security https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-12r1.pdf"
+      ],
+      "learn": {
+        "what": "En modell med tre centrala säkerhetsmål: konfidentialitet, integritet och tillgänglighet. De flesta säkerhetskontroller finns för att stärka ett eller flera av dessa mål.",
+        "why": "Utan tydliga mål blir säkerhet en diskussion om verktyg och policydokument. CIA ger ett gemensamt mått som hjälper team avgöra vad som är viktigast för varje system och datamängd.",
+        "how": [
+          "Identifiera tillgången: data, tjänst eller process, och definiera vad ett fel innebär för konfidentialitet, integritet och tillgänglighet.",
+          "Sätt krav, till exempel vem som får åtkomst, hur ändringar valideras och hur snabbt tjänsten måste återställas.",
+          "Välj kontroller som matchar kraven, till exempel åtkomststyrning och kryptering för konfidentialitet, förändringsstyrning och integritetskontroller för integritet, samt redundans och återställning för tillgänglighet.",
+          "Verifiera med tester och övervakning: åtkomstgranskningar, integritetsövervakning, återläsningstest av backup och uppföljning av tillgänglighetsmål.",
+          "Balansera om när verksamhet och hot förändras, eftersom CIA-prioriteringar alltid är kontextberoende."
+        ],
+        "security": [
+          "Kontroller för konfidentialitet omfattar identitet, minsta privilegium, kryptering och dataklassning.",
+          "Kontroller för integritet omfattar loggning, kodsignering, ändringshantering och manipuleringdetektion.",
+          "Kontroller för tillgänglighet omfattar resiliensdesign, kapacitetsplanering och beprövade återställningsrutiner."
+        ],
+        "pitfalls": [
+          "Att anta att kryptering ensam är tillräcklig säkerhet och samtidigt ignorera integritet och tillgänglighet.",
+          "Att behandla tillgänglighet som enbart infrastrukturdrifttid i stället för end-to-end tjänstetillförlitlighet.",
+          "Att underskatta integritetshot, exempelvis obehöriga konfigurationsändringar och manipulation i leverantörskedjan.",
+          "Att sakna tydligt ägarskap och accepterad risknivå, vilket gör avvägningar politiska i stället för rationella."
+        ],
+        "example": "En patientportal i vården prioriterar konfidentialitet för att skydda patientdata, integritet för att journaler ska vara korrekta och tillgänglighet eftersom avbrott kan störa vård. Kontrollerna måste väljas och testas så att alla tre målen uppfylls, inte bara kryptering."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "CIA som språk för påverkan",
+            "paragraphs": [
+              "CIA Triad är användbar eftersom den översätter säkerhet till konsekvenser. Konfidentialitet, integritet och tillgänglighet beskriver tre sätt informationssystem kan fallera på ett sätt som påverkar verksamheten.",
+              "I praktiken hjälper modellen team att avgöra vad som ska skyddas och varför. Ett konfidentialitetsfel kan exponera persondata, ett integritetsfel kan förvanska ekonomiska data och ett tillgänglighetsfel kan stoppa en kritisk tjänst när den behövs som mest.",
+              "När CIA används väl blir den ett gemensamt språk för riskdialog mellan teknik, säkerhet och ledning."
+            ]
+          },
+          {
+            "title": "Konfidentialitet, integritet och tillgänglighet i verkliga system",
+            "paragraphs": [
+              "Konfidentialitet handlar inte bara om kryptering. Det omfattar identitet, behörighetsstyrning och förmågan att förhindra oavsiktlig exponering via loggar, backup och tredjepartsflöden.",
+              "Integritet underskattas ofta. Den handlar inte enbart om att blockera obehöriga ändringar, utan även om korrekthet och tillit, till exempel skydd mot tyst datakorruption, konfigurationsmanipulation och förfalskade revisionsspår.",
+              "Tillgänglighet är mer än uptime. Det är förmågan att upprätthålla tjänsten vid störning, vilket kräver kapacitetsplanering, feltolerans, incidenthantering och verifierad återställning."
+            ]
+          },
+          {
+            "title": "Från triad till kontroller och mätetal",
+            "paragraphs": [
+              "För att operationalisera CIA börjar du med påverkan och väljer sedan kontroller som matchar den. För konfidentialitet kan det vara minsta privilegium, stark autentisering och nyckelhantering. För integritet kan det vara change control, signering och manipuleringssäkra loggar. För tillgänglighet handlar det om redundans, testade backuper och övade responsrutiner.",
+              "Mätetal ska följa utfall, inte intentioner. Ett konfidentialitetsmål utan täckande åtkomstgranskning är svagt. Ett integritetsmål utan övervakning av obehörig förändring är skört. Ett tillgänglighetsmål utan återställningstest är önsketänkande.",
+              "Modellen gör också avvägningar tydliga. Stark konfidentialitet kan öka friktion, stark integritet kan kräva mer process och stark tillgänglighet kan öka kostnad. CIA hjälper dig göra dessa avvägningar medvetet."
+            ]
+          },
+          {
+            "title": "Missförstånd som gör modellen teoretisk",
+            "paragraphs": [
+              "Ett vanligt missförstånd är att stanna vid läroboksdefinitionen. CIA skapar värde först när den kopplas till specifika tillgångar, hot och operativa krav.",
+              "En annan fälla är att alltid anta att konfidentialitet är högsta prioritet. I många miljöer är integritet eller tillgänglighet den större verksamhetsrisken, särskilt i säkerhetskritiska eller finansiella sammanhang.",
+              "Team missar också att angripare ofta angriper integritet och tillgänglighet indirekt. Exempelvis slår ransomware mot tillgänglighet, men också mot integritet när backuper eller loggar korrumperas."
+            ]
+          },
+          {
+            "title": "Så börjar du: gör avvägningarna explicita",
+            "paragraphs": [
+              "Välj en högvärdestjänst och lista värsta konsekvens för konfidentialitet, integritet och tillgänglighet. Bestäm sedan vilken konsekvens som är mest oacceptabel och varför.",
+              "Översätt besluten till ett fåtal kontroller och verifieringssignaler som visar att de fungerar i praktiken. Fokus bör ligga på återkommande evidens, inte engångskonfiguration.",
+              "När övningen upprepas över flera tjänster blir CIA en designvana. Säkerhetsbeslut blir tydligare eftersom de knyts till påverkan, inte till personliga preferenser eller senaste verktygstrend."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "iso27001",
+      "name": "ISO/IEC 27001",
+      "summary": "En internationell standard som specificerar krav för ett ledningssystem för informationssäkerhet (ISMS).",
+      "intro": "ISO/IEC 27001 är en kravstandard för att etablera, införa, underhålla och kontinuerligt förbättra ett ISMS. Den bygger på riskbaserat arbetssätt och använder en referensuppsättning informationssäkerhetskontroller i Annex A, i linje med ISO/IEC 27002.",
+      "bullets": [
+        "Definierar krav för ISMS: styrning, riskbedömning/riskbehandling och kontinuerlig förbättring.",
+        "Riskbaserad: kontroller väljs utifrån bedömd risk och dokumenteras i Statement of Applicability (SoA).",
+        "Stödjer certifiering, vilket gör evidens och repeterbara processer lika viktiga som tekniska kontroller.",
+        "Annex A är harmoniserad med ISO/IEC 27002, med 93 kontroller inom organisatoriska, personella, fysiska och tekniska områden."
+      ],
+      "references": [
+        "ISO standard page: ISO/IEC 27001:2022 https://www.iso.org/standard/27001",
+        "ISO Online Browsing Platform entry for ISO/IEC 27001 https://www.iso.org/obp/ui/en/"
+      ],
+      "learn": {
+        "what": "En ledningssystemsstandard för informationssäkerhet. Den anger vilka processer och vilken styrning som krävs för att hantera säkerhetsrisk över tid.",
+        "why": "Tekniska kontroller driver lätt över tid. ISO 27001 fokuserar på ägarskap, riskbeslut och evidens så att säkerhetsarbetet förblir effektivt när system, personal och hot förändras.",
+        "how": [
+          "Definiera ISMS-scope och kontext, inklusive intressenter, verksamhetsmål och kritiska informationstillgångar.",
+          "Genomför riskbedömning och riskbehandling för att avgöra vilka risker som ska hanteras, accepteras, överföras eller undvikas.",
+          "Välj kontroller och dokumentera dem i Statement of Applicability med motivering och evidens.",
+          "Driv ISMS i vardagen: utbildning, change control, incidenthantering, leverantörsstyrning och övervakning.",
+          "Revidera och förbättra: interna revisioner, ledningens genomgång, korrigerande åtgärder och kontinuerlig förbättring."
+        ],
+        "security": [
+          "ISO 27001 ger struktur för policyer, ägarskap och revisionsbarhet, vilket kompletterar tekniska ramverk som CIS Controls.",
+          "Riskbehandling kopplar säkerhetsarbete till verksamhetspåverkan och gör prioritering försvarbar och repeterbar.",
+          "SoA blir en samlad sanning för vilka kontroller ni förlitar er på och varför."
+        ],
+        "pitfalls": [
+          "Att jaga certifikat men förbise faktisk riskreduktion och operativ säkerhetsmognad.",
+          "Att sätta för brett scope för tidigt, vilket ger dokumentationsöverlast och svagt kontrollägarskap.",
+          "Att välja kontroller utan tydlig koppling till risk, vilket gör både revision och förbättringsarbete ineffektivt.",
+          "Att behandla Annex A som en obligatorisk checklista i stället för att motivera inklusion/exklusion via SoA."
+        ],
+        "example": "Ett teknikbolag använder ISO 27001 för att formalisera ägarskap och evidens för säkerhetskontroller. Riskbehandling styr investeringar i identitetshärdning och backupåterställning, medan internrevision fångar avvikelser i konfiguration och åtkomstgranskning."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Ett ISMS är ett ledningssystem, inte en kontrollista",
+            "paragraphs": [
+              "ISO/IEC 27001 definierar krav för ett ledningssystem för informationssäkerhet, ett ISMS. Det är avgörande eftersom fokus ligger på hur organisationen styr, hanterar risk och förbättrar arbetet, inte enbart på vilka tekniska kontroller som finns.",
+              "Ett friskt ISMS skapar repeterbara beslut: scope, riskbedömning, riskbehandling, övervakning, internrevision och ledningens genomgång. Systemet ska hålla även när personal byts ut och tekniklandskapet förändras.",
+              "Certifiering är för många valfri, men ledningssystemslogiken ger värde även utan certifikat eftersom den tvingar fram disciplin, spårbarhet och evidens."
+            ]
+          },
+          {
+            "title": "Riskbedömning, riskbehandling och Statement of Applicability",
+            "paragraphs": [
+              "ISO 27001 kräver ett riskbaserat angreppssätt. Du identifierar informationssäkerhetsrisker, värderar dem, beslutar behandling och följer kvarvarande residualrisk. Här kopplas säkerhetsarbetet direkt till verksamhetsprioriteringar.",
+              "Annex A ger en referensuppsättning kontroller, men de ska inte införas blint. Kontroller väljs utifrån riskbehandlingsbeslut och dokumenteras i Statement of Applicability med motiverade inkluderings- och exkluderingsbeslut.",
+              "I mogna program är SoA inte formalitet. Det är kartan som binder ihop policy, implementation och evidens, och den utvecklas i takt med risker och systemförändringar."
+            ]
+          },
+          {
+            "title": "Vad revisorer granskar och hur stark evidens känns",
+            "paragraphs": [
+              "Revisorer söker främst sammanhang och konsekvens. Scope ska spegla verkligheten, riskbedömningen ska vara trovärdig, kontroller ska finnas där de behövs och uppföljning ska visa att systemet hålls levande.",
+              "Stark evidens är operativ. Den består av åtkomstgranskningar, ändringshistorik, incidentrapporter, backupåterställningstester, leverantörsbedömningar och utbildningsunderlag som visar faktisk kompetens.",
+              "Bästa revisionsberedskap uppstår när ISMS drivs kontinuerligt. När internrevision och ledningens genomgång är verkliga aktiviteter blir extern revision en kontroll av ett levande system snarare än en stressad punktinsats."
+            ]
+          },
+          {
+            "title": "Missförstånd som skapar certifieringsteater",
+            "paragraphs": [
+              "Ett vanligt missförstånd är att ISO 27001 är en teknisk checklista. Då läggs kraft på policytext medan gap i övervakning, incidenthantering och leverantörsstyrning består.",
+              "En annan fälla är för brett scope. Om allt ingår blir riskbedömningen ytlig och kontrollägarskapet otydligt. Ett snävare men kritiskt scope ger ofta både bättre säkerhet och mer trovärdigt ISMS.",
+              "Vissa organisationer gör certifikatet till målet. Det faktiska målet är varaktig riskreduktion och stabil kontrollnivå; certifikatet är en bieffekt av välskött styrning."
+            ]
+          },
+          {
+            "title": "Så börjar du: en första riskdriven cykel",
+            "paragraphs": [
+              "Börja med scope och ledningsförankring. Definiera vilka informationstillgångar och tjänster som omfattas, varför de är kritiska och vem som fattar riskbeslut.",
+              "Genomför en första riskbedömning som är evidensbaserad och ärlig, ta fram riskbehandlingsplan och SoA som ni kan försvara, och inför ett begränsat antal högeffektkontroller med verifierbar funktion.",
+              "Stäng loopen med internrevision och ledningens genomgång. När den cykeln finns blir förbättring av ISMS en löpande rytm i stället för ett engångsprojekt."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "mitre",
+      "name": "MITRE ATT&CK",
+      "summary": "En kunskapsbas över angripartaktik och tekniker baserad på verkliga observationer, använd för att modellera och försvara mot angriparbeteenden.",
+      "intro": "MITRE ATT&CK ger ett gemensamt språk för hur angripare arbetar. Beteenden organiseras i tactics (varför) och techniques (hur), vilket hjälper team att planera detektion, jakt och realistisk testning.",
+      "bullets": [
+        "Tactics beskriver angriparens mål, och techniques beskriver hur målet nås, ofta med sub-techniques och procedures.",
+        "Används för hotmodellering, detekteringsutveckling, threat hunting samt planering av red team och purple team.",
+        "Hjälper team att kartlägga defensiv täckning och synliggöra gap över angreppslivscykeln.",
+        "Stödjer strukturerad användning av datakällor och telemetri för detektion och utredning."
+      ],
+      "references": [
+        "MITRE ATT&CK https://attack.mitre.org/",
+        "MITRE ATT&CK resources and key concepts https://attack.mitre.org/resources/",
+        "MITRE ATT&CK Enterprise tactics https://attack.mitre.org/tactics/"
+      ],
+      "learn": {
+        "what": "En kuraterad kunskapsbas som katalogiserar hur angripare beter sig och ger försvarsteam en gemensam modell för detektion och testning mot verkliga tekniker.",
+        "why": "Om du bara försvarar mot verktyg hamnar du efter. ATT&CK fokuserar på beteenden, som är mer stabila över tid och därför bättre för uthållig detektions- och responsförmåga.",
+        "how": [
+          "Välj domän som matchar er miljö, till exempel Enterprise, och identifiera relevanta tactics och techniques utifrån hotbilden.",
+          "Mappa befintliga kontroller, detektioner och responsplaybooks mot techniques för att se täckning och gap.",
+          "Prioritera ett mindre antal högrisktekniker och bygg detektioner utifrån relevanta datakällor och analyslogik.",
+          "Validera med kontrollerad testning, exempelvis atomic tests eller purple team-övningar, och trimma efter utfall.",
+          "Följ utvecklingen när täckning förbättras och uppdatera mappningen i takt med ATT&CK och miljöförändringar."
+        ],
+        "security": [
+          "ATT&CK är särskilt starkt för detekteringsutveckling eftersom det tvingar koppling mellan telemetri och konkreta angriparbeteenden.",
+          "Använd ramverket för repeterbar threat hunting genom att översätta techniques till hypoteser och hunt-playbooks.",
+          "Använd Navigator-liknande matriser för att kommunicera täckning till ledning och planera testning."
+        ],
+        "pitfalls": [
+          "Att färglägga matriser gröna utan evidens för detektionskvalitet, responstid och hantering av falsklarm.",
+          "Att försöka täcka alla techniques i stället för att fokusera på största hoten och mest kritiska tillgångarna.",
+          "Att underskatta datakvalitet: detektioner faller när loggar är ofullständiga, otillräckliga eller sparas för kort tid.",
+          "Att tro att ATT&CK ersätter riskanalys. Det kompletterar riskarbetet men definierar inte prioriteringar på egen hand."
+        ],
+        "example": "Ett SOC mappar vanliga angripartekniker, som credential dumping och lateral movement, till nödvändig telemetri. Kartläggningen visar gap i endpointloggning och identitetsrevision, vilket leder till förbättrad datainsamling och detektion som valideras i purple team-övningar."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Beteendemodell, inte hotlista",
+            "paragraphs": [
+              "MITRE ATT&CK är en kunskapsbas över angriparbeteenden baserad på verkliga observationer. Den beskriver vad angripare faktiskt gör under operationer, vilket gör den värdefull när försvarsteam behöver prioritera detektion, motåtgärder och testning.",
+              "ATT&CK är inte en lista över sårbarheter och inte ett efterlevnadsramverk. Styrkan ligger i att ge team ett konsekvent språk för angriparbeteenden över threat intelligence, incidenthantering och säkerhetsutveckling.",
+              "När ramverket används som beteendekarta blir det en bro mellan vad du ser i loggar och vad angriparen sannolikt försöker uppnå."
+            ]
+          },
+          {
+            "title": "Tactics, techniques och procedures: så läser du modellen",
+            "paragraphs": [
+              "ATT&CK organiserar beteenden efter tactics (angriparens mål) och techniques (metoder för att nå målet). Procedures är konkreta sätt en technique tar sig uttryck i verkligheten, ofta kopplad till en specifik grupp eller kampanj.",
+              "Modellen är avsiktligt bred. Alla techniques är inte relevanta i varje miljö, så rätt arbetssätt är urval och prioritering, inte fullständighet till varje pris.",
+              "Ett praktiskt sätt att läsa matrisen är att börja med de tactics som är mest affärskritiska, och sedan välja de techniques som är vanligast i er teknikstack och hotprofil."
+            ]
+          },
+          {
+            "title": "Att använda ATT&CK för detektion och engineering",
+            "paragraphs": [
+              "ATT&CK ger störst effekt när techniques kopplas till telemetri. För varje technique ni prioriterar behöver ni bestämma vilka datakällor som kan avslöja beteendet, vilken detektionslogik som är realistisk och vilken respons som ska följa.",
+              "Detta förbättrar detektionskvalitet eftersom precision tvingas fram. En detektion som inte tydligt anger vilket beteende den fångar och hur den valideras blir oftast brus.",
+              "Många team kombinerar ATT&CK med purple teaming: utvalda techniques emuleras, detekterat utfall observeras, logggap täpps till och processen itereras tills täckningen är tillförlitlig."
+            ]
+          },
+          {
+            "title": "Missförstånd som ger falsk trygghet",
+            "paragraphs": [
+              "Det vanligaste missförståndet är att färga rutor gröna utan validering. En enskild detektion för en technique täcker sällan alla varianter av genomförande, därför måste täckning mätas med test och realistiska scenarier.",
+              "En annan fälla är att mappa techniques till produkter i stället för evidens. En produktfunktion är inte liktydigt med detektion om den inte är konfigurerad, trimmad och operativt ägd.",
+              "Vissa team behandlar även ATT&CK som ersättning för riskstyrning. Ramverket stödjer prioritering, men ni måste fortfarande avgöra vilka hot som betyder mest och varför."
+            ]
+          },
+          {
+            "title": "Så börjar du: prioritera och validera",
+            "paragraphs": [
+              "Välj ett begränsat antal techniques som matchar era största risker, till exempel credential abuse, persistence, lateral movement och dataexfiltration relevanta för miljön. Verifiera först att rätt telemetri finns innan ni skriver detektioner.",
+              "Bygg detektioner kopplade till tydliga hypoteser och responsplaybooks. Testa dem sedan med kontrollerad emulering och incidentsimulering för att mäta signalstyrka och responsberedskap.",
+              "Bygg ut successivt. Målet är robust täckning för ett fokuserat beteendeset, inte en visuellt imponerande matris som inte håller när en verklig incident inträffar."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "owasp",
+      "name": "OWASP Top 10",
+      "summary": "Ett brett använt awareness-dokument som sammanfattar de mest kritiska riskerna i webbapplikationer och hur de hanteras.",
+      "intro": "OWASP Top 10 hjälper team att prioritera applikationssäkerhet genom att fokusera på vanliga riskkategorier med hög påverkan. Den senaste publicerade versionen är OWASP Top 10:2025.",
+      "bullets": [
+        "En praktisk startpunkt för att bygga upp eller förbättra ett AppSec-program.",
+        "Uppdateras regelbundet baserat på data och expertkonsensus för att spegla moderna risker.",
+        "Värdefull för utbildning, säkra designgranskningar och gemensamma prioriteringar mellan utveckling och säkerhet.",
+        "Top 10:2025 inkluderar supply chain och hantering av undantagssituationer, i linje med moderna utvecklingsmiljöer."
+      ],
+      "references": [
+        "OWASP Top 10:2025 https://owasp.org/Top10/2025/",
+        "OWASP Top Ten project page https://owasp.org/www-project-top-ten/"
+      ],
+      "learn": {
+        "what": "Ett OWASP-projekt som listar tio centrala riskkategorier för webbapplikationer, avsett som vägledning för medvetenhet och prioritering för utvecklare och organisationer.",
+        "why": "AppSec-program misslyckas ofta när team försöker åtgärda allt samtidigt. OWASP Top 10 ger en gemensam prioriteringsram som kan styra utbildning, säker design och åtgärdsplanering.",
+        "how": [
+          "Använd Top 10-kategorierna för att granska arkitektur och design tidigt, inte enbart i testfasen.",
+          "Mappa befintliga fynd och incidenter mot kategorierna för att se var risk koncentreras.",
+          "Ta fram standardkontroller och riktlinjer för säker kodning per kategori och utbilda team med verkliga exempel.",
+          "Bygg in kontroller i pipelinen: kodgranskning, beroendeskanning, konfigurationskontroller och säkerhetstester kopplade till kategorierna.",
+          "Följ förbättring genom färre återkommande fynd och kortare åtgärdstid, inte genom att räkna genomförda utbildningar."
+        ],
+        "security": [
+          "Använd Top 10 som grundläggande taxonomi för hotmodellering och diskussioner om säker design.",
+          "Behandla ramverket som programstyrning: standarder, återanvändbara mönster och guardrails slår punktvisa pentestfixar.",
+          "Prioritera de kategorier som bäst matchar er teknikstack, till exempel API:er, identitet och mjukvaruförsörjningskedja."
+        ],
+        "pitfalls": [
+          "Att använda OWASP Top 10 som sårbarhetschecklista i stället för programroadmap.",
+          "Att förlita sig enbart på skanning och samtidigt missa designfrågor som åtkomstmodell och trust boundaries.",
+          "Att åtgärda symptom, till exempel en enskild injectionpunkt, utan att rätta grundorsaker som osäkra frågemönster.",
+          "Att förbise operativa aspekter som loggning och larmning, trots att de avgör detektion och respons."
+        ],
+        "example": "Ett produktteam använder OWASP Top 10:2025 för att strukturera sin AppSec-roadmap. Först stärks åtkomstkontroll, säker konfiguration och beroendestyrning, därefter införs säkra designgranskningar samt förbättrad loggning och larmning för att minska återkommande problem."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Vad Top 10:2025 representerar",
+            "paragraphs": [
+              "OWASP Top 10 är ett awareness-dokument som lyfter vanliga och högpåverkande risker i webbapplikationer. Versionen 2025 organiserar riskerna i tio kategorier som team kan använda som gemensamt språk i säker utveckling.",
+              "Det är varken en komplett sårbarhetskatalog eller en garanti för säkerhet. Det är en praktisk startpunkt som hjälper team att fokusera på återkommande felmönster över olika branscher.",
+              "Använt på rätt sätt blir det en bas för utbildning, designgranskning och säkerhetskrav, särskilt för organisationer som bygger upp AppSec-förmåga."
+            ]
+          },
+          {
+            "title": "OWASP Top 10:2025 (översikt)",
+            "paragraphs": [
+              "2025-utgåvan innehåller följande kategorier (i ordning):",
+              "1. A01:2025 - Broken Access Control",
+              "2. A02:2025 - Security Misconfiguration",
+              "3. A03:2025 - Software Supply Chain Failures",
+              "4. A04:2025 - Cryptographic Failures",
+              "5. A05:2025 - Injection",
+              "6. A06:2025 - Insecure Design",
+              "7. A07:2025 - Authentication Failures",
+              "8. A08:2025 - Software or Data Integrity Failures",
+              "9. A09:2025 - Security Logging and Alerting Failures",
+              "10. A10:2025 - Mishandling of Exceptional Conditions."
+            ]
+          },
+          {
+            "title": "Användning för att styra teknikbeslut",
+            "paragraphs": [
+              "Top 10 blir värdeskapande när varje kategori översätts till konkreta förväntningar i engineering. Åtkomstkontroll blir designkrav, kryptografi blir korrekt nyckelhantering och säkra defaultval, och misconfiguration blir automatiserad härdning samt säkra deployrutiner.",
+              "I stället för att enbart leta fynd via scanning använder mogna team kategorierna för att forma arkitekturen. De ställer frågor om identitet och auktorisering, hemlighetshantering, beroendestyrning och säker hantering av fel.",
+              "Detta arbetssätt motverkar återkommande fynd. Grundorsaker i design och process åtgärdas i stället för att samma sårbarhetsmönster jagas release efter release."
+            ]
+          },
+          {
+            "title": "Integrera Top 10 i ett verkligt AppSec-program",
+            "paragraphs": [
+              "I mogna program mappas Top 10-kategorier till kontroller genom hela mjukvarulivscykeln. Kravställning och hotmodellering täcker designrisker, kodgranskning och testning fångar implementationsbrister, och säker drift/övervakning hanterar operativa risker.",
+              "Verktyg hjälper, men ägarskap är avgörande. Ett pipelinefynd som ingen triagerar eller åtgärdar är bara brus. Top 10 är ett bra sätt att definiera vem som äger vilken riskklass och vad som faktiskt räknas som klart.",
+              "Ett effektivt mönster är att definiera ett fåtal guardrails per kategori och automatisera dem. Med tiden blir Top 10 en naturlig kvalitetsnivå i leveransen, inte en årlig utbildningsslide."
+            ]
+          },
+          {
+            "title": "Missförstånd som gör det till compliance-teater",
+            "paragraphs": [
+              "Ett vanligt missförstånd är att en godkänd skanning av Top 10-fynd betyder att applikationen är säker. Många allvarliga brister är kontextspecifika och syns inte som enkla kategoriflaggor.",
+              "En annan fälla är att isolera en enskild kategori. Verkliga intrång bygger ofta på kombinationer av svagheter, till exempel felkonfiguration som möjliggör exponering och bruten åtkomstkontroll som förvärras av svag loggning.",
+              "Team misstolkar också Top 10 som en ren utvecklarfråga. Flera kategorier är organisatoriska och kräver arbete i design, beroendestyrning, driftsättning och incidentberedskap."
+            ]
+          },
+          {
+            "title": "Så börjar du: välj ett risktema och institutionaliera åtgärden",
+            "paragraphs": [
+              "Börja med en eller två Top 10-kategorier som matchar era aktuella problem, till exempel åtkomstkontroll eller felkonfiguration. Definiera en tydlig standard för vad god nivå betyder i er kodbas och arkitektur.",
+              "Bygg en eller två repeterbara kontroller, exempelvis automatiserade tester, kodgranskningsregler eller deploy-guardrails, och gör dem till en del av normal leverans. Målet är att nya funktioner inte oavsiktligt ska kunna bryta standarden.",
+              "När loopen fungerar kan ni skala till nästa kategori. Över tid byggs ett AppSec-program som drivs av ingenjörsvanor och evidens, inte av sporadiska saneringsinsatser."
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "principlesAndIdentity": [
+    {
+      "id": "zero-trust",
+      "name": "Zero Trust",
+      "summary": "Lita aldrig på, verifiera alltid - tillämpa minsta privilegium och kontinuerlig verifiering.",
+      "intro": "Zero Trust utgår från att intrång kan ske och behandlar varje förfrågan som opålitlig tills den har verifierats. Den förlitar sig på en stark identitet, enhetshälsa och kontinuerlig policybedömning.",
+      "bullets": [
+        "Segmentera appar och data; minimera implicit förtroende.",
+        "Verifiera uttryckligen: användare, enhet, sammanhang.",
+        "Tillämpa minsta privilegium och övervaka kontinuerligt."
+      ],
+      "references": [
+        "https://csrc.nist.gov/pubs/sp/800/207/final"
+      ],
+      "learn": {
+        "what": "Zero Trust är en säkerhetsstrategi där åtkomst aldrig beviljas baserat på enbart nätverksplats. Varje förfrågan utvärderas med hjälp av identitet, enhetsställning och sammanhang och utvärderas sedan kontinuerligt när förhållandena ändras.",
+        "why": "Traditionella perimeterantaganden går sönder med molntjänster, distansarbete och sidorörelser. Zero Trust minskar implicit förtroende och gör åtkomstbeslut tydliga, mätbara och lättare att granska.",
+        "how": [
+          "Definiera de skyddade resurserna och de aktörer som behöver tillgång, kartlägg sedan flödena mellan dem.",
+          "Centralisera policybeslut så att samma regler kan tillämpas konsekvent i appar och miljöer.",
+          "Tillämpa beslut nära resursen med hjälp av stark autentisering, minsta privilegium och kontinuerlig övervakning."
+        ],
+        "security": [
+          "Behandla identitet som ett primärt styrplan, inklusive stark autentisering och enhetskontroller.",
+          "Föredrar granulär segmentering och auktorisering per resurs istället för bred nätverksbaserad åtkomst.",
+          "Instrumentåtkomstvägar så att du snabbt kan upptäcka policyöverträdelser och misstänkt beteende."
+        ],
+        "pitfalls": [
+          "Att köpa ett enda verktyg och kalla det Zero Trust utan att ändra åtkomstbeslut och segmentering.",
+          "Lämna äldre förtroendevägar on-prem, till exempel platta nätverk eller delade administratörsuppgifter.",
+          "Överbelasta policylagret med undantag, vilket återinför implicit förtroende över tid."
+        ],
+        "example": "En utvecklare får åtkomst till ett kodlager. Begäran tillåts endast om användaren är starkt autentiserad, enheten uppfyller kraven för patch och kryptering och förfrågan kommer från ett godkänt sammanhang. Om enhetens ställning ändras eller sessionsrisken ökar, avbryts eller återkallas åtkomsten."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Kärnidé och NIST-modellen",
+            "paragraphs": [
+              "Zero Trust sammanfattas ofta som aldrig lita på, alltid verifiera, men den praktiska innebörden är att tillit blir ett explicit beslut snarare än ett antagande. Istället för att lita på något inom en nätverksgräns, behandlar du varje åtkomst som en förfrågan till en specifik resurs som måste motiveras av policy.",
+              "NIST beskriver en Zero Trust-arkitektur som ett sätt att planera företagets arbetsflöden och infrastruktur med hjälp av Zero Trust-principer, för att flytta försvar bort från statiska omkretsar mot användare, tillgångar och resurser. Nyckeln är inte var förfrågan kommer ifrån, utan om förfrågan ska tillåtas just nu."
+            ]
+          },
+          {
+            "title": "Policybeslut och verkställighet i verkliga miljöer",
+            "paragraphs": [
+              "I mogna program är politiken centraliserad även om tillsynen fördelas. En policymotor utvärderar identitetssignaler, enhetens hälsa, datakänslighet och hotintelligens och utfärdar sedan ett beslut om att tillämpningspunkter gäller nära resursen.",
+              "Detta mönster skalar över on-prem, moln och SaaS. Du kan implementera verkställighet genom identitetsmedvetna proxyservrar, gatewaykontroller, service-till-tjänst-auktorisering eller mikrosegmentering, så länge policylogiken förblir konsekvent."
+            ]
+          },
+          {
+            "title": "Designa segmentering som människor kan leva med",
+            "paragraphs": [
+              "Segmentering är där Zero Trust slutar vara en slogan och blir ingenjörskonst. Målet är inte att skapa otaliga nätverkszoner, utan att minska sprängradien genom att begränsa vilka identiteter som kan nå vilka resurser och under vilka förhållanden.",
+              "Börja med att segmentera kring högvärdiga resurser och vanliga attackvägar. Iterera sedan med hjälp av telemetri för att se vilka flöden som är legitima och vilka som är oavsiktliga. Den bästa segmenteringen är den som är både säker och enkel att underhålla."
+            ]
+          },
+          {
+            "title": "Vanliga missförstånd och hur de dyker upp",
+            "paragraphs": [
+              "Ett vanligt misstag är att likställa Zero Trust med en enda produktkategori. Verktyg hjälper, men arkitekturen är en uppsättning beslut om identitet, åtkomst och verifiering. Om bred nätverksåtkomst fortfarande är tillåten och du bara lägger till mer loggning har du inte tagit bort implicit förtroende.",
+              "Ett annat missförstånd är att tro att kontinuerlig verifiering innebär konstanta användarmeddelanden. I praktiken automatiserar du verifiering genom att använda enhetens hållning, sessionsrisk och kortlivade tokens, så att systemet anpassar sig utan att trötta ut användare."
+            ]
+          },
+          {
+            "title": "Hur man börjar utan att koka havet",
+            "paragraphs": [
+              "Börja med en liten uppsättning kritiska applikationer och definiera vad stark åtkomst ska betyda för dem. Dokumentera signalerna du kan samla in på ett tillförlitligt sätt och ställ in policyer som är strikta men realistiska, som att kräva MFA för privilegierade åtgärder och neka åtkomst från ohanterade enheter.",
+              "Bygg sedan en återkopplingsslinga: mät blockerade förfrågningar, undantag och incidenttrender. Använd dessa data för att skärpa kontrollerna, minska äldre förtroendevägar och utöka täckningen till fler resurser över tid."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "least-privilege",
+      "name": "Least Privilege",
+      "summary": "Ge endast den minsta åtkomst som krävs för att utföra en uppgift.",
+      "intro": "Minsta privilegium minskar sprängradien genom att bara bevilja det som är nödvändigt. Det gäller användare, tjänster, nätverk och datavägar.",
+      "bullets": [
+        "Använd rollbaserad eller attributbaserad åtkomst.",
+        "Tidsbunden och just-in-time höjd.",
+        "Granska rättigheter och ta bort överskott."
+      ],
+      "references": [
+        "https://csrc.nist.gov/glossary/term/least_privilege"
+      ],
+      "learn": {
+        "what": "Least Privilege är principen att ge en identitet endast de minsta behörigheter och resurser som behövs för att utföra dess uppgifter. Det gäller personer, tjänstekonton, applikationer och automatisering.",
+        "why": "De flesta verkliga intrång accelererar genom överdrivna privilegier. När konton har breda rättigheter sprids misstag och kompromisser snabbare. Least Privilege minskar attackytan och begränsar sprängradien.",
+        "how": [
+          "Modellåtkomst med hjälp av roller, grupper eller attribut och ge sedan behörigheter genom dessa mönster istället för direkta användarbeviljande.",
+          "Separera dagligt arbete från privilegierade åtgärder med hjälp av dedikerade administratörsvägar och tidsbunden höjd.",
+          "Granska och ta bort oanvänd åtkomst regelbundet, särskilt för behörigheter med hög effekt."
+        ],
+        "security": [
+          "Tillämpa principen på icke-mänskliga identiteter som tjänstekonton och API-tokens, inte bara användare.",
+          "Använd mönster för privilegierad åtkomsthantering som just in time elevation och starka godkännandeflöden för riskfyllda åtgärder.",
+          "Kombinera med loggning och varning om behörighetsändringar och ovanlig behörighetsanvändning."
+        ],
+        "pitfalls": [
+          "Bevilja administratörsrättigheter för bekvämlighet och aldrig ta tillbaka dem.",
+          "Behandla roller som permanenta identitetsetiketter snarare än nuvarande jobbbehov.",
+          "Ignorerar maskinidentiteter, som ofta slutar med de bredaste behörigheterna."
+        ],
+        "example": "En ingenjör har läsbehörighet till produktionsloggar som standard. När de behöver distribuera en förändring begär de tidsbegränsad höjd som ger distributionsrättigheter i en timme, med åtgärder loggade och kopplade till en biljett."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Vad minsta privilegium egentligen betyder i praktiken",
+            "paragraphs": [
+              "Least Privilege är inte samma sak som att begränsa alla hela tiden. Det är ett designmål: varje identitet ska ha behörigheter som matchar dess uppgifter, och inget mer. När uppgifterna ändras bör även åtkomsten ändras.",
+              "NIST definierar minsta privilegium som att begränsa åtkomstbehörigheter till det minimum som krävs för att utföra tilldelade uppgifter. Den definitionen inkluderar uttryckligen processer som agerar på uppdrag av användare, vilket är anledningen till att tjänstkonton och automatiserade jobb har lika stor betydelse som mänskliga användare."
+            ]
+          },
+          {
+            "title": "Implementeringsmönster som skalar",
+            "paragraphs": [
+              "De flesta organisationer implementerar minsta behörighet genom en kombination av rollbaserad åtkomstkontroll, attributbaserad åtkomstkontroll och privilegierad åtkomsthantering. Roller hanterar den gemensamma baslinjen, attribut hanterar sammanhang och PAM hanterar de sällsynta högriskåtgärderna.",
+              "En praktisk skalningsstrategi är att standardisera en liten uppsättning roller per system och sedan reservera högprivilegierade rättigheter för tidsbunden höjd. Detta gör det dagliga arbetet smidigt samtidigt som privilegieanvändningen blir synlig och kontrollerbar."
+            ]
+          },
+          {
+            "title": "Varför både revisioner och verklig säkerhet beror på det",
+            "paragraphs": [
+              "Minst privilegium är en av de tydligaste länkarna mellan styrning och incidentutfall. Revisorer bryr sig eftersom tillträdesrätt bevisar om åtskillnad mellan uppgifter och kontrollmål finns. Incident responders bryr sig eftersom privilegiegränser avgör hur långt en angripare kan röra sig.",
+              "När du behandlar åtkomstgranskningar som en rutinkontroll får du också en kontinuerligt uppdaterad karta över vem som kan göra vad. Den kartan är ovärderlig under triage, eftersom den förvandlar privilegieanalys till fakta istället för gissningar."
+            ]
+          },
+          {
+            "title": "Hur det misslyckas i den verkliga världen",
+            "paragraphs": [
+              "Minsta privilegium misslyckas ofta när behörigheter ackumuleras med tiden. Människor byter team, automatisering växer och tillfällig åtkomst blir permanent. Systemet fungerar fortfarande, men privilegieuppsättningen utökas tyst tills en kompromiss blir katastrofal.",
+              "Ett annat felläge är att utforma roller som är för breda. Om den enklaste rollen att tilldela huvudsakligen är admin, har du byggt en bekvämlighetsgenväg som kommer att användas under press. Lösningen är att omforma roller kring uppgifter och att göra höjden lätt men kontrollerad."
+            ]
+          },
+          {
+            "title": "Hur man börjar och håller farten",
+            "paragraphs": [
+              "Börja med att identifiera en liten uppsättning behörigheter med hög effekt som domänadministratör, molnägare, produktionsdatabasskrivning och CI-pipelinehemligheter. Gör dessa behörigheter tidsbundna och kräver starkare autentisering, logga sedan och granska deras användning.",
+              "Välj sedan ett system och rensa upp åtkomsten från början: definiera roller, ta bort direkta anslag och automatisera uppdateringar för uppdateringar som lämnar anslutningar. När du har ett rent exempel kan du upprepa det över system med mycket mindre friktion."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "iam",
+      "name": "Identity and Access Management (IAM)",
+      "summary": "Processer och verktyg för att hantera digitala identiteter och tillgång till resurser.",
+      "intro": "IAM centraliserar identitetens livscykel, autentisering och auktorisering. Den integrerar kataloger, SSO, provisionering och styrning.",
+      "bullets": [
+        "Automatisera arbetsflöden för snickare som flyttar och lämnar.",
+        "Förena identiteter med standarder som SAML/OIDC.",
+        "Granska åtkomst och tillämpa policy."
+      ],
+      "references": [
+        "https://csrc.nist.gov/glossary/term/identity_and_access_management",
+        "https://csrc.nist.gov/pubs/sp/800/63/4/final"
+      ],
+      "learn": {
+        "what": "Identity and Access Management är uppsättningen processer och tekniker som används för att skapa och hantera identiteter, autentisera dem och kontrollera vad de får åtkomst till. I företagsmiljöer omfattar det användare, enheter och tjänstidentiteter.",
+        "why": "De flesta moderna säkerhetsbeslut beror på identitet. Stark IAM minskar obehörig åtkomst, stöder minsta privilegium och gör utredningar och granskningar mycket enklare eftersom åtgärder är knutna till en tydlig identitet och policy.",
+        "how": [
+          "Definiera auktoritativa identitetskällor och livscykelprocesser för snickar-, flytt- och avgångshändelser.",
+          "Använd stark autentisering och sessionskontroller, utfärda sedan kortlivade autentiseringsuppgifter eller tokens för åtkomst.",
+          "Tillämpa auktorisering genom roller eller attribut, och logga åtkomst och policyändringar centralt."
+        ],
+        "security": [
+          "Behandla identitetsdata som känsliga och skydda kataloger, IdP:er och referensbutiker som värdefulla tillgångar.",
+          "Använd federation och enkel inloggning för att minska lösenordsspridningen och för att centralisera policytillämpningen.",
+          "Designa återställning och livscykelflöden noggrant eftersom angripare ofta inriktar sig på registrering och kontoåterställning."
+        ],
+        "pitfalls": [
+          "Låta identitetskällor driva, skapa dubbletter av konton och föräldralös åtkomst.",
+          "Förlita sig på delade konton eller ohanterade tjänsteuppgifter som kringgår styrning.",
+          "Underskattning av kontoåterställning och registrering som främsta bedrägeri- och övertagandevägar."
+        ],
+        "example": "Ett företag använder en central identitetsleverantör för tillgång till personal. Anställda autentiserar med MFA, får kortlivade tokens och får åtkomst till molnappar via federation. När någon byter roll uppdateras gruppmedlemskapet automatiskt och behörigheter följer den nya rollen."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Identitet som styrplan",
+            "paragraphs": [
+              "I många miljöer är nätverket inte längre den primära gränsen. SaaS, distansarbete och API:er betyder att identitet är den röda tråden över åtkomstbeslut. IAM blir styrplanet som bestämmer vem, vad och under vilka förhållanden åtkomst tillåts.",
+              "NIST beskriver IAM som administration av individuella identiteter och hantering av roller och åtkomstprivilegier i företags-IT. Den inramningen är viktig eftersom IAM inte bara är inloggning. Det är identitetsskapande, förändringshantering och åtkomststyrning över hela livscykeln."
+            ]
+          },
+          {
+            "title": "Livscykeldesign som förhindrar uppbyggnad av privilegier",
+            "paragraphs": [
+              "Skillnaden mellan bra och dåliga IAM är vanligtvis livscykeldisciplin. Joiner-processer skapar konton med rätt baslinje. Mover-processer justerar behörigheter när roller ändras. Leaver-processer återkallar åtkomst snabbt och rent över system.",
+              "I praktiken är livscykeln en kombination av HR- eller auktoritativa datakällor, provisioneringsautomatisering och periodisk avstämning. Utan avstämning ackumuleras system och åtkomst, vilket undergräver minsta privilegium oavsett hur stark autentisering är."
+            ]
+          },
+          {
+            "title": "Autentisering, sessioner och moderna hot",
+            "paragraphs": [
+              "Autentisering handlar inte bara om att bevisa identitet en gång. Moderna hot inkluderar nätfiske, tokenstöld och sessionskapning. Stark IAM behandlar sessioner som tillgångar: tokens bör vara kortlivade, bundna till enheter när det är möjligt och omvärderas när risken förändras.",
+              "NIST digital identitetsvägledning betonar riskbaserad säkerhet för identitetskontroll, autentisering och federation. Det är tänkesättet att anta: välj en säkerhetsnivå som matchar risken med resursen, inte en policy som passar alla."
+            ]
+          },
+          {
+            "title": "Behörighet som förblir begriplig",
+            "paragraphs": [
+              "Auktorisering är där komplexiteten kan explodera. Rollbaserade modeller fungerar bra för vanliga jobbfunktioner, medan attributbaserade modeller hanterar sammanhang som enhetsförtroende, plats eller datakänslighet. Nyckeln är att hålla policyspråket konsekvent och att undvika ad hoc-undantag.",
+              "En användbar regel är att varje tillstånd ska kunna spåras till ett affärsbehov och en namngiven ägare. Om du inte kan förklara varför en roll existerar eller vem som godkänner den, kommer det så småningom att bli ett säkerhetsansvar."
+            ]
+          },
+          {
+            "title": "Hur man börjar bygga IAM på rätt sätt",
+            "paragraphs": [
+              "Börja med att inventera identitetssystem: kataloger, identitetsleverantörer, privilegierade konton och tjänstekonton. Välj en kritisk applikation och styr all åtkomst via den centrala IdP:n med MFA. Etablera därefter en tydlig rollmodell med minsta privilegium.",
+              "Därefter standardisera livscykelhändelser och automatisera avadministrationen. När offboarding är tillförlitlig, utöka till provisionering, åtkomstgranskning och styrning av tjänstidentitet. Den sekvensen minskar risken tidigt och bygger förtroende för programmet."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "aaa",
+      "name": "AAA",
+      "summary": "Autentisering, auktorisering och spårbarhet - den klassiska triaden för åtkomstkontroll.",
+      "intro": "AAA-modellen skiljer på att verifiera identitet, bevilja behörigheter och logga aktivitet. Den utgör grunden för åtkomst till nätverk, system och applikationer.",
+      "bullets": [
+        "AuthN bevisar vem du är.",
+        "AuthZ styr vad du kan göra.",
+        "Redovisning loggar åtgärder för revision."
+      ],
+      "references": [
+        "https://datatracker.ietf.org/doc/html/rfc2865"
+      ],
+      "learn": {
+        "what": "AAA står för autentisering, auktorisering och redovisning. Det är en klassisk säkerhetsmodell som används för att kontrollera åtkomst till system och för att registrera vilka åtgärder som vidtogs, av vem och när.",
+        "why": "AAA gör åtkomst till en hanterad process istället för en ad hoc-behörighet. När det görs väl, minskar det obehörig åtkomst, stöder minsta privilegium och tillhandahåller granskningsspår som är avgörande för incidentrespons och efterlevnad.",
+        "how": [
+          "Autentisera ämnet, vanligtvis en användare eller enhet, med hjälp av referenser och ibland ytterligare faktorer.",
+          "Auktorisera ämnet genom att tillämpa policy för att avgöra vad de kan komma åt och vilka åtgärder de kan utföra.",
+          "Redogör för aktivitet genom att logga sessioner, kommandon och nyckelhändelser så att åtkomsten kan granskas och undersökas."
+        ],
+        "security": [
+          "Centralisera AAA där det är möjligt så att policy och loggning är konsekventa över nätverks- och programlager.",
+          "Skydda AAA-infrastrukturen eftersom kompromiss med AAA-tjänsten ofta innebär kompromiss med allt som förlitar sig på den.",
+          "Se till att bokföringsloggarna är tidssynkroniserade och manipuleringssäkra så att de förblir trovärdiga bevis."
+        ],
+        "pitfalls": [
+          "Behandla autentisering som tillräckligt och hoppa över auktoriseringsdetaljer, vilket leder till alltför bred åtkomst.",
+          "Samla in redovisningsloggar men inte granska eller varna dem, vilket förvandlar dem till hyllmaterial.",
+          "Använda delade konton, vilket bryter ansvarsskyldigheten även om loggar finns."
+        ],
+        "example": "Nätverksåtkomst kontrolleras genom en central AAA-tjänst. En användare autentiserar till VPN, får auktorisering för specifika nätverkssegment baserat på deras roll, och alla sessionsstart, stopp och privilegierade åtgärder registreras för granskning."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Varför AAA fortfarande är viktig i moderna miljöer",
+            "paragraphs": [
+              "AAA är en äldre modell, men idén förblir central: bevisa vem eller vad som begär åtkomst, bestäm vad de får göra och registrera resultatet. Cloud IAM-plattformar implementerar samma koncept även om de inte kallar det AAA.",
+              "Värdet av AAA är att det gör åtkomstpolicyn explicit och mätbar. Det möjliggör också ansvarsutkrävande, vilket är en förutsättning för både avskräckning och utredning."
+            ]
+          },
+          {
+            "title": "Autentisering, auktorisering och redovisning som distinkta problem",
+            "paragraphs": [
+              "Autentisering svarar vem du är. Auktorisering svarar på vad du kan göra. Bokföring svarar på vad du faktiskt gjorde. Att blanda dessa begrepp leder till svaga kontroller, till exempel att ge bred auktorisation eftersom autentisering känns stark.",
+              "Bokföring underskattas ofta, men det är det som gör tillgång till bevis. I nätverks- och infrastruktursammanhang inkluderar redovisning sessionsmetadata, kommandologgning och ändringar av privilegierad konfiguration, allt kopplat till en identitet."
+            ]
+          },
+          {
+            "title": "AAA protokoll och var du kommer att se dem",
+            "paragraphs": [
+              "I nätverk implementeras AAA vanligtvis med protokoll som RADIUS, som är designat för autentisering, auktorisering och redovisningsanvändning. Du kommer att se det runt VPNs, trådlösa nätverk och enhetsadministration.",
+              "I praktiken är protokollet bara en del av historien. Den verkliga säkerheten kommer från policydatabasen, förebilden och hur konsekvent enheter och applikationer upprätthåller de beslut de får."
+            ]
+          },
+          {
+            "title": "Misslyckande mönster och hur angripare utnyttjar",
+            "paragraphs": [
+              "Ett vanligt fel är svag åtskillnad mellan normal och privilegierad åtkomst. Om ett användarkonto både kan autentisera och erhålla administratörsbehörighet som standard, räcker en stulen autentiseringsinformation för fullständigt övertagande.",
+              "Ett annat misslyckande är ofullständig redovisning. Om loggar saknas, inte är tidssynkroniserade eller inte skyddas från manipulering, förlorar du förmågan att rekonstruera åtgärder. Angripare vet detta och inriktar sig ofta på loggningspipelines tidigt."
+            ]
+          },
+          {
+            "title": "Hur man bygger AAA som du kan lita på",
+            "paragraphs": [
+              "Börja med att identifiera var åtkomst beviljas idag, till exempel WiFi, VPN, administratörskonsoler och viktiga appar. Led dem genom en central policybeslutspunkt där du kan tillämpa konsekventa auktoriseringsregler.",
+              "Förbättra sedan bokföringen parallellt: se till att loggarna är kompletta, sökbara och granskade. När bokföringen börjar ge användbara upptäckter och revisionsbevis blir det mycket lättare att motivera skärpningar av auktorisation över tiden."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "mfa",
+      "name": "Multi-Factor Authentication (MFA)",
+      "summary": "Kräv 2+ faktorer (kunskap, innehav, inneboende) för att minska legitimationsrisken.",
+      "intro": "MFA stärker autentisering genom att kombinera oberoende faktorer. Phishing-resistenta metoder ger högre säkerhet.",
+      "bullets": [
+        "Föredrar WebAuthn/lösenord där det är möjligt.",
+        "Fallback till TOTP eller tryck; undvik SMS.",
+        "Använd step-up MFA för riskfyllda handlingar."
+      ],
+      "references": [
+        "https://csrc.nist.gov/glossary/term/multi_factor_authentication",
+        "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-63B-4.pdf"
+      ],
+      "learn": {
+        "what": "Multifaktorautentisering är en autentiseringsmetod som kräver minst två olika faktorer, till exempel något du vet, något du har eller något du är. Det kan implementeras med en enda autentiseringsenhet som kombinerar faktorer eller med flera autentiseringsenheter som tillhandahåller distinkta faktorer.",
+        "why": "Lösenord blir nätfiskade, återanvänds och läcker ut. MFA höjer kostnaden för kontoövertagande och hjälper till att försvara privilegierad åtkomst och fjärråtkomstvägar som angripare riktar sig mot först.",
+        "how": [
+          "Välj faktorkombinationer som matchar risken, till exempel en nätfiskeresistent enhetsbaserad faktor för administratörer.",
+          "Bind autentiserare till konton på ett säkert sätt och designa återställning så att det inte blir den svagaste länken.",
+          "Övervaka MFA-händelser och misslyckanden för att upptäcka mönster för nätfiske, push-bombning och tokenstöld."
+        ],
+        "security": [
+          "Föredrar phishing-resistenta metoder för högriskkonton och handlingar, inte vilken andra faktor som helst.",
+          "Betygsgräns och varning vid upprepade misslyckanden och ovanliga MFA uppmaningar för att snabbt fånga upp missbruk.",
+          "Hårdar kontoåterställning och registrering eftersom angripare ofta kringgår MFA genom att missbruka återställningsflöden."
+        ],
+        "pitfalls": [
+          "Förutsatt att en andra faktor är lika stark, även när det är lätt att nätfiska eller avlyssna.",
+          "Tillåter återgång till lösenord endast för bekvämlighet, vilket skapar en angripargenväg.",
+          "Underskattning av social ingenjörskonst och attacker mot utmattning av meddelanden mot push-baserade MFA."
+        ],
+        "example": "En finansadministratör loggar in med ett lösenord plus en maskinvarustödd autentisering. Riskfyllda åtgärder som att ändra bankuppgifter kräver ökad autentisering. Kontoåterställning kräver verifierad identitet och kan inte slutföras med enbart e-poståtkomst."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Faktorer, verifierare och vad som faktiskt räknas som MFA",
+            "paragraphs": [
+              "MFA handlar om distinkta faktorer, inte bara om flera steg. Ett lösenord plus ett andra lösenord är fortfarande en faktor. De klassiska kategorierna är något du vet, något du har och något du är.",
+              "NIST vägledning beskriver MFA som att det kräver mer än en distinkt autentiseringsfaktor, antingen genom en multifaktorautentisering eller genom att kombinera autentiseringsenheter som tillhandahåller olika faktortyper. Den distinktionen hjälper dig att utvärdera om en metod verkligen ger oberoende säkerhet."
+            ]
+          },
+          {
+            "title": "Styrkeskillnader och nätfiskemotstånd",
+            "paragraphs": [
+              "Alla MFA är inte lika. Vissa metoder är mycket motståndskraftiga mot nätfiske och repris, medan andra kan avlyssnas eller socialt utvecklas. Nyckelfrågan är om en angripare kan fånga faktorn och återanvända den från en annan enhet eller session.",
+              "För högriskåtkomst, prioritera metoder som är resistenta mot lösenordsfiske och sessionsuppspelning. Detta är särskilt viktigt för privilegierade konton, fjärråtkomst och åtkomst till känslig data."
+            ]
+          },
+          {
+            "title": "Livscykel och återhämtning är en del av kontrollen",
+            "paragraphs": [
+              "Verkliga implementationer misslyckas när återställningen är svag. Om en angripare kan återställa MFA med hjälp av en komprometterad e-postinkorg eller ett helpdesk-skript, blir den andra faktorn valfri i praktiken.",
+              "Behandla inskrivning, enhetsbyten och återhämtning som högriskhändelser. Tillämpa ytterligare verifiering, övervakning och vänteperioder där så är lämpligt, och logga dem som förstklassiga säkerhetshändelser."
+            ]
+          },
+          {
+            "title": "Operativa realiteter och vanliga attackmönster",
+            "paragraphs": [
+              "Push trötthet attacker utnyttjar mänskligt beteende genom att översvämma användarna med godkännande uppmaningar. SMS-baserade koder kan vara sårbara för avlyssning och kontoövertagande av telefonnummer. TOTP-koder kan fortfarande nätfiskas i realtid om angriparen kontrollerar flödet.",
+              "Försvarare bör kombinera MFA med risksignaler, såsom enhetshållning och avvikelsedetektering, och bör varna om mönster som upprepade avslag, ny enhetsregistrering eller inloggningar från ovanliga platser."
+            ]
+          },
+          {
+            "title": "Hur man börjar och förbättrar iterativt",
+            "paragraphs": [
+              "Börja med att aktivera MFA för de konton som betyder mest: administratörer, användare med fjärråtkomst och konton med åtkomst till känslig data. Använd de starkaste autentiseringsalternativen som finns tillgängliga för dessa grupper och utöka sedan täckningen till den bredare arbetsstyrkan.",
+              "Förfina sedan policyn med ökad autentisering för högriskåtgärder och stärk återhämtningen. Med tiden kan du mäta minskningar av incidenter för övertagande av konton och använda dessa bevis för att driva införandet av mer nätfiske-resistenta metoder."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ids",
+      "name": "Intrusion Detection System (IDS)",
+      "summary": "Övervakar nätverk eller värdar för att upptäcka skadlig aktivitet eller policyöverträdelser.",
+      "intro": "IDS lösningar analyserar trafik och händelser för att upptäcka hot. De kan vara signaturbaserade, anomalibaserade eller hybrider.",
+      "bullets": [
+        "Nätverket IDS inspekterar paket och flöden.",
+        "Värden IDS övervakar processer, filer och loggar.",
+        "Justera regler för att minska falska positiva resultat."
+      ],
+      "references": [
+        "https://csrc.nist.gov/pubs/sp/800/94/final"
+      ],
+      "learn": {
+        "what": "En Intrusion Detection System övervakar händelser och trafik för att identifiera misstänkt aktivitet och potentiella attacker. Den genererar varningar för utredning, och i många program matar den ett SIEM eller SOAR arbetsflöde.",
+        "why": "Förebyggande kontroller fångar inte allt. IDS ger synlighet och upptäckt så att organisationer kan upptäcka intrång snabbare, validera antaganden och svara innan skadan sprider sig.",
+        "how": [
+          "Välj var du vill övervaka, till exempel viktiga nätverksdämpningspunkter, molnmiljöer och kritiska värdar.",
+          "Justera detekteringslogik med hjälp av signaturer, beteenderegler och sammanhang från tillgångs- och identitetsdata.",
+          "Använd varningar med triage-spelböcker, återkopplingsslingor och kontinuerlig justering för att minska brus."
+        ],
+        "security": [
+          "Skydda sensor- och logrörledningar så att angripare inte kan blindupptäcka eller manipulera bevis.",
+          "Integrera med tillgångsinventering och identitetskontext för att prioritera varningar och minska falska positiva resultat.",
+          "Validera upptäckter med kontrollerad testning så att du vet vad du kan och inte kan se."
+        ],
+        "pitfalls": [
+          "Utplacera sensorer utan justering, skapar larmtrötthet och ignorerade larm.",
+          "Saknar täckning på kritiska tillgångar, lämnar blinda fläckar där angripare kan fortsätta.",
+          "Behandla IDS som en engångsinstallation snarare än en pågående upptäcktsteknik."
+        ],
+        "example": "Ett företag driver nätverk IDS vid internetkanten och mellan nyckelsegment, plus värdbaserade sensorer på kritiska servrar. Varningar berikas med tillgångskritikitet och användaridentitet och triageas sedan genom en SIEM med definierade svarsspelböcker."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "IDS kontra förebyggande och var det passar",
+            "paragraphs": [
+              "IDS fokuserar på detektion. Den är utformad för att identifiera misstänkt beteende och policyöverträdelser, inte för att blockera som standard. Många miljöer kombinerar IDS med förebyggande kontroller som brandväggar, slutpunktsskydd och IAM, men IDS tillhandahåller feedbackslingan som talar om för dig om försvar fungerar.",
+              "NIST vägledning om intrångsdetektering och förebyggande av intrång betonar praktiska design- och driftshänsyn för att distribuera och underhålla IDS och relaterade teknologier. Kärnan är att detektion är ett program, inte en produkt."
+            ]
+          },
+          {
+            "title": "Detekteringsmetoder och avvägningar",
+            "paragraphs": [
+              "Signaturbaserad detektion är bra på kända mönster men kan missa nya tekniker eller undvikas av små förändringar. Beteende- och anomalibaserad detektering kan fånga okänd aktivitet men kräver bra baslinjer och noggrann inställning för att undvika brus.",
+              "I mogna program blandar du tillvägagångssätt och förlitar dig på sammanhang. Samma händelse kan vara hög risk på en domänkontrollant och låg risk på en testvärd. Sammanhang från tillgångsinventering, identitet och nätverkssegmentering är det som gör varningar genomförbara."
+            ]
+          },
+          {
+            "title": "Tuning, falska positiva och detektionsteknik",
+            "paragraphs": [
+              "De flesta IDS-fel är operativa. Om varningarna är för bullriga kommer analytiker att ignorera dem. Om varningarna är för sparsamma kommer intrång att slinka igenom. Lösningen är kontinuerlig trimning, med en tydlig ägare som ansvarar för detekteringskvaliteten.",
+              "Behandla regler som kod: testa dem, dokumentavsikt, versionsändringar och mät resultat. Varje incident och varje övning bör återkopplas till bättre regler, bättre täckning eller bättre berikning."
+            ]
+          },
+          {
+            "title": "Undvikande, kryptering och döda fläckar",
+            "paragraphs": [
+              "Angripare försöker undvika IDS genom att blandas in i normal trafik, fragmentera paket eller missbruka legitima verktyg. Kryptering minskar också synligheten om du inte har slutpunktstelemetri eller strategiska dekrypteringspunkter under policykontroll.",
+              "Du behöver inte se allt, men du måste veta vad du inte kan se. Kartläggning av döda vinkeln är en värdefull övning: lista var sensorer finns, vilken data de samlar in och vilka kritiska flöden som förbigår övervakning."
+            ]
+          },
+          {
+            "title": "Hur man börjar bygga en användbar IDS-kapacitet",
+            "paragraphs": [
+              "Börja med ett litet antal högvärdiga övervakningspunkter: utgående internet, VPN avslutning, kritiska serversegment och viktiga molnloggar. Välj varningskategorier som mappar till verkliga hot och bygg sedan triage-spelböcker så att varningar blir till handlingar.",
+              "Skapa sedan en stämningsrytm. Granska toppvarningar varje vecka, dra tillbaka bullriga regler och lägg till täckning för luckor som upptäckts genom incidenter och tester. Med tiden blir IDS ett pålitligt system för tidig varning snarare än en brusgenerator."
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "networkingAndProtocols": [
+    {
+      "id": "tcp",
+      "name": "TCP",
+      "summary": "Pålitlig, anslutningsorienterad transport som levererar en byteström i ordning.",
+      "intro": "TCP är Internets viktigaste transportprotokoll för applikationer som kräver tillförlitlighet. Det omvandlar ett opålitligt IP-nät till en tillförlitlig, ordnad ström genom kvittenser, omsändning och kontroll av sändhastighet.",
+      "bullets": [
+        "Börjar med ett handslag som synkroniserar tillstånd mellan två slutpunkter.",
+        "Spårar sekvensnummer så att mottagaren kan ordna om data och upptäcka förlust.",
+        "Använder flödeskontroll och trängselkontroll så att det inte överväldiga nätverk eller mottagare."
+      ],
+      "learn": {
+        "what": "TCP (Transmission Control Protocol) är ett transportprotokoll som ger tillförlitlig, ordnad leverans mellan två ändpunkter. Applikationer skriver bytes till TCP och läser bytes från TCP; TCP avgör hur strömmen delas upp i segment, hur förluster återhämtas och hur data levereras i rätt ordning till mottagaren.",
+        "why": "Internets baslager, IP, kan släppa, duplicera eller omordna paket. TCP finns för att dölja den verkligheten från applikationer som behöver korrekta, såsom webbsurfning, APIs, e-post, SSH och den mesta databastrafiken.",
+        "how": [
+          "Klienten och servern utför en trevägshandskakning (SYN, SYN ACK, ACK) för att komma överens om initiala sekvensnummer och skapa per anslutningstillstånd.",
+          "Avsändaren strömmar data; TCP kapar den i segment, numrerar byten och lägger dem på tråden.",
+          "Mottagaren bekräftar vad den har tagit emot, vanligtvis genom att säga nästa byte den förväntar sig.",
+          "Om bekräftelserna inte kommer fram i tid, återsänder avsändaren de saknade uppgifterna. Mottagaren ordnar om segment och tar bort dubbletter.",
+          "Flödeskontroll begränsar hur mycket data som kan vara under överföring baserat på mottagarfönstret så att en snabb avsändare inte överväldiga en långsam mottagare.",
+          "Trängselkontroll anpassar sändningshastigheten till nätverket genom att sondera kapaciteten och backa när den upptäcker överbelastningssignaler som förlust eller ECN-märken.",
+          "När den är klar stängs anslutningen med FIN eller avbryts med RST, och TCP behåller kortlivad tillstånd (som TIME WAIT) för att undvika att blanda gamla paket med nya anslutningar."
+        ],
+        "pitfalls": [
+          "Förutsatt att en applikationsskrivning är lika med ett paket. TCP är en ström, inte ett meddelandeprotokoll.",
+          "Att glömma att prestanda beror på tur och retur tid och förlust. Liten förlust kan krossa genomströmningen.",
+          "Ignorerar MTU-problem. Path MTU-problem kan se ut som slumpmässiga timeouts eller avstannade överföringar.",
+          "Felläsning av TIME WAIT som en bugg. Det är normalt och skyddar nya anslutningar.",
+          "Behandla port 443 som automatiskt säker. TCP tillhandahåller bara transport, inte förtroende."
+        ],
+        "security": [
+          "TCP är sårbar för resursutmattning som SYN översvämningar, så servrar använder ofta begränsningar som SYN cookies och hastighetsbegränsning.",
+          "Sekvensnummerförutsägelse och återställningsinjektion är klassiska risker, men moderna stackar ger härdning. Använd TLS för att skydda applikationsdata och slutpunkter.",
+          "Middleboxar som NATs och brandväggar spårar TCP tillstånd. Felkonfigurerade tidsgränser för tillstånd kan bryta långlivade anslutningar."
+        ],
+        "example": "Du laddar en webbplats. Din webbläsare öppnar en TCP-anslutning till servern, slutför handskakningen och skickar sedan en HTTP-förfrågan. Om ett paket försvinner på vägen, återsänder TCP det, och din webbläsare får fortfarande hela svaret i ordning utan att veta att en förlust inträffade."
+      },
+      "deepDive": {
+        "summary": "En djupare titt på mekaniken som gör TCP pålitlig och effektiv.",
+        "sections": [
+          {
+            "title": "Anslutningsinställningar är förhandling plus tillstånd",
+            "paragraphs": [
+              "En TCP anslutning är inte bara ett rör. Båda slutpunkterna skapar tillstånd som nycklas av de 4 tupeln: källkod IP, källport, destination IP, destinationsport. När en klient anropar connect, skickar den ett SYN-segment som föreslår ett initialt sekvensnummer och ofta en uppsättning alternativ som MSS, fönsterskalning och SACK-behörighet. Servern svarar med SYN ACK, väljer sitt eget initiala sekvensnummer och bekräftar vad den accepterar, och klienten avslutar med ett ACK. Efter den punkten är båda sidor överens om hur man numrerar byte och hur man tolkar bekräftelser.",
+              "Det handslaget förhindrar också en stor klass av förvirring. Utan det kan ett gammalt försenat paket från en tidigare konversation se ut som giltig data för en ny konversation. Handslaget tvingar båda sidor att bevisa att de är live nu och att synkronisera sekvensnummerutrymmen innan applikationsdata levereras.",
+              "I paketfångster ser du ofta mer än de klassiska tre segmenten. Optioner är hur TCP anpassar sig till verkliga nät. MSS begränsar segmentstorlek, fönsterskalning möjliggör stora mottagningsfönster på länkar med hög bandbredd, och SACK låter mottagaren ange vilka block som kommit i fel ordning så att avsändaren kan undvika onödiga omsändningar."
+            ]
+          },
+          {
+            "title": "Tillförlitlighet är noggrann bokföring, inte magi",
+            "paragraphs": [
+              "TCP levererar en byteström, vilket innebär att applikationen inte ser meddelandegränser. Internt har varje byte en position. Avsändaren grupperar bytes i segment och märker dem med sekvensnummer. Mottagaren bekräftar vad den har tagit emot med hjälp av bekräftelser som vanligtvis är kumulativa, vilket betyder att den säger nästa byte den förväntar sig. Om ett segment går förlorat, förblir mottagaren antingen tyst om det gapet eller kvitterar förbi det bara när det kan, och avsändaren sänder så småningom om.",
+              "Förlustdetektering är en blandning av timers och tips. En återsändningstidsgräns är den sista utvägen. Snabbare återhämtning kommer från dubbla ACKs: om mottagaren fortsätter att kvittera nästa byte, kan avsändaren sluta sig till ett saknat segment och sända om tidigt med snabb återsändning. Med SACK kan mottagaren vara exakt om vilken data den redan har, så avsändaren kan fokusera återsändningar på vad som verkligen saknas.",
+              "Ordning hanteras genom buffring. Om segment kommer i fel ordning kan mottagaren lagra dem och ändå kvittera mottagen data, men levererar inte bytes till applikationen förrän luckan är fylld. Därför kan ett enda tappat paket tillfälligt stoppa ett annars snabbt flöde, ofta beskrivet som head-of-line-blockering."
+            ]
+          },
+          {
+            "title": "Flödeskontroll kontra trängselkontroll",
+            "paragraphs": [
+              "Flödeskontroll skyddar mottagaren. Varje ACK har ett annonserat mottagningsfönster som talar om för avsändaren hur mycket ytterligare data mottagaren kan buffra. Avsändaren måste respektera den gränsen även om nätverket skulle kunna hantera mer. Om fönstret sjunker till noll, pausar avsändaren och sonderar regelbundet tills mottagaren öppnar fönstret igen.",
+              "Trängselkontroll skyddar nätverket. TCP använder ett congestion window som begränsar hur mycket data som får vara under överföring utan kvittens. Avsändaren styrs alltid av det minsta av congestion window och mottagarfönstret. Detta är viktigt eftersom mottagaröverbelastning och nätverksträngsel är olika problem med olika signaler.",
+              "Verkliga algoritmer för trängselkontroll varierar beroende på operativsystem och era, men kärnidén är stabil. Börja försiktigt, öka sändningshastigheten medan bekräftelserna kommer tillbaka smidigt och minska när förlust eller försening tyder på överbelastning. Det är därför genomströmningen ökar, sedan stabiliseras och ibland sjunker kraftigt när vägen blir trafikerad."
+            ]
+          },
+          {
+            "title": "Typisk livscykel vid verklig användning",
+            "paragraphs": [
+              "De flesta moderna applikationer håller anslutningarna öppna och återanvänder dem. En webbläsare kan till exempel öppna ett litet antal TCP-anslutningar till en webbplats och skicka många HTTP-förfrågningar över varje. Återanvändning är viktigt eftersom anslutningsinstallationen kostar minst en tur och retur, och långsam start gör att avsändaren inte omedelbart kan spränga i full fart.",
+              "När en anslutning är inaktiv kan mellanboxar glömma tillståndet. NAT enheter och brandväggar tar ofta timeout-mappningar, så program som behöver långlivade anslutningar använder keepalives eller periodisk trafik. På förlustlösa trådlösa länkar kommer du att se omsändningar och variabel latens, och TCP kommer att anpassa sig genom att minska sitt överbelastningsfönster och sedan bygga om det.",
+              "När applikationen är klar är den rena avstängningen en FIN-växling. Varje riktning kan stängas oberoende, varför du kan se en sida skicka FIN och fortfarande ta emot data från den andra sidan ett tag. Efter stängning anger en sida TIME WAIT för att se till att sena paket från den gamla anslutningen inte korrumperar en framtida anslutning som råkar återanvända samma 4 tupel."
+            ]
+          },
+          {
+            "title": "Vad man ska leta efter när något känns långsamt",
+            "paragraphs": [
+              "Om du beställer stånd, leta efter förlust. En fångst kan visa upprepade dubbletter av ACKs, SACK block som pekar på ett mellanrum och återsändningar. Även små förluster kan krossa genomströmningen på långa fördröjningsvägar eftersom varje förlusthändelse utlöser backoff.",
+              "Om genomströmningen är begränsad, kontrollera begränsningsfönstret. Ett litet mottagningsfönster tyder på att mottagaren eller programmet inte läser snabbt. Ett litet trängselfönster tyder på att avsändaren är försiktig på grund av trafikstockningssignaler. Att mäta tur och returtid och återsändningshastigheter hjälper dig att bestämma vilken berättelse som passar.",
+              "Om anslutningen återställs upprepade gånger kan du se en brandväggspolicy, en krasch eller ett program som tar slut och avbryts. En RST är en hård abort, medan en FIN är en graciös nära. Den skillnaden har betydelse för felsökning."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "udp",
+      "name": "UDP",
+      "summary": "Anslutningsfri transport som skickar oberoende datagram med minimal overhead.",
+      "intro": "UDP är ett enkelt transportprotokoll som lägger till portar och en kontrollsumma ovanpå IP. Det lovar inte leverans, beställning eller trängselkontroll, vilket gör det snabbt och flexibelt när applikationen kan tolerera förlust eller implementera sin egen logik.",
+      "bullets": [
+        "Varje UDP-paket är ett meddelande. Om den försvinner, försöker inte UDP igen.",
+        "Används när låg latens är viktig eller när högre lager hanterar tillförlitlighet.",
+        "Ofta ihopkopplad med protokoll som DNS, VoIP, streaming och QUIC."
+      ],
+      "learn": {
+        "what": "UDP (User Datagram Protocol) är ett transportprotokoll som levererar diskreta meddelanden som kallas datagram. Till skillnad från TCP skapar den inte en anslutning eller underhåller en stream. Enheten du skickar är den enhet som mottagaren får, förutsatt att den kommer överhuvudtaget.",
+        "why": "Ibland är tillförlitlighet inte prioritet. Ljud, video och spel i realtid föredrar data i rätt tid framför perfekta data, och många protokoll har redan sina egna regler för omförsök och beställning. UDP finns för att tillhandahålla portar och grundläggande integritetskontroll utan vikten av en fullständig anslutning.",
+        "how": [
+          "En applikation skapar ett datagram och väljer en destination IP adress och port.",
+          "UDP lägger till en liten rubrik med källport, destinationsport, längd och kontrollsumma.",
+          "IP dirigerar paketet som alla andra IP-paket. Routrar behåller inte tillstånd per flöde för UDP som standard.",
+          "Mottagarens operativsystem använder destinationsporten för att leverera datagrammet till rätt uttag.",
+          "Om paketet försvinner eller kommer i fel ordning gör UDP ingenting. Återhämtning hanteras av applikationen.",
+          "Många nätverk använder NAT, så det första utgående paketet skapar ofta en tillfällig mappning som tillåter svar tillbaka."
+        ],
+        "pitfalls": [
+          "Förutsatt att UDP alltid är snabbare. Förlust och återsändning vid applikationslagret kan göra det långsammare totalt sett.",
+          "Skickar stora datagram. Fragmentering ökar förlusteffekten och blockeras ofta.",
+          "Att glömma att UDP fortfarande behöver medvetenhet om trafikstockningar. Hög hastighet UDP kan överbelasta länkar och skada allt.",
+          "NAT och brandväggstimeout kan tyst bryta långlivade UDP-flöden.",
+          "Feldiagnostisera paketförlust som en serverbugg när det verkligen är sökvägsförlust."
+        ],
+        "security": [
+          "UDP är lätt att förfalska, vilket möjliggör reflektion och förstärkningsattacker när protokoll svarar med större svar än förfrågan.",
+          "Eftersom det inte finns något handslag måste servrar vara försiktiga med att tilldela tillstånd eller göra tung krypto baserat på ett enda paket.",
+          "Använd autentisering på ett högre lager när identiteten är viktig, till exempel DTLS eller applikationsnivåsignaturer."
+        ],
+        "example": "En DNS-resolver skickar en liten UDP-fråga till port 53. Om svaret går förlorat försöker resolvern helt enkelt frågan igen, ofta till en annan server, istället för att förlita sig på UDP för att reparera förlusten."
+      },
+      "deepDive": {
+        "summary": "UDP är enkel till sin design. Det intressanta är vilka applikationer som bygger på det.",
+        "sections": [
+          {
+            "title": "Vad en UDP-sändning verkligen gör",
+            "paragraphs": [
+              "När en applikation skickar med UDP ger den operativsystemet ett meddelande och en destination: IP adress och port. UDP lindar in det meddelandet i en liten rubrik och ger det till IP. Det finns inget handslag, inget anslutningstillstånd och inget löfte om att meddelandet kommer. Om det anländer kommer det som ett helt datagram, så meddelandegränser bevaras till skillnad från TCPs byteström.",
+              "Eftersom det inte finns någon inbyggd återställning kan UDP ha lägre latens. Det finns ingen väntan på bekräftelser innan fler skickas, och det finns ingen blockering av linjehuvudet orsakad av ett förlorat paket. Det är därför realtidsmedia, spel och moderna transporter som QUIC ofta väljer UDP som underlag.",
+              "UDP har fortfarande portar, vilket är hur en värd demultiplexerar inkommande datagram till rätt applikation. Den har också en kontrollsumma som hjälper till att upptäcka korruption. I praktiken är kontrollsumman inte en tillförlitlighetsfunktion, det är ett skyddsnät som låter en mottagare kasta dålig data istället för att skicka den uppåt."
+            ]
+          },
+          {
+            "title": "Typiskt flöde: förfrågan, svar, klart",
+            "paragraphs": [
+              "Ett vanligt UDP-mönster är en enda förfrågan och ett enda svar. DNS är det klassiska exemplet. Klienten skickar en fråga till port 53 och väntar kort. Om svaret kommer, bra. Om inte, sänder klienten om, eventuellt till en annan resolver. Applikationen hanterar logiken igen eftersom UDP själv inte gör det.",
+              "Eftersom omförsök görs i applikationslagret, ser du ofta unika identifierare inuti nyttolasten. Identifieraren låter klienten matcha ett svar på rätt förfrågan och ignorera dubbletter. Detta är en anledning till att nybörjare ibland tror att UDP är oordnad. I verkligheten tillhandahålls helt enkelt inte beställning, så ansökan måste ta ställning till om beställning alls spelar någon roll.",
+              "NAT och brandväggsbeteende formar också verklig användning. Utgående UDP skapar vanligtvis ett tillfälligt tillstånd i en NAT-enhet. Om programmet tystnar för länge kan det tillståndet upphöra och inkommande svar tas bort. Det är därför många UDP-baserade protokoll inkluderar keepalives även om själva applikationen är inaktiv."
+            ]
+          },
+          {
+            "title": "Storlek, fragmentering och varför små paket vinner",
+            "paragraphs": [
+              "Ett UDP datagram kan vara stort på papper, men nätverksvägen har en maximal överföringsenhet. Om ett datagram inte passar, kan IP fragmentering inträffa, och om ett fragment förloras förloras hela datagrammet. Många nätverk och mellanlådor hanterar fragment dåligt, så stora UDP nyttolaster är ömtåligare än de ser ut.",
+              "Praktiska UDP-protokoll håller nyttolasten tillräckligt liten för att passa i ett enda IP-paket på vanliga vägar. Om de behöver flytta mer data skickar de flera datagram och lägger till sina egna regler för sekvensering och återmontering. Detta är i huvudsak att bygga om en del av vad TCP gör, men skräddarsytt efter applikationens behov.",
+              "Om du någon gång ser en protokollbyte från UDP till TCP för stora svar, är det vanligtvis ett tecken på att fragmentering ansågs vara för riskabel. DNS gör detta, och andra protokoll gör liknande val beroende på implementeringens verklighet."
+            ]
+          },
+          {
+            "title": "Bygga tillförlitlighet utöver UDP",
+            "paragraphs": [
+              "Om en applikation behöver tillförlitlighet kan den lägga till bekräftelser och återsändningar. Det vanliga tricket är att bekräfta specifika meddelandenummer, skicka om efter en timeout och tolerera dubbletter. Detta kan vara enklare än TCP om applikationen inte behöver en kontinuerlig ström och kan behandla varje meddelande oberoende.",
+              "Om en applikation behöver trängselkontroll kan den implementera hastighetsbegränsning och backoff baserat på observerad förlust och fördröjning. QUIC är ett viktigt exempel: den använder UDP-paket, men den implementerar strömmar, bekräftelser, kryptering och trängselkontroll i användarutrymmet, vilket möjliggör snabbare utveckling än kärnbaserade TCP i många miljöer.",
+              "Nyckeln är att välja vad du faktiskt behöver. Många UDP-protokoll accepterar viss förlust eftersom det är mindre skadligt än fördröjning. Ett röstsamtal föredrar att släppa ett gammalt paket istället för att vänta på en återsändning, medan en filöverföring vill ha alla byte och har råd med förseningar."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "dns",
+      "name": "DNS",
+      "summary": "Distribuerat namnsystem som mappar domännamn till poster som IP-adresser.",
+      "intro": "DNS förvandlar människovänliga namn till data, mest kända IP-adresser. Det är ett hierarkiskt, cachat uppslagssystem där en resolver går igenom trädet av auktoritativa servrar och sedan cachar svar för att göra framtida uppslagningar snabba.",
+      "bullets": [
+        "Upplösare cachelagrar svar med TTL för att minska belastning och latens.",
+        "Frågor använder vanligtvis UDP, med TCP för större svar eller zonöverföringar.",
+        "Att förstå rekursion och auktoritet förklarar de flesta DNS beteenden."
+      ],
+      "learn": {
+        "what": "DNS (Domain Name System) är Internets telefonbok och mycket mer. Den lagrar poster under domännamn, till exempel vilka IP-adresser som tjänar ett värdnamn, vilka e-postservrar som hanterar en domän eller vilka nycklar som används för DNSSEC.",
+        "why": "Hårdkodning av IP-adresser skalas inte. Tjänster flyttar, lastbalanserar och misslyckas. DNS ger ett stabilt namn medan de underliggande adresserna och routingen kan ändras.",
+        "how": [
+          "Din enhet ber en lokal resolver (ofta din router eller OS-stubresolver) om ett namn, som www.example.com.",
+          "Om svaret är cachelagrat och fortfarande är giltigt (TTL har inte löpt ut) svarar resolvern omedelbart.",
+          "Om den inte är cachad, utför en rekursiv resolver uppslagningen genom att fråga DNS rotservrarna var de kan hitta den relevanta toppdomänen.",
+          "Resolvern frågar toppdomänservrarna om de auktoritativa servrarna för domänen.",
+          "Resolvern ber en auktoritativ server om den slutliga posten, som en A- eller AAAA-post.",
+          "Det auktoritativa svaret kommer tillbaka med ett TTL. Resolvern cachar den och returnerar den till klienten.",
+          "Om svaret är stort kan resolvern försöka igen över TCP, och moderna miljöer använder också krypterade transporter som DoH eller DoT för sekretess."
+        ],
+        "pitfalls": [
+          "Jagar fel server. Klienten pratar vanligtvis med en rekursiv resolver, inte den auktoritativa servern.",
+          "Ignorerar cachelagring. En ändring kanske inte visas förrän TTLs löper ut.",
+          "Om vi antar att DNS alltid betyder A-poster. Många fel är faktiskt MX, TXT, CNAME eller SRV relaterade.",
+          "Att glömma negativ caching. NXDOMAIN svar kan också cachelagras.",
+          "Felsökning genom att endast pinga en IP. Namnupplösning och anslutning är olika problem."
+        ],
+        "security": [
+          "DNS kan förgiftas eller förfalskas utan skydd, så lösare använder randomisering och kan validera DNSSEC där det är tillgängligt.",
+          "Öppna resolver kan missbrukas för förstärkning. Rekursiva resolvers bör begränsas till betrodda klienter.",
+          "Krypterad DNS (DoH, DoT) förbättrar integriteten men kan också dölja DNS från traditionell nätverksövervakning."
+        ],
+        "example": "Du skriver en URL. Innan någon TCP eller TLS anslutning sker, löser din maskin värdnamnet genom en resolver. Om resolvern redan har cachat svaret kan uppslagningen vara mikrosekunder. Om inte, kan den kontakta flera servrar i DNS-hierarkin innan den returnerar den slutliga IP-adressen."
+      },
+      "deepDive": {
+        "summary": "DNS ser enkelt ut på ytan, men upplösningen är en distribuerad sökning i flera steg med cachning överallt.",
+        "sections": [
+          {
+            "title": "Rollerna: stubresolver, rekursiv resolver och auktoritativ server",
+            "paragraphs": [
+              "På de flesta enheter talar en applikation inte direkt till det globala DNS-systemet. Den frågar en lokal stubresolver, vanligtvis en del av operativsystemet, som sedan frågar en rekursiv resolver. Den rekursiva resolvern är arbetshästen. Den utför sökningen över DNS-hierarkin och returnerar ett slutgiltigt svar till stubben.",
+              "Auktoritativa servrar är olika. De söker inte. De svarar för zoner de kontrollerar, som example.com, och de returnerar poster tillsammans med TTL-värden. Rotservrar och toppdomänservrar är också auktoritativa för sina specifika zoner, och deras huvudsakliga uppgift är att tala om för resolvern vart den ska gå härnäst.",
+              "Att tänka i roller förtydligar felsökning. Om din bärbara dator inte kan lösa namn men en annan resolver fungerar, är problemet ofta den rekursiva resolvern eller sökvägen till den. Om alla på internet inte kan lösa en domän är problemet mer troligt i den auktoritativa sidan eller zonkonfigurationen."
+            ]
+          },
+          {
+            "title": "Steg för steg: lösa ett namn du aldrig har sett",
+            "paragraphs": [
+              "Föreställ dig att du skriver en ny domän i webbläsaren. Stubresolvern kontrollerar först lokal cache och hosts-fil. Finns inget svar skickas frågan till den konfigurerade rekursiva resolvern. Om inte heller den har ett cachat svar startar en iterativ uppslagning ned genom DNS-hierarkin.",
+              "Först frågar den en rotserver för domänen. Rotservern vet inte det slutliga svaret, men den returnerar en hänvisning till rätt toppdomänservrar. Därefter frågar resolvern en toppdomänserver, som returnerar en hänvisning till domänens auktoritativa namnservrar. Slutligen frågar resolvern en auktoritativ server efter posttypen den behöver, såsom A eller AAAA, och får svaret med TTL-värden.",
+              "Resolvern cachar sedan resultatet och returnerar det till din enhet. Ur ditt perspektiv ser det hela ut som en uppslagning, men under huven är det flera nätverksresor. Vinsten är att framtida sökningar är snabba eftersom de flesta delar av sökvägen är cachade, inklusive hänvisningar."
+            ]
+          },
+          {
+            "title": "Cachning är anledningen till att DNS skalar",
+            "paragraphs": [
+              "Cachning sker på flera lager: i stubresolvern, i den rekursiva resolvern, i vidarebefordrare och ibland i själva applikationerna. TTL på en DNS post talar om för cachar hur länge de får återanvända datan. När TTL löper ut måste cachen fråga igen, vilket är anledningen till att ändringar inte sprids direkt även om den auktoritativa servern uppdaterades.",
+              "Negativ cachning spelar också roll. Om ett namn inte finns kan resolvern cache det faktum ett tag för att undvika att upprepa samma misslyckade sökning. Detta förbättrar motståndskraften under stavfel och attacker, men det kan överraska dig under driftsättningen om du skapar en post kort efter ett cachat negativt svar.",
+              "En användbar mental modell är att DNS inte är en enda databas. Det är en uppsättning auktoritativa sanningar plus ett stort antal tillfälliga kopior. Felsökning innebär ofta att hitta vilken kopia någon använder och om den kopian är inaktuell."
+            ]
+          },
+          {
+            "title": "Transportdetaljer du märker i det vilda",
+            "paragraphs": [
+              "De flesta DNS frågor och svar använder UDP eftersom det är snabbt och enkelt. Om ett svar är för stort för UDP, kan servern ställa in en trunkeringsflagga och klienten försöker igen med TCP. TCP används också för zonöverföringar mellan auktoritativa servrar och i vissa DNSSEC tunga scenarier.",
+              "Moderna DNS använder EDNS för att tillåta större UDP nyttolaster än den gamla standarden, men storleken spelar fortfarande roll eftersom överdimensionerade datagram kan fragmenteras. Operatörer ställer ofta in DNS svarsstorlekar för att undvika fragmentering på vanliga vägar, vilket är anledningen till att vissa svar är avsiktligt kompakta.",
+              "Om du ser intermittenta fel, leta efter mellanlådor som misshandlar UDP-fragment, eller efter resolvers som inte kan nå auktoritativa servrar på grund av brandväggsregler. DNS är känslig för små anslutningsproblem eftersom den förlitar sig på flera distinkta destinationer under en enda lösning."
+            ]
+          },
+          {
+            "title": "Säkerhets- och integritetsöverväganden",
+            "paragraphs": [
+              "Klassisk DNS har ingen kryptering, så observatörer på vägen kan se vilka namn du slår upp och angripare kan försöka förfalska svar. Upplösare försvarar sig med slumpmässiga transaktions-ID:n, slumpmässiga källportar och noggranna cachningsregler, men det är fortfarande ett protokoll som förutsätter ett mestadels ärligt nätverk.",
+              "DNSSEC lägger till autenticitet genom att låta resolvers validera signerade poster, men den krypterar inte frågan. DNS över TLS och DNS över HTTPS lägger till kryptering för klienten till resolver-benet, vilket förbättrar integriteten i lokala nätverk, men de ändrar inte hur resolvern pratar med auktoritativa servrar om den inte är konfigurerad för att göra det.",
+              "En pragmatisk takeaway är att skilja integritet från konfidentialitet. DNSSEC hjälper dig att lita på svaret. DoT och DoH hjälper till att dölja frågan vid det första hoppet."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "dhcp",
+      "name": "DHCP",
+      "summary": "Automatiskt nätverkskonfigurationsprotokoll som delar ut IP-inställningar som leasingavtal.",
+      "intro": "DHCP ger automatiskt enheter de nätverksinställningar de behöver för att kommunicera, såsom en IP adress, standardgateway och DNS resolver. Det fungerar genom en leasingprocess där servern tillfälligt tilldelar konfigurationen till en klient.",
+      "bullets": [
+        "Använder ett bekräftelseflöde för att upptäcka erbjudandeförfrågan för att tilldela adresser.",
+        "Hyresavtal löper ut och måste förnyas, varför adresserna kan ändras med tiden.",
+        "Reläagenter tillåter DHCP att arbeta över undernät utan att utöka sändningarna."
+      ],
+      "learn": {
+        "what": "DHCP (Dynamic Host Configuration Protocol) är ett klientserverprotokoll som konfigurerar värdar på ett IP-nätverk. Istället för att manuellt ställa in en adress på varje enhet, hanterar en DHCP-server en pool av adresser och alternativ och delar ut dem som tidsbundna leasingavtal.",
+        "why": "Manuell adressering är långsam och felbenägen. DHCP säkerställer att enheter kommer online snabbt, minskar konflikter och centraliserar kontrollen över inställningar som gateways, DNS och domänsökvägar.",
+        "how": [
+          "En ny klient som inte har någon IP-adress sänder ett DHCP Discover-meddelande på det lokala nätverket.",
+          "En eller flera servrar svarar med ett DHCP-erbjudande som innehåller en föreslagen adress och konfigurationsalternativ.",
+          "Klienten sänder en DHCP-förfrågan genom att välja ett erbjudande och begära den adressen.",
+          "Servern svarar med en DHCP bekräftelse, och klienten konfigurerar sitt gränssnitt och startar leasingtimern.",
+          "Innan hyresavtalet löper ut försöker klienten förnya, vanligtvis med unicast-meddelanden till den ursprungliga servern.",
+          "Om klienten flyttar till ett nytt nätverk eller inte kan förnya, upprepar den upptäckten och kan få en annan adress.",
+          "Om servern är på ett annat subnät, vidarebefordrar en reläagent sändningsmeddelandena till servern och vidarebefordrar svaren tillbaka."
+        ],
+        "pitfalls": [
+          "Förutsatt att DHCP problem alltid är servern. Switchportsäkerhet, VLAN-problem och reläer är vanliga orsaker.",
+          "Överlappande omfattningar eller felkonfigurerade pooler kan skapa adresskonflikter.",
+          "Bortse från hyrestider. Korta hyresavtal kan orsaka onödig churn; långa hyresavtal bromsar saneringen.",
+          "Att glömma att DHCP vanligtvis är oautentiserad. En oseriös server kan dela ut dåliga gateways och DNS.",
+          "Felsökning utan att kontrollera vilkett VLAN klienten faktiskt befinner sig i."
+        ],
+        "security": [
+          "Rogue DHCP är en klassisk attack. Funktioner som DHCP snooping kan blockera serversvar på opålitliga portar.",
+          "Alternativen DHCP kan omdirigera trafik genom att ändra standardgateways eller DNS-servrar, så behandla DHCP som säkerhetskänslig.",
+          "Loggar från servern DHCP är ofta den bästa källan för att svara på vem som hade vilken IP vid en given tidpunkt."
+        ],
+        "example": "Du går med i ett kafé WiFi. Din bärbara dator sänder Discover, får ett erbjudande med en adress och DNS, begär det och får sedan ett Ack. Sekunder senare kan du surfa på webben, även om du aldrig rörde en IP-inställning."
+      },
+      "deepDive": {
+        "summary": "DHCP är hur en enhet lär sig sin nätverksidentitet och reglerna för det lokala nätverket utan manuell installation.",
+        "sections": [
+          {
+            "title": "Bootstrapping: få konfiguration från ingenting",
+            "paragraphs": [
+              "En ny enhet börjar ofta med bara en MAC-adress och ingen IP. DHCP finns för att lösa problemet med kyckling och ägg. Klienten sänder en DHCPDISCOVER eftersom den ännu inte vet vilken server den ska prata med. Servrar på det lokala nätverket svarar med DHCPOFFER-meddelanden som föreslår en adressleasing och alternativ som subnätmask, standardgateway och DNS-servrar.",
+              "Kunden väljer ett erbjudande och sänder en DHCPREQUEST för att säga vilket erbjudande den accepterar. Den valda servern svarar med DHCPACK, och först då konfigurerar klienten gränssnittet med den hyrda IP och alternativen. Detta utbyte av fyra meddelanden sammanfattas ofta som Discover, Offer, Request, Acknowledge.",
+              "I en fångst förklarar sändningsnaturen de första stegen. Tidiga meddelanden måste nå alla potentiella servrar och tidiga svar måste nå en klient som fortfarande inte kan ta emot unicast-trafik på ett tillförlitligt sätt. När de väl har konfigurerats byter senare förnyelser ofta till unicast eftersom båda sidor nu känner till varandras adresser."
+            ]
+          },
+          {
+            "title": "Hyresavtal: nätverket ger, du lånar",
+            "paragraphs": [
+              "DHCP ger en adress för en tidsperiod som kallas leasing. Leasingkonceptet låter nätverk återanvända adresser effektivt och återhämta sig från enheter som försvinner utan att säga adjö. Klienten lagrar leasingmetadata och börjar förnya innan leasingavtalet löper ut.",
+              "Förnyelse börjar vanligtvis med en unicast DHCPREQUEST till den ursprungliga servern vid en timer som ofta kallas T1. Om det misslyckas går klienten in i en återbindningsfas vid T2, där den sänder till valfri DHCP-server som kan förlänga leasingavtalet. Om förnyelsen lyckas skickar servern DHCPACK och leasingtimern återställs.",
+              "Om förnyelsen aldrig lyckas och hyresavtalet löper ut bör klienten sluta använda adressen och börja om. Det är därför felkonfigurerad DHCP kan orsaka periodiska avintrång som ser ut som slumpmässiga fall: enheten fungerar tills den förnyas, förlorar sedan sin hyreskontrakt och måste omförhandla."
+            ]
+          },
+          {
+            "title": "Korsar undernät: reläer och hjälpare",
+            "paragraphs": [
+              "Sändningar korsar inte routrar, men organisationer vill fortfarande ha centraliserad DHCP. Fixningen är en DHCP reläagent, ibland kallad en hjälpare. Reläet lyssnar efter klientsändningar på ett subnät och vidarebefordrar dem sedan som unicast till en DHCP-server på ett annat nätverk, med information om det ursprungliga subnätet.",
+              "Ur klientens perspektiv förändras ingenting. Den sänder fortfarande. Ur serverperspektivet ser den förfrågningar som kommer från reläet och väljer en adresspool baserat på reläinformationen. Så här fungerar DHCP över VLANs i verkliga företag.",
+              "Om enheter på ett VLAN aldrig får en adress är ett trasigt eller saknat relä en huvudmisstänkt. Ett annat vanligt problem är att servern inte har något utrymme för det subnätet, så den tar emot den vidarebefordrade förfrågan men kan inte erbjuda en giltig adress."
+            ]
+          },
+          {
+            "title": "Praktiska felsökningsmönster",
+            "paragraphs": [
+              "Om du ser dubbletter av IP-konflikter, leta efter oseriösa DHCP-servrar eller efter en blandning av DHCP och statisk adressering i samma pool. En enkel hemmarouter som är felkonfigurerad som en extra DHCP-server kan skapa kaotiskt beteende som ser ut som slumpmässiga anslutningsproblem.",
+              "Om en klient får en adress men inte kan nå någonting är alternativen ofta fel snarare än själva adressen. En felaktig standardgateway eller fel DNS-server kan få enheten att se offline ut trots att leasingavtalet lyckades.",
+              "Om förnyelser bara misslyckas i vissa nätverk, leta efter brandväggsregler som blockerar UDP port 67 och 68, eller efter reläer som inte är konfigurerade på alla relevanta gränssnitt. DHCP är enkelt, men det är känsligt för små policyfel eftersom klienten är beroende av det vid uppstart."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "arp",
+      "name": "ARP",
+      "summary": "Lokalt nätverksprotokoll som mappar IPv4-adresser till länklageradresser.",
+      "intro": "ARP löser en IPv4-adress till en MAC-adress på ett lokalt nätverkssegment. Innan en värd kan skicka en Ethernet-ram till en granne behöver den grannens MAC, och ARP är hur den lär sig den.",
+      "bullets": [
+        "Använder sändningsförfrågningar och unicast-svar på ett LAN.",
+        "Värdar cache-mappningar ett tag för att undvika upprepade uppslagningar.",
+        "ARP är en vanlig källa till spoofing och man i mitten attacker på platta nätverk."
+      ],
+      "learn": {
+        "what": "ARP (Address Resolution Protocol) används på IPv4 Ethernet-nätverk för att hitta länklageradressen för en IP-adress på samma lokala nätverk. IP routing avgör nästa hopp IP. ARP hittar MAC-adressen för nästa hopp så att ramen kan levereras på tråden.",
+        "why": "Ethernet levererar ramar till MAC-adresser, men applikationer och IP routing använder IP adresser. ARP överbryggar det gapet inom en lokal broadcastdomän.",
+        "how": [
+          "En värd vill skicka ett IP-paket till en destination. Om destinationen är avlägsen är nästa hopp standardgatewayen.",
+          "Värden kontrollerar sin ARP-cache efter MAC-adressen för nästa hopp IP.",
+          "Om den saknas sänder den en ARP-förfrågan som frågar vem som har den IP-adressen.",
+          "Enheten som äger IP svarar med ett ARP-svar som innehåller dess MAC-adress.",
+          "Avsändaren lagrar mappningen i sin cache och skickar Ethernet-ramen till den MAC:n.",
+          "Cachar upphör eller uppdateras. Vissa enheter skickar också gratis ARP för att meddela ändringar eller upptäcka konflikter."
+        ],
+        "pitfalls": [
+          "Förutsatt att ARP fungerar över routrar. ARP är lokal för en broadcastdomän.",
+          "Inaktuella cacheposter kan göra att enkelriktad anslutning eller trafik går till fel värd.",
+          "Dubbletter av IP-adresser visas ofta som ARP flaxande i loggar.",
+          "Virtualisering och failover kan ändra MAC-adresser snabbt, förvirrande cacher.",
+          "Blockering av ARP bryter grundläggande IPv4-kommunikation på Ethernet."
+        ],
+        "security": [
+          "ARP är oautentiserad, så angripare kan förgifta cacher genom att skicka falska svar.",
+          "Switchfunktioner som dynamisk ARP-inspektion och DHCP snooping kan minska förgiftning på hanterade nätverk.",
+          "Segmentering och begränsning av vem som delar en broadcastdomän minskar sprängradien för ARP-baserade attacker."
+        ],
+        "example": "Din bärbara dator vill nå en server på Internet. Det gör inte ARP för serverns IP. Den ARPs för standardgatewayens IP, lär sig gatewayens MAC och skickar sedan paketet till gatewayen för routing."
+      },
+      "deepDive": {
+        "summary": "ARP är bryggan mellan IP-tänkandet och Ethernet-verkligheten på en lokal länk.",
+        "sections": [
+          {
+            "title": "Varför ARP finns i Ethernet-nätverk",
+            "paragraphs": [
+              "IP routing avgör nästa hopp IP adress, men Ethernet-leverans kräver en destinations MAC-adress. På ett lokalt subnät är nästa hopp ofta den slutliga värden själv. ARP finns för att mappa en IPv4-adress till en MAC-adress så att en värd kan bygga en Ethernet-ram som faktiskt når rätt maskin.",
+              "Denna mappning är bara meningsfull på den lokala broadcastdomänen. Om din destination IP är på ett annat nätverk, gör du inte ARP för fjärrvärden. Du ARP för din standardgateway, eftersom gatewayen är nästa hopp på den lokala länken. Den enda detaljen förklarar en hel del förvirring när folk förväntar sig att ARP ska avslöja internet breda vägar.",
+              "ARP är därför ett lokalt upptäcktsprotokoll. Det är snabbt, bullrigt och avsiktligt enkelt. Det förutsätter att enheter på ett LAN kan ställa en sändningsfråga och att rätt enhet svarar."
+            ]
+          },
+          {
+            "title": "Steg för steg: hur en värd lär sig en MAC-adress",
+            "paragraphs": [
+              "Värden kontrollerar först sin ARP cache. Om den redan har en ny mappning för målet IP, använder den den omedelbart. Om inte, skickar den en ARP-förfrågan som en sändning av Ethernet-ram som effektivt frågar: vem har denna IP, berätta för mig din MAC.",
+              "Endast enheten som äger IP ska svara. Den skickar ett ARP-svar, vanligtvis unicast tillbaka till förfrågaren, som innehåller dess MAC-adress. Beställaren lagrar mappningen i sin ARP-cache med en åldringstimer och sänder sedan det ursprungliga IP-paketet inuti en Ethernet-ram adresserad till den MAC.",
+              "Eftersom ARP är cachedriven kan beteendet se konstigt ut under övergångar. Om en maskin flyttar till ett nytt nätverkskort eller en ny switchport, kan cachar tillfälligt peka på en gammal MAC. Det är därför många system skickar gratis ARP-meddelanden för att uppdatera grannar när deras mappning ändras."
+            ]
+          },
+          {
+            "title": "Cachar, gratis ARP och verklig nätverksdynamik",
+            "paragraphs": [
+              "ARP cacher upphör. Olika operativsystem använder olika timers och vissa uppdaterar poster när trafiken flyter. Detta är bra eftersom det låter nätverket anpassa sig, men det betyder också att tysta fel kan pågå tills en cache tar slut och utlöser en ny förfrågan.",
+              "Gratis ARP är ett meddelande som en värd skickar om sig själv utan att bli tillfrågad. Den används för att tillkännage en ny mappning, upptäcka dubbletter och hjälpa switchar att lära sig var en MAC bor. I inställningar med hög tillgänglighet förlitar sig en failover IP ofta på gratis ARP så att grannar snabbt skickar trafik till den nya aktiva maskinen.",
+              "Ur en felsökningsvy förklarar ARP varför en ping först kan misslyckas och sedan lyckas. Den första pingen utlöser ARP-upplösningen. När MAC är inlärt flyter efterföljande paket normalt tills cachen går ut eller kartläggningen ändras igen."
+            ]
+          },
+          {
+            "title": "Säkerhet: ARP litar på det lokala nätverket",
+            "paragraphs": [
+              "ARP har ingen autentisering. Enheter accepterar ofta svar och uppdaterar cachar även om de inte frågade, vilket gör ARP spoofing möjlig. En angripare på samma LAN kan göra anspråk på att vara gatewayen och omdirigera trafik genom sig själv.",
+              "Företagsnätverk mildrar detta med funktioner som dynamisk ARP-inspektion, DHCP snooping och statiska bindningar i känsliga segment. Att segmentera opålitliga enheter i separata VLANs minskar åtminstone vem som till och med kan delta i samma ARP broadcastdomän.",
+              "Det viktiga är att ARP är designad för samarbete, inte fientlighet. Om det lokala nätverket inte är pålitligt måste du lägga till kontroller utanför själva ARP."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "icmp",
+      "name": "ICMP",
+      "summary": "Kontroll- och felrapporteringsmeddelanden som används av IP för diagnostik och feedback.",
+      "intro": "ICMP ger feedback om IP-leverans, till exempel oåtkomliga destinationer eller meddelanden som överskridits. Verktyg som ping och traceroute förlitar sig på ICMP för att mäta nåbarhet och vägbeteende.",
+      "bullets": [
+        "ICMP är en del av IP, inte en separat transport som TCP eller UDP.",
+        "Används för fel (otillgänglig, fragmentering behövs) och för diagnostik (eko).",
+        "Att blockera alla ICMP kan bryta verklig trafik, särskilt Path MTU Discovery."
+      ],
+      "learn": {
+        "what": "ICMP (Internet Control Message Protocol) är hur IP-enheter rapporterar fel och ger driftssignaler. När en router inte kan vidarebefordra ett paket, eller när en värd behöver berätta något för en avsändare om leverans, gör den det ofta med ett ICMP-meddelande.",
+        "why": "IP är bästa försök. Utan feedback skulle avsändare inte ha någon aning om varför trafiken misslyckas. ICMP ger tillräckligt med information för felsökning och för viktiga mekanismer som Path MTU Discovery, samtidigt som IP är enkel.",
+        "how": [
+          "En enhet bearbetar ett IP-paket. Om den kan vidarebefordra eller leverera den, behövs ingen ICMP.",
+          "Om något går fel, till exempel ingen rutt, TTL har gått ut eller ett paket för stort, kan enheten generera ett ICMP-meddelande tillbaka till källan.",
+          "ICMP-meddelandet innehåller en typ och kod som beskriver tillståndet och inkluderar vanligtvis en del av originalpaketet så att avsändaren kan identifiera flödet.",
+          "Diagnostiska verktyg skickar ICMP Echo Requests, och destinationen svarar med Echo Replies, vilket är vad ping mäter.",
+          "Traceroute manipulerar TTL värden så att routrar längs vägen skickar ICMP Tid överskriden, avslöjar hoppsekvensen.",
+          "Brandväggar kan klassificera gränsen ICMP för att förhindra missbruk, så ICMP-beteende kan vara sprucket i riktiga nätverk."
+        ],
+        "pitfalls": [
+          "Blockerar alla ICMP. Vissa typer är viktiga för PMTU och för rent felbeteende.",
+          "Om du antar att ping-fel betyder att värden är nere. Många nätverk blockerar Echo men tillåter fortfarande TCP och UDP.",
+          "Ignorerar hastighetsbegränsning. Några få ICMP svar garanterar inte att varje paket får feedback.",
+          "Felläsning av traceroute-utgång när det finns asymmetriska rutter eller filtrerade ICMP.",
+          "Behandla ICMP som en säkerhetsrisk som standard snarare än att filtrera specifika typer på ett förnuftigt sätt."
+        ],
+        "security": [
+          "ICMP kan användas för skanning och för vissa reflektionsattacker, så nätverk filtrerar eller hastighetsbegränsar det ofta.",
+          "ICMP omdirigeringar och andra sällan använda typer kan vara riskabla om de aktiveras i opålitliga miljöer.",
+          "Det säkrare tillvägagångssättet är att tillåta nödvändiga ICMP för nätverkshälsa samtidigt som exponeringen från internetkanten begränsas."
+        ],
+        "example": "En router tappar ett paket eftersom dess TTL nådde noll. Den skickar ICMP Time Exceeded tillbaka till källan. Ditt traceroute-verktyg samlar in dessa meddelanden för att kartlägga rutten ett hopp i taget."
+      },
+      "deepDive": {
+        "summary": "ICMP är hur nätverket pratar tillbaka: fel, diagnostik och vägfeedback.",
+        "sections": [
+          {
+            "title": "ICMP är inte en transport, det är feedback",
+            "paragraphs": [
+              "ICMP meddelanden bärs inuti IP, men de är inte avsedda för applikationsnyttolaster. De finns så att värdar och routrar kan rapportera problem och tillhandahålla kontrollinformation. När en router inte kan vidarebefordra ditt paket kan den skicka ett ICMP-fel tillbaka till källan och förklara varför.",
+              "Du kan se det som nätverkets aviseringskanal. Utan det skulle många misslyckanden se identiska ut: din trafik skulle bara försvinna. Med ICMP kan du lära dig att en destination inte går att nå, att en tid att leva har gått ut eller att ett paket var för stort för en länk.",
+              "ICMP är därför nära kopplat till verklig verksamhet. Verktyg som ping och traceroute är inte magiska verktyg. De är praktiska omslag kring specifika ICMP meddelandetyper."
+            ]
+          },
+          {
+            "title": "Ping: ekoförfrågan och ekosvar",
+            "paragraphs": [
+              "Ping skickar en ICMP ekoförfrågan till ett mål och väntar på ett ekosvar. Begäran inkluderar en identifierare och sekvensnummer så att avsändaren kan matcha svar och mäta tur och retur tid. Om svar kommer tillbaka vet du att det finns grundläggande IP nåbarhet och att målet svarar.",
+              "Ping är användbart, men det är inte ett komplett test. Brandväggar kan blockera ekomeddelanden samtidigt som de tillåter verklig programtrafik, och vissa enheter begränsar ICMP svar. En misslyckad ping betyder inte alltid att en värd är nere, men en lyckad ping är ett starkt bevis på att vägen och målet lever.",
+              "I praktiken är ping också ett test av returvägen. Svaret måste komma tillbaka till dig. Det är därför asymmetriska routingproblem kan dyka upp som intermittenta ping-fel även när en riktning verkar bra."
+            ]
+          },
+          {
+            "title": "Traceroute: lär dig vägen med TTL utgångsdatum",
+            "paragraphs": [
+              "Traceroute fungerar genom att manipulera värdet IP Time To Live. Den skickar sonder med TTL inställd på 1, sedan 2, sedan 3, och så vidare. Varje router minskar TTL. När TTL når noll, tappar den routern paketet och skickar tillbaka ett ICMP Time Exceeded-meddelande, som avslöjar sig som ett hopp.",
+              "Så småningom når en sond destinationen. Beroende på traceroute-stilen kan destinationen svara med ett ICMP Port Unreachable, ett Echo Reply eller ett svar på applikationsnivå. Hur som helst, traceroute sys ihop hop för hop feedback från ICMP.",
+              "Eftersom routrar kan hastighetsgränsen ICMP, kan traceroute-utdata vara rörigt. Humle som saknas betyder inte alltid att en router saknas. De menar ofta att routern vidarebefordrade sonden men avböjde att skicka tillbaka ett ICMP-fel på grund av policy eller belastning."
+            ]
+          },
+          {
+            "title": "Sökväg MTU-upptäckt beror på ICMP",
+            "paragraphs": [
+              "Många system försöker undvika fragmentering av IP genom att upptäcka den maximala paketstorleken som kan korsa en väg. I IPv4 kan en avsändare ställa in Don't Fragment-biten. Om en router stöter på en länk som inte kan bära den storleken, tappar den paketet och skickar ett ICMP-meddelande som indikerar att fragmentering behövdes.",
+              "Avsändaren sänker sedan sin paketstorlek och försöker igen. Denna återkopplingsslinga är sökvägs-MTU-upptäckt. Det är avgörande för prestanda och korrekthet, särskilt när tunnlar är inblandade och effektiv MTU är mindre än du förväntar dig.",
+              "Om ICMP är blockerad kan sökvägen för MTU-upptäckt gå sönder och du får svarta håls beteende: små paket fungerar, stora stannar eller hänger sig. Det är därför att blockera alla ICMP är ett klassiskt självförvållat avintrång. Nätverket förlorar sin förmåga att förklara att paketen är för stora."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "tls",
+      "name": "TLS",
+      "summary": "Kryptografiskt protokoll som säkrar klientservertrafik mot avlyssning och manipulering.",
+      "intro": "TLS upprättar en krypterad, integritetsskyddad kanal mellan en klient och server. Den autentiserar servern med certifikat och förhandlar nycklar så att applikationsprotokoll som HTTP kan köras säkert över opålitliga nätverk.",
+      "bullets": [
+        "Handskakning förhandlar versioner, chiffer och nycklar, sedan skyddar postlagret data.",
+        "Serverautentisering bygger på certifikatkedjor och verifiering av värdnamn.",
+        "TLS 1.3 minskar handskakning tur och retur och tar bort många äldre funktioner."
+      ],
+      "learn": {
+        "what": "TLS (Transport Layer Security) är standardsättet för att säkra trafik mellan två slutpunkter på Internet. Den tillhandahåller konfidentialitet (kryptering), integritet (manipulationsdetektering) och slutpunktsautentisering, oftast autentisera servern till klienten.",
+        "why": "Utan TLS kan vem som helst på vägen läsa eller ändra trafik. TLS finns så att applikationer säkert kan använda det offentliga Internet och fortfarande ha privat, pålitlig kommunikation.",
+        "how": [
+          "Klienten ansluter till servern och skickar ett ClientHello med stödda protokollversioner, chiffersviter och slumpmässiga värden.",
+          "Servern svarar med ServerHello, väljer parametrar och tillhandahåller nyckelutbytesmaterial. I TLS 1.3 etablerar detta handskakningsnycklar snabbt.",
+          "Servern skickar sin certifikatkedja och bevisar innehav av den privata nyckeln, och klienten verifierar kedjan och värdnamnet.",
+          "Båda sidor hämtar delade hemligheter och byter till krypterade poster för resten av sessionen.",
+          "Applikationsdata delas upp i poster som är krypterade och integritetsskyddade.",
+          "Funktioner som återupptagande av session tillåter senare anslutningar att hoppa över delar av handskakningen för snabbhet.",
+          "När anslutningen avslutas kasseras nycklar. Bra implementeringar roterar också nycklar och tvingar fram moderna versioner."
+        ],
+        "pitfalls": [
+          "Hoppa över värdnamnsverifiering. Ett giltigt certifikat för fel namn är inte säkert.",
+          "Tillåter föråldrade protokoll eller svaga chiffer för kompatibilitet.",
+          "Att glömma att TLS inte säkrar själva slutpunkten. Kompromissade klienter kan fortfarande läcka hemligheter.",
+          "TLS avslutande proxyservrar kan bryta antaganden från början och ändra vad nätverksövervakning kan se.",
+          "Missförstånd av certifikatfel som valfritt. De är vanligtvis din enda varning för avlyssning."
+        ],
+        "security": [
+          "TLS säkerhet beror på korrekt certifikatvalidering och betrodda rotlager.",
+          "Modern vägledning är att föredra TLS 1.3 och starka chiffersviter och att inaktivera äldre omförhandling och äldre versioner.",
+          "Hantera certifikat som autentiseringsuppgifter operativt: spåra utgångsdatum, automatisera förnyelse och övervaka för felaktiga utfärdande."
+        ],
+        "example": "När du besöker en bankwebbplats utför din webbläsare en TLS-handskakning, verifierar att certifikatet matchar bankens domän och krypterar sedan all HTTP-trafik så att WiFi-angripare inte kan läsa dina referenser eller ändra sidan."
+      },
+      "deepDive": {
+        "summary": "TLS förvandlar en osäker byteström till en säker kanal genom att förhandla om nycklar och sedan skydda varje datapost.",
+        "sections": [
+          {
+            "title": "Vad TLS ger och var den sitter",
+            "paragraphs": [
+              "TLS sitter ovanför en transport som TCP och under applikationsprotokoll som HTTP. Transporten levererar bytes. TLS förvandlar dessa bytes till en skyddad kanal med konfidentialitet, integritet och valfri klientautentisering. Den gör detta genom att komma överens om nycklar och algoritmer och sedan slå in applikationsdata i krypterade poster.",
+              "TLS är inte bara kryptering. Integritet är lika viktigt. Varje post är autentiserad, så en passiv angripare kan inte ändra trafik utan upptäckt. Det är därför HTTPS skyddar dig från manipulering även på fientlig WiFi, inte bara från avlyssning.",
+              "Eftersom TLS är lager kan du ofta resonera om problem genom att separera lager. Om TCP är instabil ser du återsändningar och återställningar. Om TLS misslyckas ser du handskakningsvarningar, certifikatfel eller protokollförväntningar som inte matchar även när TCP-anslutning finns."
+            ]
+          },
+          {
+            "title": "TLS 1.3 handslag i verkligheten",
+            "paragraphs": [
+              "En typisk TLS 1.3-anslutning börjar med en ClientHello. Klienten erbjuder protokollversioner som stöds, chiffersviter och nyckelresurser för den tillfälliga Diffie Hellman. Det kan också inkludera SNI för att tala om för servern vilket värdnamn den vill ha, och ALPN för att förhandla fram applikationsprotokoll som HTTP/2.",
+              "Servern svarar med ServerHello som väljer parametrar och tillhandahåller sin egen nyckeldelning. Från den punkten kan båda sidor härleda handskakningsnycklar och kryptera mycket av den återstående handskakningen. Servern skickar sitt certifikat och bevis på innehav, sedan utbyter båda sidor Färdiga meddelanden som bekräftar att de såg samma utskrift och hämtade samma nycklar.",
+              "Efter avslutad flyter applikationsdataposter, skyddade av AEAD-chiffer. TLS 1.3 är utformad för att nå denna punkt med en tur och retur i det vanliga fallet, vilket är anledningen till att moderna HTTPS känns snabbare än äldre TLS-versioner på nätverk med hög latens."
+            ]
+          },
+          {
+            "title": "Certifikat, identitet och varför validering är viktigt",
+            "paragraphs": [
+              "Certifikatet är hur klienten vet att den pratar med rätt server, inte en bedragare. Servern presenterar en certifikatkedja som länkar tillbaka till en betrodd rot i klientens förtroendearkiv. Klienten validerar kedjesignaturerna, kontrollerar utgången och verifierar att certifikatet matchar värdnamnet som den avsåg att nå.",
+              "Om valideringen misslyckas får du de välbekanta webbläsarvarningarna. Ett vanligt fel är ett värdnamnsfel, vilket kan inträffa om SNI saknas eller om en lastbalanserare levererar fel certifikat. En annan är en ofullständig kedja där ett mellancertifikat inte serverades korrekt.",
+              "I företagsmiljöer ger TLS avlyssning ytterligare en twist. En proxy kan avsluta TLS och presentera ett annat certifikat signerat av en intern CA. Det fungerar bara om klienten litar på den CA. Om inte, ser det ut som en attack, vilket är korrekt från klientens synvinkel."
+            ]
+          },
+          {
+            "title": "Efter handskakningen: poster, återupptagande och viktiga uppdateringar",
+            "paragraphs": [
+              "När den väl har upprättats skickar TLS data som en sekvens av poster. Varje post har sin egen autentiseringstagg, och sekvensnummer förhindrar uppspelning och omordningstrick. Om du fångar trafik kommer du fortfarande att se paketstorlekar och timing, men innehållet är ogenomskinligt.",
+              "För att minska latensen vid upprepade besök kan servrar aktivera återupptagande. Kunden kan uppvisa en sessionsbiljett och återuppta med färre tur- och returresor. TLS 1.3 definierar också 0 RTT-data, men den funktionen kan tillåta uppspelning av tidiga data, så den är vanligtvis begränsad till idempotenta förfrågningar.",
+              "TLS stöder också nyckeluppdateringar under en lång anslutning. Regelbunden uppdatering av nycklar minskar mängden data som skyddas under en enskild nyckel och begränsar skador om en nyckel på något sätt komprometteras. I praktiken är de flesta sessioner tillräckligt korta för att du sällan märker detta, men mekanismen är en del av det som gör TLS robust i skala."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "http",
+      "name": "HTTP",
+      "summary": "Tillståndslöst förfrågningssvarsapplikationsprotokoll som används för att leverera webb- och API-innehåll.",
+      "intro": "HTTP är det protokoll som din webbläsare och många APIs använder för att begära resurser och ta emot svar. Det är tillståndslöst på protokollnivå, vilket är anledningen till att cookies, tokens och rubriker bär sammanhang mellan förfrågningar.",
+      "bullets": [
+        "Byggd kring metoder som GET och POST och svar med statuskoder.",
+        "Kör över transporter som TCP (HTTP/1.1 och HTTP/2) och QUIC (HTTP/3).",
+        "Cachning och proxyservrar är centrala designfunktioner, inte tillägg."
+      ],
+      "learn": {
+        "what": "HTTP (Hypertext Transfer Protocol) är ett applikationslagerprotokoll för att begära och överföra resurser. En klient skickar en förfrågan som inkluderar en metod, mål, rubriker och ibland en text. En server svarar med en statuskod, rubriker och en valfri text.",
+        "why": "HTTP tillhandahåller ett flexibelt, interoperabelt sätt för klienter, servrar och mellanhänder att kommunicera. Dess design stöder cachning, proxyservering och inkrementell utveckling, vilket är anledningen till att den blev grunden för webben och moderna APIs.",
+        "how": [
+          "Klienten löser servernamnet (vanligtvis via DNS) och öppnar en anslutning till servern.",
+          "Klienten skickar en HTTP förfrågan som anger en metod, en sökväg och rubriker. Vissa förfrågningar inkluderar en kropp.",
+          "Servern bearbetar förfrågan och returnerar ett HTTP-svar med en statuskod, rubriker och en text om det behövs.",
+          "HTTP är tillståndslös, så servern kommer inte automatiskt ihåg något mellan förfrågningar. Status förs i cookies, tokens eller applikationsdata.",
+          "Anslutningar kan återanvändas. HTTP/1.1 använder beständiga anslutningar, medan HTTP/2 multiplexerar många strömmar på en anslutning.",
+          "Cachningsregler tillåter klienter och mellanhänder att återanvända svar på ett säkert sätt, vilket minskar latens och belastning.",
+          "Proxies och gateways kan modifiera routing och beteende, varför vägen mellan klient och server ofta är mer komplex än den ser ut."
+        ],
+        "pitfalls": [
+          "Förutsatt att HTTP alltid är krypterad. Endast HTTPS tillhandahåller transportkryptering.",
+          "Blandar ihop idempotenta metoder med säkra metoder. Omförsök är inte alltid ofarliga.",
+          "Felkonfigurering av cachehuvuden och oavsiktlig servering av inaktuell eller privat data.",
+          "Att glömma att mellanhänder finns. Proxies kan skriva om rubriker, komprimera kroppar och avsluta anslutningar.",
+          "Behandla statuskoder som dekorativa. De är ett kontrakt som kunderna litar på."
+        ],
+        "security": [
+          "Många webbsårbarheter handlar om hur HTTP-data tolkas, såsom injicering i rubriker, parametrar eller kroppar.",
+          "Autentisering är vanligtvis en applikationslagermekanism som är skiktad ovanpå HTTP. Skydda polletter och kakor noggrant.",
+          "Att logga fullständiga webbadresser eller rubriker kan läcka hemligheter. Var medveten om vad du lagrar."
+        ],
+        "example": "Din webbläsare skickar `GET /` till en server och tar emot `200 OK` plus HTML. Senare begär den bilder och skript med fler GET-förfrågningar. Även om det känns som en session är varje förfrågan oberoende såvida inte cookies eller tokens knyter ihop dem."
+      },
+      "deepDive": {
+        "summary": "HTTP är ett tillståndslöst förfrågnings- och svarsprotokoll. Subtiliteten ligger i meddelandestruktur, cachelagring och återanvändning av anslutningar.",
+        "sections": [
+          {
+            "title": "Vad händer när du hämtar en URL",
+            "paragraphs": [
+              "Kärnan är HTTP enkel. En klient öppnar en anslutning till en server, skickar en förfråganrad plus rubriker och eventuellt en text. Servern svarar med en statuskod, rubriker och en text. Det förfrågan och svarsparet är arbetsenheten.",
+              "HTTP är statslös i den meningen att varje förfrågan står för sig själv. Om servern behöver kontinuitet använder den cookies, tokens eller annat tillstånd som bärs i rubriker. Denna separation är kraftfull eftersom den tillåter lastbalansering och cachelagring, men det betyder också att autentisering och sessionshantering är explicita designval, inte dold magi.",
+              "I riktiga webbläsare orsakar en sidladdning många HTTP-förfrågningar: HTML, CSS, JavaScript, bilder, APIs. Effektivitet kommer från återanvändning av anslutningar, parallellitet och cachning, inte från att göra en förfrågan större."
+            ]
+          },
+          {
+            "title": "Återanvändning av anslutningar och varför hålla liv är viktiga",
+            "paragraphs": [
+              "I HTTP/1.1 kan en enda TCP-anslutning bära flera förfrågningar över tid. Klienten skickar en förfrågan, läser svaret och skickar sedan en annan. Återanvändning av anslutningen undviker att upprepa TCP och TLS inställningar och undviker upprepad långsam start, vilket förbättrar latens och genomströmning.",
+              "HTTP/2 går längre genom att multiplexa många strömmar över en anslutning. Istället för strikt förfrågan och sedan svarsordning på tråden, kan ramar för olika strömmar interfoliera. Detta minskar behovet av många parallella TCP-anslutningar och förbättrar prestandan på begränsade nätverk.",
+              "Även med nyare versioner stannar den mentala modellen kvar. Förfrågningar och svar finns fortfarande kvar. Skillnaderna ligger i hur de är inramade och schemalagda på tråden."
+            ]
+          },
+          {
+            "title": "Cachning är en del av HTTP, inte en eftertanke",
+            "paragraphs": [
+              "HTTP innehåller explicita cachelagringskontroller så att klienter och mellanhänder kan återanvända svar på ett säkert sätt. Rubriker som Cache Control och Expires beskriver hur länge innehåll får återanvändas. Validatorer som ETag och Last Modified möjliggör villkorliga förfrågningar där klienten frågar, har detta ändrats, och servern kan svara med Not Modified utan att skicka om kroppen.",
+              "Detta cachinglager är en anledning till att webben skalas. En CDN är i huvudsak en HTTP cache med smart routing. När cachning är väl konfigurerad gör din webbläsare och din närmaste edge-server det mesta av arbetet, och ursprunget ser mycket färre förfrågningar.",
+              "Cachning skapar också vanliga buggar. Om du cachar något som ska vara per användare läcker du data. Om du misslyckas med att cachelagra något som är säkert att dela, slösar du med bandbredd. Att förstå cachningsrubriker är en praktisk färdighet, inte en teoretisk detalj."
+            ]
+          },
+          {
+            "title": "Meddelandedetaljer som visas i säkerhet och felsökning",
+            "paragraphs": [
+              "Rubriker är både kraftfulla och riskfyllda. De har autentiseringstokens, cookies, innehållstyper och många andra kontroller. Om ett program återspeglar opålitlig indata i rubriker eller tolkar rubriker felaktigt kan du få sårbarheter som svarsdelning eller cacheförgiftning.",
+              "HTTP definierar också hur proxyservrar ska bete sig. Vissa rubriker är hop för hop och får inte vidarebefordras. Andra är från början till slut. Misstag här kan skapa subtila fel där en förfrågan fungerar direkt men misslyckas bakom en proxy eller en lastbalanserare.",
+              "En bra felsökningsvana är att inspektera den exakta förfrågan och svaret, inte bara webbadressen. Statuskoder, omdirigeringar, innehållstyper och cachningsrubriker berättar vad som verkligen hände, och de förklarar ofta problem snabbare än bara programloggar."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "https",
+      "name": "HTTPS",
+      "summary": "HTTP skiktad ovanpå TLS för att tillhandahålla kryptering och autentisering under överföring.",
+      "intro": "HTTPS är inte ett separat applikationsprotokoll. Den HTTP skickas genom en TLS krypterad kanal, som skyddar den mot avlyssning och manipulering och låter klienten verifiera serverns identitet.",
+      "bullets": [
+        "Lägger till konfidentialitet och integritet till webbtrafik på opålitliga nätverk.",
+        "Beror på korrekt certifikatvalidering och värdnamnskontroller.",
+        "Gör inte en sårbar webbapp säker, den skyddar bara data under överföring."
+      ],
+      "learn": {
+        "what": "HTTPS betyder HTTP över TLS. Webbläsaren upprättar först en TLS-session med servern och skickar sedan normala HTTP-förfrågningar inuti den krypterade tunneln. Till applikationen ser det fortfarande ut som HTTP.",
+        "why": "Vanlig HTTP exponerar allt för nätverket, inklusive cookies och referenser, och tillåter aktiva angripare att ändra svar. HTTPS finns för att göra webben säker att använda på delade nätverk och på det offentliga internet.",
+        "how": [
+          "Klienten löser värdnamnet och öppnar sedan en anslutning till serverns HTTPS-port.",
+          "En TLS handskakning inträffar: servern presenterar ett certifikat, klienten validerar det och värdnamnet, och båda sidor härleder delade nycklar.",
+          "När handskakningen är klar krypteras alla HTTP byte i TLS-poster.",
+          "Klienten skickar en HTTP-förfrågan och får ett HTTP-svar, precis som med HTTP, men mellanhänder kan inte läsa eller ändra nyttolasten utan att avsluta TLS.",
+          "Moderna inställningar förhandlar fram protokollversioner som HTTP/2 med ALPN under handskakningen TLS.",
+          "Anslutningar kan återanvändas och sessioner kan återupptas för att påskynda senare besök.",
+          "Säkerhetsrubriker som HSTS kan tvinga framtida anslutningar att använda HTTPS och minska nedgraderingsrisken."
+        ],
+        "pitfalls": [
+          "Behandla certifikatvarningar som ignorerbara. De indikerar ofta avlyssning eller felkonfiguration.",
+          "Blandat innehåll: att ladda några resurser över HTTP motverkar säkerhetslöftet.",
+          "TLS uppsägning vid en lastbalanserare kan dölja den verkliga klienten IP och ändra förtroendegränser.",
+          "Förutsatt att kryptering döljer metadata. DNS, IP adresser, och ibland kan SNI fortfarande avslöja var du ansluter.",
+          "Att tro att HTTPS ersätter applikationssäkerhet. Det förhindrar inte XSS, SQL-injektion eller trasig autentiseringslogik."
+        ],
+        "security": [
+          "Säkerheten för HTTPS vilar på certifikatutfärdande och validering. Automatisera förnyelser och övervaka felutfärdade certifikat.",
+          "Använd moderna TLS-konfigurationer och inaktivera äldre versioner där det är möjligt.",
+          "Om du avslutar TLS, skydda det interna nätverket också. Annars skapar du en okrypterad lucka i din miljö."
+        ],
+        "example": "På offentlig WiFi kan en angripare läsa och ändra HTTP-trafik. Med HTTPS ser angriparen fortfarande att du anslutit till en banks IP, men kan inte läsa dina lösenord eller byta sidinnehåll utan att utlösa certifikatfel."
+      },
+      "deepDive": {
+        "summary": "HTTPS bärs HTTP i en TLS skyddad anslutning, med strikta identitetskontroller och moderna webbläsarsäkerhetspolicyer.",
+        "sections": [
+          {
+            "title": "Hela stacken: namn till innehåll",
+            "paragraphs": [
+              "När du laddar en HTTPS-webbplats samarbetar flera lager. Först mappar DNS värdnamnet till en IP-adress. Sedan upprättar klienten en TCP-anslutning till servern, vanligtvis till port 443. Därefter körs TLS-handskakningen för att autentisera servern och härleda krypteringsnycklar. Först efter att TLS har upprättats skickar klienten förfrågan om HTTP.",
+              "Denna skiktning är anledningen till att du kan diagnostisera fel stegvis. Ett DNS-fel betyder att du aldrig fick ett IP. Ett TCP-fel betyder att du inte kunde nå värden och porten. Ett TLS-fel betyder att serveridentiteten eller den kryptografiska förhandlingen misslyckades. Ett HTTP-fel betyder att den säkra kanalen finns men programmet returnerade ett fel eller oväntat innehåll.",
+              "I paketfångst ser HTTPS ut som en TLS-handskakning följt av krypterad applikationsdata. Du kan vanligtvis se servernamnet via SNI under handskakningen, men du kan inte se webbadresser, rubriker eller kroppar efter att krypteringen har börjat."
+            ]
+          },
+          {
+            "title": "Serverautentisering och certifikatvalidering",
+            "paragraphs": [
+              "Den definierande egenskapen för HTTPS är autentisering. Webbläsaren krypterar inte bara. Den kontrollerar att servercertifikatet matchar värdnamnet i URL:en och kedjor till en betrodd rotcertifikatutfärdare. Om dessa kontroller misslyckas varnar webbläsaren dig eftersom enbart kryptering utan identitet inte skulle stoppa människor i mitten av attacker.",
+              "Certifikatkedjor är vanliga felpunkter. En server måste presentera rätt mellancertifikat. Certifikatet får inte löpa ut eller återkallas av policy. Värdnamnet måste matcha, inklusive underdomänregler. Felkonfigurationer här kan göra att en webbplats fungerar i en webbläsare men misslyckas i en annan beroende på trust butiksdetaljer.",
+              "Moderna distributioner använder också funktioner som OCSP-häftning, loggar för certifikattransparens och automatisk förnyelse. Dessa minskar risken för tysta kompromisser, men de lägger till rörliga delar som kan gå sönder om de inte övervakas."
+            ]
+          },
+          {
+            "title": "Webbläsarsäkerhetspolicyer som kör på HTTPS",
+            "paragraphs": [
+              "När en webbplats är HTTPS möjliggör webbläsare starkare skydd. Säkra cookies kan markeras så att de bara skickas över HTTPS. Regler för blandat innehåll blockerar eller varnar när en HTTPS-sida försöker ladda skript över vanligt HTTP eftersom det skulle återinföra manipuleringsrisker.",
+              "HSTS är en annan nyckelpolicy. Den säger åt webbläsaren att alltid använda HTTPS för en domän, även om användaren skriver HTTP. Detta förhindrar nedgraderingsattacker där en angripare försöker hålla dig på en osäker version av webbplatsen.",
+              "Ur säkerhetsteknisk synvinkel är HTTPS baslinjen. Många moderna webb APIs och funktioner är begränsade till säkra sammanhang, vilket i huvudsak är en synonym för att visas över HTTPS."
+            ]
+          },
+          {
+            "title": "Prestanda i den verkliga världen",
+            "paragraphs": [
+              "HTTPS ökar handskakningskostnaden, men moderna TLS har minskat den. TLS 1.3 slutförs vanligtvis på en tur och retur, och ett återupptagande av sessionen kan minska antalet återkommande besök ytterligare. Återanvändning av anslutning innebär att kostnaden skrivs av på många förfrågningar.",
+              "CDN:er avslutar ofta TLS vid kanten, vilket förkortar sökvägen och förbättrar latensen. Den säkra anslutningen från din webbläsare slutar vid CDN, och CDN ansluter sedan till ursprunget med sina egna säkerhetsinställningar. Detta är fortfarande säkert, men det ändras var certifikaten finns och där loggar och kontroller gäller.",
+              "Om en webbplats känns långsam, mät om fördröjningen är i DNS, TCP, TLS eller serverns svar. Många människor skyller på TLS för långsamhet när det verkliga problemet är serverns bearbetningstid eller ett överbelastat nätverk."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "vpn",
+      "name": "VPN",
+      "summary": "Krypterad tunnling som utökar ett privat nätverk över ett opålitligt nätverk.",
+      "intro": "En VPN skapar en säker tunnel så att enheter kan skicka privat nätverkstrafik över det offentliga Internet. Den kan ansluta en användare till ett företagsnätverk eller ansluta två webbplatser tillsammans, samtidigt som trafiken hålls konfidentiell och autentiserad.",
+      "bullets": [
+        "Fungerar genom att kapsla in paket inuti ett krypterat yttre paket.",
+        "Nyckelutbyte och autentisering avgör vem som får komma in i tunneln.",
+        "Routing, DNS och MTU-beteende ändras när en tunnel är aktiv."
+      ],
+      "learn": {
+        "what": "Ett VPN (Virtual Private Network) är en teknik för att transportera ett nätverks trafik över ett annat nätverk på ett säkert sätt. Dina originalpaket lindas in i en yttre transport som ger kryptering och integritet, och bildar en tunnel mellan två slutpunkter.",
+        "why": "Internet är inte privat. Organisationer behöver fjärråtkomst och platsanslutning utan att exponera intern trafik eller förlita sig på säkerheten i mellanliggande nätverk. VPNs ger konfidentialitet, integritet och ofta identitetsbaserad åtkomst till interna resurser.",
+        "how": [
+          "En VPN-klient eller gateway börjar med att kontakta VPN-servern eller peer och autentisera, ofta med certifikat, delade hemligheter eller användaruppgifter.",
+          "Slutpunkterna utför ett nyckelutbyte och kommer överens om kryptografiska parametrar, till exempel via IKEv2 i IPsec eller den brusbaserade handskakningen i WireGuard.",
+          "Ett virtuellt gränssnitt skapas på klienten och rutter läggs till så att viss trafik skickas in i tunneln.",
+          "När ett program skickar ett paket dirigerar operativsystemet det till det virtuella gränssnittet. Programvaran VPN krypterar den och kapslar in den i ett nytt yttre paket.",
+          "Det yttre paketet skickas över Internet till VPN peer. Endast de yttre rubrikerna är synliga för mellanhänder.",
+          "Peer dekrypterar, verifierar integritet, tar bort det yttre omslaget och vidarebefordrar det inre paketet mot dess destination.",
+          "Keepalive-trafik och omnyckel upprätthåller tunneln och uppdaterar nycklar över tiden, och tunneln måste ta hänsyn till MTU-overhead som införts genom inkapsling."
+        ],
+        "pitfalls": [
+          "Delad tunnelförvirring. En del trafik går genom VPN, en del inte, vilket kan orsaka inkonsekvent beteende.",
+          "DNS läcker. Om DNS-frågor inte följer den avsedda sökvägen kan du avslöja interna namn eller surfaktivitet.",
+          "MTU och fragmenteringsproblem på grund av inkapslingsoverhead.",
+          "Alltför bred åtkomst. En VPN kan av misstag ge full intern nätverksräckvidd istället för minsta behörighet.",
+          "Förutsatt att VPN är lika med säkerhet överallt. Om ändpunkten äventyras blir tunneln en säker väg även för angriparen."
+        ],
+        "security": [
+          "Nyckelhantering är kärnan. Stark autentisering och regelbunden nyckelrotation är viktigare än varumärken.",
+          "Behandla VPN-åtkomst som privilegierad. Övervaka inloggningar, tillämpa enhetens hållning när det är möjligt och begränsa tillgängliga undernät.",
+          "Modern design går ofta mot noll förtroende där VPN blir ett verktyg bland andra snarare än en filt nätverksbrygga."
+        ],
+        "example": "Du är på ett hotellnätverk och öppnar en intern instrumentpanel. Din bärbara dator skickar intern IP-trafik till VPN-tunneln. Hotellet ser bara krypterade paket till VPN-servern, och företagsnätverket ser din trafik som om du var på kontorsnätverket."
+      },
+      "deepDive": {
+        "summary": "En VPN är en säker tunnel plus routing. Kärnidén är inkapsling: dina paket reser in i andra paket.",
+        "sections": [
+          {
+            "title": "Den mentala modellen: ett virtuellt gränssnitt och nya vägar",
+            "paragraphs": [
+              "En VPN-klient skapar vanligtvis ett virtuellt nätverksgränssnitt på din enhet. Ditt operativsystem kan dirigera en del trafik till det gränssnittet baserat på regler. Paket som skickas in i tunneln är sedan inkapslade: inlindade i ett yttre paket vars destination är VPN gateway eller peer.",
+              "Ur applikationssynpunkt händer inget speciellt. Den skickar IP-paket som vanligt. VPN-lagret fångar upp och lindar dem. Längst bort dekapslar gatewayen och vidarebefordrar det inre paketet till det privata nätverket, som om din enhet var lokalt ansluten.",
+              "Det är därför delad tunneldrivning kontra full tunneling spelar roll. Vid delad tunneldrift går endast vissa destinationer genom tunneln. I full tunnling pekar standardrutten in i VPN, så nästan allt går igenom den, inklusive DNS om inte annat har konfigurerats."
+            ]
+          },
+          {
+            "title": "Autentisering och nyckelavtal inför eventuell tunneltrafik",
+            "paragraphs": [
+              "En säker tunnel behöver delade nycklar. Det börjar vanligtvis med ett autentiseringssteg: du bevisar att du får gå med och servern bevisar sin identitet. Slutresultatet är en uppsättning nycklar som används för att kryptera och autentisera tunnelpaket.",
+              "I IPsec är denna inställning formaliserad genom säkerhetsföreningar. IKE förhandlar parametrar och nycklar, sedan bär ESP den skyddade trafiken. Nycklarna och policyerna definierar vilken trafik som skyddas och hur. IPsec kan köras i transportläge, skydda nyttolasten för ett IP-paket, eller tunnelläge, linda ett helt IP-paket i ett nytt.",
+              "I WireGuard är modellen enklare. Peers identifieras av statiska publika nycklar och tillåtna IP-intervall fungerar som en kombinerad routing- och åtkomstkontrolllista. En kort handskakning upprättar tillfälliga sessionsnycklar, och datapaket skyddas sedan med modern autentiserad kryptering."
+            ]
+          },
+          {
+            "title": "Vad händer egentligen när du ansluter",
+            "paragraphs": [
+              "En fjärråtkomst VPN börjar ofta med att klienten når gatewayen över det offentliga internet, vanligtvis över UDP eller TCP beroende på protokollet. Efter autentisering och handskakning kan klienten få en virtuell IP-adress, DNS-inställningar och en lista över rutter att skicka genom tunneln.",
+              "Väl uppe är tunneltrafik bara paket. Din enhet skickar ett inre paket avsett för en privat server. VPN kapslar in den och skickar den till gatewayen. Gatewayen dekrypterar, kontrollerar policy och vidarebefordrar sedan det inre paketet till den privata destinationen. Svar gör den omvända resan, inkapslad tillbaka till klienten.",
+              "Eftersom tunneln är tillståndsfull är det vanligt med keepalives. NAT-enheter kan timeout inaktiva mappningar, så VPN-klienter skickar ofta periodisk trafik för att hålla sökvägen öppen. Om du ser avintrång efter inaktiva perioder är NAT timeouts eller aggressiva brandväggspolicyer vanliga orsaker."
+            ]
+          },
+          {
+            "title": "Vanliga operativa fallgropar",
+            "paragraphs": [
+              "MTU-problem är vanliga. Inkapsling lägger till overhead, vilket minskar effektiv MTU. Om sökväg MTU-upptäckt misslyckas kan stora paket svarta hål. Många VPN-inställningar kräver justering av tunnel-MTU eller möjliggör korrekt ICMP-hantering.",
+              "DNS är en annan källa till förvirring. Om DNS-frågor inte går genom tunneln när de borde, kan du läcka interna namn till offentliga resolvers eller misslyckas med att lösa privata domäner. Bra VPN-konfigurationer ställer uttryckligen in DNS och säkerställer att resolvertrafiken följer den avsedda rutten.",
+              "Slutligen, förtroendegränser är viktiga. En VPN gör inte automatiskt en enhet säker. Det utökar nätverksräckvidden. Organisationer parar ofta VPN-åtkomst med enhetsställningskontroller, segmentering och regler för minsta privilegier så att anslutning till VPN inte innebär full intern åtkomst."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "vlan",
+      "name": "VLAN",
+      "summary": "Lager 2-segmentering som skapar separata broadcastdomäner på samma fysiska switchinfrastruktur.",
+      "intro": "En VLAN låter dig logiskt separera nätverk på en switch. Enheter i olika VLANs är isolerade vid lager två, medan trunklänkar bär flera VLANs mellan switchar med taggar.",
+      "bullets": [
+        "Accessportar tillhör ett VLAN, trunkportar har många VLANs med taggar.",
+        "VLANs minskar sändningsomfånget och hjälper till att organisera nätverk.",
+        "Trafik mellan VLANs kräver routing, vanligtvis via en lager tre switch eller router."
+      ],
+      "learn": {
+        "what": "Ett VLAN (Virtuellt LAN) är ett sätt att dela upp ett fysiskt switchnätverk i flera logiska nätverk. Varje VLAN är sin egen broadcastdomän. Ramar är associerade med ett VLAN antingen genom porten de går in i (åtkomstport) eller av en 802.1Q-tagg i ramen (trunkport).",
+        "why": "Utan VLANs blir ett stort lager två-nätverk bullrigt och riskabelt. VLANs förbättrar skalbarheten genom att begränsa sändningar och förbättra säkerheten och driften genom att separera roller, såsom användarenheter, servrar och hanteringsgränssnitt.",
+        "how": [
+          "En åtkomstport är tilldelad ett VLAN. Ramar som går in i den porten behandlas som tillhörande VLAN.",
+          "När en switch behöver skicka ramar för flera VLANs över en länk till en annan switch, använder den en trunk.",
+          "På en trunk lägger switchen till en 802.1Q-tagg som identifierar VLAN för varje ram, så att den mottagande switchen vet vilkett VLAN ramen tillhör.",
+          "En VLAN kan konfigureras som den native VLAN, dit ramar kan skickas otaggade. Detta måste matcha i båda ändarna för att undvika förvirring.",
+          "Switchar upprätthåller separata MAC-adresstabeller per VLAN, vilket håller inlärning och översvämning innesluten.",
+          "För att kommunicera mellan VLANs byter en router eller lager tre rutter mellan VLAN-gränssnitten och tillämpar policyer som ACL:er.",
+          "Operationellt avgör tillåtna VLAN-listor på trunkar vilka VLANs som kan passera vilka länkar."
+        ],
+        "pitfalls": [
+          "Inbyggda VLAN-felmatchningar på trunkarna kan orsaka trafikläckor och konstiga anslutningar.",
+          "Att lämna alla VLANs tillåtna på en trunk ökar risken och gör att misstagen sprids.",
+          "Förutsatt att VLAN separation är lika med full säkerhet. Felkonfigurationer och attacker på lager två kan kringgå det.",
+          "Glömmer inter VLAN routing. Två VLANs pratar inte utan en router, även om de delar en switch.",
+          "Blanda ihop taggningsförväntningar vid endpoints, till exempel vid anslutning till hypervisorer eller AP:er."
+        ],
+        "security": [
+          "VLANs är användbara för segmentering men bör kombineras med lager tre kontroller som ACL och brandvägg.",
+          "Felkonfigurerade trunkar och inbyggt VLAN-beteende kan möjliggöra problem med VLAN hoppstil.",
+          "Behandla ledningens VLANs som högt värderade och begränsa vart de bärs och vem som kan nå dem."
+        ],
+        "example": "En kontorsväxel har VLAN 10 för användare och VLAN 20 för servrar. Användarportar är åtkomstportar i VLAN 10. Upplänken mellan switcharna är en trunk som bär VLAN 10 och 20 med taggar. En växlingsväg mellan VLAN 10 och 20 på lager tre leder till att användare endast kan nå specifika serverportar."
+      },
+      "deepDive": {
+        "summary": "VLANs låter en fysisk kopplingsstruktur bete sig som många separata Layer 2-nätverk.",
+        "sections": [
+          {
+            "title": "Varför VLANs existerar: kontrollera sändningar och förtroendezoner",
+            "paragraphs": [
+              "På Ethernet når sändningar alla enheter i samma Layer 2-domän. Det är bra för små nätverk, men det blir bullrigt och riskabelt i skala. VLANs låter dig dela en switch-infrastruktur i flera isolerade broadcastdomäner, så att enheter i ett VLAN inte ser sändningar från en annan.",
+              "Denna segmentering är både prestanda och säkerhet. Det minskar sändningstrafiken och skapar naturliga gränser. Du kan placera gäster i ett VLAN, servrar i en annan och hanteringsgränssnitt i en tredje, även om kablarna och switcharna är delade.",
+              "Det hjälper att komma ihåg att ett VLAN är en logisk partition. Växeln behåller separata vidarebefordringstabeller per VLAN-kontext, och den tvingar fram separation såvida du inte uttryckligen dirigerar mellan VLANs."
+            ]
+          },
+          {
+            "title": "Åtkomstportar och trunkportar",
+            "paragraphs": [
+              "En åtkomstport är avsedd för slutpunkter. Ramar som kommer in på en åtkomstport kopplas till ett VLAN, och ramar som lämnar porten är normalt otaggade. Enheten behöver inte känna till VLAN, utan kommunicerar med vanlig Ethernet-trafik.",
+              "En trunkport ansluter switchar, routrar eller hypervisorer och bär flera VLANs över en länk. Trunking använder 802.1Q-taggning: switchen infogar en liten tagg i Ethernet-ramen som inkluderar ett VLAN-identifierare. Den mottagande switchen läser taggen och vet vilkett VLAN ramen tillhör.",
+              "Många miljöer har också ett native VLAN-koncept där otaggade ramar på en trunk behandlas som tillhörande ett visst VLAN. Feljusterade inbyggda VLAN-inställningar mellan switchar är en klassisk källa till subtila läckor och loopar."
+            ]
+          },
+          {
+            "title": "Inter VLAN kommunikation kräver routing",
+            "paragraphs": [
+              "VLANs isolat på Layer 2. Om en värd i VLAN 10 behöver prata med en värd i VLAN 20, måste den gå genom en Layer 3-enhet som dirigerar mellan dessa subnät. Det kan vara en router på en sticka, en brandvägg eller en Layer 3-switch med växlade virtuella gränssnitt.",
+              "Varje VLAN mappar vanligtvis till ett IP-undernät, och standardgatewayen för det undernätet finns på routingenheten. ARP fungerar inom varje VLAN, så en värd ARPs för sin gateway MAC, skickar paketet dit och routern vidarebefordrar det till destinationett VLAN.",
+              "Det är därför VLAN-planering ofta går ihop med IP-planering. Rensa subnät till VLAN mappning förenklar routingpolicy, åtkomstkontroll och felsökning."
+            ]
+          },
+          {
+            "title": "Verkliga fallgropar och attacker",
+            "paragraphs": [
+              "Operativa misstag inkluderar saknade VLANs på trunkar, felaktig åtkomst VLAN tilldelningar och felaktiga tillåtna VLAN listor. Dessa skapar problem som ser ut som slumpmässiga anslutningar: vissa enheter fungerar, andra kan inte nå gatewayen och sändningsberoende protokoll beter sig konstigt.",
+              "Ur en säkerhetssynpunkt utnyttjar VLAN hoppattacker felkonfigurationer som dynamisk trunkförhandling eller dåligt kontrollerade inhemska VLANs. God praxis är att inaktivera onödig trunkförhandling, uttryckligen definiera tillåtna VLANs och ha en dedikerad hantering VLAN med strikta åtkomstkontroller.",
+              "Kom ihåg att VLAN inte är kryptering. Det är logisk separation i en switchinfrastruktur. Om en angripare får åtkomst till switcharnas styrplan, eller lyckas få nätet att tagga ramar felaktigt, kan VLAN-gränser kringgås."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "nat",
+      "name": "NAT",
+      "summary": "Adress- och portöversättning som låter många privata värdar dela färre offentliga IPv4-adresser.",
+      "intro": "NAT skriver om IP-adresser, och portar ofta, när trafik passerar en gräns. Den vanligaste formen, NAPT eller PAT, låter många interna enheter dela en offentlig IPv4-adress genom att ge varje flöde en unik extern port.",
+      "bullets": [
+        "Skapar mappningar i en översättningstabell när flöden går ut.",
+        "Svaren matchas till dessa mappningar och översätts tillbaka in.",
+        "Avbryter adressering från början till slut, vilket påverkar vissa protokoll och gör loggning viktig."
+      ],
+      "learn": {
+        "what": "NAT (nätverksadressöversättning) är en mekanism där en enhet skriver om pakethuvuden för att mappa en adressvärld till en annan, vanligtvis privat IPv4 till offentlig IPv4. Det vanliga beteendet hos hemmaroutern är portadressöversättning, där många interna flöden delar en offentlig adress.",
+        "why": "IPv4 adresser är knappa. NAT tillåter privata nätverk att använda icke routbara adresser internt samtidigt som de fortfarande ansluter till Internet via en eller några offentliga adresser. Det förenklar också intern omnumrering eftersom interna adresser är frikopplade från externa.",
+        "how": [
+          "En intern värd initierar en utgående anslutning till en Internetdestination.",
+          "NAT-enheten skapar en mappning som binder den interna källan IP och porten till en extern offentlig IP och en vald extern port.",
+          "NAT skriver om paketets källadress och ofta källporten och vidarebefordrar det sedan till Internet.",
+          "När svaret kommer tillbaka till den offentliga IP och externa porten, letar NAT upp mappningen och skriver om destinationen tillbaka till den interna värden.",
+          "Kartorna sparas under en begränsad tid och uppdateras av trafiken. När de löper ut kommer nya inkommande paket att tas bort.",
+          "Inkommande initierade anslutningar kräver explicit konfiguration som portvidarebefordran eller statiska mappningar.",
+          "I stor skala kan Internetleverantörer köra bärarklass NAT, vilket lägger till ytterligare ett översättningsskikt och komplicerar spårbarheten."
+        ],
+        "pitfalls": [
+          "Förutsatt att NAT är en brandvägg. Många NAT-enheter har också en brandvägg, men enbart NAT är inte en säkerhetskontroll.",
+          "Protokoll som bäddar in IP-adresser eller portar i nyttolaster kan gå sönder om inte en applikationslagergateway skriver om dem.",
+          "Korta NAT timeouts kan bryta inaktiva men giltiga sessioner, speciellt för UDP.",
+          "Carrier grade NAT kan orsaka portutmattning och gör tillskrivning och felsökning svårare.",
+          "Loggning blir viktig eftersom externa observatörer bara ser den offentliga adressen, inte den interna värden."
+        ],
+        "security": [
+          "NAT ger en viss tillfällig avskärmning genom att blockera oönskad inkommande trafik, men lita inte på det för säkerhetspolicy.",
+          "För undersökningar kan NAT-loggar vara avgörande för att mappa en offentlig IP och porta tillbaka till en intern enhet.",
+          "Dubbla NAT och CGNAT kan dölja klienter och komplicera tillåten listning och prisbegränsning för offentliga tjänster."
+        ],
+        "example": "Hemma öppnar din bärbara dator en TCP-anslutning till en webbplats. Din router skriver om din privata källadress till sin offentliga adress och väljer en oanvänd extern port. Webbplatsen svarar på den offentliga IP och porten, och routern översätter den tillbaka till din bärbara dator."
+      },
+      "deepDive": {
+        "summary": "NAT är ett översättningslager som skriver om adresser och ofta portar, som handlar om transparens från början till slut för adressbevarande och policykontroll.",
+        "sections": [
+          {
+            "title": "Den grundläggande mekanismen: en översättningstabell",
+            "paragraphs": [
+              "I sin vanligaste form är NAT faktiskt NAPT: många privata värdar delar en offentlig IP genom att använda olika källportar. När en intern värd skickar ett paket till internet skapar NAT-enheten en mappning från den interna tupeln till en extern tuppel. Den skriver sedan om paketets källkod IP och ofta källporten innan den vidarebefordras.",
+              "Mappningen lagras i en översättningstabell med timeouts. När svaret kommer tillbaka till den offentliga IP och porten, letar NAT enheten upp mappningen och skriver om destinationen tillbaka till den interna värden och porten. För utgående initierade flöden fungerar detta smidigt och är för det mesta osynligt för användarna.",
+              "Detta tabellstyrda beteende är anledningen till att NAT känns tillståndsgivande. Det är inte bara att skriva om rubriker. Det är att komma ihåg vilken intern konversation som motsvarar vilken extern port så att svaren kan demultiplexeras korrekt."
+            ]
+          },
+          {
+            "title": "Varför inkommande anslutningar är olika",
+            "paragraphs": [
+              "Om en anslutning startar från internetsidan finns det ingen befintlig mappning, så NAT-enheten har ingen aning om vilken intern värd som ska ta emot den. Det är därför du behöver vidarebefordra portar eller en statisk mappning för inkommande tjänster som servrar med egen värd eller fjärrskrivbord.",
+              "Vissa NATs stöder hårnålning, vilket låter en intern värd nå en annan intern värd med hjälp av den offentliga adressen. Andra gör det inte. Detta kan skapa förvirrande fall där en tjänst fungerar utifrån men inte inifrån, eller vice versa.",
+              "Olika kartbeteenden har också betydelse för peer to peer. Vissa NATs skapar samma externa mappning oavsett destination, medan andra varierar mappningar per destination. Det mer restriktiva beteendet gör det svårare för två kamrater bakom NATs att hitta en väg till varandra utan hjälp."
+            ]
+          },
+          {
+            "title": "Kartläggning och filtrering är separata beteenden",
+            "paragraphs": [
+              "Det hjälper till att skilja kartläggning från filtrering. Kartläggningssvar: vilken extern adress och port använder detta interna flöde. Filtrera svar: vilka inkommande paket som tillåts tillbaka. Dessa val påverkar om UDP håltagning fungerar, om spel kan vara värd för sessioner och om VoIP-samtal ansluter tillförlitligt.",
+              "IETF har dokumenterat rekommenderade beteenden för NAT-hantering av UDP så att applikationer kan göra färre antaganden och fortfarande fungera konsekvent. Även med rekommendationer varierar verkliga distributioner mycket, vilket är anledningen till att NAT-traverseringstekniker överhuvudtaget finns.",
+              "När du felsöker NAT-problem, leta efter tre frågor. Fanns kartläggningen. Levde det fortfarande eller tog det timeout. Tillät brandväggspolicyn returtrafik. Du kan ofta lokalisera felet genom att observera om det utgående paketet lämnade och om något inkommande svar nådde kanten."
+            ]
+          },
+          {
+            "title": "Biverkningar och säkerhetsmissuppfattningar",
+            "paragraphs": [
+              "NAT bryter den rena end-to-end-modellen av internet. Protokoll som bäddar in IP-adresser eller portar i nyttolaster kan misslyckas om inte en gateway på applikationsnivå också skriver om dessa nyttolaster. Det är därför vissa äldre protokoll är ömtåliga bakom NAT.",
+              "Folk hävdar ibland att NAT är säkerhet. Det kan minska oönskad inkommande trafik som standard, men det är en policyeffekt av stateful filtrering, inte en säkerhetsgaranti. Skadlig programvara kan fortfarande ansluta utåt och ta emot svar, och felkonfigurerade port forwards kan exponera tjänster direkt.",
+              "En bättre inramning är att NAT är ett adress- och policyverktyg. Verklig säkerhet kommer från explicita brandväggsregler, stark autentisering, segmentering och korrigering, oavsett om NAT finns eller inte."
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "ports": [
+    {
+      "port": 20,
+      "name": "FTP data",
+      "desc": "Används av FTP för dataöverföring i aktivt läge. Sällsynt i moderna nätverk, ofta blockerad."
+    },
+    {
+      "port": 21,
+      "name": "FTP control",
+      "desc": "Kontrollkanal för FTP-sessioner. Äldre protokoll; föredra SFTP eller FTPS."
+    },
+    {
+      "port": 22,
+      "name": "SSH",
+      "desc": "Säker fjärrskal och tunnling. Används för administratörsåtkomst, Git över SSH och säker filkopiering (SCP/SFTP)."
+    },
+    {
+      "port": 23,
+      "name": "Telnet",
+      "desc": "Okrypterad fjärrterminal. Undvik i produktionen; ersätt med SSH."
+    },
+    {
+      "port": 25,
+      "name": "SMTP",
+      "desc": "E-postöverföring mellan MTA:er. Inlämning sker vanligtvis på 587 med autentisering och TLS."
+    },
+    {
+      "port": 53,
+      "name": "DNS",
+      "desc": "Namnupplösning över UDP/TCP. Övervaka exfiltrering och tunnling."
+    },
+    {
+      "port": 67,
+      "name": "DHCP server",
+      "desc": "Tilldelar IP-konfiguration till klienter. Paras med UDP 68 på klienter."
+    },
+    {
+      "port": 68,
+      "name": "DHCP client",
+      "desc": "Klientsidan av DHCP utbyter med servern på UDP 67."
+    },
+    {
+      "port": 80,
+      "name": "HTTP",
+      "desc": "Webb över klartext. Omdirigera till HTTPS; förvänta dig skannrar och bots."
+    },
+    {
+      "port": 110,
+      "name": "POP3",
+      "desc": "Äldre e-posthämtning. Föredrar moderna protokoll med TLS eller IMAP."
+    },
+    {
+      "port": 123,
+      "name": "NTP",
+      "desc": "Tidssynkronisering. Kritiskt för loggar, Kerberos och TLS; begränsa åtkomsten."
+    },
+    {
+      "port": 139,
+      "name": "NetBIOS-SSN",
+      "desc": "Fil- och skrivardelning i äldre Windows-nätverk. Granska och begränsa exponeringen noggrant."
+    },
+    {
+      "port": 143,
+      "name": "IMAP",
+      "desc": "E-posthämtning och lagring. Använd IMAPS på 993 för kryptering."
+    },
+    {
+      "port": 161,
+      "name": "SNMP",
+      "desc": "Enhetshantering och övervakning. Ändra community-strängar och föredra v3."
+    },
+    {
+      "port": 162,
+      "name": "SNMP trap",
+      "desc": "Tar emot asynkrona SNMP-meddelanden från enheter."
+    },
+    {
+      "port": 389,
+      "name": "LDAP",
+      "desc": "Katalogtjänster; ofta för autentisering. Använd LDAPS (636) när det är möjligt."
+    },
+    {
+      "port": 443,
+      "name": "HTTPS",
+      "desc": "Krypterad webbtrafik med TLS. De flesta moderna webbplatser använder detta."
+    },
+    {
+      "port": 465,
+      "name": "SMTPS",
+      "desc": "Implicit TLS för SMTP. Ibland utfasad till förmån för STARTTLS på 587."
+    },
+    {
+      "port": 514,
+      "name": "Syslog",
+      "desc": "Systemloggning. UDP standard är förlustbringande; TCP/TLS föredras för tillförlitlighet."
+    },
+    {
+      "port": 587,
+      "name": "SMTP submission",
+      "desc": "Autentiserad e-postinlämning från klienter till servrar med STARTTLS."
+    },
+    {
+      "port": 636,
+      "name": "LDAPS",
+      "desc": "LDAP över TLS. Skyddar katalogautentisering och frågor."
+    },
+    {
+      "port": 989,
+      "name": "FTPS data",
+      "desc": "Datakanal för FTPS i implicit TLS-läge."
+    },
+    {
+      "port": 990,
+      "name": "FTPS control",
+      "desc": "Styrkanal för FTPS i implicit TLS-läge."
+    },
+    {
+      "port": 993,
+      "name": "IMAPS",
+      "desc": "IMAP över TLS för säker e-poståtkomst."
+    },
+    {
+      "port": 995,
+      "name": "POP3S",
+      "desc": "POP3 över TLS. Arv; föredrar IMAPS."
+    },
+    {
+      "port": 1433,
+      "name": "MS SQL Server",
+      "desc": "Standardport för Microsoft SQL Server. Härda tjänsten och begränsa nätverksåtkomst."
+    },
+    {
+      "port": 1521,
+      "name": "Oracle SQL",
+      "desc": "Oracle-databasavlyssnare; ofta exponerad i företagsnätverk."
+    },
+    {
+      "port": 1723,
+      "name": "PPTP",
+      "desc": "Äldre VPN-tunnlingsprotokoll. Undvik; använd moderna VPN som OpenVPN eller WireGuard."
+    },
+    {
+      "port": 2049,
+      "name": "NFS",
+      "desc": "Nätverksfilsystem. Begränsa till betrodda undernät; se upp för dataläckage."
+    },
+    {
+      "port": 3306,
+      "name": "MySQL",
+      "desc": "Standardport för MySQL/MariaDB. Kräv autentisering och TLS; exponera inte offentligt."
+    },
+    {
+      "port": 3389,
+      "name": "RDP",
+      "desc": "Remote Desktop Protocol. Skydda med MFA, gateways och övervakning."
+    },
+    {
+      "port": 5432,
+      "name": "PostgreSQL",
+      "desc": "PostgreSQL-server. Kryptera trafiken, begränsa källor och använd tydliga roller."
+    },
+    {
+      "port": 5900,
+      "name": "VNC",
+      "desc": "Fjärrskrivbordsdelning, ofta svagt skyddad. Föredra SSH-tunnel eller VPN."
+    },
+    {
+      "port": 6379,
+      "name": "Redis",
+      "desc": "In-memory-datalager. Exponera inte publikt; använd autentisering och nätverks-ACL:er."
+    },
+    {
+      "port": 8080,
+      "name": "HTTP-alt",
+      "desc": "Alternativ HTTP-port för API:er/admin. Behandla som produktion: TLS och autentisering."
+    },
+    {
+      "port": 8443,
+      "name": "HTTPS-alt",
+      "desc": "Alternativ HTTPS; vanligt för admin och API:er."
+    }
+  ]
+}
+

@@ -1,0 +1,1875 @@
+# Translations template for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-02-18 07:51+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app.py:911 app.py:915 app.py:1144 templates/base.html:1041
+#: templates/base.html:1091 templates/base.html:1092 templates/base.html:1173
+#: templates/commands.html:629
+msgid "Command"
+msgstr ""
+
+#: app.py:932
+msgid "Tool (CLI)"
+msgstr ""
+
+#: app.py:933 app.py:948 app.py:960 app.py:975 templates/base.html:1038
+msgid "Tool"
+msgstr ""
+
+#: app.py:947
+msgid "Tool (GUI)"
+msgstr ""
+
+#: app.py:959 app.py:974
+msgid "Tool (Detection)"
+msgstr ""
+
+#: app.py:1000 app.py:1004 app.py:1656 templates/base.html:1039
+msgid "Concept"
+msgstr ""
+
+#: app.py:1028 app.py:1029 app.py:1687 app.py:1712 templates/base.html:822
+#: templates/base.html:931 templates/base.html:1040 templates/base.html:1177
+#: templates/defend_detail.html:4 templates/defend_hub.html:3
+#: templates/defend_hub.html:10 templates/home.html:369
+msgid "Defend"
+msgstr ""
+
+#: app.py:1161
+#, python-format
+msgid "Tool - %(kind)s"
+msgstr ""
+
+#: app.py:1183
+msgid "Concept - Frameworks"
+msgstr ""
+
+#: app.py:1184
+msgid "Concept - Principles"
+msgstr ""
+
+#: app.py:1185
+msgid "Concept - Networking"
+msgstr ""
+
+#: app.py:1217
+msgid "Concept - Ports"
+msgstr ""
+
+#: app.py:1233
+msgid "Defend - Detection"
+msgstr ""
+
+#: app.py:1246
+msgid "Defend - Hardening"
+msgstr ""
+
+#: app.py:1339 app.py:1444 services/ai_assistant.py:391
+#: templates/base.html:1170
+msgid "AI request failed."
+msgstr ""
+
+#: app.py:1375
+msgid "Please log in to use the AI assistant."
+msgstr ""
+
+#: app.py:1394
+msgid "Missing prompt"
+msgstr ""
+
+#: app.py:1568 templates/concepts_hub.html:16
+msgid "Frameworks and Standards"
+msgstr ""
+
+#: app.py:1569 templates/concepts_hub.html:17
+msgid "Principles and Identity"
+msgstr ""
+
+#: app.py:1570 templates/concepts_hub.html:18
+msgid "Networking and Protocols"
+msgstr ""
+
+#: app.py:1571 templates/base.html:930 templates/concepts_hub.html:19
+msgid "Ports"
+msgstr ""
+
+#: app.py:1579 app.py:1596 app.py:1686 app.py:1702
+#: templates/concept_detail.html:47 templates/defend_detail.html:140
+msgid "Not found"
+msgstr ""
+
+#: app.py:1580 templates/base.html:821 templates/base.html:929
+#: templates/base.html:1176 templates/concepts_hub.html:3
+#: templates/concepts_hub.html:9 templates/home.html:250
+#: templates/home.html:357
+msgid "Concepts"
+msgstr ""
+
+#: app.py:1608
+msgid "Service"
+msgstr ""
+
+#: app.py:1610
+#, python-format
+msgid "Port %(port)s: %(service)s"
+msgstr ""
+
+#: app.py:1621
+msgid ""
+"You will see this in scans, firewall rules, vulnerability reports, and "
+"service configs. "
+msgstr ""
+
+#: app.py:1622
+msgid ""
+"Treat open ports as exposure points and verify the service is expected, "
+"hardened, and restricted."
+msgstr ""
+
+#: app.py:1642
+msgid ""
+"Used in governance, risk, and compliance work: control selection, audits,"
+" reporting, and security roadmaps."
+msgstr ""
+
+#: app.py:1646
+msgid ""
+"Used when designing and operating access control, authentication, "
+"authorization, and identity lifecycle."
+msgstr ""
+
+#: app.py:1650
+msgid ""
+"Shows up in packet captures, network diagrams, firewall rules, and system"
+" or network logs."
+msgstr ""
+
+#: app.py:1677 templates/defend_hub.html:22
+msgid "Detection and Logging"
+msgstr ""
+
+#: app.py:1678 templates/defend_hub.html:41
+msgid "Hardening"
+msgstr ""
+
+#: app.py:1764
+msgid ""
+"Analysis is already running for the same log. Please try again in a "
+"moment."
+msgstr ""
+
+#: app.py:1793
+msgid "No file provided."
+msgstr ""
+
+#: app.py:1798
+msgid "File too large (max 5MB)."
+msgstr ""
+
+#: app.py:1820 app.py:1850
+msgid "Missing log text."
+msgstr ""
+
+#: app.py:1824 app.py:1853
+msgid "Input too large (max 200,000 characters)."
+msgstr ""
+
+#: app.py:1841 app.py:1865
+msgid "Unexpected analyzer error."
+msgstr ""
+
+#: auth_routes.py:106
+msgid "Unauthorized"
+msgstr ""
+
+#: auth_routes.py:153
+msgid "Missing idToken"
+msgstr ""
+
+#: auth_routes.py:159
+msgid "Invalid token"
+msgstr ""
+
+#: auth_routes.py:161
+msgid "Email not verified"
+msgstr ""
+
+#: auth_routes.py:164
+msgid "Token verification failed"
+msgstr ""
+
+#: auth_routes.py:171
+msgid "Could not create session"
+msgstr ""
+
+#: auth_routes.py:263
+msgid "Invalid avatar"
+msgstr ""
+
+#: auth_routes.py:269 auth_routes.py:340
+msgid "Update failed"
+msgstr ""
+
+#: auth_routes.py:286
+msgid "Display name must be 4-16 characters."
+msgstr ""
+
+#: auth_routes.py:290
+msgid "Only letters, numbers, space, underscore and dot are allowed."
+msgstr ""
+
+#: auth_routes.py:299 auth_routes.py:301
+msgid "That name is not allowed."
+msgstr ""
+
+#: auth_routes.py:329
+#, python-format
+msgid "You can change your name again in %(days)s day(s)."
+msgstr ""
+
+#: services/ai_assistant.py:367
+msgid "Unknown AI mode."
+msgstr ""
+
+#: services/ai_assistant.py:415
+msgid "Invalid AI mode."
+msgstr ""
+
+#: services/ai_assistant.py:423
+msgid "Please wait a moment before using AI again."
+msgstr ""
+
+#: services/ai_assistant.py:431
+msgid ""
+"AI limit reached for today. You get 3 requests per day. Try again "
+"tomorrow."
+msgstr ""
+
+#: services/ai_assistant.py:473
+msgid "I did not get a response. Please try again with a shorter snippet."
+msgstr ""
+
+#: templates/analyze.html:6 templates/analyze.html:11 templates/base.html:825
+#: templates/home.html:405
+msgid "Log Analyzer"
+msgstr ""
+
+#: templates/analyze.html:12
+msgid "Analyze logs to detect suspicious activity and security events."
+msgstr ""
+
+#: templates/analyze.html:20
+msgid "Upload file"
+msgstr ""
+
+#: templates/analyze.html:23
+msgid "Paste text"
+msgstr ""
+
+#: templates/analyze.html:29
+msgid "How analysis works"
+msgstr ""
+
+#: templates/analyze.html:33
+msgid "Parsing and normalization:"
+msgstr ""
+
+#: templates/analyze.html:33
+msgid ""
+"Attempts to extract timestamp, host, service, level, IP, and username. "
+"For web logs, it also extracts method, path, and status. Every line is "
+"always preserved as raw text."
+msgstr ""
+
+#: templates/analyze.html:37
+msgid "Rule-based detection:"
+msgstr ""
+
+#: templates/analyze.html:37
+msgid ""
+"Runs a deterministic set of rules covering authentication attacks, web "
+"probing, privilege escalation, persistence, malware indicators, and "
+"scanning patterns."
+msgstr ""
+
+#: templates/analyze.html:41
+msgid "Correlation windows:"
+msgstr ""
+
+#: templates/analyze.html:41
+msgid ""
+"Detects bursts over short time windows, such as SSH brute force per IP, "
+"password spraying across many users, many 404 responses across many "
+"paths, and fail-then-success sequences."
+msgstr ""
+
+#: templates/analyze.html:45
+msgid "Evidence in matched lines:"
+msgstr ""
+
+#: templates/analyze.html:45
+msgid ""
+"Every finding includes the real log lines that matched the rule, so you "
+"can triage quickly with concrete evidence."
+msgstr ""
+
+#: templates/analyze.html:49
+msgid "Tuning and allowlisting:"
+msgstr ""
+
+#: templates/analyze.html:49
+msgid ""
+"Thresholds and allowlists reduce false positives, for example localhost "
+"and common health endpoints."
+msgstr ""
+
+#: templates/analyze.html:53
+msgid "Privacy:"
+msgstr ""
+
+#: templates/analyze.html:53
+msgid "Analysis runs in memory. Logs are not stored and are not forwarded."
+msgstr ""
+
+#: templates/analyze.html:70
+msgid "Upload log file"
+msgstr ""
+
+#: templates/analyze.html:71
+msgid "Drag and drop a .log or .txt file here, or click to browse."
+msgstr ""
+
+#: templates/analyze.html:72
+msgid "Maximum 5 MB"
+msgstr ""
+
+#: templates/analyze.html:79
+msgid "Paste log text"
+msgstr ""
+
+#: templates/analyze.html:80
+msgid "Paste log lines here..."
+msgstr ""
+
+#: templates/analyze.html:82
+msgid "Analyze text"
+msgstr ""
+
+#: templates/analyze.html:250
+msgid "Analyzing..."
+msgstr ""
+
+#: templates/analyze.html:251
+msgid "Analysis error"
+msgstr ""
+
+#: templates/analyze.html:252
+msgid "File analyzed successfully"
+msgstr ""
+
+#: templates/analyze.html:253
+msgid "Analysis results"
+msgstr ""
+
+#: templates/analyze.html:254 templates/commands.html:628
+msgid "All"
+msgstr ""
+
+#: templates/analyze.html:255
+msgid "Critical"
+msgstr ""
+
+#: templates/analyze.html:256
+msgid "High"
+msgstr ""
+
+#: templates/analyze.html:257
+msgid "Medium"
+msgstr ""
+
+#: templates/analyze.html:258
+msgid "Low"
+msgstr ""
+
+#: templates/analyze.html:259
+msgid "Details"
+msgstr ""
+
+#: templates/analyze.html:260
+msgid "Matched log lines"
+msgstr ""
+
+#: templates/analyze.html:261
+msgid "New analysis"
+msgstr ""
+
+#: templates/analyze.html:262
+msgid "No suspicious activity detected"
+msgstr ""
+
+#: templates/analyze.html:263
+msgid "The log file appears to be clean."
+msgstr ""
+
+#: templates/analyze.html:264
+msgid "Only .log and .txt files are allowed."
+msgstr ""
+
+#: templates/analyze.html:265
+msgid "File is too large (maximum 5 MB)."
+msgstr ""
+
+#: templates/analyze.html:266
+msgid "An error occurred during analysis."
+msgstr ""
+
+#: templates/analyze.html:267
+msgid "Network error: "
+msgstr ""
+
+#: templates/analyze.html:268
+msgid "Please paste some log text."
+msgstr ""
+
+#: templates/analyze.html:269
+msgid "Text is too long (maximum 200,000 characters)."
+msgstr ""
+
+#: templates/base.html:818
+msgid "Home"
+msgstr ""
+
+#: templates/base.html:819 templates/base.html:927 templates/base.html:1174
+#: templates/commands.html:4 templates/commands.html:116
+#: templates/home.html:333 templates/tool_view.html:251
+msgid "Command Library"
+msgstr ""
+
+#: templates/base.html:820 templates/base.html:928 templates/base.html:1175
+#: templates/home.html:345 templates/tool_view.html:5
+#: templates/tools_landing.html:4 templates/tools_landing.html:13
+msgid "Toolbox"
+msgstr ""
+
+#: templates/base.html:823 templates/home.html:381
+#: templates/resource_hub.html:4 templates/resource_hub.html:11
+#: templates/resource_hub.html:12
+msgid "Resource Hub"
+msgstr ""
+
+#: templates/base.html:824 templates/home.html:393 templates/quiz.html:4
+#: templates/quiz.html:9
+msgid "Quiz"
+msgstr ""
+
+#: templates/base.html:836
+msgid "Search..."
+msgstr ""
+
+#: templates/base.html:860
+msgid "No results"
+msgstr ""
+
+#: templates/base.html:868
+msgid "Language"
+msgstr ""
+
+#: templates/base.html:881
+msgid "Toggle theme"
+msgstr ""
+
+#: templates/auth/login.html:40 templates/base.html:893
+msgid "Login"
+msgstr ""
+
+#: templates/auth/dashboard.html:6 templates/base.html:895
+msgid "Dashboard"
+msgstr ""
+
+#: templates/auth/dashboard.html:18 templates/auth/dashboard.html:66
+#: templates/auth/dashboard.html:85 templates/base.html:897
+msgid "Avatar"
+msgstr ""
+
+#: templates/base.html:902
+msgid "Account"
+msgstr ""
+
+#: templates/base.html:916 templates/base.html:1126 templates/base.html:1178
+msgid "CyberBase"
+msgstr ""
+
+#: templates/base.html:916 templates/home.html:295
+msgid "Learn"
+msgstr ""
+
+#: templates/base.html:916 templates/home.html:305
+msgid "Reference"
+msgstr ""
+
+#: templates/base.html:916 templates/home.html:315
+msgid "Practice"
+msgstr ""
+
+#: templates/base.html:941 templates/base.html:945 templates/base.html:1010
+#: templates/base.html:1011 templates/base.html:1042
+msgid "Item"
+msgstr ""
+
+#: templates/base.html:1115
+msgid "Open AI Assistant"
+msgstr ""
+
+#: templates/base.html:1125 templates/home.html:417
+msgid "AI Assistant"
+msgstr ""
+
+#: templates/base.html:1130
+msgid "Close"
+msgstr ""
+
+#: templates/base.html:1140
+msgid "Ask a follow-up..."
+msgstr ""
+
+#: templates/base.html:1144
+msgid "Send"
+msgstr ""
+
+#: templates/base.html:1147
+msgid "Enter sends. Esc closes."
+msgstr ""
+
+#: templates/base.html:1157 templates/commands.html:265
+#: templates/commands.html:485
+msgid "Explain with AI"
+msgstr ""
+
+#: templates/auth/dashboard.html:68 templates/base.html:1164
+msgid "You"
+msgstr ""
+
+#: templates/base.html:1165
+msgid "Bad response from server."
+msgstr ""
+
+#: templates/base.html:1166
+msgid "You need to be logged in to use the AI assistant."
+msgstr ""
+
+#: templates/base.html:1167
+msgid "Chat failed."
+msgstr ""
+
+#: templates/base.html:1168
+msgid "Thinking..."
+msgstr ""
+
+#: templates/base.html:1169
+msgid "No reply received."
+msgstr ""
+
+#: templates/base.html:1171
+msgid "AI request failed. Please try again."
+msgstr ""
+
+#: templates/base.html:1172
+msgid "Selected text"
+msgstr ""
+
+#: templates/base.html:1179
+msgid "Explain:"
+msgstr ""
+
+#: templates/base.html:1180
+msgid "Command title:"
+msgstr ""
+
+#: templates/base.html:1181
+msgid "Short description:"
+msgstr ""
+
+#: templates/base.html:1182
+msgid "Syntax:"
+msgstr ""
+
+#: templates/commands.html:117
+msgid "Docker, Git, GitHub CLI, and MongoDB with clear syntax and examples"
+msgstr ""
+
+#: templates/commands.html:125
+msgid "Search commands..."
+msgstr ""
+
+#: templates/commands.html:135
+msgid "TOOLS:"
+msgstr ""
+
+#: templates/commands.html:148
+msgid "WORKFLOWS:"
+msgstr ""
+
+#: templates/commands.html:155
+msgid "All Workflows"
+msgstr ""
+
+#: templates/commands.html:170
+msgid "No workflows for this tool"
+msgstr ""
+
+#: templates/commands.html:237
+msgid "No commands found. Try a different search."
+msgstr ""
+
+#: templates/commands.html:249
+msgid "No command selected"
+msgstr ""
+
+#: templates/commands.html:250
+msgid "Pick a command from the left to see syntax, flags and examples here."
+msgstr ""
+
+#: templates/commands.html:294 templates/commands.html:492
+msgid "Short description"
+msgstr ""
+
+#: templates/commands.html:301 templates/commands.html:499
+msgid "Syntax"
+msgstr ""
+
+#: templates/commands.html:310 templates/commands.html:508
+#: templates/commands.html:640
+msgid "How to read syntax"
+msgstr ""
+
+#: templates/commands.html:319 templates/commands.html:517
+msgid "Copy syntax"
+msgstr ""
+
+#: templates/commands.html:331 templates/commands.html:529
+msgid "Minimal usage"
+msgstr ""
+
+#: templates/commands.html:337 templates/commands.html:535
+msgid "Copy minimal usage"
+msgstr ""
+
+#: templates/commands.html:349 templates/commands.html:547
+#: templates/tool_view.html:208
+msgid "Common flags"
+msgstr ""
+
+#: templates/commands.html:358 templates/commands.html:360
+#: templates/commands.html:381 templates/commands.html:553
+#: templates/commands.html:573 templates/commands.html:638
+msgid "Copy"
+msgstr ""
+
+#: templates/commands.html:367 templates/commands.html:559
+msgid "No common flags available."
+msgstr ""
+
+#: templates/commands.html:372 templates/commands.html:564
+#: templates/tool_view.html:222
+msgid "Examples"
+msgstr ""
+
+#: templates/commands.html:391 templates/commands.html:583
+msgid "No examples available."
+msgstr ""
+
+#: templates/commands.html:396 templates/commands.html:599
+msgid "Verify with:"
+msgstr ""
+
+#: templates/commands.html:403
+msgid "Recent"
+msgstr ""
+
+#: templates/commands.html:411
+msgid "Clear recent"
+msgstr ""
+
+#: templates/commands.html:429
+msgid "No recent items."
+msgstr ""
+
+#: templates/commands.html:630
+msgid "Pin"
+msgstr ""
+
+#: templates/commands.html:631
+msgid "Unpin"
+msgstr ""
+
+#: templates/commands.html:632
+msgid "items"
+msgstr ""
+
+#: templates/commands.html:633 templates/tool_view.html:281
+msgid "Notes"
+msgstr ""
+
+#: templates/commands.html:634
+msgid "Pitfalls"
+msgstr ""
+
+#: templates/commands.html:635 templates/concept_detail.html:90
+msgid "No description available."
+msgstr ""
+
+#: templates/commands.html:636
+msgid "Not provided"
+msgstr ""
+
+#: templates/commands.html:637
+msgid "Not available"
+msgstr ""
+
+#: templates/commands.html:639
+msgid "Copied"
+msgstr ""
+
+#: templates/commands.html:641
+msgid "You can pin up to 3 items."
+msgstr ""
+
+#: templates/commands.html:651 templates/commands.html:665
+#: templates/commands.html:672
+msgid "[options] means optional flags you can add"
+msgstr ""
+
+#: templates/commands.html:652
+msgid "<arg> is a placeholder, replace it with a real value"
+msgstr ""
+
+#: templates/commands.html:653 templates/commands.html:667
+#: templates/commands.html:674
+msgid "[<arg>...] means you can repeat it for multiple values"
+msgstr ""
+
+#: templates/commands.html:654 templates/commands.html:662
+msgid "A | B inside <...> means choose one of the alternatives"
+msgstr ""
+
+#: templates/commands.html:655 templates/commands.html:669
+#: templates/commands.html:676
+msgid "... means \"repeat as needed\""
+msgstr ""
+
+#: templates/commands.html:658
+msgid "[options] means optional flags you can add, like -p or --name"
+msgstr ""
+
+#: templates/commands.html:659
+msgid "<container> and <image> are placeholders, replace them with real names"
+msgstr ""
+
+#: templates/commands.html:660
+msgid "[<container>...] means you can repeat it for multiple containers"
+msgstr ""
+
+#: templates/commands.html:661
+msgid ""
+"<command> [<arg>...] means a command to run inside the container plus "
+"optional arguments"
+msgstr ""
+
+#: templates/commands.html:666 templates/commands.html:673
+msgid "<arg>, <path>, <name> are placeholders, replace them with real values"
+msgstr ""
+
+#: templates/commands.html:668 templates/commands.html:675
+msgid "<subcommand> means choose exactly one subcommand"
+msgstr ""
+
+#: templates/commands.html:679
+msgid ""
+"db.<collection> means replace <collection> with a real collection name, "
+"like db.users"
+msgstr ""
+
+#: templates/commands.html:680
+msgid "( ... ) contains method arguments, separated by commas"
+msgstr ""
+
+#: templates/commands.html:681
+msgid ""
+"<query>, <filter>, <projection> are placeholders for MongoDB query "
+"documents"
+msgstr ""
+
+#: templates/commands.html:682
+#, python-brace-format
+msgid "{ } is a document (object), [ ] is an array"
+msgstr ""
+
+#: templates/commands.html:683
+msgid "Some parameters are optional depending on the method, check the examples"
+msgstr ""
+
+#: templates/commands.html:686
+msgid "<targets> can be a host, IP, CIDR, range, or a hostname"
+msgstr ""
+
+#: templates/commands.html:687
+msgid ""
+"-p <ports> supports lists and ranges like 22,80,443 or 1-1024, and -p- "
+"means all ports"
+msgstr ""
+
+#: templates/commands.html:688
+msgid "Scan types are flags like -sT (connect), -sU (UDP), -sV (version), -O (OS)"
+msgstr ""
+
+#: templates/commands.html:689
+msgid "Scripts use --script <scripts> and optional --script-args <k=v,...>"
+msgstr ""
+
+#: templates/commands.html:690
+msgid "Output flags like -oN, -oX, or -oA write results to files for reports"
+msgstr ""
+
+#: templates/commands.html:693
+msgid ""
+"auditctl manages kernel audit rules, while ausearch and aureport query "
+"the logs"
+msgstr ""
+
+#: templates/commands.html:694
+msgid "File watches use: -w <path> -p <r|w|x|a> -k <key>"
+msgstr ""
+
+#: templates/commands.html:695
+msgid ""
+"Syscall rules use: -a always,exit -F arch=b64 -S <syscall> -F "
+"<field>=<value> -k <key>"
+msgstr ""
+
+#: templates/commands.html:696
+msgid "Keys are used for searching later with: ausearch -k <key>"
+msgstr ""
+
+#: templates/commands.html:697
+msgid ""
+"Time filters often use -ts <start> and -te <end>, and -i interprets IDs "
+"to names"
+msgstr ""
+
+#: templates/commands.html:700
+msgid "Lynis uses subcommands like: lynis audit system, lynis show <topic>"
+msgstr ""
+
+#: templates/commands.html:701
+msgid "Common automation flags are --quick and --quiet"
+msgstr ""
+
+#: templates/commands.html:702
+msgid ""
+"Profiles can be selected with --profile <profile> to apply custom "
+"baselines"
+msgstr ""
+
+#: templates/commands.html:703
+msgid "Cron automation is supported via --cronjob"
+msgstr ""
+
+#: templates/commands.html:704
+msgid ""
+"Use show commands like: lynis show profiles, lynis show settings, lynis "
+"show options"
+msgstr ""
+
+#: templates/commands.html:707
+msgid ""
+"ClamAV has on demand scanning (clamscan), daemon based scanning "
+"(clamdscan), and updates (freshclam)"
+msgstr ""
+
+#: templates/commands.html:708
+msgid ""
+"<path> can be a file or directory, and scanning directories usually needs"
+" --recursive"
+msgstr ""
+
+#: templates/commands.html:709
+msgid "Use --infected to only list infected files"
+msgstr ""
+
+#: templates/commands.html:710
+msgid ""
+"Logging uses --log=<file>, and quarantine actions include --move=<dir> or"
+" --copy=<dir>"
+msgstr ""
+
+#: templates/commands.html:711
+msgid ""
+"Daemon scans can use --multiscan and optional --fdpass depending on "
+"permissions"
+msgstr ""
+
+#: templates/concept_detail.html:11 templates/defend_detail.html:98
+#: templates/tool_view.html:345
+msgid "Deep Dive"
+msgstr ""
+
+#: templates/concept_detail.html:48
+msgid "That concept does not exist or the link is invalid."
+msgstr ""
+
+#: templates/concept_detail.html:50
+msgid "Back to Concepts"
+msgstr ""
+
+#: templates/concept_detail.html:77
+msgid "Where you will see it:"
+msgstr ""
+
+#: templates/concept_detail.html:88 templates/tool_view.html:390
+msgid "What it is"
+msgstr ""
+
+#: templates/concept_detail.html:142 templates/defend_detail.html:277
+msgid "Key points"
+msgstr ""
+
+#: templates/concept_detail.html:154
+msgid "How it works in broad strokes"
+msgstr ""
+
+#: templates/concept_detail.html:165
+msgid "Concrete example"
+msgstr ""
+
+#: templates/concept_detail.html:175
+msgid "Why it matters"
+msgstr ""
+
+#: templates/concept_detail.html:182
+msgid "Security angle"
+msgstr ""
+
+#: templates/concept_detail.html:193
+msgid "Common pitfalls"
+msgstr ""
+
+#: templates/concept_detail.html:204
+msgid "Quick self test"
+msgstr ""
+
+#: templates/concepts_hub.html:10
+msgid "Explore categories and drill into details."
+msgstr ""
+
+#: templates/concepts_hub.html:16
+msgid "Mental models and checklists used in real security programs."
+msgstr ""
+
+#: templates/concepts_hub.html:17
+msgid "Access control, authentication, and core security principles."
+msgstr ""
+
+#: templates/concepts_hub.html:18
+msgid "Protocols you will see in scans, traffic captures, and logs."
+msgstr ""
+
+#: templates/concepts_hub.html:19
+msgid ""
+"Common ports you will run into in scans, firewall rules, and service "
+"configs."
+msgstr ""
+
+#: templates/concepts_hub.html:64
+msgid "View all"
+msgstr ""
+
+#: templates/concepts_hub.html:65
+msgid "Show less"
+msgstr ""
+
+#: templates/defend_detail.html:26
+msgid "Watch out"
+msgstr ""
+
+#: templates/defend_detail.html:30 templates/defend_detail.html:52
+msgid "Tip"
+msgstr ""
+
+#: templates/defend_detail.html:135
+msgid "Back to Defend"
+msgstr ""
+
+#: templates/defend_detail.html:141
+msgid "This topic does not exist."
+msgstr ""
+
+#: templates/defend_detail.html:160
+msgid "Learning objectives"
+msgstr ""
+
+#: templates/defend_detail.html:161
+msgid "What you should be able to do after reading."
+msgstr ""
+
+#: templates/defend_detail.html:179
+msgid "At a glance"
+msgstr ""
+
+#: templates/defend_detail.html:180
+msgid "Fast mental model before you dive in."
+msgstr ""
+
+#: templates/defend_detail.html:285
+msgid "Checklist"
+msgstr ""
+
+#: templates/defend_detail.html:296
+msgid "Signals to watch for"
+msgstr ""
+
+#: templates/defend_detail.html:297
+msgid "Patterns worth investigating further."
+msgstr ""
+
+#: templates/defend_hub.html:13
+msgid ""
+"Detection, logging, and hardening topics. Open a topic to read the "
+"details."
+msgstr ""
+
+#: templates/defend_hub.html:23
+msgid "What to collect, what to look for, and what it means."
+msgstr ""
+
+#: templates/defend_hub.html:42
+msgid "Baseline security improvements for common platforms and services."
+msgstr ""
+
+#: templates/home.html:229
+msgid "Train. Defend. Execute."
+msgstr ""
+
+#: templates/home.html:233
+msgid "Your personal cybersecurity command center."
+msgstr ""
+
+#: templates/home.html:238
+msgid "Commands"
+msgstr ""
+
+#: templates/home.html:240
+msgid "Syntax and examples"
+msgstr ""
+
+#: templates/home.html:244
+msgid "Tools"
+msgstr ""
+
+#: templates/home.html:246
+msgid "CLI, GUI, detection"
+msgstr ""
+
+#: templates/home.html:252
+msgid "Models and foundations"
+msgstr ""
+
+#: templates/home.html:256
+msgid "Defend topics"
+msgstr ""
+
+#: templates/home.html:258
+msgid "Hardening and detection"
+msgstr ""
+
+#: templates/home.html:271
+msgid "Recently used"
+msgstr ""
+
+#: templates/home.html:297
+msgid "Build a mental map that makes everything else easier."
+msgstr ""
+
+#: templates/home.html:307
+msgid "Consistent formats so you can apply knowledge quickly."
+msgstr ""
+
+#: templates/home.html:317
+msgid "Use repetition and pressure testing to make it stick."
+msgstr ""
+
+#: templates/home.html:324
+msgid "Overview"
+msgstr ""
+
+#: templates/home.html:335
+msgid ""
+"Learn commands with clear syntax, flags, and examples you can apply while"
+" working."
+msgstr ""
+
+#: templates/home.html:347
+msgid ""
+"Practical tool guides that explain what each tool does, how to use it, "
+"and when it matters."
+msgstr ""
+
+#: templates/home.html:359
+msgid ""
+"Clear fundamentals across networking, protocols, identity, and core "
+"security principles."
+msgstr ""
+
+#: templates/home.html:371
+msgid ""
+"Action driven checklists for logging, detection, and hardening in real "
+"environments."
+msgstr ""
+
+#: templates/home.html:383
+msgid ""
+"Curated resources for deeper learning, trusted guidance, and continued "
+"study."
+msgstr ""
+
+#: templates/home.html:395
+msgid "Quick topic quizzes to test understanding and improve long term retention."
+msgstr ""
+
+#: templates/home.html:407
+msgid ""
+"Paste or upload logs to review events, spot anomalies, and flag "
+"suspicious activity."
+msgstr ""
+
+#: templates/home.html:419
+msgid ""
+"Built in AI support to explain cybersecurity topics and help you learn "
+"faster."
+msgstr ""
+
+#: templates/home.html:430
+msgid "Quick pick"
+msgstr ""
+
+#: templates/quiz.html:16
+msgid "No quiz topics available right now."
+msgstr ""
+
+#: templates/quiz.html:37
+msgid "New topic"
+msgstr ""
+
+#: templates/quiz.html:54
+msgid "Prev"
+msgstr ""
+
+#: templates/quiz.html:55
+msgid "Next"
+msgstr ""
+
+#: templates/quiz.html:63
+msgid "Results"
+msgstr ""
+
+#: templates/quiz.html:80
+msgid "Back to topics"
+msgstr ""
+
+#: templates/quiz.html:92
+msgid "10 Questions"
+msgstr ""
+
+#: templates/quiz.html:93
+msgid "Question"
+msgstr ""
+
+#: templates/quiz.html:94
+msgid "of"
+msgstr ""
+
+#: templates/quiz.html:95
+msgid "Correct"
+msgstr ""
+
+#: templates/quiz.html:96
+msgid "Wrong"
+msgstr ""
+
+#: templates/quiz.html:97
+msgid "Your answer"
+msgstr ""
+
+#: templates/quiz.html:98
+msgid "Correct answer"
+msgstr ""
+
+#: templates/resource_hub.html:13
+msgid ""
+"Curated references for incident response, governance, standards, and "
+"hands on learning."
+msgstr ""
+
+#: templates/resource_hub.html:21
+msgid "Sweden: Authorities & National Capabilities"
+msgstr ""
+
+#: templates/resource_hub.html:22
+msgid "Public sector"
+msgstr ""
+
+#: templates/resource_hub.html:24
+msgid ""
+"Official sources for incident reporting, national guidance, resilience "
+"and privacy regulation."
+msgstr ""
+
+#: templates/resource_hub.html:30
+msgid "Sweden's national CSIRT. Support, alerts, incident handling and guidance."
+msgstr ""
+
+#: templates/resource_hub.html:32 templates/resource_hub.html:42
+#: templates/resource_hub.html:52 templates/resource_hub.html:62
+#: templates/resource_hub.html:81 templates/resource_hub.html:91
+#: templates/resource_hub.html:101 templates/resource_hub.html:120
+#: templates/resource_hub.html:139 templates/resource_hub.html:158
+#: templates/resource_hub.html:168 templates/resource_hub.html:178
+#: templates/resource_hub.html:188 templates/resource_hub.html:207
+#: templates/resource_hub.html:217 templates/resource_hub.html:227
+msgid "Open"
+msgstr ""
+
+#: templates/resource_hub.html:40
+msgid ""
+"National Cyber Security Centre. Coordination, guidance and threat "
+"handling capabilities."
+msgstr ""
+
+#: templates/resource_hub.html:50
+msgid ""
+"Civil defence and resilience agency. Crisis preparedness, guidance and "
+"coordination."
+msgstr ""
+
+#: templates/resource_hub.html:60
+msgid ""
+"Authority for Privacy Protection. GDPR oversight, guidance and "
+"enforcement."
+msgstr ""
+
+#: templates/resource_hub.html:70
+msgid "Frameworks, Standards & Best Practices"
+msgstr ""
+
+#: templates/resource_hub.html:71
+msgid "Build your baseline"
+msgstr ""
+
+#: templates/resource_hub.html:73
+msgid ""
+"Well known references for governance, risk management and secure "
+"development."
+msgstr ""
+
+#: templates/resource_hub.html:79
+msgid "Standards and guidance, including the NIST Cybersecurity Framework (CSF)."
+msgstr ""
+
+#: templates/resource_hub.html:89
+msgid ""
+"Open source community improving software security. Includes Top 10 and "
+"testing guides."
+msgstr ""
+
+#: templates/resource_hub.html:99
+msgid ""
+"Practical, prioritized security safeguards. Good starting point for "
+"security hygiene."
+msgstr ""
+
+#: templates/resource_hub.html:109
+msgid "Incident Response & Communities"
+msgstr ""
+
+#: templates/resource_hub.html:110
+msgid "Coordination"
+msgstr ""
+
+#: templates/resource_hub.html:112
+msgid ""
+"Where responders share practices, coordinate and strengthen global "
+"collaboration."
+msgstr ""
+
+#: templates/resource_hub.html:118
+msgid ""
+"Global forum for incident response and security teams focused on "
+"cooperation and sharing."
+msgstr ""
+
+#: templates/resource_hub.html:128
+msgid "Security News & Threat Monitoring"
+msgstr ""
+
+#: templates/resource_hub.html:129
+msgid "Stay current"
+msgstr ""
+
+#: templates/resource_hub.html:131
+msgid ""
+"Daily news, advisories and incident coverage for quick situational "
+"awareness."
+msgstr ""
+
+#: templates/resource_hub.html:137
+msgid ""
+"Security and tech news publication with frequent coverage of active "
+"threats and breaches."
+msgstr ""
+
+#: templates/resource_hub.html:147
+msgid "Learning Platforms"
+msgstr ""
+
+#: templates/resource_hub.html:148
+msgid "Courses"
+msgstr ""
+
+#: templates/resource_hub.html:150
+msgid ""
+"Structured courses, tutorials and bundles for building technical "
+"fundamentals."
+msgstr ""
+
+#: templates/resource_hub.html:156
+msgid ""
+"Fast, example driven tutorials for web technologies and programming "
+"basics."
+msgstr ""
+
+#: templates/resource_hub.html:166
+msgid ""
+"Large course marketplace covering IT, security, programming and "
+"certifications."
+msgstr ""
+
+#: templates/resource_hub.html:176
+msgid "Free and structured training in networking, security and IT skills."
+msgstr ""
+
+#: templates/resource_hub.html:186
+msgid ""
+"Time limited discounted software bundles, often useful for tools and "
+"learning material."
+msgstr ""
+
+#: templates/resource_hub.html:196
+msgid "Hands on Practice"
+msgstr ""
+
+#: templates/resource_hub.html:197
+msgid "Do the work"
+msgstr ""
+
+#: templates/resource_hub.html:199
+msgid ""
+"Practice platforms for real skill building: labs, exercises, and "
+"interactive training."
+msgstr ""
+
+#: templates/resource_hub.html:205
+msgid "Free coding practice across many languages with optional mentor feedback."
+msgstr ""
+
+#: templates/resource_hub.html:215
+msgid ""
+"CTF style wargames to learn Linux, security concepts and practical "
+"exploitation basics."
+msgstr ""
+
+#: templates/resource_hub.html:225
+msgid ""
+"Interactive browser based simulator to practice git commands and "
+"branching workflows."
+msgstr ""
+
+#: templates/tool_view.html:34
+msgid "HTTP protocol traffic"
+msgstr ""
+
+#: templates/tool_view.html:35
+msgid "DNS protocol traffic"
+msgstr ""
+
+#: templates/tool_view.html:36
+msgid "TLS handshake messages"
+msgstr ""
+
+#: templates/tool_view.html:37
+msgid "TCP retransmissions"
+msgstr ""
+
+#: templates/tool_view.html:38
+msgid "TCP reset (RST) packets"
+msgstr ""
+
+#: templates/tool_view.html:39
+msgid "TCP SYN packets (handshake start)"
+msgstr ""
+
+#: templates/tool_view.html:40
+msgid "Traffic to or from the specified IP"
+msgstr ""
+
+#: templates/tool_view.html:41
+msgid "TCP traffic on the specified port"
+msgstr ""
+
+#: templates/tool_view.html:42
+msgid "HTTP error responses (4xx/5xx)"
+msgstr ""
+
+#: templates/tool_view.html:43
+msgid "DNS responses with an error code"
+msgstr ""
+
+#: templates/tool_view.html:44
+msgid "Filter expression"
+msgstr ""
+
+#: templates/tool_view.html:62
+msgid "Usage"
+msgstr ""
+
+#: templates/tool_view.html:65
+msgid "A fast GUI cheat sheet: quick actions, common views/filters, and exports."
+msgstr ""
+
+#: templates/tool_view.html:69
+msgid "Quick actions"
+msgstr ""
+
+#: templates/tool_view.html:80
+msgid "Common filters or views"
+msgstr ""
+
+#: templates/tool_view.html:99
+msgid "Exports"
+msgstr ""
+
+#: templates/tool_view.html:109
+msgid "Quick setup steps and common actions."
+msgstr ""
+
+#: templates/tool_view.html:113
+msgid "Quick setup"
+msgstr ""
+
+#: templates/tool_view.html:157
+msgid "Actions"
+msgstr ""
+
+#: templates/tool_view.html:179
+msgid ""
+"Minimal usage, a general pattern, common flags, and examples you can "
+"adapt in authorized environments."
+msgstr ""
+
+#: templates/tool_view.html:183
+msgid "Minimal"
+msgstr ""
+
+#: templates/tool_view.html:190
+msgid "General pattern"
+msgstr ""
+
+#: templates/tool_view.html:251
+msgid "Check"
+msgstr ""
+
+#: templates/tool_view.html:251
+msgid "for more commands"
+msgstr ""
+
+#: templates/tool_view.html:263
+msgid "Quick panel"
+msgstr ""
+
+#: templates/tool_view.html:266
+msgid "Meaning and caveats that change what you see"
+msgstr ""
+
+#: templates/tool_view.html:267
+msgid "Small habits that prevent bad reads"
+msgstr ""
+
+#: templates/tool_view.html:268
+msgid "Patterns that create false confidence"
+msgstr ""
+
+#: templates/tool_view.html:269
+msgid "Optional trivia, nothing you should rely on"
+msgstr ""
+
+#: templates/tool_view.html:292
+msgid "Pro tips"
+msgstr ""
+
+#: templates/tool_view.html:303
+msgid "Common mistakes"
+msgstr ""
+
+#: templates/tool_view.html:314
+msgid "What good looks like"
+msgstr ""
+
+#: templates/tool_view.html:321
+msgid "Fun fact"
+msgstr ""
+
+#: templates/tool_view.html:334
+msgid "Workflow"
+msgstr ""
+
+#: templates/tool_view.html:337
+msgid "Features"
+msgstr ""
+
+#: templates/tool_view.html:379
+msgid "Back to Toolbox"
+msgstr ""
+
+#: templates/tool_view.html:392
+msgid ""
+"It aims to be fast and transparent, returning plain output you can verify"
+" and reuse."
+msgstr ""
+
+#: templates/tool_view.html:398
+msgid "How it works"
+msgstr ""
+
+#: templates/tool_view.html:400
+msgid ""
+"You steer behavior with clear flags and inputs, which keeps results "
+"reproducible and easy to compare."
+msgstr ""
+
+#: templates/tool_view.html:406
+msgid "Use it for"
+msgstr ""
+
+#: templates/tool_view.html:447
+msgid "Next steps"
+msgstr ""
+
+#: templates/tool_view.html:454
+msgid "Action"
+msgstr ""
+
+#: templates/tools_landing.html:6
+msgid "Search CyberBase..."
+msgstr ""
+
+#: templates/tools_landing.html:26
+msgid "CLI Tools"
+msgstr ""
+
+#: templates/tools_landing.html:28
+msgid "Terminal utilities with clear syntax, flags, and examples."
+msgstr ""
+
+#: templates/tools_landing.html:46
+msgid "No CLI tools added yet."
+msgstr ""
+
+#: templates/tools_landing.html:51
+msgid "Quick usage patterns and examples inside each tool page."
+msgstr ""
+
+#: templates/tools_landing.html:60
+msgid "GUI Tools"
+msgstr ""
+
+#: templates/tools_landing.html:62
+msgid "Visual tools and analyzers with what to look for and how to use them."
+msgstr ""
+
+#: templates/tools_landing.html:80
+msgid "No GUI tools added yet."
+msgstr ""
+
+#: templates/tools_landing.html:85
+msgid "Focus on what to capture, filter, and verify, then document findings."
+msgstr ""
+
+#: templates/tools_landing.html:94
+msgid "Detection Tools"
+msgstr ""
+
+#: templates/tools_landing.html:96
+msgid "IDS and monitoring tools with quick actions you actually use."
+msgstr ""
+
+#: templates/tools_landing.html:105
+msgid "No detection tools added yet."
+msgstr ""
+
+#: templates/tools_landing.html:126
+msgid "Use alerts as signals, then validate with logs and packet context."
+msgstr ""
+
+#: templates/auth/dashboard.html:8
+#, python-format
+msgid "Logged in as %(identity)s"
+msgstr ""
+
+#: templates/auth/dashboard.html:12
+msgid "Logout"
+msgstr ""
+
+#: templates/auth/dashboard.html:16
+msgid "Your profile"
+msgstr ""
+
+#: templates/auth/dashboard.html:25
+msgid "Current login streak"
+msgstr ""
+
+#: templates/auth/dashboard.html:29
+msgid "Best login streak"
+msgstr ""
+
+#: templates/auth/dashboard.html:37
+msgid "Display name"
+msgstr ""
+
+#: templates/auth/dashboard.html:40
+msgid "Save"
+msgstr ""
+
+#: templates/auth/dashboard.html:46
+msgid "Choose avatar"
+msgstr ""
+
+#: templates/auth/dashboard.html:53
+msgid "Save Avatar"
+msgstr ""
+
+#: templates/auth/dashboard.html:59
+msgid "Leaderboard"
+msgstr ""
+
+#: templates/auth/dashboard.html:69 templates/auth/dashboard.html:88
+msgid "Best"
+msgstr ""
+
+#: templates/auth/dashboard.html:72
+msgid "No entries yet."
+msgstr ""
+
+#: templates/auth/dashboard.html:97
+msgid "Saved."
+msgstr ""
+
+#: templates/auth/dashboard.html:98
+msgid "Failed."
+msgstr ""
+
+#: templates/auth/login.html:6
+msgid "Welcome back"
+msgstr ""
+
+#: templates/auth/login.html:7
+msgid "Sign in or create your account."
+msgstr ""
+
+#: templates/auth/login.html:15
+msgid "Continue with Google"
+msgstr ""
+
+#: templates/auth/login.html:21
+msgid "Email"
+msgstr ""
+
+#: templates/auth/login.html:32
+msgid "Password"
+msgstr ""
+
+#: templates/auth/login.html:34
+msgid "Enter your password"
+msgstr ""
+
+#: templates/auth/login.html:35 templates/auth/login.html:127
+msgid "Show"
+msgstr ""
+
+#: templates/auth/login.html:41
+msgid "Create account"
+msgstr ""
+
+#: templates/auth/login.html:45
+msgid "Forgot password?"
+msgstr ""
+
+#: templates/auth/login.html:102
+msgid "We sent a verification email to "
+msgstr ""
+
+#: templates/auth/login.html:103
+msgid ". Verify it to continue."
+msgstr ""
+
+#: templates/auth/login.html:104
+msgid "Resend"
+msgstr ""
+
+#: templates/auth/login.html:105
+msgid "I verified"
+msgstr ""
+
+#: templates/auth/login.html:106
+msgid ""
+"Password must be 12 to 30 characters and include uppercase, lowercase, a "
+"number, and a special character."
+msgstr ""
+
+#: templates/auth/login.html:107
+msgid "Please enter a valid email address."
+msgstr ""
+
+#: templates/auth/login.html:108
+msgid "Please enter your password."
+msgstr ""
+
+#: templates/auth/login.html:109
+msgid "Incorrect email or password."
+msgstr ""
+
+#: templates/auth/login.html:110
+msgid "No account found with that email."
+msgstr ""
+
+#: templates/auth/login.html:111
+msgid "Too many attempts. Please try again later."
+msgstr ""
+
+#: templates/auth/login.html:112
+msgid "Network error. Check your connection and try again."
+msgstr ""
+
+#: templates/auth/login.html:113
+msgid "An account with this email already exists."
+msgstr ""
+
+#: templates/auth/login.html:114
+msgid "Sign-in is not enabled for this domain."
+msgstr ""
+
+#: templates/auth/login.html:115
+msgid "This sign-in method is not enabled."
+msgstr ""
+
+#: templates/auth/login.html:116
+msgid "Configuration error. Please contact support."
+msgstr ""
+
+#: templates/auth/login.html:117
+msgid ""
+"Your password no longer meets the security requirements. Please reset "
+"your password to continue."
+msgstr ""
+
+#: templates/auth/login.html:118
+msgid "Something went wrong. Please try again."
+msgstr ""
+
+#: templates/auth/login.html:119
+msgid "Google sign-in is not enabled for this project."
+msgstr ""
+
+#: templates/auth/login.html:120
+msgid "Your browser blocked the sign-in popup. We will use a redirect instead."
+msgstr ""
+
+#: templates/auth/login.html:121
+msgid "The sign-in window was closed. Please try again."
+msgstr ""
+
+#: templates/auth/login.html:122
+msgid "Another sign-in attempt was canceled. Please try again."
+msgstr ""
+
+#: templates/auth/login.html:123
+msgid "Could not use the provided Google credential. Try again."
+msgstr ""
+
+#: templates/auth/login.html:124
+#, python-brace-format
+msgid ""
+"An account already exists for {email}. Sign in with your password to link"
+" Google."
+msgstr ""
+
+#: templates/auth/login.html:125
+msgid "Google sign-in failed. Please try again."
+msgstr ""
+
+#: templates/auth/login.html:126
+msgid "Loading..."
+msgstr ""
+
+#: templates/auth/login.html:128
+msgid "Hide"
+msgstr ""
+
+#: templates/auth/login.html:129
+msgid "Session login failed"
+msgstr ""
+
+#: templates/auth/login.html:130
+msgid "Account linking failed. You can reset your password and try again."
+msgstr ""
+
+#: templates/auth/login.html:131
+msgid "Logged in. Redirecting..."
+msgstr ""
+
+#: templates/auth/login.html:132
+msgid "We sent a verification email. Please verify to continue."
+msgstr ""
+
+#: templates/auth/login.html:133
+msgid "Please enter your email and password to resend the verification."
+msgstr ""
+
+#: templates/auth/login.html:134
+msgid "Verification email resent."
+msgstr ""
+
+#: templates/auth/login.html:135
+msgid "Still not verified yet. Please check your inbox."
+msgstr ""
+
+#: templates/auth/login.html:136
+msgid "Please enter your email to reset your password."
+msgstr ""
+
+#: templates/auth/login.html:137
+msgid "Password reset email sent. Check your inbox."
+msgstr ""
+

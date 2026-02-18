@@ -1,0 +1,3 @@
+{% macro user_name(name, is_admin=False, extra_classes='') -%}
+  <span class="{{ 'text-cyan-300 font-semibold' if is_admin else 'text-gray-200' }} {{ extra_classes }}">{{ name }}</span>
+{%- endmacro %}

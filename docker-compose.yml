@@ -1,17 +1,22 @@
-version: '3.8'
+# docker-compose.yml v4
+# docker-compose.yml v4 bygger vidare på v3
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
     ports:
       - "5000:5000"
     environment:
       FLASK_ENV: development
+      FLASK_APP: app.py
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      AI_ASSISTANT_DEBUG: ${AI_ASSISTANT_DEBUG:-0}
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase_service_account.json
     volumes:
       - .:/app
-    command: flask run --host=0.0.0.0
-
-  static:
-    build: ./docs
-    ports:
-      - "8080:80"
+      - ./secrets/firebase_service_account.json:/run/secrets/firebase_service_account.json:ro
+    command: flask run --host=0.0.0.0 --port=5000

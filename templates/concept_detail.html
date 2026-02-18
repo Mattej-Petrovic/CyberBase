@@ -1,0 +1,222 @@
+{# concept_detail.html v4 (bygger vidare på v3) #}
+{% extends "base.html" %}
+{% block title %}{{ title }} - CyberBase{% endblock %}
+
+{% macro deep_dive_card(item, extra_classes='') %}
+  {% set sections = item.deepDive.sections if item.deepDive and item.deepDive.sections else [] %}
+  {% if sections %}
+  <details class="group rounded-2xl border border-white/10 bg-white/[0.03] ct-deepdive {{ extra_classes }}">
+    <summary class="cursor-pointer list-none p-6 hover:bg-white/[0.02] transition rounded-2xl">
+      <div class="flex flex-col items-center text-center gap-1">
+        <h2 class="text-xl font-semibold text-white uppercase tracking-[0.08em]">{{ _('Deep Dive') | upper }}</h2>
+        <div class="ct-dd-chevron">
+          <span class="ct-dd-icon text-slate-200 text-2xl transition-transform duration-200 group-open:rotate-180">▾</span>
+        </div>
+      </div>
+    </summary>
+
+    <div class="px-6 pb-6">
+      <div class="space-y-10">
+        {% for section in sections %}
+          {% if section.title and section.paragraphs %}
+          <div>
+            <h3 class="text-base font-semibold text-slate-100">{{ section.title }}</h3>
+            <div class="mt-1 h-px w-10 bg-white/10"></div>
+            <div class="mt-4 space-y-4">
+              {% for p in section.paragraphs %}
+              {% if loop.index0 == 0 %}
+              <p class="text-sm text-slate-300/90 leading-7 tracking-[0.01em]">{{ p }}</p>
+              {% else %}
+              <p class="text-sm text-slate-200/90 leading-7 tracking-[0.01em]">{{ p }}</p>
+              {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </details>
+  {% endif %}
+{% endmacro %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 ct-concept-page" data-ai-explain-scope="true">
+  {% if not_found %}
+    <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-8">
+      <h1 class="text-2xl font-semibold text-white mb-2">{{ _('Not found') }}</h1>
+      <p class="text-slate-300">{{ _('That concept does not exist or the link is invalid.') }}</p>
+      <div class="mt-6">
+        <a href="/concepts" class="inline-flex items-center px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 smooth-hover">{{ _('Back to Concepts') }}</a>
+      </div>
+    </div>
+  {% else %}
+
+  {% set learn = item.learn if item.learn is defined and item.learn else {} %}
+
+  <div class="mb-8">
+    <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <div class="text-slate-300 text-sm mb-2">{{ category }}</div>
+        <h1 class="text-3xl md:text-4xl font-semibold tracking-tight text-white">
+          {{ title }}
+        </h1>
+        {% if item.summary %}
+          <p class="mt-3 text-slate-300 max-w-3xl">{{ item.summary }}</p>
+        {% elif item.intro %}
+          <p class="mt-3 text-slate-300 max-w-3xl">{{ item.intro }}</p>
+        {% endif %}
+      </div>
+
+      
+    </div>
+
+    {% if where_when %}
+    <div class="mt-6 bg-slate-900/60 border border-slate-700 rounded-2xl p-5">
+      <div class="text-sm text-slate-300">
+        <span class="font-semibold text-white">{{ _('Where you will see it:') }}</span>
+        <span class="ml-1">{{ where_when }}</span>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+
+      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-maincard">
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('What it is') }}</h2>
+        {% set is_ports_view = is_ports | default(false) %}
+        {% set what_text = learn.what if learn.what is defined else (item.intro or _('No description available.')) %}
+
+        {% if is_ports_view %}
+          {# Break long Ports intros into readable paragraphs without changing meaning. #}
+          {% set raw = what_text | trim %}
+          {% set sentences = raw.split('. ') %}
+          {% set n = sentences | length %}
+
+          <div class="text-slate-300 leading-7 max-w-prose space-y-4">
+            {% if n <= 2 %}
+              <p class="leading-7">{{ raw }}</p>
+            {% else %}
+              {% set first_size = 3 if (n % 2 == 1 and n > 2) else 2 %}
+
+              {% if first_size == 3 %}
+                {% set chunk0 = sentences[0:3] %}
+                <p class="leading-7">
+                  {% for s in chunk0 %}
+                    {% set ss = s | trim %}
+                    {{ ss }}{% if not ss.endswith('.') and not ss.endswith('!') and not ss.endswith('?') %}.{% endif %}{% if not loop.last %} {% endif %}
+                  {% endfor %}
+                </p>
+                {% for i in range(3, n, 2) %}
+                  {% set chunk = sentences[i:i+2] %}
+                  <p class="leading-7">
+                    {% for s in chunk %}
+                      {% set ss = s | trim %}
+                      {{ ss }}{% if not ss.endswith('.') and not ss.endswith('!') and not ss.endswith('?') %}.{% endif %}{% if not loop.last %} {% endif %}
+                    {% endfor %}
+                  </p>
+                {% endfor %}
+              {% else %}
+                {% for i in range(0, n, 2) %}
+                  {% set chunk = sentences[i:i+2] %}
+                  <p class="leading-7">
+                    {% for s in chunk %}
+                      {% set ss = s | trim %}
+                      {{ ss }}{% if not ss.endswith('.') and not ss.endswith('!') and not ss.endswith('?') %}.{% endif %}{% if not loop.last %} {% endif %}
+                    {% endfor %}
+                  </p>
+                {% endfor %}
+              {% endif %}
+            {% endif %}
+          </div>
+        {% else %}
+          <p class="text-slate-300 leading-relaxed">
+            {{ what_text }}
+          </p>
+        {% endif %}
+
+        {% if item.bullets %}
+          <div class="mt-5">
+            <div class="text-sm font-semibold text-white mb-2">{{ _('Key points') }}</div>
+            <ul class="list-disc list-inside text-slate-300 space-y-1">
+              {% for b in item.bullets %}
+                <li>{{ b }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      </div>
+
+      {% if learn.how is defined and learn.how %}
+      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-maincard">
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('How it works in broad strokes') }}</h2>
+        <ol class="list-decimal list-inside text-slate-300 space-y-2">
+          {% for step in learn.how %}
+            <li class="leading-relaxed">{{ step }}</li>
+          {% endfor %}
+        </ol>
+      </div>
+      {% endif %}
+
+      {% if learn.example is defined and learn.example %}
+      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-maincard">
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('Concrete example') }}</h2>
+        <p class="text-slate-300 leading-relaxed">{{ learn.example }}</p>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <div class="space-y-6">
+      {% if learn.why is defined and learn.why %}
+      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('Why it matters') }}</h2>
+        <p class="text-slate-300 leading-relaxed">{{ learn.why }}</p>
+      </div>
+      {% endif %}
+
+      {% if learn.security is defined and learn.security %}
+      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('Security angle') }}</h2>
+        <ul class="list-disc list-inside text-slate-300 space-y-1">
+          {% for s in learn.security %}
+            <li>{{ s }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if learn.pitfalls is defined and learn.pitfalls %}
+      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('Common pitfalls') }}</h2>
+        <ul class="list-disc list-inside text-slate-300 space-y-1">
+          {% for p in learn.pitfalls %}
+            <li>{{ p }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if learn.selfTest is defined and learn.selfTest %}
+      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('Quick self test') }}</h2>
+        <ul class="list-disc list-inside text-slate-300 space-y-1">
+          {% for q in learn.selfTest %}
+            <li>{{ q }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+{% if item.deepDive is defined and item.deepDive and item.deepDive.sections %}
+<div class="mt-6">
+  {{ deep_dive_card(item) }}
+</div>
+{% endif %}
+
+  {% endif %}
+</div>
+{% endblock %}

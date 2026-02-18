@@ -7,6 +7,7 @@ __pycache__/
 env/
 venv/
 ENV/
+.venv/
 build/
 develop-eggs/
 dist/
@@ -38,7 +39,26 @@ htmlcov/
 # Environment
 .env
 .env.local
+.env.*
+!.env.example
 
 # OS
 .DS_Store
 Thumbs.db
+
+secrets/
+node_modules/
+**/node_modules/
+
+# Secret/key material
+*.pem
+*.p12
+*.pfx
+*.key
+*.crt
+*.cer
+*.jks
+*service_account*.json
+*-service-account*.json
+*.key.json
+*private_key*.json

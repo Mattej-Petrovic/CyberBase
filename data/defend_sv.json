@@ -1,0 +1,2157 @@
+{
+  "_version": 9,
+  "detectionAndLogging": [
+    {
+      "id": "log-types",
+      "title": "Översikt över loggtyper",
+      "intro": "Olika loggtyper svarar på olika frågor. Stark detektering kommer från att samla in rätt källor, hålla klockor synkroniserade och göra händelser sökbara med tydliga, normaliserade fält.",
+      "objectives": [
+        "Förklara vad system-, autentiserings-, program- och nätverksloggar används för",
+        "Välj en praktisk baslinje av loggkällor som stöder vanliga undersökningar",
+        "Förstå varför normalisering, tidssynkronisering, retention och integritetskontroller är viktiga"
+      ],
+      "atAGlance": [
+        {
+          "title": "Vad loggar besvarar",
+          "items": [
+            "Vad hände, när det hände och vad förändrades",
+            "Vem gjorde det och vilken identitet som användes",
+            "Var den uppstod och vad den nådde",
+            "Om det lyckades och vad som följde"
+          ]
+        },
+        {
+          "title": "Kärnloggfamiljer",
+          "items": [
+            "System- och serviceloggar för stabilitet och serviceaktivitet",
+            "Autentiserings- och granskningsloggar för identitet och privilegierade åtgärder",
+            "Nätverksloggar för tillgänglighet och policybeslut",
+            "Applikationsloggar för affärsåtgärder och API-beteende"
+          ]
+        },
+        {
+          "title": "Vanliga misstag",
+          "items": [
+            "Att endast hålla loggar lokalt, vilket gör radering och manipulering enklare",
+            "Tidsdrift och blandade tidszoner som bryter tidslinjer",
+            "Oparsad data och inkonsekventa fältnamn",
+            "Samla in buller utan en tydlig undersökningsanvändning"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "title": "Kärnloggkategorier",
+          "paragraphs": [
+            "Systemloggar beskriver vad operativsystemet och kärntjänsterna gör. Använd dem för att bekräfta omstarter, omstarter av tjänsten, uppdateringsaktivitet och tecken på instabilitet som disk-, minnes- eller drivrutinsfel.",
+            "Autentiserings- och granskningsloggar beskriver vem som fick åtkomst till vad och vilka privilegierade åtgärder som vidtogs. Använd dem för att undersöka inloggningar, misslyckade försök, behörighetshöjningar, kontoändringar och säkerhetsrelevanta konfigurationsändringar.",
+            "Applikationsloggar beskriver vad en specifik applikation gör. Använd dem för att spåra användaråtgärder, API-anrop, valideringsfel och affärshändelser och för att koppla en incident till en appfunktion eller transaktion.",
+            "Nätverksloggar beskriver anslutningsmöjligheter och policybeslut. Använd dem för att förstå vem som pratade med vad, genom vilka portar och om trafik tilläts, nekades, omdirigerades eller löstes genom DNS."
+          ]
+        },
+        {
+          "title": "Normalisering och tid",
+          "bullets": [
+            "Normalisera nyckelfält som användare, värd, source_ip, dest_ip, `action`, `outcome` och `reason` så att sökningar fungerar i olika verktyg",
+            "Lagra tidsstämplar i UTC för korrelation och behåll den ursprungliga tidszonen endast för visning vid behov",
+            "Verifiera tidssynkronisering och logga pipelines kontinuerligt så att du märker drift, luckor eller analysfel tidigt"
+          ],
+          "callout": {
+            "type": "warn",
+            "title": "Varför tidssynkronisering är viktig",
+            "text": "Incidenttidslinjer bygger på korrekt händelseordning. Om klockor driver kan en inloggning och en efterföljande åtgärd se omvända ut, och korrelation mellan värdar blir opålitlig."
+          }
+        },
+        {
+          "title": "Retention och integritet",
+          "bullets": [
+            "Ställ in retention baserat på utredningsbehov och budgetera sedan lagring för de loggkällor som ger det högsta säkerhetsvärdet",
+            "Skydda loggar av högt värde med central lagring, minst privilegierad åtkomst och säkerhetskopior eller kontroller när det är möjligt att skriva en gång",
+            "Varning om saknade värdar, plötsliga volymsänkningar eller inaktiverad loggning så att du snabbt fångar blinda fläckar"
+          ]
+        }
+      ],
+      "signals": [
+        "En värd som slutar skicka loggar eller har upprepade luckor under kontorstid",
+        "Säkerhets- eller revisionshändelser minskar kraftigt medan andra loggar fortsätter som vanligt",
+        "Oväntade klockändringar, upprepade NTP-fel eller plötsliga tidszonförskjutningar",
+        "Fel och omstartstoppar som sammanfaller med autentiseringsavvikelser"
+      ],
+      "references": [
+        {
+          "label": "NIST SP 800-92 Guide to Computer Security Log Management",
+          "url": "https://csrc.nist.gov/pubs/sp/800/92/final"
+        }
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Tänk i frågor, inte källor",
+            "paragraphs": [
+              "En bra loggningsplan börjar med de frågor du förväntar dig att besvara under incidenter. Till exempel: vem som autentiserade, vad som förändrades, vilken process som kördes, var den kopplades och om den lyckades.",
+              "När du känner till frågorna, mappa dem till källor. Systemloggar täcker stabilitet och serviceaktivitet. Autentiserings- och granskningsloggar täcker identitet och privilegierade åtgärder. Nätverksloggar täcker tillgänglighet och policybeslut. Applikationsloggar fångar affärer och API-beteende.",
+              "En praktisk teknik: skriv en lista över incidenter på en sida för din miljö och lägg sedan till en loggkälla för varje obesvarad fråga.",
+              "• Identitetsfrågor: vem loggade in, varifrån och med vilken metod",
+              "• Ändra frågor: vad som installerades, modifierades eller startade",
+              "• Nätverksfrågor: vad pratade med vad och vad som blockerades",
+              "• Datafrågor: vad fick åtkomst till, exporterades eller raderades"
+            ]
+          },
+          {
+            "title": "Normalisering och fältkartläggning",
+            "paragraphs": [
+              "Normalisering är hur du gör olika källor sökbara på ett konsekvent sätt. Det låter dig skriva en fråga som fungerar över många loggtyper.",
+              "Välj konsekventa fältnamn för samma idé över källor, såsom användare, värd, process, src_ip, dst_ip, `action` och resultat. Behåll den råa händelsen också så att du kan återvända till analysen senare.",
+              "Behandla analyskvalitet som ett säkerhetsproblem. Om ett nyckelfält slutar extrahera korrekt kan detektioner försämras tyst.",
+              "• Håll en kort lista över kritiska fält per loggfamilj och övervaka dem",
+              "• Föredrar strukturerade loggar när de är tillgängliga, men mata in ostrukturerade loggar också"
+            ]
+          },
+          {
+            "title": "Tid, integritet och retention",
+            "paragraphs": [
+              "Tidssynkronisering är en säkerhetskontroll. Om klockorna går, går tidslinjerna sönder och korrelationerna misslyckas. Använd en gemensam tidskälla för servrar, slutpunkter och nätverksenheter och se efter plötsliga tidshopp.",
+              "Skydda loggintegriteten med åtkomstkontroll och oföränderlighet där det är möjligt. Loggar är bevis, så du vill ha insyn i ändringar, raderingar och insamlingsfel.",
+              "Retention är en avvägning mellan kostnad och utredningsdjup. Ett vanligt tillvägagångssätt är snabb sökbar lagring för senaste data och billigare arkivlagring för äldre data som du fortfarande kan behöva under en längre incident.",
+              "Centralisera loggar så att du kan söka konsekvent och minska risken för lokal loggborttagning på en komprometterad värd."
+            ]
+          },
+          {
+            "title": "Driftskontroller som förhindrar överraskningar",
+            "paragraphs": [
+              "Validera hela pipelinen: generering, insamling, transport, analys, lagring och sökning. Många fel inträffar i mitten på grund av hastighetsbegränsningar, köförluster eller analysfel.",
+              "Spåra enkla hälsosignaler: logga volymtrender per källa, intagsfördröjning, antal parserfel och saknade kritiska fält.",
+              "Skapa en liten uppsättning syntetiska händelser som du kan generera med avsikt, så att du kan bekräfta synlighet från början till slut när du misstänker en lucka."
+            ]
+          },
+          {
+            "title": "Att välja källor efter undersökningsanvändningsfall",
+            "paragraphs": [
+              "Olika utredningar kräver olika loggtyper. Autentiseringsfrågor kräver identitetsloggar. Sidorörelse kräver ofta endpoint- och fjärrhanteringsloggar. Frågor om dataåtkomst kräver applikations- och databasloggar.",
+              "Börja med en minimiuppsättning som täcker identitet, endpoint, nätverksperimeter, DNS och kritiska applikationer. Utöka sedan utifrån vad ni faktiskt kör och vilka hot ni prioriterar."
+            ]
+          },
+          {
+            "title": "Vanliga fallgropar och hur man undviker dem",
+            "paragraphs": [
+              "För mycket brus är ett vanligt felläge. Att samla allt är inte en strategi om ingen kan söka i det. Föredrar högvärdiga händelser först och utöka sedan med mätning.",
+              "Lita inte på en enda källa för kritiska slutsatser. Använd minst två perspektiv när det är möjligt, t.ex. endpoint plus nätverk eller applikation plus databas.",
+              "Standardisera på UTC för lagring och bevara alltid den ursprungliga tidsstämpeln, eftersom tidszoner och dagsljusförändringar skapar förvirring under svar."
+            ]
+          },
+          {
+            "title": "Startchecklista",
+            "paragraphs": [
+              "• Definiera viktiga incidentfrågor och mappa var och en till källor",
+              "• Synkronisera klockor och lagra tidsstämplar konsekvent",
+              "• Centralisera loggar och validera analys av kritiska fält",
+              "• Skydda loggåtkomst och integritet, ställ sedan upp förväntningar på lagring",
+              "• Skapa repeterbara sökningar efter vanliga incidenter och validera regelbundet"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "auth-logs",
+      "title": "Autentiseringsloggar",
+      "intro": "Autentiseringsloggar visar vem som försökte komma åt, varifrån och om det fungerade. De är viktiga för att upptäcka brute force, lösenordssprayning, misstänkta framgångar och missbruk av privilegierade konton.",
+      "objectives": [
+        "Tolka vanliga autentiseringsresultat och fält som användare, källa, metod och orsak",
+        "Upptäck brute force, sprayning och misstänkta framgångsmönster med enkla regler och baslinjer",
+        "Förstå varför privilegierad åtkomst kräver striktare övervakning och snabbare respons"
+      ],
+      "sections": [
+        {
+          "title": "Vad du ska samla in",
+          "bullets": [
+            "Framgångsrika och misslyckade autentiseringsförsök med användare, källa, värd, metod och orsak till misslyckande",
+            "Användning av privilegier och behörighetshöjningshändelser (till exempel sudo, användning av administratörsroll eller nya privilegierade sessioner)",
+            "MFA- och step-up-autentiseringshändelser när de finns tillgängliga, inklusive godkännanden, avslag och timeouts",
+            "Kontolivscykelförändringar som skapande, inaktivering, lösenordsåterställning, lockouter och uppdateringar av gruppmedlemskap"
+          ]
+        },
+        {
+          "title": "Hur angripare dyker upp i autentiseringsloggar",
+          "table": {
+            "headers": [
+              "Mönster",
+              "Vad du ser",
+              "Varför det spelar roll",
+              "Typiskt svar"
+            ],
+            "rows": [
+              [
+                "Brute force",
+                "Stora volymfel för ett konto från en eller några källor",
+                "Direkt gissning mot ett målkonto eller tjänst",
+                "Stryp och blockera källor, kräver MFA och granska exponerade tjänster"
+              ],
+              [
+                "Lösenordssprayning",
+                "Lågfrekventa fel spridda över många konton från en källa",
+                "Designad för att undvika lockout-policyer när vanliga lösenord testas",
+                "Upptäck över användare och tidsfönster, blockera källan och framtvinga starkare autentisering"
+              ],
+              [
+                "Misslyckanden följt av lyckad inloggning",
+                "En framgång kort efter flera misslyckanden för samma konto",
+                "Indikerar ofta att gissade uppgifter eller stulna lösenord valideras",
+                "Undersök enheten och sessionen, rotera autentiseringsuppgifter och granska den senaste aktiviteten"
+              ],
+              [
+                "Omöjlig förflyttning",
+                "Inloggningar från avlägsna nätverk eller platser på orealistiskt kort tid",
+                "Kan indikera tokenstöld, delade konton eller riskfylld VPN användning",
+                "Återkalla sessioner, kräva ökad autentisering och verifiera användaraktivitet"
+              ]
+            ]
+          }
+        },
+        {
+          "title": "Gör loggar handlingsbara",
+          "bullets": [
+            "Baslinjetypiska inloggningskällor och timmar per konto så att avvikelser sticker ut",
+            "Använd snävare varningsgränser för högt värde och administratörskonton, och varna vid förstagångsåtkomst",
+            "Korrelera inloggningar med endpoint-, VPN- och brandväggsdata för att bekräfta om åtkomsten var förväntad"
+          ]
+        }
+      ],
+      "signals": [
+        "Många fel för en enskild användare under en kort period",
+        "En källa som försöker många olika användare över tiden",
+        "Ett privilegierat konto som autentiseras från en ny enhet eller nätverk",
+        "Lyckad inloggning följt av ovanlig behörighetsanvändning eller utgående anslutningar"
+      ],
+      "references": [
+        {
+          "label": "NIST SP 800-92 Guide to Computer Security Log Management",
+          "url": "https://csrc.nist.gov/pubs/sp/800/92/final"
+        }
+      ],
+      "atAGlance": [
+        {
+          "title": "Fält med högt värde",
+          "items": [
+            "Användar- och kontotyp (människa, tjänst, administratör)",
+            "Källa (IP, enhet, plats, inloggningstyp)",
+            "Mål (värd, tjänst, applikation)",
+            "Resultat och orsak (framgång, felorsak)"
+          ]
+        },
+        {
+          "title": "Vad du bör detektera först",
+          "items": [
+            "Upprepade fel och lösenordsspraymönster",
+            "Framgång efter många misslyckanden för samma användare",
+            "Ny enhet eller ny källa för en privilegierad användare",
+            "Privilege användning kort efter en ny inloggning"
+          ]
+        },
+        {
+          "title": "Snabba triagekontroller",
+          "items": [
+            "Är kontot förväntat och för närvarande aktivt",
+            "Förväntas källan för den användaren",
+            "Är målet ett system de bör komma åt",
+            "Finns det uppföljning av aktivitet som bekräftar avsikten"
+          ]
+        }
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Hur man läser en autentiseringshändelse",
+            "paragraphs": [
+              "Autentiseringsloggar beskriver vanligtvis ett försök och dess resultat. Fokusera på vem som försökte, varifrån, till vad, hur de autentiserades och varför det misslyckades om det misslyckades.",
+              "I Linux ser du ofta autentiseringsposter i /var/log/auth.log eller /var/log/secure, och på systemd system kan samma händelser efterfrågas genom journald. I Windows fångar säkerhetshändelseloggen detaljerad inloggningsaktivitet som lyckade och misslyckade inloggningar.",
+              "Separera autentisering från auktorisering. Autentisering bevisar identitet. Auktorisering är vad identiteten får göra efter inloggning."
+            ]
+          },
+          {
+            "title": "Pålitliga detektionsmönster",
+            "paragraphs": [
+              "Räknebaserade mönster kan vara användbara, men sammanhanget är viktigt. En skur av fel från en källa kan vara en lösenordsspray, eller så kan det vara en felkonfigurerad tjänst. Lägg till berikning som tillgångskriticitet, kända administratörsarbetsstationer och förväntade platser.",
+              "Leta efter sekvenser som tyder på kompromisser: många misslyckanden följt av framgång, framgång från en ny enhet direkt efter en lösenordsåterställning eller privilegieanvändning kort efter en ny inloggning.",
+              "Föredrar upptäckter som inkluderar ett tydligt nästa steg. Till exempel, pivotera från en misstänkt inloggning till att bearbeta aktivitet och nätverksanslutningar på samma värd."
+            ]
+          },
+          {
+            "title": "Privilegerad tillgång förtjänar sina egna regler",
+            "paragraphs": [
+              "Separera privilegierad autentisering från normal autentisering. Administratörsåtgärder bör vara sällsynta och väldefinierade, så de är lättare att varna om.",
+              "Spåra sudo-användning på Linux och privilegierad gruppanvändning på Windows och i molnkontrollplan. Övervaka skapandet av nya administratörskonton, nya SSH-nycklar och ändringar av MFA eller åtkomstpolicyer.",
+              "Använd nycklar eller konsekventa etiketter i revisionsregler och sökningar så att du snabbt kan hämta hela historien under en incident."
+            ]
+          },
+          {
+            "title": "Triage som minskar falska positiva resultat",
+            "paragraphs": [
+              "Ett snabbt triageflöde ställer tre frågor: är identiteten förväntad, är källan förväntad och är målet förväntat.",
+              "Undersök sedan metoden och orsakskoden. Till exempel kan många fel vara normala om en tjänst använder gamla referenser, men samma mönster för en mänsklig användare vid ovanliga timmar förtjänar uppmärksamhet.",
+              "Stäng slingan genom att kontrollera efter aktivitet som nya sessioner, nya processer, fjärrhanteringsverktyg eller tillgång till känslig data."
+            ]
+          },
+          {
+            "title": "Linux kontra Windows kontra molnidentitetssignaler",
+            "paragraphs": [
+              "Linux autentiseringstelemetri återspeglar ofta SSH, sudo, PAM och lokala kontohändelser. Den är stark för att upptäcka brute force-försök, nya nycklar och privilegieupptrappning genom sudo.",
+              "Windows identitetstelemetri kan inkludera inloggningstyp, autentiseringspaket och målkontodetaljer, vilket hjälper till att skilja interaktiva inloggningar från tjänstinloggningar.",
+              "Molnidentitetsloggar inkluderar ofta MFA-resultat, enhetsställning, beslut om villkorad åtkomst och riskfyllda inloggningssignaler. Behandla identitet som ett system över on prem, moln, VPN och fjärråtkomst."
+            ]
+          },
+          {
+            "title": "Sessionisering och korrelation",
+            "paragraphs": [
+              "En autentiseringshändelse är sällan slutet på historien. Länka det till en session och sedan till åtgärder. Korrelera inloggningar med processskapande, fjärrexekvering och åtkomst till privilegierade resurser.",
+              "Om telemetri tillhandahåller en sessionsidentifierare, behåll den. Om inte, uppskatta sessioner med hjälp av användare, källa, mål och ett tidsfönster som matchar din miljö."
+            ]
+          },
+          {
+            "title": "Startjakter",
+            "paragraphs": [
+              "• Topp misslyckade inloggningar efter användare och källa under den senaste dagen",
+              "• Framgång efter många misslyckanden för samma användare",
+              "• Framgångsrika inloggningar för privilegierade konton från nya källor",
+              "• Nya tjänstkonton eller nya SSH-nycklar",
+              "• Privilegeanvändning kort efter en ny inloggning"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "fw-logs",
+      "title": "Brandväggsloggar",
+      "intro": "Brandväggsloggar registrerar tillåter och nekar beslut vid nätverksgränser och värdbrandväggar. De hjälper dig att validera segmentering, upptäcka skanning och upptäcka oväntad utgående aktivitet som kan indikera kommando och kontroll eller dataexfiltrering.",
+      "objectives": [
+        "Använd brandväggsloggar för att förstå exponering, segmentering och utgångsbeteende",
+        "Känn igen skanningsmönster, felkonfigurationer och policydrift i loggdata",
+        "Designa brandväggsloggning som stöder utredningar utan att skapa brus"
+      ],
+      "sections": [
+        {
+          "title": "Vad brandväggsloggar bör innehålla",
+          "bullets": [
+            "Tidsstämpel, `action` (tillåt eller neka), regelnamn eller id, gränssnitt, protokoll och portar",
+            "Källa och destination IP plus riktning och användar- eller enhetsidentitet när tillgängligt",
+            "Anslutningskontext som tillstånd, byte eller paket, NAT översättning och släpp orsak när det tillhandahålls"
+          ]
+        },
+        {
+          "title": "Detektionsidéer",
+          "table": {
+            "headers": [
+              "Mönster",
+              "Vad du ser",
+              "Varför det spelar roll",
+              "Säkerhetseffekt av att agera"
+            ],
+            "rows": [
+              [
+                "Portskanning",
+                "En källa träffar många portar eller många värdar med frekventa avslag",
+                "Ofta spaning före exploateringsförsök",
+                "Blockera eller hastighetsbegränsa källan och verifiera att exponerade tjänster är avsiktliga"
+              ],
+              [
+                "Oväntat utträde",
+                "Nya destinationer, ovanliga portar eller trafik till domäner som är sällsynta för den värden",
+                "Kan indikera kommando och kontroll av skadlig programvara eller iscensättning för exfiltrering",
+                "Innehåll värden, blockera destinationer och leta efter samma mönster över slutpunkter"
+              ],
+              [
+                "Policyavvikelse",
+                "Nya breda tillåtelseregler eller plötsliga toppar i träffar på en befintlig regel",
+                "Ökar attackytan och kan dölja skadlig trafik",
+                "Se över ändringskontrollen, skärp reglerna och lägg till varningar om regeländringar med hög risk"
+              ]
+            ]
+          }
+        }
+      ],
+      "signals": [
+        "Neka toppar från en enda källa eller mot en kritisk tjänst",
+        "Utgående förbindelser till nya destinationer som är sällsynta för miljön",
+        "Tillåt regler som plötsligt tar emot tät trafik utanför normal tid"
+      ],
+      "references": [
+        {
+          "label": "NIST SP 800-41 Rev.1 Guidelines on Firewalls and Firewall Policy",
+          "url": "https://csrc.nist.gov/pubs/sp/800/41/r1/final"
+        },
+        {
+          "label": "Configure Windows Firewall logging",
+          "url": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/network-security/windows-firewall/configure-logging"
+        }
+      ],
+      "atAGlance": [
+        {
+          "title": "Vad brandväggsloggar visar",
+          "items": [
+            "Ett policybeslut (tillåtet, nekat, avvisat)",
+            "Vem pratade med vem och på vilket protokoll",
+            "Vilken regel eller zon matchade trafiken",
+            "När och var trafiken träffade brandväggen"
+          ]
+        },
+        {
+          "title": "Hög signalvy",
+          "items": [
+            "Nekar administratörsportar och känsliga segment",
+            "Nya utgående destinationer från servrar",
+            "Östvästtrafiken ökar mellan segmenten",
+            "Upprepade avslag från en källa över många mål"
+          ]
+        },
+        {
+          "title": "Gotchas",
+          "items": [
+            "NAT kan dölja den ursprungliga interna källan",
+            "Stateful loggning kan endast fånga det första paketet",
+            "Hastighetsgränser kan dölja skanningsformer",
+            "Tillåten trafikloggning kan explodera volymen snabbt"
+          ]
+        }
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Tolka ett brandväggsbeslut",
+            "paragraphs": [
+              "En brandväggslogg är ett policybeslut i ett visst ögonblick. Läs den som en mening: en åtgärd inträffade eftersom en regel matchade protokoll, källa, destination och port.",
+              "Extrahera en konsekvent kärnuppsättning av fält: `action`, regelnamn eller id, riktning, gränssnitt, src_ip, dst_ip, src_port, dst_port, protokoll och valfri zon eller policyetikett.",
+              "Bekräfta alltid vad du tittar på. Vissa enheter loggar pre NAT adresser, vissa loggar postar NAT adresser, och vissa kan logga båda."
+            ]
+          },
+          {
+            "title": "Logga utan att drunkna i buller",
+            "paragraphs": [
+              "Att logga alla tillåtna anslutningar är vanligtvis för bullriga. Ett praktiskt tillvägagångssätt är att logga avslag, plus en kurerad uppsättning tillåtelser som indikerar risk, såsom nya utgående destinationer, administratörsportar och trafik till känsliga segment.",
+              "Om du använder provtagning eller hastighetsbegränsning, dokumentera det. Under skanning kan hastighetsgränser dölja formen på en attack. Föredrar fullständiga detaljer för nyckeltillgångar och segment."
+            ]
+          },
+          {
+            "title": "Skanna mönster kontra normalt beteende",
+            "paragraphs": [
+              "Portskanningar ser ofta ut som många korta försök till många portar eller många värdar. Kombinera brandväggsloggar med slutpunktssignaler när det är möjligt för att bekräfta om en legitim process gjorde försöken.",
+              "Normalt beteende har mönster. En webbserver som tar emot många inkommande anslutningar är normalt. En databasserver som tar emot slumpmässiga inkommande portar är det inte.",
+              "Baslinje efter roll. Segmentera dina sökningar efter serverklass, användarundernät och kritiska tillgångar för att minska brus."
+            ]
+          },
+          {
+            "title": "Utgång och segmentering som detektionsytor",
+            "paragraphs": [
+              "Utträde är ofta där upptäckt är lättast. Utgående anslutningar från servrar som inte ska prata med internet är högt värderade.",
+              "Segmenteringsbeslut är också starka signaler. Om en värd börjar prata med ett segment som den aldrig berört tidigare, undersök processen och identiteten bakom den.",
+              "Para ihop brandväggsloggar med DNS och proxyloggar för att förstå domänkontexten bakom en utgående anslutning."
+            ]
+          },
+          {
+            "title": "NAT, tillstånd och andra gotchas",
+            "paragraphs": [
+              "NAT kan ändra det du ser. Du kan behöva både den interna och externa adressen för att spåra aktivitet tillbaka till en värd. Se till att du vet var NAT förekommer i din väg.",
+              "Stateful brandväggar kan bara logga det första paketet i ett flöde, eller bara neka. Förstå om du får loggar per paket, loggar per anslutning eller sammanfattningar, eftersom detta ändrar hur du tolkar volymen."
+            ]
+          },
+          {
+            "title": "Praktiska undersökningar med brandväggsloggar",
+            "paragraphs": [
+              "När du ser ett avslag, fråga vad det försökte göra och om värden någonsin skulle försöka det. Om destinationen är extern, kontrollera om den visas i DNS-loggar och proxyloggar för samma tidsfönster.",
+              "När du ser en ny tillåtelse till en sällsynt destination, behandla den som en ledning. Identifiera ursprungsprocessen från slutpunktstelemetri och bekräfta om destinationen förväntas för den applikationen."
+            ]
+          },
+          {
+            "title": "Startjakter",
+            "paragraphs": [
+              "• Nekar adminportar från användarundernät",
+              "• Nya utgående destinationer från servrar",
+              "• Östvästlig trafik ökar mellan segmenten",
+              "• Upprepade avslag från en källa över många mål",
+              "• Högvolym utgående anslutningar till en destination"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "dns-logs",
+      "title": "DNS-loggar",
+      "intro": "DNS-loggar har högt värde eftersom de flesta anslutningar börjar med namnupplösning. De hjälper dig att identifiera misstänkta domäner, domängenereringsbeteende och tecken på DNS tunnling eller felkonfiguration.",
+      "objectives": [
+        "Förstå vad en DNS fråga och svar representerar i en utredning",
+        "Använd baslinjer för att upptäcka sällsynta domäner, ovanliga frågetyper och onormala felfrekvenser",
+        "Känn igen indikatorer för tunnling och domängenerering utan att förlita sig på exakta signaturer"
+      ],
+      "sections": [
+        {
+          "title": "Vad du ska samla in",
+          "bullets": [
+            "Klientidentifierare, efterfrågat namn, frågetyp, svarskod och de returnerade svaren",
+            "Lösningsåtgärder som tillåt, blockera, omdirigera eller slukhål, inklusive policyorsaken när den är tillgänglig",
+            "Latens- och felfrekvenser så att du kan upptäcka avbrott, missbruk och felkonfiguration av lösare"
+          ]
+        },
+        {
+          "title": "Vanliga misstänkta mönster",
+          "table": {
+            "headers": [
+              "Mönster",
+              "Vad du ser",
+              "Varför det spelar roll",
+              "Typiskt svar"
+            ],
+            "rows": [
+              [
+                "Hög NXDOMAIN",
+                "Många uppslagningar som returnerar obefintliga domäner från en värd",
+                "DGA-aktivitet, stavfel eller blockerade skadliga program försöker ofta igen loopar",
+                "Inspektera de mest efterfrågade namnen, kontrollera slutpunkten och blockera kända dåliga domäner"
+              ],
+              [
+                "Långa etiketter",
+                "Mycket långa eller hög entropi underdomäner med jämn volym",
+                "Kan indikera att data kodas till DNS-frågor (tunneling)",
+                "Granska domänen och frågestrukturen, blockera om det är skadligt och undersök värden"
+              ],
+              [
+                "Sällsynta toppdomäner",
+                "Nya eller ovanliga toppdomäner och domäner blir plötsligt frekventa",
+                "Används ofta i infrastruktur för nätfiske och skadlig programvara",
+                "Berika och validera, blockera eller sjunkhål och övervaka påverkade värdar"
+              ]
+            ]
+          }
+        }
+      ],
+      "signals": [
+        "En plötslig ökning av NXDOMAIN eller SERVFAIL svar",
+        "Domäner med hög entropietiketter som verkar maskingenererade",
+        "En slutpunkt genererar mycket fler DNS frågor än jämförbara system"
+      ],
+      "atAGlance": [
+        {
+          "title": "Fält med högt värde",
+          "items": [
+            "Klientidentitet (värd, IP, subnät)",
+            "Frågeinformation (qname, qtype)",
+            "Svarsdetaljer (rcode, svar)",
+            "Timing (tidsstämpel, svarstid)"
+          ]
+        },
+        {
+          "title": "Starka tidiga signaler",
+          "items": [
+            "Nyligen sedda domäner efterfrågade av kritiska värdar",
+            "Många NXDOMAIN svar från en klient",
+            "Unika underdomäner med hög volym under en domän",
+            "Ovanliga frågetyper som ofta TXT"
+          ]
+        },
+        {
+          "title": "Säkert svar",
+          "items": [
+            "Bekräfta med endpoint- och proxyloggar innan du blockerar brett",
+            "Föredrar kontroller på resolvernivå för konsekvent tillämpning",
+            "Använd tillåtelselistor för affärskritiska domäner",
+            "Dokumentändringar så att du snabbt kan rulla tillbaka"
+          ]
+        }
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "DNS grunder som har betydelse i utredningar",
+            "paragraphs": [
+              "DNS är ofta det första observerbara steget före en anslutning. Om en värd löser en domän är det en stark antydan om att den kan försöka ansluta till den returnerade adressen strax efter.",
+              "Fånga nyckelfält konsekvent: klient, resolver, qname, qtype, rcode, svar och svarstid.",
+              "Bevara både frågan och svaret när det är möjligt, eftersom svaren kan ändras med tiden och cacher kan maskera vad som hände senare."
+            ]
+          },
+          {
+            "title": "Baslinjer slår gissningar",
+            "paragraphs": [
+              "En baslinje kan vara en rullande lista med vanliga domäner per subnät och per applikation. När du vet hur normalt ser ut, sticker sällsynta domäner och sällsynta frågetyper ut snabbt.",
+              "Baslinjerna bör vara kontextuella. En utvecklararbetsstation, en server och en kiosk har olika normala. Jämför gilla med gilla.",
+              "Spår först sågs för domäner i din miljö. Det är ett enkelt men kraftfullt anrikningsfält under utredningar."
+            ]
+          },
+          {
+            "title": "Tunneldrivning och missbrukssignaler",
+            "paragraphs": [
+              "DNS tunnling och missbruk visar ofta udda frågeformer och udda volymer. Mycket långa underdomäner, etiketter med hög entropi, frekventa TXT-frågor och många unika underdomäner under en domän är vanliga varningstecken.",
+              "Upprepade NXDOMAIN svar kan indikera domängenereringsbeteende, stavfel eller ett felkonfigurerat program. Använd sammanhang för att avgöra vilken.",
+              "Korrelera misstänkta DNS med utgående anslutningar till de lösta IPs och med processaktivitet på värden som gjorde frågorna."
+            ]
+          },
+          {
+            "title": "Anrikning och blockering säkert",
+            "paragraphs": [
+              "Anrikning gör DNS-loggar mycket mer användbara. Mappa domäner till kategori, rykte och ägande när du kan. Även grundläggande berikning som först sågs och vem som frågade hjälper.",
+              "Blockering bör vara försiktig och reversibel. Föredrar kontroller på upplösarnivå så att du kan logga beslutet och tillämpa policy konsekvent.",
+              "Använd tillåtelselistor för kritiska affärsdomäner och dokumentändringar så att du snabbt kan rulla tillbaka om något går sönder."
+            ]
+          },
+          {
+            "title": "Resolversyn kontra auktoritativ syn",
+            "paragraphs": [
+              "Var du loggar DNS spelar roll. Lösningsloggar visar vad dina kunder frågade. Auktoritativa loggar visar vad världen frågade om dina domäner. De svarar på olika frågor.",
+              "För detektering och loggning inom en organisation är resolverloggar vanligtvis de mest värdefulla eftersom de kopplar aktiviteten tillbaka till interna klienter."
+            ]
+          },
+          {
+            "title": "Moderna DNS funktioner som påverkar sikten",
+            "paragraphs": [
+              "Krypterade DNS-alternativ kan minska synligheten på traditionella nätverkssensorer. Om klienter använder DNS över HTTPS direkt till externa resolvers, kanske dina interna resolverloggar inte ser frågorna.",
+              "Ett praktiskt tillvägagångssätt är att upprätthålla godkända resolvers och övervaka direkt utgående trafik till kända offentliga resolvertjänster."
+            ]
+          },
+          {
+            "title": "Startjakter",
+            "paragraphs": [
+              "• Nyligen sedda domäner efterfrågade av kritiska värdar",
+              "• Många NXDOMAIN svar från en klient",
+              "• Ovanlig qtype användning som frekvent TXT för en domän",
+              "• Unika underdomäner med hög volym under en förälder",
+              "• Domäner med mycket långa etiketter jämfört med baslinjen"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "siem",
+      "title": "Grunder i SIEM",
+      "intro": "En SIEM sammanför loggar, analyserar dem i konsekventa fält, lägger till sammanhang och korrelerar beteenden över tid. Börja med en liten uppsättning detekteringar av högt värde, mät brus och iterera.",
+      "objectives": [
+        "Förklara intag, parsning, normalisering, berikning och korrelation i enkla termer",
+        "Bygg upptäckter som är testbara, underhållsbara och knutna till tydliga svarsåtgärder",
+        "Använd instrumentpaneler och triage arbetsflöden för att minska tiden för att undersöka och begränsa incidenter"
+      ],
+      "sections": [
+        {
+          "title": "SIEM arbetsflöde",
+          "table": {
+            "headers": [
+              "Etapp",
+              "Vad händer",
+              "Varför det spelar roll",
+              "Utgångar"
+            ],
+            "rows": [
+              [
+                "Inta",
+                "Samla händelser från slutpunkter, servrar, nätverk och molntjänster",
+                "Utan täckning kan du inte upptäcka eller undersöka på ett tillförlitligt sätt",
+                "Anslutningar, speditörer och insugningsrörledningar"
+              ],
+              [
+                "Normalisera",
+                "Analysera loggar och kartlägga fält till ett konsekvent schema",
+                "Gör sökningar portabla och korrelationsförutsägbara",
+                "Enhetliga fält som användare, värd, `source_ip` och `outcome`"
+              ],
+              [
+                "Berika",
+                "Lägg till tillgång, identitet och affärskontext plus kända dåliga indikatorer",
+                "Förbättrar prioritering och minskar falska positiva resultat",
+                "Entitetskontext, riskpoäng och taggning"
+              ],
+              [
+                "Upptäcka",
+                "Kör regler och analyser som letar efter beteenden över tid",
+                "Förvandlar råa händelser till handlingsbara varningar",
+                "Varningar med bevis, tidslinjer och länkar till råloggar"
+              ],
+              [
+                "Svara",
+                "Triagera, innehålla, utrota och dokumentera lärdomar",
+                "Minskar påverkan och förbättrar framtida upptäckter",
+                "Fodral, spelböcker och feedback till trimning"
+              ]
+            ]
+          }
+        },
+        {
+          "title": "Gör det hållbart",
+          "bullets": [
+            "Börja med några få användningsfall med högt förtroende och lägg till fler först efter justering",
+            "Testa upptäckter med kända bra och kända dåliga scenarier, spåra sedan falska positiva",
+            "Dokumentera ägarskap, allvarlighetsgrad och svarssteg så att varningar leder till konsekventa åtgärder"
+          ]
+        }
+      ],
+      "atAGlance": [
+        {
+          "title": "Kärnfunktioner",
+          "items": [
+            "Samla och lagra loggar centralt",
+            "Analysera och normalisera fält för sökning",
+            "Korrelera händelser och utlösa varningar",
+            "Stödja utredning och rapportering"
+          ]
+        },
+        {
+          "title": "Hur bra data ser ut",
+          "items": [
+            "Konsekvent tidsstämplar och tidszonshantering",
+            "Stabila fält som användare, värd, src_ip och `action`",
+            "Låga parserfelfrekvenser och tydlig källtaggning",
+            "Berikning för tillgångar och identitetssammanhang"
+          ]
+        },
+        {
+          "title": "Ett fungerande arbetsflöde",
+          "items": [
+            "Upptäck, validera signalkvalitet, lägg till sammanhang",
+            "Besluta: stäng, övervaka eller eskalera till incident",
+            "Dokumentera vad du lärt dig och justera regler",
+            "Granska luckor och förbättra avverkningstäckningen"
+          ]
+        }
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Intag och analys: där kvalitet vinner",
+            "paragraphs": [
+              "Intag är inte komplett förrän du kan fråga på ett tillförlitligt sätt. Spåra vilka källor som är inbyggda, om de kommer i tid och om nyckelfält analyseras korrekt.",
+              "Analysfel är en tyst risk. Om en parser slutar extrahera användare eller src_ip, kan detektioner fortfarande köras men bli mycket mindre användbara. Övervaka analysens hälsa som ett förstklassigt mått.",
+              "Behåll källmetadata. Tagga alltid händelser med källsystem, miljö och insamlingsväg så att du kan felsöka och lita på dina sökningar."
+            ]
+          },
+          {
+            "title": "Detekteringsutveckling för nybörjare",
+            "paragraphs": [
+              "Börja med en liten uppsättning upptäckter som du kan förklara och validera. Bra startande kartlägger för att rensa angripares beteenden som brute force, skapande av nya administratörer, misstänkt fjärråtkomst eller oväntade utgående anslutningar.",
+              "Skriv upptäckter för att vara genomförbara: vad som hände, varför det är viktigt, vad du ska kontrollera härnäst och vad du ska göra om det bekräftas.",
+              "Föredrar stabila fält och undvik spröd strängmatchning när det är möjligt. Om data är rörig, åtgärda parsning först."
+            ]
+          },
+          {
+            "title": "Triageflöde som skalar",
+            "paragraphs": [
+              "Ett skalbart triageflöde är konsekvent. Verifiera signalkvaliteten, kontrollera sammanhanget och bestäm sedan. Använd en kort checklista så att olika analytiker når liknande slutsatser.",
+              "Fånga bevis och pivoter: relaterade händelser, tidsfönster, påverkade tillgångar och användarkontext. Detta minskar upprepat arbete och förbättrar handoffs.",
+              "Om din SIEM stöder ärenden, använd dem för att länka relaterade varningar och dokumentjusteringsbeslut."
+            ]
+          },
+          {
+            "title": "Kontinuerlig förbättringsslinga",
+            "paragraphs": [
+              "Behandla upptäckter som produkter. Varje regel bör ha en ägare, ett syfte, testdata och en inställningshistorik.",
+              "Granska falska positiva och missade upptäckter regelbundet. Om en incident krävde data som du inte hade, är det en loggningslucka att stänga.",
+              "Använd granskningar efter incidenter för att uppdatera både loggningskrav och detekteringslogik, och validera sedan ändringarna."
+            ]
+          },
+          {
+            "title": "En enkel datamodell gör allt enklare",
+            "paragraphs": [
+              "SIEM fungerar bäst när fält betyder samma sak överallt. Använd ett konsekvent schema för kärnfält som användare, värd, process, src_ip, dst_ip, `action` och resultat.",
+              "Anrikning passar naturligt in i denna modell. Lägg till tillgångstaggar, företagsägare och kritik så att upptäckter kan prioritera det som är viktigt.",
+              "Behåll råhändelser vid sidan av analyserade fält så att du kan bearbeta om allt eftersom din datamodell utvecklas."
+            ]
+          },
+          {
+            "title": "Varningskvalitet: signal, svårighetsgrad och förtroende",
+            "paragraphs": [
+              "Inte varje misstänkt händelse är en incident. Använd svårighetsgrad för att beskriva effekten om den är sann, och självförtroende för att beskriva hur troligt det är sant. Denna separation förbättrar prioriteringen.",
+              "Föredrar färre högkvalitativa varningar framför många lågvärde. Om du genererar för många varningar blir triage slumpmässigt och verkliga incidenter missas.",
+              "Inkludera sammanhang i varningar: vem, vad, var och varför, plus föreslagna pivoter."
+            ]
+          },
+          {
+            "title": "Retention, åtkomst och driftshygien",
+            "paragraphs": [
+              "Retention bör matcha utredningsbehov och kostnadsbegränsningar. Behåll snabb sökbar data för den period du oftast undersöker, arkivera sedan äldre data för längre tillbakablickar.",
+              "Skydda själva SIEM. Begränsa vem som kan radera data eller inaktivera källor. Logga ändringar av inmatningsinställningar och detektionsregler, eftersom dessa är angriparmål av högt värde.",
+              "Mät intagsfördröjning, uteblivna händelser och lagringshälsa så att du vet när din synlighet försämras."
+            ]
+          },
+          {
+            "title": "Startplan",
+            "paragraphs": [
+              "• Inventeringsloggkällor och ombord de högsta värdena först",
+              "• Normalisera nyckelfält och övervaka analysens hälsa",
+              "• Bygg en liten detekteringsuppsättning och dokumentera triage-steg",
+              "• Lägg till berikning för tillgångar och identitet",
+              "• Ställ in regelbundet och utöka sedan täckningen med uppmätt räckvidd"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "hardening": [
+    {
+      "id": "win",
+      "title": "Windows",
+      "intro": "Windows härdning handlar om att minska attackytan, skydda autentiseringsuppgifter och data och upprätthålla säkra inställningar konsekvent. Börja från en baslinje och lägg sedan på kontroller som blockerar vanliga missbruksvägar och gör ändringar mätbara.",
+      "objectives": [
+        "Applicera en baslinje och håll konfigurationsdriften under kontroll",
+        "Minska privilegier och skydda referenser från stöld och återanvändning",
+        "Förstärk vanliga initiala åtkomstvägar som makron, skript och fjärrhantering",
+        "Verifiera härdningen med loggar, varningar och enkla stickprovskontroller"
+      ],
+      "atAGlance": [
+        {
+          "title": "Huvudmål",
+          "items": [
+            "Konsekvens genom baslinjer och policytillämpning",
+            "Minsta privilegium och stark autentisering för administratörsåtgärder",
+            "Förebyggande kontroller som bryter vanliga skadliga kedjor",
+            "Synlighet så att du kan bevisa att kontrollerna fungerar"
+          ]
+        },
+        {
+          "title": "Hög effektkontroller",
+          "items": [
+            "Microsofts säkerhetsbaslinjer distribueras via GPO eller Intune",
+            "BitLocker för data i vila med hanterade återställningsnycklar",
+            "Autentiseringsskydd som Credential Guard stöddes",
+            "Attack Surface Reduction regler anpassade från granskning till block"
+          ]
+        },
+        {
+          "title": "Praktiskt arbetsflöde",
+          "items": [
+            "Börja i en pilotring, mät effekten och utöka sedan lanseringen",
+            "Dokumentera undantag som affärsbeslut, inte engångshack",
+            "Kontrollera driften med jämna mellanrum och efter större Windows uppdateringar",
+            "Behandla lokal administratör, fjärråtkomst och körning av skript som toppriskområden"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "title": "Översikt",
+          "paragraphs": [
+            "En användbar mental modell är att härda Windows i lager. Först minskar du vad som är nåbart och vad som kan köras, sedan begränsar du vad en angripare kan göra om de kommer in, och slutligen lägger du till synlighet så att du kan upptäcka drift och misstänkt beteende.",
+            "I hanterade miljöer kommer de största säkerhetsvinsterna från konsekvens. En väl testad baslinje plus snäva adminkontroller slår vanligtvis en lång lista med slumpmässiga justeringar som tillämpas inkonsekvent.",
+            "När du lägger till strängare förebyggande kontroller som ASR-regler eller applikationskontroll, gör det medvetet: börja med granskningen, titta på vad som skulle ha blockerats, och gå sedan vidare för att upprätthålla med snävt avgränsade undantag."
+          ],
+          "bullets": [
+            "Som standard nekar du inkommande och minimerar exponeringen för fjärrhantering",
+            "Föredrar modern autentisering med MFA för privilegierade åtgärder",
+            "Minska lokal administratörsanvändning och rotera lokala administratörshemligheter",
+            "Logga det som är viktigt och centralisera det om du har fler än några slutpunkter"
+          ],
+          "callout": {
+            "type": "tip",
+            "title": "Baslinjen först, stämningen andra",
+            "text": "Baslinjer ger dig en säker utgångspunkt. Tuning är där du anpassar dig till verkliga appar och arbetsflöden utan att tappa kontrollen över säkerhetsställningen."
+          }
+        },
+        {
+          "title": "Härdningsåtgärder",
+          "paragraphs": [
+            "Använd reglaget för att växla mellan en baslinje med låg friktion och en strängare säkerhetsbaslinje."
+          ],
+          "toggle": {
+            "default": "home",
+            "options": [
+              {
+                "key": "home",
+                "label": "Hembaslinje"
+              },
+              {
+                "key": "security",
+                "label": "Säkerhetsbaslinje"
+              }
+            ],
+            "views": {
+              "home": {
+                "table": {
+                  "headers": [
+                    "Handling",
+                    "Vad du gör",
+                    "Varför gör du det",
+                    "Säkerhetseffekt"
+                  ],
+                  "rows": [
+                    [
+                      "Håll Windows Uppdatering och appuppdateringar aktiverade",
+                      "Aktivera automatiska uppdateringar för Windows och håll vanliga appar uppdaterade (webbläsare, Office, PDF-läsare).",
+                      "De flesta kompromisser i den verkliga världen är beroende av kända sårbarheter som redan har patchar.",
+                      "Stänger kända buggar och minskar exponeringen för råvaruexploatering."
+                    ],
+                    [
+                      "Använd en standardanvändare för det dagliga arbetet",
+                      "Skapa ett separat administratörskonto för installationer och systemändringar. Använd standardkontot som standard.",
+                      "Adminsessioner gör nätfiske och skadlig programvara mycket mer skadlig.",
+                      "Begränsar vilken skadlig kod som kan ändras utan en höjdprompt."
+                    ],
+                    [
+                      "Aktivera Microsoft Defender-skydd",
+                      "Se till att realtidsskydd är aktiverat och håll molnbaserat skydd och provinlämning på när det är möjligt.",
+                      "Inbyggda skydd stoppar en stor del av vanlig skadlig programvara och misstänkt beteende.",
+                      "Blockerar eller stör många råvaruhot tidigt i kedjan."
+                    ],
+                    [
+                      "Aktivera BitLocker där tillgängligt",
+                      "Slå på enhets- eller volymkryptering och lagra återställningsnyckeln säkert (Microsoft-konto eller ett säkert valv).",
+                      "Förlorade eller stulna enheter är en vanlig orsak till dataexponering.",
+                      "Skyddar data i vila från offlineåtkomst."
+                    ],
+                    [
+                      "Hårda webbläsare och makroinställningar",
+                      "Föredrar moderna webbläsare, håll SmartScreen eller ryktesbaserat skydd aktiverat och begränsa makron till pålitliga källor.",
+                      "Många initiala infektioner startar från webbläsaren eller dokumentkörningen.",
+                      "Minskar nedladdningar och skadlig makrokörning."
+                    ],
+                    [
+                      "Håll Windows Defender brandvägg på",
+                      "Se till att brandväggen är aktiverad för alla profiler och inaktivera den inte för felsökning.",
+                      "Värdbrandväggen är din sista rad när nätverket inte är pålitligt.",
+                      "Minskar exponeringen för oönskad inkommande trafik och enkel sidorörelse."
+                    ],
+                    [
+                      "Ta bort äldre protokoll och oanvända funktioner",
+                      "Inaktivera SMBv1 och avinstallera eller inaktivera komponenter du inte använder (till exempel gamla fjärråtkomstverktyg).",
+                      "Äldre funktioner finns ofta främst för kompatibilitet och för att öka attackytan.",
+                      "Färre tillgängliga tjänster och färre svaga protokollalternativ."
+                    ]
+                  ]
+                }
+              },
+              "security": {
+                "table": {
+                  "headers": [
+                    "Handling",
+                    "Vad du gör",
+                    "Varför gör du det",
+                    "Säkerhetseffekt"
+                  ],
+                  "rows": [
+                    [
+                      "Distribuera Microsofts säkerhetsbaslinjer",
+                      "Använd Microsofts rekommenderade baslinjer och distribuera via GPO eller Intune. Spåra efterlevnad och undantag.",
+                      "Baslinjer minskar risken för felkonfiguration och hjälper till att förhindra drift.",
+                      "Skapar repeterbar, granskningsbar härdning över enheter."
+                    ],
+                    [
+                      "Framtvinga en stark administratörsidentitet",
+                      "Kräv MFA för privilegierad åtkomst, använd dedikerade administratörskonton och begränsa var administratörsinloggningar är tillåtna.",
+                      "Kompromissade administratörsuppgifter möjliggör fullständigt övertagande och snabb rörelse i sidled.",
+                      "Höjer kostnaderna för identitetsstöld och minskar missbruk av privilegier."
+                    ],
+                    [
+                      "Rotera och skydda lokala administratörshemligheter",
+                      "Använd Windows LAPS för att hantera unika lokala administratörslösenord per enhet och kontrollera vem som kan hämta dem.",
+                      "Delade lokala administratörslösenord förvandlar en kompromiss till många.",
+                      "Minskar sidorörelser och uthållighetsmöjligheter."
+                    ],
+                    [
+                      "Aktivera autentiseringsskydd där det stöds",
+                      "Aktivera funktioner som Credential Guard och virtualiseringsbaserad säkerhet när hårdvara och operativsystem stöder det.",
+                      "Autentiseringsdumpning är en vanlig teknik efter kompromisser.",
+                      "Gör identitetsstöld svårare och minskar risken för återanvändning."
+                    ],
+                    [
+                      "Använd regler för Attack Surface Reduction",
+                      "Kör först ASR i granskningen, justera uteslutningar och verkställ sedan. Övervaka regelträffar och undersök signaler av hög kvalitet.",
+                      "ASR blockerar vanliga missbruksvägar som involverar skript, makron och att leva på markverktygen.",
+                      "Förhindrar eller stör många ransomware och intrångskedjor."
+                    ],
+                    [
+                      "Tillämpa applikationskontroll för högrisksystem",
+                      "Använd AppLocker eller Windows Defender Application Control för servrar eller privilegierade arbetsstationer där det är möjligt.",
+                      "Om otillförlitlig kod inte kan köras stoppas många attacker tidigt.",
+                      "Stark minskning av exekveringsbaserad attackyta."
+                    ],
+                    [
+                      "Härda fjärrhantering",
+                      "Begränsa RDP och WinRM-exponering, kräva NLA, begränsa till hanteringsnätverk eller VPN och logga alla administratörssessioner.",
+                      "Fjärrhantering är kraftfull och ofta riktad.",
+                      "Minskar exponering mot internet och förbättrar spårbarheten."
+                    ],
+                    [
+                      "Stärk brandväggspolicy och loggning",
+                      "Standardblockera inkommande, tillåt endast nödvändiga portar per profil, aktivera brandväggsloggning och vidarebefordra nyckelloggar centralt.",
+                      "Brandväggar misslyckas tyst om du inte övervakar dem.",
+                      "Bättre inneslutning och bättre utredningsbevis."
+                    ],
+                    [
+                      "Centralisera loggning och larm",
+                      "Vidarebefordra säkerhetsrelevanta händelser till en central plattform, definiera varningsregler för adminändringar och misstänkt exekvering.",
+                      "Lokala loggar är lätta att manipulera efter kompromisser.",
+                      "Förbättrar upptäckten och stödjer incidentrespons."
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          "callout": {
+            "type": "warn",
+            "title": "Pilot strikta kontroller",
+            "text": "Strängare baslinjer och ASR-regler kan bryta äldre appar. Använd granskningsläge, testa i ringar och dokumentera undantag avsiktligt."
+          }
+        }
+      ],
+      "signals": [
+        "Baslinjeefterlevnaden sjunker eller enheter avviker från policyn",
+        "Nya lokala administratörsmedlemskap utan ändringsförfrågan",
+        "Oväntade fjärrinloggningar eller RDP från ovanliga nätverk",
+        "ASR eller programkontrollhändelser anpassade till misstänkta processträd"
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Mental modell: härdning som skiktad riskminskning",
+            "paragraphs": [
+              "Härdning handlar om att forma standardbeteendet för ett system så att vanliga misstag inte förvandlas till full kompromiss. På Windows betyder det att du minskar antalet sätt som kod kan köras på, minskar värdet på stulna autentiseringsuppgifter och minskar vad en nätverksväg kan nå.",
+              "En praktisk mental modell är att tänka i lager som var och en blockerar olika typer av fel: identitet och privilegier, kodexekvering, nätverksexponering, dataskydd och återställning. Om ett lager misslyckas begränsar nästa sprängradie.",
+              "Ett annat sätt att tänka på det är tid: förhindra det du kan, upptäcka det du inte kan förhindra och göra återhämtningen förutsägbar. Många riktiga incidenter är inte en enda stor bugg, de är en kedja av små luckor plus tid.",
+              "• Attackyta är allt som kan acceptera input eller exekvera logik. Minska det först eftersom det sänker mängden du måste övervaka.",
+              "• Privilege är gaspedalen för angripare. Håll det sällsynt och behåll bevis när det används.",
+              "• Förtroende är kontextuellt. En enhet kan lita på i ett nätverk och riskabel i ett annat, så din baslinje måste överleva mobilitet och förändring."
+            ]
+          },
+          {
+            "title": "Baslinjeprioriteringar för en Windows arbetsstation",
+            "paragraphs": [
+              "Bra Windows härdning handlar mindre om en lång checklista och mer om att skydda några högvärdiga vägar. Huvudsökvägen är referenssökvägen: hur användare autentiserar, hur hemligheter lagras och hur administratörsbehörighet beviljas.",
+              "Starka skyddsräcken här förhindrar vanliga rörelsemönster i sidled: återanvändning av lösenord, cachade referenser, tokenstöld och tyst ihärdighet via schemalagda uppgifter eller startposter.",
+              "En andra väg är exekveringsvägen. Du vill ha färre platser där osignerad eller oväntad kod kan köras, och du vill ha hög friktion för riskfyllda exekveringslägen som Office-makron, skriptvärdar och att leva på markverktygen.",
+              "Det finns en viktig kompromiss: skärpta exekveringskontroller kan bryta äldre appar och arbetsflöden för utvecklare. Rätt tillvägagångssätt är att segmentera efter roll, till exempel en striktare baslinje för standardanvändare och en dokumenterad undantagsprofil för dedikerade dev-boxar.",
+              "En tredje väg är datavägen. Kryptering är inte bara för stöld, det ändrar också vad en angripare kan göra efter att en enhet har tappats bort, ombildats eller delvis äventyrats.",
+              "Slutligen, planera för motståndskraft. Om du inte kan bygga om en maskin snabbt kommer din baslinje sakta att glida eftersom människor undviker förändringar som de är rädda för att inte kan ångra."
+            ]
+          },
+          {
+            "title": "Vanliga fällor som försvagar Windows härdning",
+            "paragraphs": [
+              "Ett vanligt felläge är baslinjedrift som sker tyst. En brådskande fix blir en permanent inställning, sedan en annan, tills slutpunkten i praktiken är ohanterad även om den ser hård ut på dag ett.",
+              "Ett annat felläge är bekvämlighetsadministration. Om det dagliga arbetet utförs med administratörsrättigheter, ärver varje webbläsarexploatering och varje nätfiskebilaga kraft som du aldrig hade för avsikt att ge den.",
+              "Se upp för verktygskonflikter. Flera säkerhetsagenter, äldre VPN-klienter och gamla drivrutiner kan inaktivera eller försvaga skydden på subtila sätt, eller tvinga användare att stänga av kontrollerna för att göra arbetet möjligt.",
+              "Var försiktig med fjärradministration. Fjärråtkomst är ibland nödvändigt, men det farliga mönstret är bred åtkomst med svag autentisering och ingen synlighet. Begränsa vem som kan nå den och göra den bullrig när den används.",
+              "• Undantagsspridning: en bra baslinje plus många odokumenterade undantag är vanligtvis sämre än en lite lösare baslinje med tydliga regler.",
+              "• Att lita för mycket på den lokala maskinen: lokal administratör, lokala hemligheter och lokala policyredigeringar är precis vad angripare strävar efter att kontrollera."
+            ]
+          },
+          {
+            "title": "Operativt arbetsflöde: gör baslinjen hållbar",
+            "paragraphs": [
+              "Det varaktiga tillvägagångssättet är politiken först. Definiera en baslinje som tillämpas upprepade gånger och mät sedan drift. Behandla baslinjen som en levande artefakt med ägare och granskningscykler, inte som en engångsinställning.",
+              "Använd stegvis lansering. Tillämpa ändringar på en liten uppsättning maskiner, observera brott och supportbiljetter, expandera sedan. Härdning som orsakar frekventa störningar kommer att kringgås av användare och administratörer.",
+              "Bygg en liten undantagsprocess som är säker genom design. Ett undantag bör vara tydligt, tidsbegränsat och parat med kompenserande kontroller som starkare övervakning eller minskad nätverksåtkomst.",
+              "När du behöver lätta på härdning, gör det av en tydlig orsak – inte för att det känns bekvämt. Säkra undantag ser ofta ut så här: dedikerad utvecklingsmaskin, isolerad testmiljö eller tillfällig åtkomst för akutfelsökning med sessionsloggning.",
+              "Dokumentera undantag på ett sätt som överlever personalomsättningen:",
+              "• Vad förändrades och var det gäller",
+              "• Varför det behövs och vilken risk det innebär",
+              "• Ägare, utgångsdatum och hur det kommer att granskas"
+            ]
+          },
+          {
+            "title": "Verifiering och bevis: hur du vet att det fungerar",
+            "paragraphs": [
+              "Verifiering är där Windows härdning blir verklig. Du vill ha kontroller som svarar på två frågor: är de avsedda kontrollerna aktiverade och skulle du märka om de ändrades i morgon.",
+              "Praktiska kontroller kan göras med inbyggda verktyg och ledningsrapportering. En hälsosam slutpunkt visar vanligtvis: aktuell patchnivå, aktiva skydd mot skadlig programvara, diskkryptering aktiverad och en brandväggsprofil som matchar nätverkskontexten.",
+              "Leta efter konkreta bevis snarare än antaganden. Anta till exempel inte att kryptering är aktiverad för att du avsåg det. Bekräfta det. Anta inte att Defender är aktiv eftersom den är installerad. Bekräfta dess skyddstillstånd.",
+              "Bra betyder också observerbar. Dina loggar bör fånga säkerhetsrelevanta förändringar som nya lokala administratörer, nya tjänster, nya schemalagda uppgifter och misstänkt skriptaktivitet. Om en förändring inte loggas någonstans är det svårt att försvara långsiktigt.",
+              "Så här verifierar du och hur det ser ut:",
+              "• Systemuppdateringar: enheter rapporterar senaste framgångsrika uppdateringar och ingen lång eftersläpning",
+              "• Identitet: standardanvändare är inte lokala administratörer, ändringar i admingrupp är sällsynta och granskas",
+              "• Data: krypteringsstatus är på och återställningsnycklar hanteras, går inte förlorade",
+              "• Nätverk: inkommande regler är minimala och loggning är aktiverad åtminstone för fall på riskabla profiler",
+              "När verifiering hittar luckor, avgör om ni ska skärpa baslinjen eller lägga till övervakning. Det värsta utfallet är att upptäcka samma luckor upprepade gånger utan att genomföra förbättringar."
+            ]
+          }
+        ]
+      },
+      "references": [
+        {
+          "label": "Security Compliance Toolkit",
+          "url": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/device-management/windows-security-configuration-framework/security-compliance-toolkit-10"
+        },
+        {
+          "label": "Windows security baselines",
+          "url": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/device-management/windows-security-configuration-framework/windows-security-baselines"
+        },
+        {
+          "label": "Attack surface reduction overview",
+          "url": "https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction"
+        },
+        {
+          "label": "ASR rules reference",
+          "url": "https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction-rules-reference"
+        },
+        {
+          "label": "Microsoft Security Compliance Toolkit download",
+          "url": "https://www.microsoft.com/en-us/download/details.aspx?id=55319"
+        },
+        {
+          "label": "NIST Guide to General Server Security",
+          "url": "https://csrc.nist.gov/pubs/sp/800/123/final"
+        }
+      ]
+    },
+    {
+      "id": "linux",
+      "title": "Linux",
+      "intro": "Linux härdning handlar om minimalism, stark autentisering och förutsägbar konfiguration. Du minskar antalet pågående tjänster, upprätthåller minsta privilegium och använder inbyggda säkerhetsfunktioner som MAC, revision och brandväggar för att göra kompromisser svårare och lättare att upptäcka.",
+      "objectives": [
+        "Minska attackytan genom att inaktivera det du inte behöver",
+        "Hårda vägar för autentisering och eskalering av privilegier",
+        "Tillämpa kärna och paketuppdateringar säkert och konsekvent",
+        "Validera härdning med enkla kontroller och meningsfull loggning"
+      ],
+      "atAGlance": [
+        {
+          "title": "Huvudmål",
+          "items": [
+            "Minimalt exponerade tjänster och tydligt ägande av förändringar",
+            "Stark SSH och sudo konfiguration",
+            "Försvar på djupet med MAC, brandvägg och revision",
+            "Snabb återställning med säkerhetskopior och kända bra konfigurationer"
+          ]
+        },
+        {
+          "title": "Hög effektkontroller",
+          "items": [
+            "Automatiska säkerhetsuppdateringar där så är lämpligt",
+            "SSH nyckelbehörighet och policy för begränsad inloggning",
+            "Brandväggsstandard neka inkommande med explicit tillåtna portar",
+            "SELinux eller AppArmor tillämpar på system som stöds"
+          ]
+        },
+        {
+          "title": "Praktiskt arbetsflöde",
+          "items": [
+            "Baslinjebyggd, härda sedan i små steg med verifiering",
+            "Använd konfigurationshantering för att undvika snöflingaservrar",
+            "Logga och övervaka autentisering, behörighet och nätverksändringar",
+            "Granska installerade paket och körande tjänster regelbundet"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "title": "Översikt",
+          "paragraphs": [
+            "Linux härdning börjar med att minska komplexiteten. Varje aktiverad tjänst, öppen port och installerat paket är en annan plats där en sårbarhet eller felkonfiguration kan existera.",
+            "De flesta kompromisser lyckas på grund av svag autentisering, exponerade hanteringstjänster eller oparpad programvara. Din första prioritet är att göra fjärråtkomst förutsägbar och att hålla uppdateringarna flytande.",
+            "För striktare miljöer, använd obligatorisk åtkomstkontroll, granskning och filintegritetskontroller för att lägga till lager som fortfarande är viktiga efter att ett användarkonto har äventyrats."
+          ],
+          "bullets": [
+            "Ta bort eller inaktivera oanvända tjänster och lyssningsdemoner",
+            "Föredrar SSH nycklar och begränsa vem som kan logga in och varifrån",
+            "Använd sudo med avsikt och undvik direkt rotinloggning",
+            "Håll tiden synkroniserad och loggarna sparas för undersökningar"
+          ],
+          "callout": {
+            "type": "tip",
+            "title": "Härdning är lättare före produktion",
+            "text": "Bygg först en säker bild och klona den sedan. Eftermontering av härdning på många unika system är långsam och felbenägen."
+          }
+        },
+        {
+          "title": "Härdningsåtgärder",
+          "paragraphs": [
+            "Använd reglaget för att växla mellan en baslinje med låg friktion och en strängare säkerhetsbaslinje."
+          ],
+          "toggle": {
+            "default": "home",
+            "options": [
+              {
+                "key": "home",
+                "label": "Hembaslinje"
+              },
+              {
+                "key": "security",
+                "label": "Säkerhetsbaslinje"
+              }
+            ],
+            "views": {
+              "home": {
+                "table": {
+                  "headers": [
+                    "Handling",
+                    "Vad du gör",
+                    "Varför gör du det",
+                    "Säkerhetseffekt"
+                  ],
+                  "rows": [
+                    [
+                      "Håll paket uppdaterade",
+                      "Aktivera regelbundna uppdateringar för OS och nyckelpaket. Starta om när det krävs för kärn- eller libc-uppdateringar.",
+                      "Många utnyttjar riktar sig mot kända sårbarheter som redan har patchar.",
+                      "Minskar exponeringen för råvaruexploatering."
+                    ],
+                    [
+                      "Inaktivera oanvända tjänster",
+                      "Lista aktiverade tjänster och inaktivera allt du inte använder. Stäng oanvända portar.",
+                      "En tjänst du inte behöver är ren risk.",
+                      "Mindre attackyta och färre avlägsna ingångspunkter."
+                    ],
+                    [
+                      "Använd en värdbrandvägg",
+                      "Aktivera ett brandväggsverktyg (ufw, firewalld eller nftables wrapper) och neka inkommande som standard. Tillåt endast nödvändiga portar.",
+                      "Lokala brandväggar innehåller misstag och minskar rörelser i sidled.",
+                      "Färre tillgängliga tjänster och tydligare nätverkshållning."
+                    ],
+                    [
+                      "Härda SSH grunderna",
+                      "Använd SSH-nycklar, inaktivera direkt rotinloggning och begränsa vilka användare som kan SSH i.",
+                      "SSH är ett vanligt brute force och credential stuffing-mål.",
+                      "Starkare autentisering och minskad exponering för lösenordsattacker."
+                    ],
+                    [
+                      "Använd sudo, undvik delade konton",
+                      "Ge namngivna användare sudo där det behövs och undvik att logga in som root.",
+                      "Delade konton förstör ansvar och ökar sprängradien.",
+                      "Bättre spårbarhet och minskat missbruk av privilegier."
+                    ],
+                    [
+                      "Grundläggande loggning och loggrotation",
+                      "Se till att journald eller syslog körs och att loggarna roteras och behålls tillräckligt länge för felsökning.",
+                      "Utan loggar kan du inte förklara incidenter eller misslyckanden.",
+                      "Förbättrar upptäckt och kriminalteknisk beredskap."
+                    ],
+                    [
+                      "Säkerhetskopiering och återställningsplan",
+                      "Säkerhetskopiera viktiga konfigurationer och data. Teståterställningar, inte bara säkerhetskopieringsjobb.",
+                      "Härdning förhindrar inte varje incident. Återhämtning spelar roll.",
+                      "Begränsar stilleståndstiden och minskar lösensumman."
+                    ]
+                  ]
+                }
+              },
+              "security": {
+                "table": {
+                  "headers": [
+                    "Handling",
+                    "Vad du gör",
+                    "Varför gör du det",
+                    "Säkerhetseffekt"
+                  ],
+                  "rows": [
+                    [
+                      "Tillämpa en dokumenterad baslinje",
+                      "Använd en CIS-justerad baslinje eller leverantörshärdningsguide och hantera den som kod.",
+                      "En baslinje minskar driften och gör revisioner möjliga.",
+                      "Repeterbar hållning över flottor och snabbare undersökning."
+                    ],
+                    [
+                      "Framtvinga MAC (SELinux eller AppArmor)",
+                      "Håll SELinux eller AppArmor i verkställande läge där det stöds och fixa avslag istället för att inaktivera det.",
+                      "MAC begränsar vad komprometterade processer kan komma åt även med exekvering på användarnivå.",
+                      "Innehåller exploatering och minskar privilegieeskaleringsvägar."
+                    ],
+                    [
+                      "Centralisera autentisering och begränsa SSH",
+                      "Inaktivera lösenordsautentisering där det är möjligt, begränsa användare och källnätverk och överväg MFA för privilegierad åtkomst.",
+                      "Lösenord är lätta att råka ut för och lätta att nätfiska.",
+                      "Minskar missbruk av autentiseringsuppgifter och begränsar fjärrinträde."
+                    ],
+                    [
+                      "Härda sudo och privilegieupptrappning",
+                      "Begränsa sudoers ingångar till specifika kommandon, kräver omautentisering och övervaka användningen av sudo.",
+                      "Över bred sudo förvandlar en användarkompromiss till full root snabbt.",
+                      "Minskar sidorörelser och uthållighetsmöjligheter."
+                    ],
+                    [
+                      "Aktivera och justera revision",
+                      "Aktivera granskade och distribuera regler fokuserade på autentisering, behörighet och kritiska filer. Vidarebefordra revisionsloggar centralt.",
+                      "Revisionsspår är värdefulla när du behöver svara på vem som gjorde vad och när.",
+                      "Förbättrar upptäckten och stödjer incidentrespons."
+                    ],
+                    [
+                      "Kärn- och nätverkshärdning",
+                      "Tillämpa säkra sysctl-inställningar för nätverk och inaktivera osäkra äldre beteenden när det inte behövs.",
+                      "Många attacker är beroende av svaga standardinställningar och äldre kompatibilitet.",
+                      "Minskar exploateringsytan och förbättrar motståndskraften."
+                    ],
+                    [
+                      "Övervakning av filintegritet",
+                      "Använd ett filintegritetsverktyg (till exempel AIDE) på kritiska sökvägar och varna om oväntade ändringar.",
+                      "Angripare modifierar ofta binärer, konfigurationer och cron-jobb för uthållighet.",
+                      "Upptäcker manipulering och stödjer inneslutning."
+                    ],
+                    [
+                      "Logga pipeline och varning",
+                      "Skicka autentiserings- och granskningsloggar till ett centralt system och varna om misstänkta mönster som upprepade fel eller nya privilegierade grupper.",
+                      "Lokala loggar kan raderas efter kompromiss.",
+                      "Högre chans att upptäcka incidenter tidigt."
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          "callout": {
+            "type": "warn",
+            "title": "Inaktivera inte MAC för att fixa en app",
+            "text": "Om SELinux eller AppArmor blockerar en åtgärd, behandla det som en signal. Justera policy eller applikation – inte själva säkerhetsskiktet."
+          }
+        }
+      ],
+      "signals": [
+        "Nya lyssningsportar eller tjänster aktiverade utanför ändringsfönster",
+        "Upprepade SSH autentiseringsfel eller inloggningar från ovanliga platser",
+        "Oväntad sudo användning eller ändringar av sudoers filer",
+        "Ändringar av kritiska konfigurationer, cron-jobb eller systembinärer"
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Mental modell: minska vad som är nåbart och vad som är tillåtet",
+            "paragraphs": [
+              "Linux härdning är enklast när du behandlar systemet som en samling av små, komponerbara behörigheter. Kärnidén är enkel: minska det som är tillgängligt, minska det som är tillåtet och minska det man litar på.",
+              "En användbar mental modell är exponeringstider tillstånd är lika med risk. Exponering är öppna tjänster och nåbara gränssnitt. Behörighet är vad koden kan göra efter att den startar. Trust är vilka paket och konfigurationer du accepterar som giltiga.",
+              "Linux ger dig många kontroller, men det svåra är konsekvens. Små skillnader mellan värdar, distributioner och team kan skapa luckor som angripare utnyttjar eftersom miljön blir oförutsägbar.",
+              "• Minimera tjänster och lyssningsuttag eftersom de definierar fjärringång.",
+              "• Minimera privilegier och funktioner eftersom de definierar lokal påverkan.",
+              "• Minimera förtroendegränser genom att separera roller, användare och arbetsbelastningar."
+            ]
+          },
+          {
+            "title": "Baslinjeprioriteringar för Linux system",
+            "paragraphs": [
+              "Verkliga Linux incidenter börjar ofta med ett av tre mönster: en exponerad tjänst, en svag referensväg eller en överraskning i leveranskedjan. En bra baslinje prioriterar kontroller som blockerar dessa mönster över många arbetsbelastningar.",
+              "Serviceexponering handlar inte bara om hamnar. Det handlar också om vem som kan nå dem, vilket gränssnitt de binder till och om de kör med onödiga behörigheter. Standard för att bara binda till det du behöver.",
+              "Autentiseringssökvägar inkluderar SSH, lokala konton, API tokens i filer och programhemligheter. Härdning handlar dels om att minska var hemligheter bor och dels om att begränsa vad en angripare kan göra om en läcker.",
+              "Försörjningskedjans risk är operativ. Om du installerar från många källor, kör okända skript som root eller hoppar över uppdateringar är din baslinje ömtålig. Föredrar färre förråd, signerade paket och en repeterbar installationshistoria.",
+              "Avvägning att förvänta sig: härdning kan kosta bekvämlighet. Snäva behörigheter och strikta tjänster kan bryta automatisering och utvecklarverktyg. Det säkra förhållningssättet är att separera miljöer eller roller istället för att försvaga allt för alla.",
+              "När du behöver kompatibilitet, sikta på snävare ändringar, som att tillåta en tjänstfunktion, snarare än breda ändringar som att inaktivera en kontroll globalt."
+            ]
+          },
+          {
+            "title": "Vanliga fällor vid Linux härdning",
+            "paragraphs": [
+              "En ofta förekommande fälla är att härda värden men att glömma appen. Om programmet körs som root, skriver hemligheter till världsläsbara filer eller inte har någon patch-kadens, tvingas värdhärdning att kompensera och misslyckas ofta.",
+              "En annan fälla är att lita för mycket på nätverksgränser. Många Linux-servrar kan nås från platser som folk inte hade tänkt sig på grund av VPNs, molnsäkerhetsgrupper, containernätverk eller platta interna nätverk.",
+              "Privilegekrypning är också vanligt. Med tiden får fler användare sudo åtkomst, fler tjänster körs som privilegierade och fler undantag läggs till. Baslinjen blir långsamt ett förslag snarare än en regel.",
+              "Överhärdning kan också vara en fälla. Om du gör ändringar som är svåra att felsöka, kommer operatörerna att kringgå dem under press. Det skapar en splittrad hjärnmiljö med odokumenterat beteende.",
+              "• Tysta fel: en kontroll konfigureras men tillämpas inte, till exempel en policy i tillåtande läge eller en tjänst som startas med en annan enhetsfil.",
+              "• Inkonsekvent konfiguration: samma roll beter sig olika mellan värdarna, vilket gör både övervakning och incidentrespons svårare."
+            ]
+          },
+          {
+            "title": "Inneslutning: MAC, isolering och säkrare standardinställningar",
+            "paragraphs": [
+              "Inneslutning är där Linux lyser när den används avsiktligt. Tänk i termer av att minska vad en process kan se, röra och anropa. Även om kodexekvering sker, kan inneslutning förhindra privilegieskalering och datastöld.",
+              "Använd obligatorisk åtkomstkontroll när det är lämpligt. SELinux eller AppArmor kan vara frustrerande i början, men de ger en stark gräns som är svår att replikera med enbart filbehörigheter. Avvägningen är policyunderhåll och felsökningsförmåga.",
+              "Isoleringsverktyg spelar också roll. Namnutrymmen, cgroups och containerkörningstider kan vara en del av en hårdnande historia, men bara om du behandlar dem som säkerhetsgränser med tydliga antaganden.",
+              "Systemd kan också minska risken genom att begränsa en tjänst under körning, som att begränsa filsystemåtkomst och systemanrop. Detta är kraftfullt eftersom det hårdnar tjänsten utan att kräva kodändringar.",
+              "När ska man koppla av inneslutningen: ofta för äldre programvara, leverantörsagenter eller felsökning. Det säkra mönstret är att bara koppla av för den specifika tjänsten och hålla resten strikt, sedan dokumentera orsaken och en plan för att återbesöka.",
+              "Dokumentera undantag med ett test: vad ska du kontrollera senare för att bekräfta att du kan dra åt igen utan att avbryta produktionen."
+            ]
+          },
+          {
+            "title": "Verifiering och bevis: loggar, revisioner och integritetskontroller",
+            "paragraphs": [
+              "Verifiering på Linux bör fokusera på effektivt tillstånd, inte avsett tillstånd. Många system ser härdade ut på papper men körs med olika körtidsinställningar, anpassade enhetsöverstyrningar eller föråldrade paket.",
+              "Börja med exponeringskontroller: lista lyssningsportar, tjänster och gränssnitt. Det ser bra ut som att bara förväntade tjänster lyssnar, och administrationstjänster är endast tillgängliga från kontrollerade nätverk.",
+              "Verifiera sedan behörighet och integritet: kontrollera vilka konton som har sudo, vilka tjänster som körs som root och om viktiga filer är skyddade från modifiering. Om du använder integritetsverktyg, bekräfta att det faktiskt rapporterar ändringar.",
+              "Så här verifierar du och hur det ser ut:",
+              "• Exponering: inga oväntade lyssningsuttag, och brandväggar eller säkerhetsgrupper matchar dokumenterad avsikt",
+              "• Konton: minimala sudo användare, inga inaktuella konton och tydligt ägande för tjänstekonton",
+              "• Policy: SELinux tillämpar eller AppArmor-profiler tillämpas där det är avsett, inte tyst inaktiverat",
+              "• Drift: konfigurationshanteringsrapporter konvergerar och manuella redigeringar är sällsynta och granskas",
+              "När du ska koppla av detta: för kortlivade labbvärdar eller isolerade byggmaskiner. Redan då, skriv ner vad som är avslappnat, och håll åtminstone grundläggande lappning och kontohygien eftersom dessa misslyckanden lätt går mellan miljöer."
+            ]
+          }
+        ]
+      },
+      "references": [
+        {
+          "label": "RHEL security hardening guide",
+          "url": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/8/html-single/security_hardening/index"
+        },
+        {
+          "label": "SUSE Security and Hardening Guide",
+          "url": "https://documentation.suse.com/sles/15-SP7/single-html/SLES-security/book-security.html"
+        },
+        {
+          "label": "NIST Guide to General Server Security",
+          "url": "https://csrc.nist.gov/pubs/sp/800/123/final"
+        },
+        {
+          "label": "sshd_config manual",
+          "url": "https://man7.org/linux/man-pages/man5/sshd_config.5.html"
+        }
+      ]
+    },
+    {
+      "id": "macos",
+      "title": "macOS",
+      "intro": "macOS-härdning fokuserar på att skydda data i vila, kontrollera appkörning och upprätthålla säkra inställningar genom konfigurationsprofiler där det är möjligt. För hanterade flottor är MDM mekanismen som gör härdningen konsekvent och mätbar.",
+      "objectives": [
+        "Skydda lokal data med kryptering och stark skärmlåspolicy",
+        "Minska risken från opålitliga appar och riskfyllda användarbeteenden",
+        "Begränsa nätverksexponeringen och hårdna arbetsflöden för fjärråtkomst",
+        "Använd hanteringsverktyg för att genomdriva inställningar och bevisa efterlevnad"
+      ],
+      "atAGlance": [
+        {
+          "title": "Huvudmål",
+          "items": [
+            "FileVault och säkra låsskärmsinställningar för att skydda lokal data",
+            "Gatekeeper och appkontroller för att minska opålitlig körning",
+            "Brandväggs- och delningsinställningar för att minska nätverksexponeringen",
+            "Konsekvent tillämpning genom MDM eller konfigurationsprofiler"
+          ]
+        },
+        {
+          "title": "Hög effektkontroller",
+          "items": [
+            "FileVault hanteras med enhetshantering där det är möjligt",
+            "Brandvägg aktiverad, med smygläge när så är lämpligt",
+            "Begränsa administratörsbehörigheter och kräva höjning avsiktligt",
+            "Kontrollera integritetsbehörigheter för känsliga appar"
+          ]
+        },
+        {
+          "title": "Praktiskt arbetsflöde",
+          "items": [
+            "Börja från en baslinjeprofil och lägg sedan till strängare policyer gradvis",
+            "Testa ändringar mot vanliga appar och arbetsflöden för utvecklare",
+            "Använd rapportering om lager plus efterlevnad för att fånga avdrift",
+            "Behandla delningstjänster och fjärråtkomst som toppriskområden"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "title": "Översikt",
+          "paragraphs": [
+            "macOS säkerheten är starkast när du håller plattformens standardinställningar intakta och lägger till efterlevnad genom profiler, inte manuella justeringar. De största riskerna är exekvering av opålitlig programvara, stulna enheter och breda användarbehörigheter.",
+            "Hemanvändare bör prioritera kryptering, en stark låspolicy och att hålla uppdateringar aktuella. Hanterade miljöer bör prioritera MDM tvingade inställningar, konsekventa identitetskontroller och minskad lokal administratörsanvändning.",
+            "När du hårdnar macOS, undvik att bryta kärnarbetsflöden genom att först fokusera på kontroller med hög konfidens: kryptering, brandvägg, skyddsräcken för appkörning och snäva administratörsgränser."
+          ],
+          "bullets": [
+            "Håll macOS och vanliga appar uppdaterade",
+            "Använd FileVault och skydda återställningsnycklar",
+            "Minska lokal administratörsåtkomst och separata administratörsuppgifter",
+            "Begränsa delningstjänster och övervaka fjärråtkomst"
+          ],
+          "callout": {
+            "type": "tip",
+            "title": "Föredrar profiler framför manuell inställning",
+            "text": "Konfigurationsprofiler och MDM ger konsekvent tillämpning och gör det lättare att verifiera inställningar på många Mac-datorer."
+          }
+        },
+        {
+          "title": "Härdningsåtgärder",
+          "paragraphs": [
+            "Använd reglaget för att växla mellan en baslinje med låg friktion och en strängare säkerhetsbaslinje. Åtgärder förutsätter moderna macOS-inställningar och profilbaserad hantering där så är möjligt."
+          ],
+          "toggle": {
+            "default": "home",
+            "options": [
+              {
+                "key": "home",
+                "label": "Hembaslinje"
+              },
+              {
+                "key": "security",
+                "label": "Säkerhetsbaslinje"
+              }
+            ],
+            "views": {
+              "home": {
+                "table": {
+                  "headers": [
+                    "Handling",
+                    "Vad du gör",
+                    "Varför gör du det",
+                    "Säkerhetseffekt"
+                  ],
+                  "rows": [
+                    [
+                      "Håll macOS uppdaterad",
+                      "Aktivera automatiska uppdateringar för macOS och vanliga appar. Starta om omedelbart för säkerhetsuppdateringar.",
+                      "Uppdateringar åtgärdar sårbarheter som angripare använder.",
+                      "Minskar exponeringen för kända utnyttjande."
+                    ],
+                    [
+                      "Aktivera FileVault",
+                      "Slå på FileVault fullständig diskkryptering och lagra återställningsinformation på ett säkert sätt.",
+                      "En stulen bärbar dator är ett dataintrång om disken är läsbar offline.",
+                      "Skyddar data i vila."
+                    ],
+                    [
+                      "Starkt skärmlås och lösenord",
+                      "Använd ett starkt lösenord, kort inaktiv låstid och kräv lösenord direkt efter viloläge eller skärmsläckare.",
+                      "Fysisk åtkomst är vanligt och ofta förbises.",
+                      "Minskar risken från opportunistisk åtkomst och stöld."
+                    ],
+                    [
+                      "Aktivera brandväggen",
+                      "Slå på macOS brandväggen och granska vilka appar som tillåts inkommande anslutningar.",
+                      "Det minskar oönskade inkommande anslutningar på opålitliga nätverk.",
+                      "Minskar exponeringen för nätverksupptäckt och inkommande sondering."
+                    ],
+                    [
+                      "Använd smygläge när du är på offentliga nätverk",
+                      "Aktivera smygläge om du reser eller använder allmänt wifi ofta.",
+                      "Det minskar svaren på vissa nätverkssonder.",
+                      "Sänker sikten till opportunistisk skanning."
+                    ],
+                    [
+                      "Använd en standardanvändare för det dagliga arbetet",
+                      "Undvik att köra som administratör för dagliga uppgifter och använd endast höjd när det behövs.",
+                      "Administratörssessioner förstärker effekten av nätfiske och opålitlig programvara.",
+                      "Begränsar missbruk av privilegier och oavsiktliga riskabla ändringar."
+                    ],
+                    [
+                      "Håll Gatekeeper aktiverat",
+                      "Tillåt appar från App Store och identifierade utvecklare om du inte har en specifik orsak att åsidosätta.",
+                      "Det minskar chansen att köra opålitliga eller manipulerade appar.",
+                      "Minskar risken för opålitlig exekvering."
+                    ]
+                  ]
+                }
+              },
+              "security": {
+                "table": {
+                  "headers": [
+                    "Handling",
+                    "Vad du gör",
+                    "Varför gör du det",
+                    "Säkerhetseffekt"
+                  ],
+                  "rows": [
+                    [
+                      "Genomför baslinjen via MDM eller profiler",
+                      "Använd konfigurationsprofiler för att genomdriva en baslinje: uppdateringar, låspolicy, brandvägg och säkerhetsinställningar.",
+                      "Manuell härdning driver snabbt över flottorna.",
+                      "Konsekvent hållning och mätbar följsamhet."
+                    ],
+                    [
+                      "Hantera FileVault med enhetshantering",
+                      "Aktivera FileVault till MDM och spärra återställningsnycklar med ett godkänt arbetsflöde.",
+                      "Återställningshantering är en del av säker kryptering.",
+                      "Skyddar data i vila samtidigt som återställningen kontrolleras."
+                    ],
+                    [
+                      "Begränsa lokal administratör och höj avsiktligt",
+                      "Minimera lokala administratörsanvändare, använd separata administratörskonton och överväg arbetsflöden för administratörsgodkännande i hanterade miljöer.",
+                      "Lokal administratör möjliggör beständighet och säkerhetsinaktivering.",
+                      "Minskar angriparens kontroll efter första kompromiss."
+                    ],
+                    [
+                      "Skärp brandväggspolicy och fjärrtjänster",
+                      "Aktivera brandvägg och begränsa delningstjänster. Inaktivera fjärrinloggning och skärmdelning om det inte krävs och begränsa sedan till hanteringsnätverk.",
+                      "Inbyggda tjänster kan exponera system oväntat i nätverk.",
+                      "Minskade fjärringångar och förbättrad inneslutning."
+                    ],
+                    [
+                      "Kontrollera integritetsbehörigheter (PPPC)",
+                      "Använd profiler för att hantera sekretessbehörigheter för känsliga resurser som Full Disk Access, skärminspelning och tillgänglighet.",
+                      "Angripare och oönskad programvara missbrukar dessa behörigheter för uthållighet och dataåtkomst.",
+                      "Minskar behörighetsmissbruk vid OS-behörighetslagret."
+                    ],
+                    [
+                      "Härda utvecklare och administratörsverktyg",
+                      "Standardisera på godkända verktyg, begränsa otillförlitliga kärntillägg och övervaka efter nya LaunchAgents och LaunchDaemons.",
+                      "Persistens på macOS använder ofta startmekanismer och missbruk av betrodda verktyg.",
+                      "Förbättrar förebyggande och upptäckt av persistens."
+                    ],
+                    [
+                      "Centralisera loggning och detektering",
+                      "Samla säkerhetsrelevanta loggar och integrera med EDR där det är tillgängligt. Varning om administratörsändringar och misstänkta exekveringsmönster.",
+                      "Endast lokal sikt är ömtålig efter kompromiss.",
+                      "Bättre upptäckt och snabbare respons."
+                    ],
+                    [
+                      "Begränsa inkommande nåbarhet",
+                      "Använd nätverkskontroller eller VPN för hanteringsåtkomst. Undvik att exponera macOS tjänster direkt för internet.",
+                      "Att minska exponeringen slår ofta att lägga till fler lokala kontroller.",
+                      "Lägre attackyta och minskad risk för brute force."
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          "callout": {
+            "type": "warn",
+            "title": "Var försiktig med filtblock",
+            "text": "Alltför strikta appkontroller kan bryta legitima arbetsflöden. Börja med verkställighet på områden med högst risk och utöka med uppmätta undantag."
+          }
+        }
+      ],
+      "signals": [
+        "FileVault avaktiverad eller återställningsnyckelhanteringen ändras oväntat",
+        "Brandvägg eller delningstjänster stängdes av utan en ändringsbegäran",
+        "Nya administratörsanvändare eller behörighetsändringar",
+        "Nya LaunchAgents eller LaunchDaemons som inte matchar förväntad programvara"
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Mental modell: behåll starka standardinställningar och kontrollera exekvering",
+            "paragraphs": [
+              "macOS härdning fungerar bäst när du respekterar plattformsmodellen: starka standardinställningar plus uttryckligt användarmedgivande för känsliga åtgärder. Målet är att behålla dessa standardinställningar intakta och minska vägar som går förbi dem.",
+              "En användbar mental modell är execution trust plus data trust. Exekveringsförtroende är vilken kod som får köras och hur den får behörigheter. Dataförtroende är vilka identiteter som kan komma åt känslig data och hur förlust eller stöld hanteras.",
+              "Många macOS kontroller är byggda kring användarens avsikt, till exempel uppmaningar och integritetsbehörigheter. Härdning handlar dels om att göra uppmaningar meningsfulla och dels om att förhindra tyst bypass genom överdrivna administratörsrättigheter.",
+              "• Håll OS-säkerhetsfunktionerna aktiverade eftersom de är utformade för att fungera tillsammans.",
+              "• Kontrollera vem som är administratör eftersom administratörsrättigheter kan åsidosätta många skydd.",
+              "• Behandla konfigurationsprofiler som det hållbara sättet att uttrycka policy."
+            ]
+          },
+          {
+            "title": "Baslinjeprioriteringar för macOS slutpunkter",
+            "paragraphs": [
+              "En stark baslinje för macOS fokuserar på kodexekveringskontroller och på att skydda användardata. Den största praktiska risken är opålitlig programvara plus användarbehörighet, som kan se legitim ut samtidigt som den är skadlig.",
+              "Exekveringskontrollen är mer subtil än på vissa plattformar. Gatekeeper, notarisering och sekretessmeddelanden minskar risken, men de är beroende av att användarna inte är utbildade för att klicka sig igenom. Designa din baslinje så att användarna ser färre förvirrande uppmaningar.",
+              "Dataskyddet fungerar också: kryptering, starkt skärmlås och säkra säkerhetskopior minskar skadorna på en förlorad bärbar dator och minskar trycket för att försvaga kontrollerna för bekvämlighet.",
+              "Avvägning att förvänta sig: kreativa arbetsflöden och utvecklare behöver ofta bredare behörigheter, osignerade verktyg eller ytterligare nätverksåtkomst. Det säkra tillvägagångssättet är att anpassa dessa behov till specifika maskiner eller profiler snarare än att göra hela flottan tillåtande.",
+              "En annan avvägning är integritet kontra övervakning. Mer telemetri kan hjälpa till att upptäcka, men det kan också skapa problem med användarnas förtroende. Var tydlig med vad du samlar in, varför och vem som kan komma åt det.",
+              "När du kopplar av kontrollerna, föredrar du reversibla avslappningar, som att ge en specifik behörighet för en specifik app, istället för att inaktivera en plattformskontroll globalt."
+            ]
+          },
+          {
+            "title": "Vanliga fällor som undergräver macOS säkerhet",
+            "paragraphs": [
+              "En vanlig fälla är att man förlitar sig på tanken att macOS är säker som standard. Standardinställningarna hjälper, men verklig risk uppstår när användare kör programvara från tredje part, behåller lokal administratör eller ignorerar uppdateringsmeddelanden i flera veckor.",
+              "En annan fälla är att använda administratörskonton för det dagliga arbetet. Många tillståndsmeddelanden blir mindre meningsfulla om användaren alltid kan godkänna ändringar utan friktion och utan förbiseende.",
+              "Var försiktig med säkerhetsverktyg från tredje part som kräver djup systemåtkomst. De kan utöka attackytan och kan pressa användare att inaktivera skydd. Använd dem bara när du har en tydlig fördel och en uppdateringsplan.",
+              "Misslyckanden i vagnparkshanteringen dyker också upp som säkerhetsproblem: ohanterade enheter, inkonsekventa profiler och saknat lager skapar blinda fläckar som angripare älskar.",
+              "• Tillståndströtthet: om användare ser för många uppmaningar kommer de att godkänna allt. Minska brus så att riktiga uppmaningar sticker ut.",
+              "• Shadow IT: ett ej godkänt verktyg med breda behörigheter kan undergräva hela baslinjen."
+            ]
+          },
+          {
+            "title": "Praktisk härdning för enskilda enheter och flottor",
+            "paragraphs": [
+              "För enstaka enheter kommer hållbarhet från vanor: uppdatera kadens, minsta privilegium och en enkel inventering av vad som är installerat. För flottor kommer hållbarheten från policytillämpning genom konfigurationsprofiler och MDM.",
+              "Ett operativt härdande tillvägagångssätt är att separera baslinjekontroller från rollbaserade tillägg. Baslinjen täcker grunderna, sedan lägger du till rollprofiler för utvecklare, designers eller support, var och en med begränsade undantag.",
+              "Planera för fellägen som förlorade enheter, stulna autentiseringsuppgifter och intrång i användarkonton. Din härdning är starkare om du kan återkalla åtkomst snabbt och torka eller låsa enheter vid behov.",
+              "När ska man slappna av detta: vissa team behöver kärntillägg, felsökningsverktyg eller lokala tjänster. Det säkra mönstret är att hålla dessa enheter i en separat hanteringsgrupp, kräva starkare autentisering och öka övervakningen för dessa grupper.",
+              "Dokumentera orsak och gränsen: vad som är tillåtet, var det är tillåtet och vilken kompenserande kontroll som minskar risken.",
+              "Behandla avslappningar som tillfälliga tills det visar sig nödvändigt. Granska dem enligt ett schema eftersom många undantag bara finns på grund av gamla arbetsflöden."
+            ]
+          },
+          {
+            "title": "Verifiering och bevis: vad ska man kontrollera regelbundet",
+            "paragraphs": [
+              "Verifiering på macOS bör balansera inställningskontroller med beteendekontroller. Det är möjligt för en enhet att ha korrekta inställningar men ändå vara riskabelt på grund av installerad programvara och beviljade behörigheter.",
+              "Börja med grunderna: krypteringsstatus, skärmlåsställning, uppdateringsstatus och om plattformens säkerhetsfunktioner är aktiverade. Bra ser ut som en enhet som är aktuell och inte kräver speciella åtgärder för att hålla sig skyddad.",
+              "Verifiera sedan den känsliga behörighetsytan. Granska vilka appar som har tillgång till full disk, tillgänglighet, skärminspelning, kamera, mikrofon och automation. Bra ser ut som en kort lista över godkända appar med tydlig motivering.",
+              "Så här verifierar du och hur det ser ut:",
+              "• Plattformsskydd: nyckelskydd är aktiverade och inte i ett reducerat säkerhetsläge utan en dokumenterad orsak",
+              "• Administratörshållning: dagliga användare är standardanvändare där det är möjligt, och administratörshöjning är avsiktlig",
+              "• Inventering: installerade appar är kända och osignerade eller icke-notariserade appar är sällsynta och granskade",
+              "När du ska koppla av detta: labbmaskiner, isolerade demoenheter eller dedikerade utvecklingsslutpunkter. Dokumentera vad som är avslappnat och kräver en återställningsplan, till exempel omregistrering eller ombilder, så att avslappningar inte glider över i långvarig exponering."
+            ]
+          }
+        ]
+      },
+      "references": [
+        {
+          "label": "Apple Platform Security guide",
+          "url": "https://help.apple.com/pdf/security/en_US/apple-platform-security-guide.pdf"
+        },
+        {
+          "label": "Manage FileVault with device management",
+          "url": "https://support.apple.com/guide/deployment/manage-filevault-with-device-management-dep0a2cb7686/web"
+        },
+        {
+          "label": "Use stealth mode on macOS firewall",
+          "url": "https://support.apple.com/guide/mac-help/mh17133/mac"
+        },
+        {
+          "label": "Intune macOS endpoint protection settings",
+          "url": "https://learn.microsoft.com/en-us/intune/intune-service/protect/endpoint-protection-macos"
+        }
+      ]
+    },
+    {
+      "id": "ssh",
+      "title": "SSH",
+      "intro": "SSH är ofta den primära kanalen för fjärradministration. Härdning av SSH handlar om stark autentisering, strikt åtkomstkontroll och säker drift, så att fjärråtkomst förblir tillförlitlig utan att bli en enkel ingångspunkt.",
+      "objectives": [
+        "Konfigurera SSH för stark autentisering och begränsad exponering",
+        "Minska risken för brute force och dra åt vem som kan logga in",
+        "Använd modern driftpraxis för administratörsåtkomst och nyckelhantering",
+        "Validera ändringar på ett säkert sätt och undvik att låsa dig ute"
+      ],
+      "atAGlance": [
+        {
+          "title": "Huvudmål",
+          "items": [
+            "Nycklar eller certifikat istället för lösenord där det är möjligt",
+            "Ingen direkt rotinloggning och rensa listor för användares tillåtelse",
+            "Begränsad nätverksexponering och hastighetsbegränsning",
+            "Loggar så att du kan undersöka åtkomstförsök"
+          ]
+        },
+        {
+          "title": "Hög effektkontroller",
+          "items": [
+            "Inaktivera lösenordsautentisering om möjligt",
+            "Ställ in PermitRootLogin på ingen eller förbjud lösenordsbaserad rotinloggning",
+            "Använd AllowUsers eller AllowGroups för att begränsa åtkomsten",
+            "Använd en bastion eller VPN istället för att exponera SSH offentligt"
+          ]
+        },
+        {
+          "title": "Praktiskt arbetsflöde",
+          "items": [
+            "Testa ändringar i en andra session innan du startar om sshd",
+            "Behåll nödåtkomstplaner och kända bra konfigurationer",
+            "Vrid på nycklar och ta bort åtkomst omedelbart när folk går",
+            "Övervaka autentiseringsloggar för misslyckade inloggningar och ovanliga källor"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "title": "Översikt",
+          "paragraphs": [
+            "SSH härdning handlar mindre om hemliga magiska inställningar och mer om att kontrollera förtroendegränser. Bestäm vem som kan nå SSH-tjänsten, vem som kan autentisera och vad de kan göra efter inloggning.",
+            "Nyckelbaserad autentisering är vanligtvis starkare än lösenord eftersom den inte är sårbar för onlinegissning på samma sätt. Att kombinera nycklar med nätverksrestriktioner och hastighetsbegränsning minskar drastiskt risken för brute force.",
+            "Driftsäkerhet har betydelse. Tillämpa alltid ändringar medan du har en andra öppen session, och validera konfigurationssyntaxen innan du startar om tjänsten."
+          ],
+          "bullets": [
+            "Föredrar nycklar eller certifikat och inaktivera lösenord där det är möjligt",
+            "Tillåt inte direkt rotinloggning och använd sudo för elevation",
+            "Begränsa åtkomst efter användare, grupp och källnätverk",
+            "Logga och övervaka autentiseringshändelser"
+          ],
+          "callout": {
+            "type": "warn",
+            "title": "Undvik självlåsning",
+            "text": "Innan du startar om sshd, håll en andra session öppen och validera konfigurationssyntaxen. Ett misstag kan avbryta fjärråtkomst."
+          }
+        },
+        {
+          "title": "Härdningsåtgärder",
+          "paragraphs": [
+            "Varje åtgärd nedan är säker på de flesta system, men validera alltid i en testsession. Alla miljöer kan inte inaktivera lösenord omedelbart, så behandla listan som en stegvis härdningsplan."
+          ],
+          "table": {
+            "headers": [
+              "Handling",
+              "Vad du gör",
+              "Varför gör du det",
+              "Säkerhetseffekt"
+            ],
+            "rows": [
+              [
+                "Använd SSH-tangenterna för autentisering",
+                "Generera nycklar per användare, lagra privata nycklar säkert och distribuera offentliga nycklar till auktoriserade nycklar.",
+                "Nycklar är resistenta mot onlinegissning och kan roteras per användare.",
+                "Minskar meriters fyllning och brute force effektivitet."
+              ],
+              [
+                "Inaktivera lösenordsautentisering där det är möjligt",
+                "Ställ in lösenordsautentisering på nej och se till att alla användare har fungerande nycklar först.",
+                "Lösenord är lätta att råka ut för och lätta att nätfiska.",
+                "Eliminerar lösenordsbaserad brute force som en ingångsväg."
+              ],
+              [
+                "Inaktivera direkt rotinloggning",
+                "Ställ in PermitRootLogin på ingen eller åtminstone förbjud lösenordsbaserad rotinloggning och använd sudo för elevation.",
+                "Root är ett högvärdigt mål och ofta brutalt forcerat.",
+                "Minskar risken för direkt privilegieövertagande."
+              ],
+              [
+                "Begränsa vem som kan logga in",
+                "Använd AllowUsers eller AllowGroups för att definiera explicita tillåtna identiteter.",
+                "En mindre tillåten uppsättning minskar exponeringen och förenklar övervakningen.",
+                "Begränsar åtkomst och minskar risken för kontomissbruk."
+              ],
+              [
+                "Begränsa nätverksexponeringen",
+                "Bind SSH till hanteringsgränssnitt, använd brandväggsregler och föredrar VPN eller en bastionvärd för internetåtkomst.",
+                "Om färre nätverk kan nå SSH, kan färre angripare testa autentiseringsuppgifter.",
+                "Stor minskning av attackytan."
+              ],
+              [
+                "Aktivera hastighetsbegränsning och missbrukskontroller",
+                "Använd verktyg som fail2ban eller brandväggshastighetsgränser för att bromsa upprepade fel.",
+                "Angripare förlitar sig på gissningar med hög volym.",
+                "Minskar brute force-genomströmning och buller."
+              ],
+              [
+                "Använd moderna kryptostandarder",
+                "Håll OpenSSH uppdaterad och undvik att aktivera äldre chiffer eller svaga nyckeltyper för kompatibilitet om det inte krävs.",
+                "Äldre kryptoalternativ är svagare och ökar risken.",
+                "Förbättrar sessionernas konfidentialitet och integritet."
+              ],
+              [
+                "Logga och övervaka SSH aktivitet",
+                "Samla in autentiseringsloggar och varna om upprepade fel, nya källplatser och administratörsinloggningar.",
+                "SSH attacker är synliga om du tittar på rätt signaler.",
+                "Förbättrar detekterings- och utredningskvaliteten."
+              ],
+              [
+                "Använd separata administratörskonton",
+                "Använd inte personliga konton för privilegierade uppgifter. Använd sudo med auditerbarhet.",
+                "Det minskar oavsiktlig privilegiekrypning och förbättrar ansvarsskyldigheten.",
+                "Bättre spårbarhet och minskad sprängradie."
+              ]
+            ]
+          },
+          "callout": {
+            "type": "tip",
+            "title": "Ändra en sak i taget",
+            "text": "Vänd inte många SSH inställningar samtidigt. Tillämpa, validera och dokumentera varje ändring så att du kan rulla tillbaka på ett säkert sätt."
+          }
+        }
+      ],
+      "signals": [
+        "Upprepade autentiseringsfel från många IP-adresser",
+        "Framgångsrika inloggningar från nya geografier eller ovanliga undernät",
+        "Oväntade root-inloggningsförsök eller sudo toppar",
+        "Nya nycklar har lagts till auktoriserade nycklar utan en spårad ändring"
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Mental modell: SSH är ditt ledningsplan",
+            "paragraphs": [
+              "SSH är inte bara ett inloggningsverktyg, det är ett kontrollplan. Om SSH misslyckas får din angripare samma hanteringsräckvidd som dina administratörer. Det är därför SSH härdning bör behandlas som att skydda en API för full systemkontroll.",
+              "En användbar mental modell är identitet plus kanal plus auktoritet. Identitet är hur du autentiserar. Kanal är hur sessioner upprättas och vidarebefordras. Auktoritet är vad sessionen kan göra när den är ansluten.",
+              "SSH härdning lyckas när du gör identiteten stark, gör sessioner förutsägbara och gör privilegierade handlingar granskbara. Du måste också undvika lockouter, eftersom lockouttryck får människor att försvaga konfigurationer permanent.",
+              "• Minska vem som kan försöka logga in, inte bara vem som kan lyckas.",
+              "• Minska vad en session kan nå, till exempel genom att begränsa vidarebefordran och begränsa adminomfattningen.",
+              "• Öka bevis: sessionsloggar och tydliga register över nyckelägande."
+            ]
+          },
+          {
+            "title": "Baslinjeprioriteter i sshd-konfiguration",
+            "paragraphs": [
+              "Den största säkerhetsvinsten kommer vanligtvis från att kontrollera autentiseringsmetoder och begränsa antalet tillåtna användare. Nycklar är säkrare än lösenord när de hanteras väl, men ohanterade nycklar kan bli en osynlig bakdörr.",
+              "Nyckelhantering har avvägningar: om du inaktiverar lösenordsinloggningar måste du vara säker på din nyckellivscykel, inklusive rotation och återkallelse. Annars blir en stulen privat nyckel en långlivad legitimation.",
+              "Modern SSH-härdning handlar också om att begränsa riskabla funktioner som är bekväma men som utökar räckvidden, som agentsändning, TCP-sändning och obegränsade hamntunnlar.",
+              "En annan kompromiss är användbarhet inom automatisering. CI-system och konfigurationshantering behöver åtkomst. Det säkra mönstret är att använda separata tjänstekonton, scoped principals och begränsade kommandon snarare än att ge bred interaktiv åtkomst.",
+              "När du antar striktare inställningar, planera en säker utrullning så att du kan bekräfta åtkomsten innan du stänger den sista dörren.",
+              "En bra konfiguration är en du kan förklara. Om du inte kan förklara varför ett direktiv finns, kommer det att missbrukas under incidentrespons."
+            ]
+          },
+          {
+            "title": "Vanliga fällor i SSH härdning",
+            "paragraphs": [
+              "Ett vanligt felläge är att behandla SSH som inställt och glömt. Med tiden läggs fler nycklar till, gamla konton förblir aktiverade och undantag görs för enkelhetens skull. Åtkomstytan växer långsamt.",
+              "En annan fälla är att endast förlita sig på nätverksplats. SSH som exponeras för interna nätverk attackeras fortfarande genom komprometterade slutpunkter, VPN åtkomst och feldirigerad trafik. Antag att angripare kan nå interna SSH så småningom.",
+              "Operativa misstag spelar också roll: administratörer testar ändringar på fel värd, glömmer att ladda om eller underhåller flera konfigurationsfiler som beter sig annorlunda än förväntat.",
+              "Se upp för dold nåbarhet genom vidarebefordran. En användare med SSH-åtkomst kan ofta skapa tunnlar som kringgår nätverkskontroller om vidarebefordran inte är begränsad.",
+              "• Föräldralösa nycklar: nycklar utan ägare är hög risk eftersom du inte kan rotera dem med förtroende.",
+              "• Missbruk av krossglas: nödåtkomst som blir daglig åtkomst är en förutsägbar väg till svag autentisering."
+            ]
+          },
+          {
+            "title": "Säker utrullning och förändringskontroll",
+            "paragraphs": [
+              "Säker förändringskontroll för SSH är inte byråkrati, det är hur man undviker lockouter och undviker att försvaga kontroller under press. Validera alltid nya inställningar i en parallell session innan du stänger din sista arbetssession.",
+              "Rulla ut ändringar i etapper. Börja med en kanariefågelvärd, sedan en undergrupp av värdar och sedan flottan. Om du har en bastionmodell, tillämpa strängare regler vid bastionen först eftersom det är chokepunkten.",
+              "Använd explicita tillåtelselistor för vem som kan logga in och varifrån. Detta minskar chansen att ett oväntat konto eller nyckel fungerar tyst.",
+              "När ska du slappna av härdning: ibland behöver du tillfällig lösenordsautentisering för en leverantör eller en tillfällig tunnel för migrering. Det säkra mönstret är tidsboxad tillgång plus övervakning, sedan automatisk återgång.",
+              "Dokumentera undantag som du skulle dokumentera brandväggsregler: omfattning, ägare, utgångsdatum och teststeg för att bekräfta borttagning.",
+              "Föredrar att slappna av genom att begränsa omfattningen istället för att försvagas globalt, tillåt till exempel en användare från ett källnätverk under en kort period."
+            ]
+          },
+          {
+            "title": "Loggning och detektering som kompletterar härdning",
+            "paragraphs": [
+              "SSH härdning behöver detekteras för att fånga upp det som härdning inte kan förhindra, såsom stulna nycklar eller insidermissbruk. Målet är att synliggöra onormal åtkomst snabbt.",
+              "Verifiering börjar med att bekräfta effektiv konfiguration, inte bara vad som är skrivet i en fil. Olika inkluderar och matchningsblock kan få två värdar att bete sig olika även om de ser likadana ut.",
+              "Så här verifierar du och hur det ser ut:",
+              "• Effektiv konfiguration: du kan bekräfta den slutgiltiga utvärderade konfigurationen och den matchar din avsikt",
+              "• Åtkomstyta: inloggningsförsök kommer från förväntade nätverk och den tillåtna användarlistan är kort",
+              "• Autentiseringsbeteende: lösenordsautentisering inaktiveras där det är avsett, och nyckelbaserad autentisering är knuten till kända ägare",
+              "• Sessionsbevis: loggar visar vem som anslutit, varifrån och vad som kördes för privilegierade sökvägar",
+              "När du ska slappna av detta: akut återhämtning och initial bootstrap. Dokumentera bootstrap-fönstret, håll det kort och se till att värden automatiskt övergår till standardbaslinjen.",
+              "Behandla varje permanent avslappning som en riskacceptans. Para ihop den med kompenserande kontroller som tightare nätverksomfång, starkare MFA vid en gateway eller sessionsinspelning."
+            ]
+          }
+        ]
+      },
+      "references": [
+        {
+          "label": "sshd_config manual",
+          "url": "https://man7.org/linux/man-pages/man5/sshd_config.5.html"
+        },
+        {
+          "label": "OpenSSH on Debian manpage",
+          "url": "https://manpages.debian.org/testing/openssh-server/sshd_config.5.en.html"
+        }
+      ]
+    },
+    {
+      "id": "fw",
+      "title": "Brandvägg",
+      "intro": "Brandväggshärdning handlar om att upprätthålla minsta privilegium för nätverksflöden. En bra brandväggspolicy blockerar som standard, tillåter bara det som krävs och hanteras som en levande artefakt med recensioner, loggning och ändringskontroll.",
+      "objectives": [
+        "Designregler som återspeglar verkliga applikationsbehov och förtroendegränser",
+        "Minska inkommande och utgående exponering med minsta privilegium",
+        "Gör brandväggsändringar granskbara, testbara och reversibla",
+        "Använd loggning för att validera policy och stödja utredningar"
+      ],
+      "atAGlance": [
+        {
+          "title": "Huvudmål",
+          "items": [
+            "Standard neka där det är möjligt med uttryckliga tillåtelseregler",
+            "Tydlig segmentering mellan zoner och roller",
+            "Regellivscykelhantering med ägare och recensioner",
+            "Loggar som är användbara, inte bara bullriga"
+          ]
+        },
+        {
+          "title": "Hög effektkontroller",
+          "items": [
+            "Ingress tillåter listor baserade på appportar och källor",
+            "Utgående kontroller för servrar och administratörsnätverk",
+            "Separat hanteringsplan från användar- och internetzoner",
+            "Regelbunden granskning och städning för att förhindra spridning"
+          ]
+        },
+        {
+          "title": "Praktiskt arbetsflöde",
+          "items": [
+            "Dokumentera de tänkta flödena innan du skriver regler",
+            "Implementera minsta privilegium och verifiera med loggar och testning",
+            "Granska regler på ett schema och ta bort inaktuella undantag",
+            "Behandla brandväggsändringar som kod med versionsbaserade säkerhetskopior"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "title": "Översikt",
+          "paragraphs": [
+            "En brandvägg är inte bara en enhet eller en funktion. Det är policyn som avgör vilka nätverksflöden som är tillåtna. De flesta brandväggsfel kommer från oklara krav och okontrollerad ökning av undantag.",
+            "Nätverk med minst privilegier börjar med att förstå förtroendegränser. Olika zoner bör ha olika regler och ledningstrafik bör behandlas som högrisk och hårt kontrollerad.",
+            "Loggning är en del av kontrollen. Du behöver tillräckligt med synlighet för att validera att reglerna stämmer överens med verkligheten och för att undersöka misstänkt trafik, men inte så mycket att allt blir buller."
+          ],
+          "bullets": [
+            "Börja med standard neka inkommande där det är möjligt",
+            "Tillåt endast nödvändiga källor och destinationer, inte hela undernät av vana",
+            "Segmentera efter roll: användare, servrar, hantering och internetfördelar",
+            "Granska reglerna regelbundet och ta bort inaktuella poster"
+          ],
+          "callout": {
+            "type": "tip",
+            "title": "Policy först, regler sedan",
+            "text": "Skriv policyn i klartext innan du skriver regler. Det förhindrar oavsiktlig exponering och gör recensioner mycket enklare."
+          }
+        },
+        {
+          "title": "Härdningsåtgärder",
+          "paragraphs": [
+            "Använd reglaget för att växla mellan en hemmabaslinje och en striktare säkerhetsbaslinje. Samma principer gäller, men säkerhetsbaslinjen lägger till styrning och stramare utgående kontroll."
+          ],
+          "toggle": {
+            "default": "home",
+            "options": [
+              {
+                "key": "home",
+                "label": "Hembaslinje"
+              },
+              {
+                "key": "security",
+                "label": "Säkerhetsbaslinje"
+              }
+            ],
+            "views": {
+              "home": {
+                "table": {
+                  "headers": [
+                    "Handling",
+                    "Vad du gör",
+                    "Varför gör du det",
+                    "Säkerhetseffekt"
+                  ],
+                  "rows": [
+                    [
+                      "Standardblockera inkommande",
+                      "Blockera oönskade inkommande anslutningar och tillåt endast tjänster som du avsiktligt exponerar.",
+                      "De flesta hemenheter behöver inte inkommande tjänster på internet.",
+                      "Minskar exponeringen för skanningar och opportunistiskt utnyttjande."
+                    ],
+                    [
+                      "Tillåt etablerad och relaterad trafik",
+                      "Använd tillståndsregler så att svar på utgående anslutningar tillåts automatiskt.",
+                      "Det behåller användbarheten samtidigt som det blockerar oönskade inkommande.",
+                      "Upprätthåller funktionalitet utan att öppna breda inkommande regler."
+                    ],
+                    [
+                      "Begränsa administratörstjänster till ditt LAN",
+                      "Om du kör SSH eller administratörsgränssnitt, begränsa dem till lokala nätverk eller endast VPN.",
+                      "Administratörsgränssnitt är vanliga attackmål.",
+                      "Minskar risken för fjärrövertagande."
+                    ],
+                    [
+                      "Håll routern och brandväggen uppdaterad",
+                      "Tillämpa leverantörsuppdateringar och inaktivera fjärrhantering om du inte verkligen behöver det.",
+                      "Edge-enheter är högt värderade och ofta riktade.",
+                      "Minskar risken från sårbarheter för edge-enheter."
+                    ],
+                    [
+                      "Aktivera grundläggande loggning för block",
+                      "Logga bort inkommande försök och granska då och då för ovanliga mönster.",
+                      "Du kan inte validera policy utan synlighet.",
+                      "Ger bevis på skanning och blockerade försök."
+                    ],
+                    [
+                      "Använd DNS-filtrering om tillgängligt",
+                      "Använd en betrodd resolver eller filtreringstjänst för att blockera kända skadliga domäner.",
+                      "Många hot förlitar sig på DNS för kommando och kontroll.",
+                      "Minskar exponeringen för skadlig infrastruktur."
+                    ],
+                    [
+                      "Separat gäst WiFi",
+                      "Använd ett gästnätverk för opålitliga enheter och besökare.",
+                      "Segmentering minskar risken för sidorörelser hemma.",
+                      "Innehåller kompromiss till en mindre zon."
+                    ]
+                  ]
+                }
+              },
+              "security": {
+                "table": {
+                  "headers": [
+                    "Handling",
+                    "Vad du gör",
+                    "Varför gör du det",
+                    "Säkerhetseffekt"
+                  ],
+                  "rows": [
+                    [
+                      "Definiera en brandväggspolicy med ägarna",
+                      "Dokumentera tillåtna flöden per zon, tilldela ägare och kräver granskning för undantag.",
+                      "Utan styrning blir reglerna en hög med permanenta undantag.",
+                      "Förbättrar kontrollkvaliteten och minskar oavsiktlig exponering."
+                    ],
+                    [
+                      "Standard neka plus explicit tillåtelse per applikation",
+                      "Tillåt endast nödvändiga portar och protokoll för varje app och begränsa efter källa och destination.",
+                      "Breda regler är lätta att missbruka och svåra att granska.",
+                      "Minskar attackytan och rörelsevägarna i sidled."
+                    ],
+                    [
+                      "Segmentera nätverk i zoner",
+                      "Separera användar-, server-, hanterings- och internetkantzoner och upprätthåll explicit interzonpolicy.",
+                      "Segmentering begränsar sprängradien efter kompromiss.",
+                      "Innehåller incidenter och minskar pivotmöjligheter."
+                    ],
+                    [
+                      "Implementera utgående kontroller",
+                      "Begränsa utgående trafik för servrar och känsliga nätverk. Tillåt endast nödvändiga destinationer och portar.",
+                      "Många attacker är beroende av utgående åtkomst för kommando och kontroll och dataexfiltrering.",
+                      "Minskar exfiltration och C2 tillförlitlighet."
+                    ],
+                    [
+                      "Förstärk hanteringsåtkomsten",
+                      "Begränsa brandväggshanteringen till dedikerade administratörsnätverk, använd MFA och logga alla ändringar.",
+                      "Brandväggsadministratörsåtkomst är en tillgång på högsta nivå.",
+                      "Minskar risken för policymanipulation."
+                    ],
+                    [
+                      "Aktivera meningsfull loggning och lagring",
+                      "Logga nekar på kritiska gränser, prov tillåter där det behövs och sparar loggar centralt för undersökningar.",
+                      "Loggar stödjer upptäckt och incidentrespons.",
+                      "Förbättrar upptäckten och stödjer kriminalteknik."
+                    ],
+                    [
+                      "Granska och städa upp regler enligt ett schema",
+                      "Kör regelbundna granskningar för att ta bort inaktuella regler och skärpa över breda.",
+                      "Rule sprawl är det vanligaste brandväggsfelet i verkliga världen.",
+                      "Minskar dold exponering och förbättrar underhållsbarheten."
+                    ],
+                    [
+                      "Testa ändringar och behåll återställningsplaner",
+                      "Använd iscensättning eller kontrollerade ändringsfönster och behåll versionsbaserade säkerhetskopior av brandväggskonfigurationer.",
+                      "Brandväggar är kritisk infrastruktur. Dåliga förändringar orsakar avbrott.",
+                      "Säkrare operationer och snabbare återhämtning."
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          "callout": {
+            "type": "warn",
+            "title": "Undvik regler för tyst tillåtelse",
+            "text": "Regler som tillåter bred trafik utan granskning ackumuleras tyst. Om du inte kan förklara en regel bör du förmodligen ta bort eller skärpa den."
+          }
+        }
+      ],
+      "signals": [
+        "Plötslig ökning av tillåten utgående trafik från en serverroll",
+        "Nya regler läggs till utan biljett eller ägare",
+        "Länge levde regler som ingen kan motivera",
+        "Upprepade inkommande block från en enda källa som skannar flera portar"
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Mental modell: en brandvägg upprätthåller tillåtna flöden",
+            "paragraphs": [
+              "En brandvägg är policyupprätthållande punkt för nätverksflöden. Den djupa idén blockerar inte slumpmässiga portar, den uttrycker avsikt: vilka system kan prata, på vilka protokoll, för vilket ändamål och under vilka förhållanden.",
+              "En användbar mental modell är tillåt listade flöden plus tillstånd. Du definierar den lilla uppsättningen tillåtna flöden och brandväggen spårar anslutningstillståndet så att returtrafiken hanteras säkert.",
+              "Det svåra är att nätverken förändras. Tjänster flyttas, portar ändras och beroenden visas. En bra brandväggshållning förutser förändringar genom att göra regler läsbara, avgränsade och granskningsbara.",
+              "• En regel är ett affärsbeslut uttryckt som nätverkslogik.",
+              "• Omfattning är säkerhet: snävare källa, destination och serviceomfattning är nästan alltid säkrare än breda regler.",
+              "• Loggning är en del av tillsynen eftersom synlighet ändrar beteende och stödjer incidentrespons."
+            ]
+          },
+          {
+            "title": "Grundprioriteringar för brandväggspolicy",
+            "paragraphs": [
+              "Bra brandväggspolicy börjar med en inventering och en modell av förtroendezoner. Även på en enskild värdbrandvägg har du fortfarande zoner, till exempel loopback, lokalt subnät, VPN och internet.",
+              "Avvägningar är verkliga. En strikt standardförnekarställning minskar risken men ökar den operativa belastningen eftersom nya beroenden bryts tills du uttryckligen tillåter dem. Därför är dokumentation och förändringsflöde viktigt.",
+              "En annan avvägning är mellan grova regler som är lätta att hantera och fina regler som är säkrare. Grova regler är frestande, men de döljer ofta onödig exponering som blir dyr senare.",
+              "I verkliga miljöer är felläget vanligtvis inte en saknad regel, det är en alltför bred regel som skapas under ett avbrott och som aldrig återkommer.",
+              "När du måste öppna åtkomst snabbt, använd en tidsinramad regel, en snäv räckvidd och en uppföljningsgranskning. Detta hindrar nödsituationen från att bli baslinjen.",
+              "Policy bör även innehålla vad du inte tillåter, till exempel vilka utgående destinationer som är förbjudna eller vilka hanteringsportar som aldrig får exponeras."
+            ]
+          },
+          {
+            "title": "Vanliga fällor i brandväggskonfiguration",
+            "paragraphs": [
+              "En vanlig fälla är att blanda miljöer i samma regeluppsättning. När produktion, iscensättning och labb delar breda regler, blir den minst hårda miljön en språngbräda.",
+              "En annan fälla är skuggregler och regelordning. Du kan ha en strikt policy som förbigås av en tidigare bred tillåtsregel, särskilt när regler läggs till snabbt.",
+              "Loggningen kan också gå fel. Att logga allt skapar brus och lagringsproblem. Att logga ingenting tar bort bevis. Den praktiska vägen är att logga policyöverträdelser och känsliga händelser och sedan ställa in.",
+              "Akta dig för implicita ersättningar. Vissa plattformar tillåter automatiskt etablerade anslutningar, lokala tjänster eller vissa hjälpprotokoll. Om du inte förstår dessa beteenden kan din exponeringsmodell vara felaktig.",
+              "• Eventuella regler är sällan motiverade. Om du tror att du behöver en betyder det vanligtvis att du ännu inte förstår beroendet.",
+              "• Undantag utan ägare är för alltid, och för alltid undantag blir den verkliga policyn."
+            ]
+          },
+          {
+            "title": "Utgångskontroll och detekteringsfördelen",
+            "paragraphs": [
+              "Utgångskontroll är där många lag får överraskande värde, men det kommer med kompromisser. Blockering av okända utgående anslutningar kan begränsa dataexfiltrering och återuppringningar av skadlig programvara, men det kan också bryta programuppdateringar och molntjänster.",
+              "Ett praktiskt tillvägagångssätt är att börja med synlighet. Mät utgående destinationer och begränsa sedan gradvis. Många miljöer lyckas med allow-listning för en liten uppsättning servrar och en övervaka-först-strategi för endpoints.",
+              "Utgångsregler förbättrar också upptäckten. Om bara ett fåtal destinationer är normala, sticker ovanlig utgående trafik ut och kan utlösa utredning.",
+              "När ska man slappna av utgångskontroller: bärbara datorer för utvecklare, byggsystem och forskningsmaskiner behöver ofta bred utgående åtkomst. Det säkra mönstret är att dela upp dem i en distinkt policygrupp och öka övervakningen snarare än att försvaga utträdesreglerna överallt.",
+              "Dokumentera utgående undantag särskilt noggrant eftersom utgående åtkomst ofta korsar integritet och affärsverksamhet.",
+              "Använd tydliga taggar eller kommentarer så att du senare kan svara på varför ett flöde finns och vem som godkände det."
+            ]
+          },
+          {
+            "title": "Livscykel: granskning, testning och säker förändring",
+            "paragraphs": [
+              "Brandväggshärdning är en livscykelaktivitet. Du bör förvänta dig att regler läggs till, tas bort och justeras. Skillnaden mellan säkra och osäkra miljöer är om den livscykeln är kontrollerad.",
+              "Verifiering bör kontrollera både avsikt och effekt. En regel som finns men aldrig träffas kan vara död kod. En regel som träffas konstant kan vara för bred eller kan återspegla en saknad uppströmskontroll.",
+              "Så här verifierar du och hur det ser ut:",
+              "• Standardställning: ej obligatorisk inkommande trafik nekas som standard, och explicita tillåtelser är smala",
+              "• Täckning: ledningsåtkomst är begränsad till kända källor och loggas för utredning",
+              "• Ändringssäkerhet: regeländringar granskas och testas, och nödändringar ses över",
+              "• Bevis: loggar eller räknare låter dig se förnekar och kritiska tillåtelser utan att drunkna i buller",
+              "När ska du slappna av detta: under migrering, incidentrespons eller tillfällig leverantörsåtkomst. Dokumentera omfattningen och återställningsplanen och schemalägg sedan en granskning för att ta bort avlastningen.",
+              "Bra brandväggar är tråkiga. Om du inte kan beskriva regeluppsättningen snabbt kan du förmodligen inte försvara den under en incident."
+            ]
+          }
+        ]
+      },
+      "references": [
+        {
+          "label": "NIST Guidelines on Firewalls and Firewall Policy",
+          "url": "https://csrc.nist.gov/pubs/sp/800/41/r1/final"
+        },
+        {
+          "label": "NIST Guide to General Server Security",
+          "url": "https://csrc.nist.gov/pubs/sp/800/123/final"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+<!-- templates/concepts_hub.html v4 bygger vidare på v3 -->
+{% extends "base.html" %}
+{% block title %}{{ _('Concepts') }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-white">{{ _('Concepts') }}</h1>
+    <p class="mt-2 text-slate-300">{{ _('Explore categories and drill into details.') }}</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:items-start">
+
+    {% set cards = [
+      (_('Frameworks and Standards'), 'frameworks-and-standards', concepts.frameworksAndStandards, '🧩', _('Mental models and checklists used in real security programs.')),
+      (_('Principles and Identity'), 'principles-and-identity', concepts.principlesAndIdentity, '🧠', _('Access control, authentication, and core security principles.')),
+      (_('Networking and Protocols'), 'networking-and-protocols', concepts.networkingAndProtocols, '🌐', _('Protocols you will see in scans, traffic captures, and logs.')),
+      (_('Ports'), 'ports', concepts.ports, '🔌', _('Common ports you will run into in scans, firewall rules, and service configs.'))
+    ] %}
+
+    {% for title, slug, items, icon, desc in cards %}
+      {% set limit = 9 if slug in ['frameworks-and-standards','networking-and-protocols'] else 6 %}
+      {% set min_to_toggle = 10 if slug in ['frameworks-and-standards','networking-and-protocols'] else 7 %}
+      <section class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl" x-data="{ isExpanded: false, limit: {{ limit }} }">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-semibold text-white">{{ title }}</h2>
+            <p class="mt-1 text-sm text-slate-300">{{ desc }}</p>
+          </div>
+          <div class="text-2xl opacity-80">{{ icon }}</div>
+        </div>
+
+        {% if slug != 'ports' %}
+          <div class="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {% for item in items %}
+                <a href="{{ url_for('concept_detail', cat=slug, cid=item.id) }}" data-i="{{ loop.index }}"
+                 x-show="isExpanded || (Number($el.dataset.i) <= limit)"
+                 class="group rounded-xl border border-slate-700/60 bg-slate-900/40 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800/60 hover:border-slate-600 transition">
+                <span class="font-medium">{{ item.name }}</span>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="mt-5 grid grid-cols-3 gap-2">
+            {% for port in items %}
+              <a href="{{ url_for('concept_detail', cat='ports', cid=port.port) }}" data-i="{{ loop.index }}"
+                 x-show="isExpanded || (Number($el.dataset.i) <= limit)"
+                 class="group rounded-xl border border-slate-700/60 bg-slate-900/40 px-3 py-2 hover:bg-slate-800/60 hover:border-slate-600 transition">
+                <div class="flex flex-col leading-tight">
+                  <span class="text-sm text-white font-semibold">{{ port.port }}</span>
+                  <span class="text-xs text-slate-300">{{ port.name }}</span>
+                </div>
+              </a>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% set total = (items|length) if items is iterable else 0 %}
+        {% if total >= min_to_toggle %}
+        <div class="mt-4 flex justify-end">
+          <button @click="isExpanded = !isExpanded"
+                  class="text-sm text-slate-400 hover:text-white transition">
+            <span x-show="!isExpanded">{{ _('View all') }}</span>
+            <span x-show="isExpanded">{{ _('Show less') }}</span>
+          </button>
+        </div>
+        {% endif %}
+      </section>
+    {% endfor %}
+
+  </div>
+</div>
+{% endblock %}

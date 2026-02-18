@@ -1,12 +1,15 @@
+﻿{# analyze.html v7
+   analyze.html v7 builds on v6 #}
+
 {% extends "base.html" %}
 
-{% block title %}Log Analyzer - SecureOps Toolkit{% endblock %}
+{% block title %}{{ _('Log Analyzer') }} - CyberBase{% endblock %}
 
 {% block content %}
 <div x-data="analyzerApp()" class="space-y-6">
     <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold mb-2">Log Analyzer</h1>
-        <p class="text-gray-400">Analyze logs to detect suspicious activity and security events</p>
+        <h1 class="text-4xl font-bold mb-2">{{ _('Log Analyzer') }}</h1>
+        <p class="text-gray-400">{{ _('Analyze logs to detect suspicious activity and security events.') }}</p>
     </div>
 
     <!-- Input Method Tabs -->
@@ -14,40 +17,40 @@
         <div class="inline-flex bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
             <button @click="activeTab = 'file'"
                 :class="activeTab === 'file' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:text-white hover:bg-slate-700'"
-                class="px-4 py-2 text-sm font-medium smooth-hover">Upload File</button>
+                class="px-4 py-2 text-sm font-medium smooth-hover">{{ _('Upload file') }}</button>
             <button @click="activeTab = 'text'"
                 :class="activeTab === 'text' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:text-white hover:bg-slate-700'"
-                class="px-4 py-2 text-sm font-medium smooth-hover">Paste Text</button>
+                class="px-4 py-2 text-sm font-medium smooth-hover">{{ _('Paste text') }}</button>
         </div>
     </div>
 
     <!-- How Analysis Works Section -->
     <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-6 mb-8">
-        <h2 class="text-xl font-bold text-gray-200 mb-4">How Analysis Works</h2>
+        <h2 class="text-xl font-bold text-gray-200 mb-4">{{ _('How analysis works') }}</h2>
         <ul class="space-y-2 text-sm text-gray-400">
             <li class="flex items-start space-x-3">
-                <span class="text-blue-400 font-bold">•</span>
-                <span><strong>Event Parsing:</strong> Extracts timestamp, level, service, and key=value fields, including quoted values like key="value with spaces". Remaining text is kept as message.</span>
+                <span class="text-blue-400 font-bold">&bull;</span>
+                <span><strong>{{ _('Parsing and normalization:') }}</strong> {{ _('Attempts to extract timestamp, host, service, level, IP, and username. For web logs, it also extracts method, path, and status. Every line is always preserved as raw text.') }}</span>
             </li>
             <li class="flex items-start space-x-3">
-                <span class="text-blue-400 font-bold">•</span>
-                <span><strong>Deterministic Normalization:</strong> Maps Swedish and English phrases to event types using a fixed priority (e.g. privilege_change > account_lockout > WAF > auth_fail > ...).</span>
+                <span class="text-blue-400 font-bold">&bull;</span>
+                <span><strong>{{ _('Rule-based detection:') }}</strong> {{ _('Runs a deterministic set of rules covering authentication attacks, web probing, privilege escalation, persistence, malware indicators, and scanning patterns.') }}</span>
             </li>
             <li class="flex items-start space-x-3">
-                <span class="text-blue-400 font-bold">•</span>
-                <span><strong>Risk Scoring per Entity:</strong> Scores are accumulated per IP and per user from atomic indicators and correlations.</span>
+                <span class="text-blue-400 font-bold">&bull;</span>
+                <span><strong>{{ _('Correlation windows:') }}</strong> {{ _('Detects bursts over short time windows, such as SSH brute force per IP, password spraying across many users, many 404 responses across many paths, and fail-then-success sequences.') }}</span>
             </li>
             <li class="flex items-start space-x-3">
-                <span class="text-blue-400 font-bold">•</span>
-                <span><strong>Correlation Windows:</strong> Time-based rules relate events within minutes (e.g. brute-force, spraying, fail→success, WAF+auth, multi-port scans).</span>
+                <span class="text-blue-400 font-bold">&bull;</span>
+                <span><strong>{{ _('Evidence in matched lines:') }}</strong> {{ _('Every finding includes the real log lines that matched the rule, so you can triage quickly with concrete evidence.') }}</span>
             </li>
             <li class="flex items-start space-x-3">
-                <span class="text-blue-400 font-bold">•</span>
-                <span><strong>Allowlists & Tuning:</strong> Localhost, health endpoints, and optional internal ranges can be allowlisted. Thresholds and scores are configurable.</span>
+                <span class="text-blue-400 font-bold">&bull;</span>
+                <span><strong>{{ _('Tuning and allowlisting:') }}</strong> {{ _('Thresholds and allowlists reduce false positives, for example localhost and common health endpoints.') }}</span>
             </li>
             <li class="flex items-start space-x-3">
-                <span class="text-blue-400 font-bold">•</span>
-                <span><strong>Privacy:</strong> Uploaded files are analyzed in memory and never stored on disk.</span>
+                <span class="text-blue-400 font-bold">&bull;</span>
+                <span><strong>{{ _('Privacy:') }}</strong> {{ _('Analysis runs in memory. Logs are not stored and are not forwarded.') }}</span>
             </li>
         </ul>
     </div>
@@ -64,20 +67,19 @@
             <svg class="h-12 w-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
-            <p class="text-lg font-semibold text-gray-200 mb-2">Upload log file</p>
-            <p class="text-sm text-gray-400">Drag and drop a .log or .txt file here, or click to browse</p>
-            <p class="text-xs text-gray-500 mt-2">Maximum 5MB</p>
+            <p class="text-lg font-semibold text-gray-200 mb-2">{{ _('Upload log file') }}</p>
+            <p class="text-sm text-gray-400">{{ _('Drag and drop a .log or .txt file here, or click to browse.') }}</p>
+            <p class="text-xs text-gray-500 mt-2">{{ _('Maximum 5 MB') }}</p>
         </div>
     </div>
 
     <!-- Paste Text Section (Tab: Paste Text) -->
     <div x-show="activeTab === 'text'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1"
          class="bg-slate-800 border border-slate-700 rounded-lg p-6">
-        <label for="logTextArea" class="block text-sm font-medium text-gray-300 mb-2">Paste log text</label>
-        <textarea id="logTextArea" x-model="textInput" placeholder="Paste log lines here..." class="w-full h-64 p-4 bg-slate-900 text-gray-100 border border-slate-700 rounded font-mono resize-y placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+        <label for="logTextArea" class="block text-sm font-medium text-gray-300 mb-2">{{ _('Paste log text') }}</label>
+        <textarea id="logTextArea" x-model="textInput" placeholder="{{ _('Paste log lines here...') }}" class="w-full h-64 p-4 bg-slate-900 text-gray-100 border border-slate-700 rounded font-mono resize-y placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
         <div class="flex items-center justify-between mt-3">
-            <p class="text-xs text-gray-400">Tip: You can paste mixed English/Swedish logs.</p>
-            <button @click="analyzeText()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded text-sm smooth-hover">Analyze Text</button>
+            <button @click="analyzeText()" :disabled="loading" :class="loading ? 'opacity-60 cursor-not-allowed' : ''" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded text-sm smooth-hover">{{ _('Analyze text') }}</button>
         </div>
     </div>
 
@@ -86,21 +88,21 @@
         <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4 text-blue-300 text-center">
             <div class="flex items-center justify-center space-x-2">
                 <div class="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
-                <span>Analyzing...</span>
+                <span x-text="i18n.analyzing"></span>
             </div>
         </div>
     </template>
 
     <template x-if="error">
         <div class="bg-red-500/10 border border-red-500 rounded-lg p-4 text-red-300">
-            <p class="font-semibold">Analysis Error</p>
+            <p class="font-semibold" x-text="i18n.analysisError"></p>
             <p x-text="error" class="text-sm mt-1"></p>
         </div>
     </template>
 
     <template x-if="uploadSuccess">
         <div class="bg-green-500/10 border border-green-500 rounded-lg p-4 text-green-300">
-            <p class="font-semibold">File analyzed successfully</p>
+            <p class="font-semibold" x-text="i18n.fileAnalyzedSuccessfully"></p>
         </div>
     </template>
 
@@ -108,61 +110,56 @@
     <template x-if="findings.length > 0">
         <div class="space-y-4">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-bold">Analysis Results</h2>
+                <h2 class="text-2xl font-bold" x-text="i18n.analysisResults"></h2>
                 <div class="text-sm text-gray-400">
-                    <span x-text="`${findingsByType.critical.length} critical`"></span>
+                    <span x-text="severityCountText('critical')"></span>
                     <span class="mx-2">|</span>
-                    <span x-text="`${findingsByType.high.length} high priority`"></span>
+                    <span x-text="severityCountText('high')"></span>
                     <span class="mx-2">|</span>
-                    <span x-text="`${findingsByType.medium.length} medium`"></span>
+                    <span x-text="severityCountText('medium')"></span>
                     <span class="mx-2">|</span>
-                    <span x-text="`${findingsByType.low.length} low priority`"></span>
+                    <span x-text="severityCountText('low')"></span>
                 </div>
             </div>
 
             <!-- Filter by severity -->
             <div class="flex gap-2 mb-4 flex-wrap">
-                <button 
+                <button
                     @click="severityFilter = null"
                     :class="severityFilter === null ? 'bg-blue-600 text-white' : 'bg-slate-700 text-gray-300 hover:bg-slate-600'"
                     class="px-3 py-2 rounded text-sm smooth-hover transition-colors"
-                >
-                    All
-                </button>
-                <button 
+                    x-text="i18n.all"
+                ></button>
+                <button
                     @click="severityFilter = 'critical'"
                     :class="severityFilter === 'critical' ? 'bg-red-700 text-white' : 'bg-slate-700 text-gray-300 hover:bg-slate-600'"
                     class="px-3 py-2 rounded text-sm smooth-hover transition-colors"
-                >
-                    Critical
-                </button>
-                <button 
+                    x-text="i18n.critical"
+                ></button>
+                <button
                     @click="severityFilter = 'high'"
                     :class="severityFilter === 'high' ? 'bg-red-600 text-white' : 'bg-slate-700 text-gray-300 hover:bg-slate-600'"
                     class="px-3 py-2 rounded text-sm smooth-hover transition-colors"
-                >
-                    High
-                </button>
-                <button 
+                    x-text="i18n.high"
+                ></button>
+                <button
                     @click="severityFilter = 'medium'"
                     :class="severityFilter === 'medium' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-gray-300 hover:bg-slate-600'"
                     class="px-3 py-2 rounded text-sm smooth-hover transition-colors"
-                >
-                    Medium
-                </button>
-                <button 
+                    x-text="i18n.medium"
+                ></button>
+                <button
                     @click="severityFilter = 'low'"
                     :class="severityFilter === 'low' ? 'bg-green-600 text-white' : 'bg-slate-700 text-gray-300 hover:bg-slate-600'"
                     class="px-3 py-2 rounded text-sm smooth-hover transition-colors"
-                >
-                    Low
-                </button>
+                    x-text="i18n.low"
+                ></button>
             </div>
 
             <!-- Findings List -->
             <div class="space-y-3">
                 <template x-for="(finding, index) in filteredFindings" :key="finding.id || index">
-                    <div 
+                    <div
                         x-data="{ detailsOpen: false }"
                         class="border rounded-lg overflow-hidden relative smooth-hover transition-transform duration-200 hover:-translate-y-0.5 hover:scale-105 hover:shadow-lg hover:shadow-black/30"
                         :class="getSeverityClass(finding.severity) + (((finding.severity || '') + '').toLowerCase() === 'critical' ? ' critical-halo' : '')"
@@ -176,22 +173,22 @@
                                 :class="getSeverityBgClass(finding.severity)"
                             >
                             <div class="flex items-start space-x-3 flex-1 text-left">
-                                <span 
+                                <span
                                     class="inline-block px-2 py-1 rounded text-xs font-semibold mt-0.5 severity-badge"
                                     :class="getSeverityTagClass(finding.severity) + (((finding.severity || '') + '').toLowerCase() === 'critical' ? ' critical-badge-solid' : '')"
                                     :style="getSeverityTagStyle(finding.severity)"
-                                    x-text="finding.severity.toUpperCase()"
+                                    x-text="severityLabel(finding.severity)"
                                 ></span>
                                 <div>
-                                    <p class="font-semibold text-white" style="text-shadow: 0 1px 3px rgba(0,0,0,0.55);" x-text="finding.display_name ? finding.display_name : finding.rule_name"></p>
+                                    <p class="font-semibold text-white" style="text-shadow: 0 1px 3px rgb(var(--black-rgb) / 0.55);" x-text="finding.display_name ? finding.display_name : finding.rule_name"></p>
                                     <p class="text-sm text-white" x-text="finding.summary ? finding.summary : finding.description"></p>
                                 </div>
                             </div>
-                            <svg 
+                            <svg
                                 class="h-5 w-5 flex-shrink-0 transition-transform duration-200"
                                 :class="detailsOpen ? 'rotate-180' : ''"
-                                fill="none" 
-                                stroke="currentColor" 
+                                fill="none"
+                                stroke="currentColor"
                                 viewBox="0 0 24 24"
                             >
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
@@ -203,19 +200,19 @@
                             <div class="px-4 py-3 bg-opacity-20">
                                 <template x-if="finding.details && String(finding.details).trim().length">
                                     <div class="mb-3">
-                                        <h4 class="text-sm font-semibold mb-2 text-gray-300">Details:</h4>
+                                        <h4 class="text-sm font-semibold mb-2 text-gray-300" x-text="i18n.details + ':'"></h4>
                                         <div class="bg-slate-900 p-2 rounded text-xs text-gray-200 whitespace-pre-wrap break-words" x-text="finding.details"></div>
                                     </div>
                                 </template>
 
                                 <template x-if="(!finding.details || !String(finding.details).trim().length) && finding.summary && finding.description">
                                     <div class="mb-3">
-                                        <h4 class="text-sm font-semibold mb-2 text-gray-300">Details:</h4>
+                                        <h4 class="text-sm font-semibold mb-2 text-gray-300" x-text="i18n.details + ':'"></h4>
                                         <div class="bg-slate-900 p-2 rounded text-xs text-gray-200 whitespace-pre-wrap break-words" x-text="finding.description"></div>
                                     </div>
                                 </template>
 
-                                <h4 class="text-sm font-semibold mb-2 text-gray-300">Matched log lines:</h4>
+                                <h4 class="text-sm font-semibold mb-2 text-gray-300" x-text="i18n.matchedLogLines + ':'"></h4>
                                 <div class="space-y-1">
                                     <template x-for="(line, i) in finding.matched_lines" :key="i">
                                         <div class="bg-slate-900 p-2 rounded text-xs font-mono text-gray-300 break-all overflow-auto" x-text="line"></div>
@@ -230,12 +227,11 @@
 
             <!-- Clear Results -->
             <div class="text-center pt-4">
-                <button 
+                <button
                     @click="clearResults()"
                     class="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-gray-200 rounded text-sm smooth-hover transition-colors"
-                >
-                    New Analysis
-                </button>
+                    x-text="i18n.newAnalysis"
+                ></button>
             </div>
         </div>
     </template>
@@ -243,15 +239,39 @@
     <!-- No findings -->
     <template x-if="findings.length === 0 && uploadSuccess && !loading">
         <div class="text-center py-12 bg-slate-800 border border-slate-700 rounded-lg">
-            <p class="text-gray-300 text-lg">✓ No suspicious activity detected</p>
-            <p class="text-gray-400 text-sm mt-2">The log file appears to be clean</p>
+            <p class="text-gray-300 text-lg" x-text="i18n.noSuspiciousActivity"></p>
+            <p class="text-gray-400 text-sm mt-2" x-text="i18n.cleanLogFile"></p>
         </div>
     </template>
 </div>
 
 <script>
+const ANALYZER_I18N = {
+    analyzing: {{ _('Analyzing...')|tojson }},
+    analysisError: {{ _('Analysis error')|tojson }},
+    fileAnalyzedSuccessfully: {{ _('File analyzed successfully')|tojson }},
+    analysisResults: {{ _('Analysis results')|tojson }},
+    all: {{ _('All')|tojson }},
+    critical: {{ _('Critical')|tojson }},
+    high: {{ _('High')|tojson }},
+    medium: {{ _('Medium')|tojson }},
+    low: {{ _('Low')|tojson }},
+    details: {{ _('Details')|tojson }},
+    matchedLogLines: {{ _('Matched log lines')|tojson }},
+    newAnalysis: {{ _('New analysis')|tojson }},
+    noSuspiciousActivity: {{ _('No suspicious activity detected')|tojson }},
+    cleanLogFile: {{ _('The log file appears to be clean.')|tojson }},
+    invalidFileType: {{ _('Only .log and .txt files are allowed.')|tojson }},
+    fileTooLarge: {{ _('File is too large (maximum 5 MB).')|tojson }},
+    analysisFailed: {{ _('An error occurred during analysis.')|tojson }},
+    networkErrorPrefix: {{ _('Network error: ')|tojson }},
+    pasteRequired: {{ _('Please paste some log text.')|tojson }},
+    textTooLong: {{ _('Text is too long (maximum 200,000 characters).')|tojson }}
+};
+
 function analyzerApp() {
     return {
+        i18n: ANALYZER_I18N,
         loading: false,
         error: '',
         uploadSuccess: false,
@@ -260,6 +280,28 @@ function analyzerApp() {
         activeTab: 'file',
         textInput: '',
         severityFilter: null,
+
+        makeRequestId() {
+            if (window.crypto && typeof crypto.randomUUID === 'function') {
+                return crypto.randomUUID();
+            }
+            return String(Date.now()) + '_' + Math.random().toString(16).slice(2);
+        },
+
+        severityLabel(severity) {
+            const key = String(severity || '').toLowerCase();
+            if (key === 'critical') return this.i18n.critical;
+            if (key === 'high') return this.i18n.high;
+            if (key === 'medium') return this.i18n.medium;
+            if (key === 'low') return this.i18n.low;
+            return key;
+        },
+
+        severityCountText(severity) {
+            const key = String(severity || '').toLowerCase();
+            const count = this.findingsByType[key] ? this.findingsByType[key].length : 0;
+            return `${count} ${this.severityLabel(key)}`;
+        },
 
         get findingsByType() {
             return {
@@ -271,21 +313,21 @@ function analyzerApp() {
         },
 
         get filteredFindings() {
-                if (!this.findings) return [];
-                const sevOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-                const showAll = (this.severityFilter === null || this.severityFilter === 'all');
-                const arr = showAll
-                    ? [...this.findings]
-                    : this.findings.filter(f => f.severity === this.severityFilter);
-                return arr.sort((a, b) => {
-                    const sa = sevOrder[a.severity] ?? 99;
-                    const sb = sevOrder[b.severity] ?? 99;
-                    if (sa !== sb) return sa - sb;
-                    const na = (a.display_name || a.rule_name || '').toLowerCase();
-                    const nb = (b.display_name || b.rule_name || '').toLowerCase();
-                    return na.localeCompare(nb);
-                });
-            },
+            if (!this.findings) return [];
+            const sevOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+            const showAll = (this.severityFilter === null || this.severityFilter === 'all');
+            const arr = showAll
+                ? [...this.findings]
+                : this.findings.filter(f => f.severity === this.severityFilter);
+            return arr.sort((a, b) => {
+                const sa = sevOrder[a.severity] ?? 99;
+                const sb = sevOrder[b.severity] ?? 99;
+                if (sa !== sb) return sa - sb;
+                const na = (a.display_name || a.rule_name || '').toLowerCase();
+                const nb = (b.display_name || b.rule_name || '').toLowerCase();
+                return na.localeCompare(nb);
+            });
+        },
 
         handleFileDrop(event) {
             this.isDragging = false;
@@ -303,16 +345,17 @@ function analyzerApp() {
         },
 
         async analyzeFile(file) {
+            if (this.loading) return;
             const allowedExtensions = ['log', 'txt'];
             const extension = file.name.split('.').pop().toLowerCase();
-            
+
             if (!allowedExtensions.includes(extension)) {
-                this.error = 'Only .log and .txt files are allowed';
+                this.error = this.i18n.invalidFileType;
                 return;
             }
 
             if (file.size > 5 * 1024 * 1024) {
-                this.error = 'File is too large (maximum 5MB)';
+                this.error = this.i18n.fileTooLarge;
                 return;
             }
 
@@ -320,19 +363,21 @@ function analyzerApp() {
             this.error = '';
             this.uploadSuccess = false;
 
+            const requestId = this.makeRequestId();
             const formData = new FormData();
             formData.append('file', file);
 
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
+                    headers: { 'X-LogAnalyzer-Request-ID': requestId },
                     body: formData
                 });
 
                 const data = await response.json();
 
                 if (!response.ok) {
-                    this.error = data.error || 'An error occurred during analysis';
+                    this.error = data.error || this.i18n.analysisFailed;
                 } else {
                     this.findings = (data.findings || []).map(f => ({
                         ...f,
@@ -342,37 +387,40 @@ function analyzerApp() {
                     this.error = '';
                 }
             } catch (err) {
-                this.error = 'Network error: ' + err.message;
+                const detail = err && err.message ? err.message : '';
+                this.error = this.i18n.networkErrorPrefix + detail;
             } finally {
                 this.loading = false;
             }
         },
 
         async analyzeText() {
+            if (this.loading) return;
             const raw = this.textInput || '';
             const trimmed = raw.trim();
             this.error = '';
 
             if (!trimmed) {
-                this.error = 'Please paste some log text.';
+                this.error = this.i18n.pasteRequired;
                 return;
             }
             if (raw.length > 200000) {
-                this.error = 'Text is too long (max 200,000 characters).';
+                this.error = this.i18n.textTooLong;
                 return;
             }
 
             this.loading = true;
             this.uploadSuccess = false;
             try {
+                const requestId = this.makeRequestId();
                 const response = await fetch('/analyze-text', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ log_text: raw })
+                    headers: { 'Content-Type': 'application/json', 'X-LogAnalyzer-Request-ID': requestId },
+                    body: JSON.stringify({ log_text: raw, request_id: requestId })
                 });
                 const data = await response.json();
                 if (!response.ok) {
-                    this.error = data.error || 'An error occurred during analysis';
+                    this.error = data.error || this.i18n.analysisFailed;
                 } else {
                     this.findings = (data.findings || []).map(f => ({
                         ...f,
@@ -382,7 +430,8 @@ function analyzerApp() {
                     this.error = '';
                 }
             } catch (err) {
-                this.error = 'Network error: ' + err.message;
+                const detail = err && err.message ? err.message : '';
+                this.error = this.i18n.networkErrorPrefix + detail;
             } finally {
                 this.loading = false;
             }
@@ -420,22 +469,20 @@ function analyzerApp() {
 
         getSeverityTagStyle(severity) {
             if ((severity || '').toLowerCase() === 'critical') {
-                return 'background-color:#B71C1C;border:1px solid #B71C1C;color:#FFFFFF;';
+                return 'background-color:var(--dangerCritical);border:1px solid var(--dangerCritical);color:rgb(var(--white-rgb));';
             }
             if ((severity || '').toLowerCase() === 'high') {
-                return 'background-color:#D32F2F;color:#FFFFFF;';
+                return 'background-color:var(--dangerHigh);color:rgb(var(--white-rgb));';
             }
             return '';
         },
 
         getSeverityCardStyle(severity) {
             if ((severity || '').toLowerCase() === 'critical') {
-                return 'border-left: 6px solid #B71C1C;';
+                return 'border-left: 6px solid var(--dangerCritical);';
             }
             return '';
         },
-
-        // Backend already HTML-escapes matched_lines exactly once; keep x-text="line" to avoid double-escaping.
 
         clearResults() {
             this.findings = [];
