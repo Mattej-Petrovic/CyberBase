@@ -1,22 +1,22 @@
 <!-- templates/concepts_hub.html v4 bygger vidare på v3 -->
 {% extends "base.html" %}
-{% block title %}Concepts{% endblock %}
+{% block title %}{{ _('Concepts') }}{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
 
   <div class="mb-8">
-    <h1 class="text-3xl font-bold text-white">Concepts</h1>
-    <p class="mt-2 text-slate-300">Explore categories and drill into details.</p>
+    <h1 class="text-3xl font-bold text-white">{{ _('Concepts') }}</h1>
+    <p class="mt-2 text-slate-300">{{ _('Explore categories and drill into details.') }}</p>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:items-start">
 
     {% set cards = [
-      ('Frameworks and Standards', 'frameworks-and-standards', concepts.frameworksAndStandards, '🧩', 'Mental models and checklists used in real security programs.'),
-      ('Principles and Identity', 'principles-and-identity', concepts.principlesAndIdentity, '🧠', 'Access control, authentication, and core security principles.'),
-      ('Networking and Protocols', 'networking-and-protocols', concepts.networkingAndProtocols, '🌐', 'Protocols you will see in scans, traffic captures, and logs.'),
-      ('Ports', 'ports', concepts.ports, '🔌', 'Common ports you will run into in scans, firewall rules, and service configs.')
+      (_('Frameworks and Standards'), 'frameworks-and-standards', concepts.frameworksAndStandards, '🧩', _('Mental models and checklists used in real security programs.')),
+      (_('Principles and Identity'), 'principles-and-identity', concepts.principlesAndIdentity, '🧠', _('Access control, authentication, and core security principles.')),
+      (_('Networking and Protocols'), 'networking-and-protocols', concepts.networkingAndProtocols, '🌐', _('Protocols you will see in scans, traffic captures, and logs.')),
+      (_('Ports'), 'ports', concepts.ports, '🔌', _('Common ports you will run into in scans, firewall rules, and service configs.'))
     ] %}
 
     {% for title, slug, items, icon, desc in cards %}
@@ -61,8 +61,8 @@
         <div class="mt-4 flex justify-end">
           <button @click="isExpanded = !isExpanded"
                   class="text-sm text-slate-400 hover:text-white transition">
-            <span x-show="!isExpanded">View all</span>
-            <span x-show="isExpanded">Show less</span>
+            <span x-show="!isExpanded">{{ _('View all') }}</span>
+            <span x-show="isExpanded">{{ _('Show less') }}</span>
           </button>
         </div>
         {% endif %}

@@ -8,7 +8,7 @@
   <details class="group rounded-2xl border border-white/10 bg-white/[0.03] ct-deepdive {{ extra_classes }}">
     <summary class="cursor-pointer list-none p-6 hover:bg-white/[0.02] transition rounded-2xl">
       <div class="flex flex-col items-center text-center gap-1">
-        <h2 class="text-xl font-semibold text-white uppercase tracking-[0.08em]">DEEP DIVE</h2>
+        <h2 class="text-xl font-semibold text-white uppercase tracking-[0.08em]">{{ _('Deep Dive') | upper }}</h2>
         <div class="ct-dd-chevron">
           <span class="ct-dd-icon text-slate-200 text-2xl transition-transform duration-200 group-open:rotate-180">▾</span>
         </div>
@@ -44,10 +44,10 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 ct-concept-page" data-ai-explain-scope="true">
   {% if not_found %}
     <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-8">
-      <h1 class="text-2xl font-semibold text-white mb-2">Not found</h1>
-      <p class="text-slate-300">That concept does not exist or the link is invalid.</p>
+      <h1 class="text-2xl font-semibold text-white mb-2">{{ _('Not found') }}</h1>
+      <p class="text-slate-300">{{ _('That concept does not exist or the link is invalid.') }}</p>
       <div class="mt-6">
-        <a href="/concepts" class="inline-flex items-center px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 smooth-hover">Back to Concepts</a>
+        <a href="/concepts" class="inline-flex items-center px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 smooth-hover">{{ _('Back to Concepts') }}</a>
       </div>
     </div>
   {% else %}
@@ -74,7 +74,7 @@
     {% if where_when %}
     <div class="mt-6 bg-slate-900/60 border border-slate-700 rounded-2xl p-5">
       <div class="text-sm text-slate-300">
-        <span class="font-semibold text-white">Where you will see it:</span>
+        <span class="font-semibold text-white">{{ _('Where you will see it:') }}</span>
         <span class="ml-1">{{ where_when }}</span>
       </div>
     </div>
@@ -85,11 +85,11 @@
     <div class="lg:col-span-2 space-y-6">
 
       <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-maincard">
-        <h2 class="text-lg font-semibold text-white mb-3">What it is</h2>
-                {% set is_ports = (category == "Ports") %}
-        {% set what_text = learn.what if learn.what is defined else (item.intro or "No description available.") %}
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('What it is') }}</h2>
+        {% set is_ports_view = is_ports | default(false) %}
+        {% set what_text = learn.what if learn.what is defined else (item.intro or _('No description available.')) %}
 
-        {% if is_ports %}
+        {% if is_ports_view %}
           {# Break long Ports intros into readable paragraphs without changing meaning. #}
           {% set raw = what_text | trim %}
           {% set sentences = raw.split('. ') %}
@@ -139,7 +139,7 @@
 
         {% if item.bullets %}
           <div class="mt-5">
-            <div class="text-sm font-semibold text-white mb-2">Key points</div>
+            <div class="text-sm font-semibold text-white mb-2">{{ _('Key points') }}</div>
             <ul class="list-disc list-inside text-slate-300 space-y-1">
               {% for b in item.bullets %}
                 <li>{{ b }}</li>
@@ -151,7 +151,7 @@
 
       {% if learn.how is defined and learn.how %}
       <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-maincard">
-        <h2 class="text-lg font-semibold text-white mb-3">How it works in broad strokes</h2>
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('How it works in broad strokes') }}</h2>
         <ol class="list-decimal list-inside text-slate-300 space-y-2">
           {% for step in learn.how %}
             <li class="leading-relaxed">{{ step }}</li>
@@ -162,7 +162,7 @@
 
       {% if learn.example is defined and learn.example %}
       <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-maincard">
-        <h2 class="text-lg font-semibold text-white mb-3">Concrete example</h2>
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('Concrete example') }}</h2>
         <p class="text-slate-300 leading-relaxed">{{ learn.example }}</p>
       </div>
       {% endif %}
@@ -172,14 +172,14 @@
     <div class="space-y-6">
       {% if learn.why is defined and learn.why %}
       <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
-        <h2 class="text-lg font-semibold text-white mb-3">Why it matters</h2>
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('Why it matters') }}</h2>
         <p class="text-slate-300 leading-relaxed">{{ learn.why }}</p>
       </div>
       {% endif %}
 
       {% if learn.security is defined and learn.security %}
       <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
-        <h2 class="text-lg font-semibold text-white mb-3">Security angle</h2>
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('Security angle') }}</h2>
         <ul class="list-disc list-inside text-slate-300 space-y-1">
           {% for s in learn.security %}
             <li>{{ s }}</li>
@@ -190,7 +190,7 @@
 
       {% if learn.pitfalls is defined and learn.pitfalls %}
       <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
-        <h2 class="text-lg font-semibold text-white mb-3">Common pitfalls</h2>
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('Common pitfalls') }}</h2>
         <ul class="list-disc list-inside text-slate-300 space-y-1">
           {% for p in learn.pitfalls %}
             <li>{{ p }}</li>
@@ -201,7 +201,7 @@
 
       {% if learn.selfTest is defined and learn.selfTest %}
       <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
-        <h2 class="text-lg font-semibold text-white mb-3">Quick self test</h2>
+        <h2 class="text-lg font-semibold text-white mb-3">{{ _('Quick self test') }}</h2>
         <ul class="list-disc list-inside text-slate-300 space-y-1">
           {% for q in learn.selfTest %}
             <li>{{ q }}</li>

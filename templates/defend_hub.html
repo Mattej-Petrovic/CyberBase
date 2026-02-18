@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Defend · CyberBase{% endblock %}
+{% block title %}{{ _('Defend') }} · CyberBase{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 space-y-8">
 
   <section class="rounded-2xl border border-slate-700/60 bg-slate-900/40 p-6 md:p-8 shadow-xl">
     <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-200 via-cyan-200 to-blue-200 bg-clip-text text-transparent">
-      Defend
+      {{ _('Defend') }}
     </h1>
     <p class="mt-3 text-slate-300 max-w-3xl">
-      Detection, logging, and hardening topics. Open a topic to read the details.
+      {{ _('Detection, logging, and hardening topics. Open a topic to read the details.') }}
     </p>
   </section>
 
@@ -19,8 +19,8 @@
     <section class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <h2 class="text-xl font-semibold text-white">Detection and Logging</h2>
-          <p class="mt-1 text-sm text-slate-300">What to collect, what to look for, and what it means.</p>
+          <h2 class="text-xl font-semibold text-white">{{ _('Detection and Logging') }}</h2>
+          <p class="mt-1 text-sm text-slate-300">{{ _('What to collect, what to look for, and what it means.') }}</p>
         </div>
         <div class="text-2xl opacity-80">🧭</div>
       </div>
@@ -38,8 +38,8 @@
     <section class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <h2 class="text-xl font-semibold text-white">Hardening</h2>
-          <p class="mt-1 text-sm text-slate-300">Baseline security improvements for common platforms and services.</p>
+          <h2 class="text-xl font-semibold text-white">{{ _('Hardening') }}</h2>
+          <p class="mt-1 text-sm text-slate-300">{{ _('Baseline security improvements for common platforms and services.') }}</p>
         </div>
         <div class="text-2xl opacity-80">🛡️</div>
       </div>

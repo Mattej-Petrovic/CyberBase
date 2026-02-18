@@ -226,36 +226,36 @@
 
       <h1 class="cb-hero-title fade-up text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight bg-gradient-to-r from-blue-200 via-cyan-200 to-blue-100 bg-clip-text text-transparent"
           style="animation-delay:.12s;">
-        Train. Defend. Execute.
+        {{ _('Train. Defend. Execute.') }}
       </h1>
 
       <p class="fade-up max-w-3xl text-slate-200/90 text-lg leading-relaxed" style="animation-delay:.18s;">
-        Your personal cybersecurity command center.
+        {{ _('Your personal cybersecurity command center.') }}
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
         <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent p-5 shadow-none">
-          <div class="text-xs uppercase tracking-widest text-slate-400">Commands</div>
+          <div class="text-xs uppercase tracking-widest text-slate-400">{{ _('Commands') }}</div>
           <div class="mt-2 text-3xl font-bold text-white">{{ commands_count }}</div>
-          <div class="mt-1 text-sm text-slate-200/85">Syntax and examples</div>
+          <div class="mt-1 text-sm text-slate-200/85">{{ _('Syntax and examples') }}</div>
         </div>
 
         <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent p-5 shadow-none">
-          <div class="text-xs uppercase tracking-widest text-slate-400">Tools</div>
+          <div class="text-xs uppercase tracking-widest text-slate-400">{{ _('Tools') }}</div>
           <div class="mt-2 text-3xl font-bold text-white">{{ tools_count }}</div>
-          <div class="mt-1 text-sm text-slate-200/85">CLI, GUI, detection</div>
+          <div class="mt-1 text-sm text-slate-200/85">{{ _('CLI, GUI, detection') }}</div>
         </div>
 
         <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent p-5 shadow-none">
-          <div class="text-xs uppercase tracking-widest text-slate-400">Concepts</div>
+          <div class="text-xs uppercase tracking-widest text-slate-400">{{ _('Concepts') }}</div>
           <div class="mt-2 text-3xl font-bold text-white">{{ concepts_count }}</div>
-          <div class="mt-1 text-sm text-slate-200/85">Models and foundations</div>
+          <div class="mt-1 text-sm text-slate-200/85">{{ _('Models and foundations') }}</div>
         </div>
 
         <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent p-5 shadow-none">
-          <div class="text-xs uppercase tracking-widest text-slate-400">Defend topics</div>
+          <div class="text-xs uppercase tracking-widest text-slate-400">{{ _('Defend topics') }}</div>
           <div class="mt-2 text-3xl font-bold text-white">{{ defend_count }}</div>
-          <div class="mt-1 text-sm text-slate-200/85">Hardening and detection</div>
+          <div class="mt-1 text-sm text-slate-200/85">{{ _('Hardening and detection') }}</div>
         </div>
       </div>
 
@@ -268,7 +268,7 @@
         style="animation-delay:.30s;"
       >
         <div class="flex items-center justify-between gap-4">
-          <h2 class="text-lg md:text-xl font-bold text-white">Recently used</h2>
+          <h2 class="text-lg md:text-xl font-bold text-white">{{ _('Recently used') }}</h2>
         </div>
 
         <div class="mt-4 recent-wrap">
@@ -292,9 +292,9 @@
         <div class="lrp-icon">
           <span class="lrp-emoji">📚</span>
         </div>
-        <h2 class="mt-4 text-xl font-semibold text-white">Learn</h2>
+        <h2 class="mt-4 text-xl font-semibold text-white">{{ _('Learn') }}</h2>
         <p class="mt-2 text-slate-200/85 leading-relaxed clamp-2">
-          Build a mental map that makes everything else easier.
+          {{ _('Build a mental map that makes everything else easier.') }}
         </p>
       </div>
 
@@ -302,9 +302,9 @@
         <div class="lrp-icon">
           <span class="lrp-emoji">🧠</span>
         </div>
-        <h2 class="mt-4 text-xl font-semibold text-white">Reference</h2>
+        <h2 class="mt-4 text-xl font-semibold text-white">{{ _('Reference') }}</h2>
         <p class="mt-2 text-slate-200/85 leading-relaxed clamp-2">
-          Consistent formats so you can apply knowledge quickly.
+          {{ _('Consistent formats so you can apply knowledge quickly.') }}
         </p>
       </div>
 
@@ -312,16 +312,16 @@
         <div class="lrp-icon">
           <span class="lrp-emoji">🎯</span>
         </div>
-        <h2 class="mt-4 text-xl font-semibold text-white">Practice</h2>
+        <h2 class="mt-4 text-xl font-semibold text-white">{{ _('Practice') }}</h2>
         <p class="mt-2 text-slate-200/85 leading-relaxed clamp-2">
-          Use repetition and pressure testing to make it stick.
+          {{ _('Use repetition and pressure testing to make it stick.') }}
         </p>
       </div>
     </section>
 
     <section class="fade-up rounded-2xl border border-slate-700/55 bg-slate-950/18 px-6 md:px-8 py-6 md:py-7" style="animation-delay:.22s;">
       <div class="flex items-center justify-between gap-4">
-        <h2 class="text-2xl font-bold text-white">Overview</h2>
+        <h2 class="text-2xl font-bold text-white">{{ _('Overview') }}</h2>
       </div>
 
       <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -330,9 +330,9 @@
           <div class="flex items-start gap-4">
             <div class="ov-icon"><span class="ov-emoji">⌨️</span></div>
             <div class="min-w-0">
-              <div class="text-white font-semibold text-base">Command Library</div>
+              <div class="text-white font-semibold text-base">{{ _('Command Library') }}</div>
               <p class="mt-1 ov-desc">
-                Learn commands with clear syntax, flags, and examples you can apply while working.
+                {{ _('Learn commands with clear syntax, flags, and examples you can apply while working.') }}
               </p>
             </div>
           </div>
@@ -342,9 +342,9 @@
           <div class="flex items-start gap-4">
             <div class="ov-icon"><span class="ov-emoji">🧰</span></div>
             <div class="min-w-0">
-              <div class="text-white font-semibold text-base">Toolbox</div>
+              <div class="text-white font-semibold text-base">{{ _('Toolbox') }}</div>
               <p class="mt-1 ov-desc">
-                Practical tool guides that explain what each tool does, how to use it, and when it matters.
+                {{ _('Practical tool guides that explain what each tool does, how to use it, and when it matters.') }}
               </p>
             </div>
           </div>
@@ -354,9 +354,9 @@
           <div class="flex items-start gap-4">
             <div class="ov-icon"><span class="ov-emoji">🧩</span></div>
             <div class="min-w-0">
-              <div class="text-white font-semibold text-base">Concepts</div>
+              <div class="text-white font-semibold text-base">{{ _('Concepts') }}</div>
               <p class="mt-1 ov-desc">
-                Clear fundamentals across networking, protocols, identity, and core security principles.
+                {{ _('Clear fundamentals across networking, protocols, identity, and core security principles.') }}
               </p>
             </div>
           </div>
@@ -366,9 +366,9 @@
           <div class="flex items-start gap-4">
             <div class="ov-icon"><span class="ov-emoji">🛡️</span></div>
             <div class="min-w-0">
-              <div class="text-white font-semibold text-base">Defend</div>
+              <div class="text-white font-semibold text-base">{{ _('Defend') }}</div>
               <p class="mt-1 ov-desc">
-                Action driven checklists for logging, detection, and hardening in real environments.
+                {{ _('Action driven checklists for logging, detection, and hardening in real environments.') }}
               </p>
             </div>
           </div>
@@ -378,9 +378,9 @@
           <div class="flex items-start gap-4">
             <div class="ov-icon"><span class="ov-emoji">🗂️</span></div>
             <div class="min-w-0">
-              <div class="text-white font-semibold text-base">Resource Hub</div>
+              <div class="text-white font-semibold text-base">{{ _('Resource Hub') }}</div>
               <p class="mt-1 ov-desc">
-                Curated resources for deeper learning, trusted guidance, and continued study.
+                {{ _('Curated resources for deeper learning, trusted guidance, and continued study.') }}
               </p>
             </div>
           </div>
@@ -390,9 +390,9 @@
           <div class="flex items-start gap-4">
             <div class="ov-icon"><span class="ov-emoji">❓</span></div>
             <div class="min-w-0">
-              <div class="text-white font-semibold text-base">Quiz</div>
+              <div class="text-white font-semibold text-base">{{ _('Quiz') }}</div>
               <p class="mt-1 ov-desc">
-                Quick topic quizzes to test understanding and improve long term retention.
+                {{ _('Quick topic quizzes to test understanding and improve long term retention.') }}
               </p>
             </div>
           </div>
@@ -402,9 +402,9 @@
           <div class="flex items-start gap-4">
             <div class="ov-icon"><span class="ov-emoji">📊</span></div>
             <div class="min-w-0">
-              <div class="text-white font-semibold text-base">Log Analyzer</div>
+              <div class="text-white font-semibold text-base">{{ _('Log Analyzer') }}</div>
               <p class="mt-1 ov-desc">
-                Paste or upload logs to review events, spot anomalies, and flag suspicious activity.
+                {{ _('Paste or upload logs to review events, spot anomalies, and flag suspicious activity.') }}
               </p>
             </div>
           </div>
@@ -414,9 +414,9 @@
           <div class="flex items-start gap-4">
             <div class="ov-icon"><span class="ov-emoji">✨</span></div>
             <div class="min-w-0">
-              <div class="text-white font-semibold text-base">AI Assistant</div>
+              <div class="text-white font-semibold text-base">{{ _('AI Assistant') }}</div>
               <p class="mt-1 ov-desc">
-                Built in AI support to explain cybersecurity topics and help you learn faster.
+                {{ _('Built in AI support to explain cybersecurity topics and help you learn faster.') }}
               </p>
             </div>
           </div>
@@ -427,7 +427,7 @@
     <section class="fade-up rounded-2xl border border-slate-700/60 bg-slate-950/26 px-6 md:px-8 py-6 md:py-7 shadow-lg" style="animation-delay:.26s;">
       <div class="rounded-2xl border border-slate-700/55 bg-slate-950/40 px-6 md:px-8 py-6 md:py-7" style="background-color: var(--hs-raised);">
         <div class="flex items-center justify-between gap-4">
-          <h2 class="text-2xl font-bold text-white">Quick pick</h2>
+          <h2 class="text-2xl font-bold text-white">{{ _('Quick pick') }}</h2>
         </div>
 
         <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">

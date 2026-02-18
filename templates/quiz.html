@@ -1,21 +1,26 @@
 {% extends "base.html" %}
 {# quiz.html v2 builds on v1: 30-question bank + 10-per-run sampling #}
 
-{% block title %}Quiz - CyberBase{% endblock %}
+{% block title %}{{ _('Quiz') }} - CyberBase{% endblock %}
 
 {% block content %}
 <div x-data="quizFlow()" x-init="init()" class="space-y-8">
   <div class="text-center mb-2">
-    <h1 class="text-4xl font-bold mb-2">Quiz</h1>
+    <h1 class="text-4xl font-bold mb-2">{{ _('Quiz') }}</h1>
   </div>
 
   <template x-if="mode==='topics'">
     <div>
+      <template x-if="!topics.length">
+        <div class="max-w-xl mx-auto p-5 bg-gray-800 rounded-lg text-center text-gray-300">
+          {{ _('No quiz topics available right now.') }}
+        </div>
+      </template>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <template x-for="g in topics" :key="g.id">
           <a :href="'/quiz?topic=' + encodeURIComponent(g.id)" @click.prevent="start(g.id)" class="block p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition">
             <h3 class="text-xl font-semibold" x-text="g.title"></h3>
-            <p class="text-gray-400 text-sm mt-1" x-text="'10 Questions'"></p>
+            <p class="text-gray-400 text-sm mt-1" x-text="i18n.tenQuestions"></p>
           </a>
         </template>
       </div>
@@ -27,9 +32,9 @@
       <div class="flex items-center justify-between mb-4">
         <div>
           <h2 class="text-2xl font-semibold" x-text="currentTopic.title"></h2>
-          <p class="text-gray-400 text-sm" x-text="'Question ' + (index+1) + ' of ' + total"></p>
+          <p class="text-gray-400 text-sm" x-text="i18n.question + ' ' + (index+1) + ' ' + i18n.of + ' ' + total"></p>
         </div>
-        <a href="/quiz" class="text-sm px-3 py-2 rounded bg-gray-700 hover:bg-gray-600">New Topic</a>
+        <a href="/quiz" class="text-sm px-3 py-2 rounded bg-gray-700 hover:bg-gray-600">{{ _('New topic') }}</a>
       </div>
 
       <div class="p-5 bg-gray-800 rounded-lg">
@@ -46,8 +51,8 @@
             </div>
 
             <div class="flex items-center justify-between mt-5">
-              <button class="px-3 py-2 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50" @click="prev" :disabled="index===0">Prev</button>
-              <button class="px-3 py-2 rounded bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50" @click="next" :disabled="answers[index]===null">Next</button>
+              <button class="px-3 py-2 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50" @click="prev" :disabled="index===0">{{ _('Prev') }}</button>
+              <button class="px-3 py-2 rounded bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50" @click="next" :disabled="answers[index]===null">{{ _('Next') }}</button>
             </div>
           </div>
         </template>
@@ -55,7 +60,7 @@
         <template x-if="review">
           <div>
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-xl font-semibold">Results</h3>
+              <h3 class="text-xl font-semibold">{{ _('Results') }}</h3>
               <span class="text-sm px-2 py-1 rounded bg-gray-700" x-text="scoreText"></span>
             </div>
             <div class="space-y-4">
@@ -63,16 +68,16 @@
                 <div class="p-4 rounded border border-gray-700">
                   <div class="flex items-start justify-between gap-3">
                     <p class="font-medium" x-text="(qi+1) + '. ' + q.q"></p>
-                    <span class="text-xs px-2 py-1 rounded" :class="answers[qi]===q.answer ? 'bg-green-700' : 'bg-red-700'" x-text="answers[qi]===q.answer ? 'Correct' : 'Wrong'"></span>
+                    <span class="text-xs px-2 py-1 rounded" :class="answers[qi]===q.answer ? 'bg-green-700' : 'bg-red-700'" x-text="answers[qi]===q.answer ? i18n.correct : i18n.wrong"></span>
                   </div>
-                  <p class="text-sm text-gray-300 mt-2"><span class="text-gray-400">Your answer:</span> <span x-text="q.choices[answers[qi]]"></span></p>
-                  <p class="text-sm text-gray-300"><span class="text-gray-400">Correct:</span> <span x-text="q.choices[q.answer]"></span></p>
+                  <p class="text-sm text-gray-300 mt-2"><span class="text-gray-400" x-text="i18n.yourAnswer + ':'"></span> <span x-text="q.choices[answers[qi]]"></span></p>
+                  <p class="text-sm text-gray-300"><span class="text-gray-400" x-text="i18n.correctAnswer + ':'"></span> <span x-text="q.choices[q.answer]"></span></p>
                   <p class="text-sm text-gray-400 mt-2" x-text="q.explain"></p>
                 </div>
               </template>
             </div>
             <div class="mt-6 flex justify-end">
-              <a href="/quiz" class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-500">Back to topics</a>
+              <a href="/quiz" class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-500">{{ _('Back to topics') }}</a>
             </div>
           </div>
         </template>
@@ -83,10 +88,20 @@
 
 <script>
   const QUIZ_DATA = {{ quiz|tojson }};
+  const QUIZ_I18N = {
+    tenQuestions: {{ _('10 Questions')|tojson }},
+    question: {{ _('Question')|tojson }},
+    of: {{ _('of')|tojson }},
+    correct: {{ _('Correct')|tojson }},
+    wrong: {{ _('Wrong')|tojson }},
+    yourAnswer: {{ _('Your answer')|tojson }},
+    correctAnswer: {{ _('Correct answer')|tojson }}
+  };
 
   function quizFlow() {
     return {
       data: QUIZ_DATA,
+      i18n: QUIZ_I18N,
       mode: 'topics',
       topics: [],
       currentTopic: null,

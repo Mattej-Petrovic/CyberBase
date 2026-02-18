@@ -1,7 +1,7 @@
 {# defend_detail.html v6 (bygger vidare på v5) #}
 {% extends "base.html" %}
 
-{% block title %}{{ title }} · Defend{% endblock %}
+{% block title %}{{ title }} · {{ _('Defend') }}{% endblock %}
 
 {% macro bullet_list(items, dot_color) -%}
   <ul class="mt-4 space-y-2">
@@ -23,11 +23,11 @@
       {% if kind == 'warn' %}
         {% set border = 'border-amber-400/60' %}
         {% set bg = 'bg-amber-500/10' %}
-        {% set label = 'Watch out' %}
+        {% set label = _('Watch out') %}
       {% else %}
         {% set border = 'border-cyan-400/60' %}
         {% set bg = 'bg-cyan-500/10' %}
-        {% set label = 'Tip' %}
+        {% set label = _('Tip') %}
       {% endif %}
 
       <div class="mt-5 rounded-xl border {{ border }} {{ bg }} p-4">
@@ -49,7 +49,7 @@
       <div class="mt-5 rounded-xl border border-cyan-400/60 bg-cyan-500/10 p-4">
         <div class="flex items-start justify-between gap-4">
           <div>
-            <div class="text-xs uppercase tracking-widest text-slate-300">Tip</div>
+            <div class="text-xs uppercase tracking-widest text-slate-300">{{ _('Tip') }}</div>
             <div class="mt-2 text-sm text-slate-200/90 leading-relaxed">{{ callout }}</div>
           </div>
           <div class="text-xl opacity-80">💡</div>
@@ -95,7 +95,7 @@
   <details class="group rounded-2xl border border-white/10 bg-white/[0.03] ct-deepdive {{ extra_classes }}">
     <summary class="cursor-pointer list-none p-6 hover:bg-white/[0.02] transition rounded-2xl">
       <div class="flex flex-col items-center text-center gap-1">
-        <h2 class="text-xl font-semibold text-white uppercase tracking-[0.08em]">DEEP DIVE</h2>
+        <h2 class="text-xl font-semibold text-white uppercase tracking-[0.08em]">{{ _('Deep Dive') | upper }}</h2>
         <div class="ct-dd-chevron">
           <span class="ct-dd-icon text-slate-200 text-2xl transition-transform duration-200 group-open:rotate-180">▾</span>
         </div>
@@ -132,13 +132,13 @@
 <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 space-y-6 ct-defend-page" data-ai-explain-scope="true">
 
   <div class="flex items-center justify-between">
-    <a href="{{ url_for('defend_hub') }}" class="text-sm text-slate-300 hover:text-white">← Back to Defend</a>
+    <a href="{{ url_for('defend_hub') }}" class="text-sm text-slate-300 hover:text-white">← {{ _('Back to Defend') }}</a>
   </div>
 
   {% if not_found %}
     <section class="rounded-2xl border border-slate-700/60 bg-slate-900/40 p-6 md:p-8 shadow-xl">
-      <h1 class="text-2xl md:text-3xl font-bold text-white">Not found</h1>
-      <p class="mt-2 text-slate-300">This topic does not exist.</p>
+      <h1 class="text-2xl md:text-3xl font-bold text-white">{{ _('Not found') }}</h1>
+      <p class="mt-2 text-slate-300">{{ _('This topic does not exist.') }}</p>
     </section>
   {% else %}
 
@@ -157,8 +157,8 @@
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {% if item.objectives %}
           <div class="lg:col-span-1 rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
-            <h2 class="text-lg font-semibold text-white">Learning objectives</h2>
-            <div class="text-sm text-slate-300 mt-2">What you should be able to do after reading.</div>
+            <h2 class="text-lg font-semibold text-white">{{ _('Learning objectives') }}</h2>
+            <div class="text-sm text-slate-300 mt-2">{{ _('What you should be able to do after reading.') }}</div>
             <ul class="mt-4 space-y-2">
               {% for o in item.objectives or [] %}
                 {% if o %}
@@ -176,8 +176,8 @@
           <div class="{% if item.objectives %}lg:col-span-2{% else %}lg:col-span-3{% endif %} rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
             <div class="flex items-start justify-between gap-4">
               <div>
-                <h2 class="text-lg font-semibold text-white">At a glance</h2>
-                <div class="text-sm text-slate-300 mt-2">Fast mental model before you dive in.</div>
+                <h2 class="text-lg font-semibold text-white">{{ _('At a glance') }}</h2>
+                <div class="text-sm text-slate-300 mt-2">{{ _('Fast mental model before you dive in.') }}</div>
               </div>
               <div class="text-2xl opacity-80">🧠</div>
             </div>
@@ -274,7 +274,7 @@
 
       {% if item.points and item.points|length %}
         <section class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
-          <h2 class="text-xl font-semibold text-white">Key points</h2>
+          <h2 class="text-xl font-semibold text-white">{{ _('Key points') }}</h2>
           {{ bullet_list(item.points, 'bg-cyan-300/80') }}
         </section>
       {% endif %}
@@ -282,7 +282,7 @@
       {% set checklist = (item.get('items', []) if item is mapping else []) %}
       {% if checklist and checklist|length %}
         <section class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
-          <h2 class="text-xl font-semibold text-white">Checklist</h2>
+          <h2 class="text-xl font-semibold text-white">{{ _('Checklist') }}</h2>
           {{ bullet_list(checklist, 'bg-blue-300/80') }}
         </section>
       {% endif %}
@@ -293,8 +293,8 @@
       <section class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl">
         <div class="flex items-start justify-between gap-4">
           <div>
-            <h2 class="text-xl font-semibold text-white">Signals to watch for</h2>
-            <div class="mt-2 text-sm text-slate-300">Patterns worth investigating further.</div>
+            <h2 class="text-xl font-semibold text-white">{{ _('Signals to watch for') }}</h2>
+            <div class="mt-2 text-sm text-slate-300">{{ _('Patterns worth investigating further.') }}</div>
           </div>
           <div class="text-2xl opacity-80">📡</div>
         </div>

@@ -19,6 +19,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 from collections import defaultdict, deque
+from flask import has_request_context
+from flask_babel import get_locale
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +75,19 @@ _DEFAULT_CONFIG: Dict[str, Any] = {
 
 def _env_debug_enabled() -> bool:
     return (os.getenv("LOG_ANALYZER_DEBUG") or "").strip() in {"1", "true", "yes", "on"}
+
+
+def _is_swedish_locale() -> bool:
+    try:
+        if not has_request_context():
+            return False
+        return str(get_locale() or "").lower().startswith("sv")
+    except Exception:
+        return False
+
+
+def _t(en_text: str, sv_text: str) -> str:
+    return sv_text if _is_swedish_locale() else en_text
 
 
 def _get_config() -> Dict[str, Any]:
@@ -567,11 +582,17 @@ def _rule_failed_login_totals(events: List[Event], cfg: Dict[str, Any]) -> List[
         sev = "high"
     return [
         _mk_finding(
-            rule_name="Repeated failed logins",
-            display_name="Repeated failed logins",
+            rule_name=_t("Repeated failed logins", "Upprepade misslyckade inloggningar"),
+            display_name=_t("Repeated failed logins", "Upprepade misslyckade inloggningar"),
             severity=sev,
-            summary=f"{len(matched)} failed login attempts detected",
-            description="The log contains many failed login attempts. This may indicate brute force or credential stuffing.",
+            summary=_t(
+                f"{len(matched)} failed login attempts detected",
+                f"{len(matched)} misslyckade inloggningsförsök upptäcktes",
+            ),
+            description=_t(
+                "The log contains many failed login attempts. This may indicate brute force or credential stuffing.",
+                "Loggen innehåller många misslyckade inloggningsförsök. Det kan tyda på brute force eller credential stuffing.",
+            ),
             matched_lines=_clamp_lines(matched, cfg),
             salt=str(len(matched)),
         )
@@ -587,11 +608,17 @@ def _rule_ssh_auth_failures(events: List[Event], cfg: Dict[str, Any]) -> List[Di
         sev = "medium"
     return [
         _mk_finding(
-            rule_name="SSH authentication errors",
-            display_name="SSH authentication errors",
+            rule_name=_t("SSH authentication errors", "SSH-autentiseringsfel"),
+            display_name=_t("SSH authentication errors", "SSH-autentiseringsfel"),
             severity=sev,
-            summary=f"{len(matched)} SSH related authentication errors",
-            description="SSH related errors such as invalid user, failed keys, or closed connections can indicate attempted unauthorized access.",
+            summary=_t(
+                f"{len(matched)} SSH related authentication errors",
+                f"{len(matched)} SSH-relaterade autentiseringsfel",
+            ),
+            description=_t(
+                "SSH related errors such as invalid user, failed keys, or closed connections can indicate attempted unauthorized access.",
+                "SSH-relaterade fel, som ogiltig användare, misslyckade nycklar eller stängda anslutningar, kan tyda på obehöriga åtkomstförsök.",
+            ),
             matched_lines=_clamp_lines(matched, cfg),
             salt=str(len(matched)),
         )
@@ -604,16 +631,25 @@ def _rule_sudo_commands(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[s
         return []
     sensitive = [l for l in lines if _SENSITIVE_PATH_RE.search(l)]
     sev = "medium"
-    desc = "Sudo was used to run commands. Review whether this is expected."
+    desc = _t(
+        "Sudo was used to run commands. Review whether this is expected.",
+        "Sudo användes för att köra kommandon. Verifiera att aktiviteten är förväntad.",
+    )
     if sensitive:
         sev = "high"
-        desc = "Sudo was used against sensitive targets such as /etc/shadow or root SSH keys. This may indicate credential access or privilege escalation."
+        desc = _t(
+            "Sudo was used against sensitive targets such as /etc/shadow or root SSH keys. This may indicate credential access or privilege escalation.",
+            "Sudo användes mot känsliga mål som /etc/shadow eller root-SSH-nycklar. Det kan tyda på credential access eller privilegieeskalering.",
+        )
     return [
         _mk_finding(
-            rule_name="Sudo command execution",
-            display_name="Sudo command execution",
+            rule_name=_t("Sudo command execution", "Sudo-kommandokörning"),
+            display_name=_t("Sudo command execution", "Sudo-kommandokörning"),
             severity=sev,
-            summary=f"{len(lines)} sudo lines detected",
+            summary=_t(
+                f"{len(lines)} sudo lines detected",
+                f"{len(lines)} sudo-rader upptäcktes",
+            ),
             description=desc,
             matched_lines=_clamp_lines(sensitive if sensitive else lines, cfg),
             salt=str(len(lines)),
@@ -628,11 +664,17 @@ def _rule_user_account_changes(events: List[Event], cfg: Dict[str, Any]) -> List
     sev = "high" if len(matched) >= 2 else "medium"
     return [
         _mk_finding(
-            rule_name="User account changes",
-            display_name="User account changes",
+            rule_name=_t("User account changes", "Ändringar av användarkonton"),
+            display_name=_t("User account changes", "Ändringar av användarkonton"),
             severity=sev,
-            summary=f"{len(matched)} account related changes",
-            description="Creating, deleting, or modifying users and groups can be legitimate admin activity or a sign of persistence. Verify intent and source.",
+            summary=_t(
+                f"{len(matched)} account related changes",
+                f"{len(matched)} kontorelaterade ändringar",
+            ),
+            description=_t(
+                "Creating, deleting, or modifying users and groups can be legitimate admin activity or a sign of persistence. Verify intent and source.",
+                "Skapande, borttagning eller ändring av användare och grupper kan vara legitim administration eller ett tecken på persistens. Verifiera syfte och källa.",
+            ),
             matched_lines=_clamp_lines(matched, cfg),
             salt=str(len(matched)),
         )
@@ -645,11 +687,17 @@ def _rule_suspicious_ip_lines(events: List[Event], cfg: Dict[str, Any]) -> List[
         return []
     return [
         _mk_finding(
-            rule_name="Suspicious IP indicators",
-            display_name="Suspicious IP indicators",
+            rule_name=_t("Suspicious IP indicators", "Misstänkta IP-indikatorer"),
+            display_name=_t("Suspicious IP indicators", "Misstänkta IP-indikatorer"),
             severity="medium",
-            summary=f"{len(matched)} lines indicating attacks tied to an IP",
-            description="Log lines contain clear keywords such as attack, malware, or shellcode tied to IP addresses. Triage is recommended.",
+            summary=_t(
+                f"{len(matched)} lines indicating attacks tied to an IP",
+                f"{len(matched)} rader med attackindikatorer kopplade till en IP-adress",
+            ),
+            description=_t(
+                "Log lines contain clear keywords such as attack, malware, or shellcode tied to IP addresses. Triage is recommended.",
+                "Loggraderna innehåller tydliga nyckelord som attack, malware eller shellcode kopplade till IP-adresser. Rekommenderad åtgärd är triage.",
+            ),
             matched_lines=_clamp_lines(matched, cfg),
             salt=str(len(matched)),
         )
@@ -665,11 +713,17 @@ def _rule_bruteforce_indicators(events: List[Event], cfg: Dict[str, Any]) -> Lis
         sev = "high"
     return [
         _mk_finding(
-            rule_name="Brute force indicators",
-            display_name="Brute force indicators",
+            rule_name=_t("Brute force indicators", "Brute force-indikatorer"),
+            display_name=_t("Brute force indicators", "Brute force-indikatorer"),
             severity=sev,
-            summary=f"{len(matched)} brute force related indicators",
-            description="The log contains indicators such as port scan, many connection attempts, or too many authentication attempts. This may indicate scanning or brute force.",
+            summary=_t(
+                f"{len(matched)} brute force related indicators",
+                f"{len(matched)} brute force-relaterade indikatorer",
+            ),
+            description=_t(
+                "The log contains indicators such as port scan, many connection attempts, or too many authentication attempts. This may indicate scanning or brute force.",
+                "Loggen innehåller indikatorer som portskanning, många anslutningsförsök eller för många autentiseringsförsök. Det kan tyda på skanning eller brute force.",
+            ),
             matched_lines=_clamp_lines(matched, cfg),
             salt=str(len(matched)),
         )
@@ -688,11 +742,17 @@ def _rule_web_sensitive_paths(events: List[Event], cfg: Dict[str, Any]) -> List[
     sev = "high" if any("/.env" in h.lower() or "/.git" in h.lower() for h in hits) else "medium"
     return [
         _mk_finding(
-            rule_name="Sensitive path probing",
-            display_name="Sensitive path probing",
+            rule_name=_t("Sensitive path probing", "Skanning av känsliga sökvägar"),
+            display_name=_t("Sensitive path probing", "Skanning av känsliga sökvägar"),
             severity=sev,
-            summary=f"{len(hits)} requests to sensitive URLs",
-            description="Attempts to access files and endpoints commonly targeted during scanning and exploitation, such as .env or .git. Check the source IP and block if needed.",
+            summary=_t(
+                f"{len(hits)} requests to sensitive URLs",
+                f"{len(hits)} förfrågningar till känsliga URL:er",
+            ),
+            description=_t(
+                "Attempts to access files and endpoints commonly targeted during scanning and exploitation, such as .env or .git. Check the source IP and block if needed.",
+                "Försök att nå filer och endpoints som ofta angrips vid skanning och exploatering, till exempel .env eller .git. Kontrollera käll-IP och blockera vid behov.",
+            ),
             matched_lines=_clamp_lines(hits, cfg),
             salt=str(len(hits)),
         )
@@ -705,11 +765,17 @@ def _rule_sqli_attempts(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[s
         return []
     return [
         _mk_finding(
-            rule_name="SQL injection attempts",
-            display_name="SQL injection attempts",
+            rule_name=_t("SQL injection attempts", "SQL-injektionsförsök"),
+            display_name=_t("SQL injection attempts", "SQL-injektionsförsök"),
             severity="high",
-            summary=f"{len(hits)} possible SQLi payloads",
-            description="The log contains patterns such as UNION SELECT or time based functions commonly used in SQL injection. Verify input validation and WAF rules.",
+            summary=_t(
+                f"{len(hits)} possible SQLi payloads",
+                f"{len(hits)} möjliga SQLi-payloads",
+            ),
+            description=_t(
+                "The log contains patterns such as UNION SELECT or time based functions commonly used in SQL injection. Verify input validation and WAF rules.",
+                "Loggen innehåller mönster som UNION SELECT eller tidsbaserade funktioner som ofta används vid SQL-injektion. Verifiera indata-validering och WAF-regler.",
+            ),
             matched_lines=_clamp_lines(hits, cfg),
             salt=str(len(hits)),
         )
@@ -722,11 +788,17 @@ def _rule_path_traversal_attempts(events: List[Event], cfg: Dict[str, Any]) -> L
         return []
     return [
         _mk_finding(
-            rule_name="Path traversal attempts",
-            display_name="Path traversal attempts",
+            rule_name=_t("Path traversal attempts", "Försök till path traversal"),
+            display_name=_t("Path traversal attempts", "Försök till path traversal"),
             severity="high",
-            summary=f"{len(hits)} traversal indicators",
-            description="The log contains dot dot slash variants or direct references to sensitive files. This may indicate attempts to read files outside the web root.",
+            summary=_t(
+                f"{len(hits)} traversal indicators",
+                f"{len(hits)} traversal-indikatorer",
+            ),
+            description=_t(
+                "The log contains dot dot slash variants or direct references to sensitive files. This may indicate attempts to read files outside the web root.",
+                "Loggen innehåller dot-dot-slash-varianter eller direkta referenser till känsliga filer. Det kan tyda på försök att läsa filer utanför webbroten.",
+            ),
             matched_lines=_clamp_lines(hits, cfg),
             salt=str(len(hits)),
         )
@@ -742,22 +814,34 @@ def _rule_malware_downloads(events: List[Event], cfg: Dict[str, Any]) -> List[Di
     if pipe_hits:
         return [
             _mk_finding(
-                rule_name="Download piped to shell",
-                display_name="Download piped to shell",
+                rule_name=_t("Download piped to shell", "Nedladdning pipad till shell"),
+                display_name=_t("Download piped to shell", "Nedladdning pipad till shell"),
                 severity="critical",
-                summary=f"{len(pipe_hits)} lines with curl or wget piped to a shell",
-                description="Patterns like curl or wget piped to sh or bash are commonly used for payload execution. This is highly suspicious unless it is a known installer in a controlled environment.",
+                summary=_t(
+                    f"{len(pipe_hits)} lines with curl or wget piped to a shell",
+                    f"{len(pipe_hits)} rader med curl eller wget pipade till shell",
+                ),
+                description=_t(
+                    "Patterns like curl or wget piped to sh or bash are commonly used for payload execution. This is highly suspicious unless it is a known installer in a controlled environment.",
+                    "Mönster som curl eller wget pipat till sh eller bash används ofta för payload-exekvering. Detta är starkt misstänkt om det inte är en känd installerare i en kontrollerad miljö.",
+                ),
                 matched_lines=_clamp_lines(pipe_hits, cfg),
                 salt=str(len(pipe_hits)),
             )
         ]
     return [
         _mk_finding(
-            rule_name="Suspicious payload download",
-            display_name="Suspicious payload download",
+            rule_name=_t("Suspicious payload download", "Misstänkt nedladdning av payload"),
+            display_name=_t("Suspicious payload download", "Misstänkt nedladdning av payload"),
             severity="high",
-            summary=f"{len(hits)} download attempts",
-            description="Patterns like curl, wget, or PowerShell downloads can be legitimate, but they are also common in malware droppers. Verify process, user, and destination.",
+            summary=_t(
+                f"{len(hits)} download attempts",
+                f"{len(hits)} nedladdningsförsök",
+            ),
+            description=_t(
+                "Patterns like curl, wget, or PowerShell downloads can be legitimate, but they are also common in malware droppers. Verify process, user, and destination.",
+                "Mönster som curl-, wget- eller PowerShell-nedladdningar kan vara legitima men är också vanliga i malware droppers. Verifiera process, användare och destination.",
+            ),
             matched_lines=_clamp_lines(hits, cfg),
             salt=str(len(hits)),
         )
@@ -770,11 +854,17 @@ def _rule_cron_and_tasks(events: List[Event], cfg: Dict[str, Any]) -> List[Dict[
         return []
     return [
         _mk_finding(
-            rule_name="Scheduled tasks and cron changes",
-            display_name="Scheduled tasks and cron changes",
+            rule_name=_t("Scheduled tasks and cron changes", "Ändringar i schemalagda jobb och cron"),
+            display_name=_t("Scheduled tasks and cron changes", "Ändringar i schemalagda jobb och cron"),
             severity="medium",
-            summary=f"{len(hits)} lines involving cron or scheduling",
-            description="Changes to cron or scheduled tasks can be used for persistence. Verify that the change is intentional and comes from a known admin source.",
+            summary=_t(
+                f"{len(hits)} lines involving cron or scheduling",
+                f"{len(hits)} rader som berör cron eller schemaläggning",
+            ),
+            description=_t(
+                "Changes to cron or scheduled tasks can be used for persistence. Verify that the change is intentional and comes from a known admin source.",
+                "Ändringar i cron eller schemalagda jobb kan användas för persistens. Verifiera att ändringen är avsiktlig och kommer från en känd administratörskälla.",
+            ),
             matched_lines=_clamp_lines(hits, cfg),
             salt=str(len(hits)),
         )
@@ -803,11 +893,17 @@ def _rule_correlate_ssh_bruteforce(events: List[Event], cfg: Dict[str, Any]) -> 
             lines = [e.raw for e in list(q)]
             findings.append(
                 _mk_finding(
-                    rule_name="SSH brute force per IP",
-                    display_name="SSH brute force per IP",
+                    rule_name=_t("SSH brute force per IP", "SSH brute force per IP-adress"),
+                    display_name=_t("SSH brute force per IP", "SSH brute force per IP-adress"),
                     severity="high",
-                    summary=f"{len(q)} failed logins from {ip} within {window} seconds",
-                    description="Repeated failed logins from the same IP within a short time window indicate brute force. Block the IP and verify whether any login succeeded afterward.",
+                    summary=_t(
+                        f"{len(q)} failed logins from {ip} within {window} seconds",
+                        f"{len(q)} misslyckade inloggningar från {ip} inom {window} sekunder",
+                    ),
+                    description=_t(
+                        "Repeated failed logins from the same IP within a short time window indicate brute force. Block the IP and verify whether any login succeeded afterward.",
+                        "Upprepade misslyckade inloggningar från samma IP inom kort tid tyder på brute force. Blockera IP-adressen och verifiera om någon inloggning lyckades efteråt.",
+                    ),
                     matched_lines=_clamp_lines(lines, cfg),
                     salt=f"{ip}|{ev.time_key}",
                 )
@@ -839,11 +935,17 @@ def _rule_correlate_password_spray(events: List[Event], cfg: Dict[str, Any]) -> 
                 lines = [e.raw for e in list(q)]
                 findings.append(
                     _mk_finding(
-                        rule_name="Password spraying",
-                        display_name="Password spraying",
+                        rule_name=_t("Password spraying", "Password spraying mot flera konton"),
+                        display_name=_t("Password spraying", "Password spraying mot flera konton"),
                         severity="high",
-                        summary=f"{len(q)} failed attempts against {len(users)} distinct users from {ip}",
-                        description="Many failed logins across many different users from the same IP indicate password spraying. Check for lockouts and apply blocking or MFA.",
+                        summary=_t(
+                            f"{len(q)} failed attempts against {len(users)} distinct users from {ip}",
+                            f"{len(q)} misslyckade försök mot {len(users)} unika användare från {ip}",
+                        ),
+                        description=_t(
+                            "Many failed logins across many different users from the same IP indicate password spraying. Check for lockouts and apply blocking or MFA.",
+                            "Många misslyckade inloggningar mot många olika användare från samma IP tyder på password spraying. Kontrollera kontolåsningar och tillämpa blockering eller MFA.",
+                        ),
                         matched_lines=_clamp_lines(lines, cfg),
                         salt=f"{ip}|{ev.time_key}|{len(users)}",
                     )
@@ -880,11 +982,17 @@ def _rule_correlate_fail_then_success(events: List[Event], cfg: Dict[str, Any]) 
                 lines = [e.raw for e in list(q)] + [ev.raw]
                 findings.append(
                     _mk_finding(
-                        rule_name="Successful login after multiple failures",
-                        display_name="Successful login after multiple failures",
+                        rule_name=_t("Successful login after multiple failures", "Lyckad inloggning efter flera misslyckanden"),
+                        display_name=_t("Successful login after multiple failures", "Lyckad inloggning efter flera misslyckanden"),
                         severity="critical",
-                        summary=f"Login succeeded for {user} from {ip} after {len(q)} failed attempts",
-                        description="A successful login immediately after many failures can indicate the attacker guessed correctly or obtained valid credentials. Review account activity and rotate credentials.",
+                        summary=_t(
+                            f"Login succeeded for {user} from {ip} after {len(q)} failed attempts",
+                            f"Inloggning lyckades för {user} från {ip} efter {len(q)} misslyckade försök",
+                        ),
+                        description=_t(
+                            "A successful login immediately after many failures can indicate the attacker guessed correctly or obtained valid credentials. Review account activity and rotate credentials.",
+                            "En lyckad inloggning direkt efter många misslyckanden kan tyda på att angriparen gissat rätt eller fått giltiga uppgifter. Granska kontoaktivitet och rotera autentiseringsuppgifter.",
+                        ),
                         matched_lines=_clamp_lines(lines, cfg),
                         salt=f"{ip}|{user}|{ev.time_key}",
                     )
@@ -922,11 +1030,17 @@ def _rule_correlate_web_scanning(events: List[Event], cfg: Dict[str, Any]) -> Li
             lines = [e.raw for e in list(q)]
             findings.append(
                 _mk_finding(
-                    rule_name="Web scanning with many 404s",
-                    display_name="Web scanning with many 404s",
+                    rule_name=_t("Web scanning with many 404s", "Webbskanning med många 404:or"),
+                    display_name=_t("Web scanning with many 404s", "Webbskanning med många 404:or"),
                     severity="medium",
-                    summary=f"{len(unique_paths)} unique paths returned 404 from {ip} within {window} seconds",
-                    description="Many 404 responses across many different endpoints from the same IP in a short time window are typical of directory brute force and scanning.",
+                    summary=_t(
+                        f"{len(unique_paths)} unique paths returned 404 from {ip} within {window} seconds",
+                        f"{len(unique_paths)} unika sökvägar gav 404 från {ip} inom {window} sekunder",
+                    ),
+                    description=_t(
+                        "Many 404 responses across many different endpoints from the same IP in a short time window are typical of directory brute force and scanning.",
+                        "Många 404-svar över många olika endpoints från samma IP under kort tid är typiskt för katalog-bruteforce och skanning.",
+                    ),
                     matched_lines=_clamp_lines(lines, cfg),
                     salt=f"{ip}|{ev.time_key}|{len(unique_paths)}",
                 )
@@ -956,11 +1070,17 @@ def _rule_correlate_web_401_403(events: List[Event], cfg: Dict[str, Any]) -> Lis
             lines = [e.raw for e in list(q)]
             findings.append(
                 _mk_finding(
-                    rule_name="Many 401 or 403 from the same IP",
-                    display_name="Many 401 or 403 from the same IP",
+                    rule_name=_t("Many 401 or 403 from the same IP", "Många 401 eller 403 från samma IP"),
+                    display_name=_t("Many 401 or 403 from the same IP", "Många 401 eller 403 från samma IP"),
                     severity="medium",
-                    summary=f"{len(q)} responses with 401 or 403 from {ip} within {window} seconds",
-                    description="Many 401 or 403 responses from the same IP in a short time window may indicate brute force against protected endpoints or credential stuffing.",
+                    summary=_t(
+                        f"{len(q)} responses with 401 or 403 from {ip} within {window} seconds",
+                        f"{len(q)} svar med 401 eller 403 från {ip} inom {window} sekunder",
+                    ),
+                    description=_t(
+                        "Many 401 or 403 responses from the same IP in a short time window may indicate brute force against protected endpoints or credential stuffing.",
+                        "Många 401- eller 403-svar från samma IP under kort tid kan tyda på brute force mot skyddade endpoints eller credential stuffing.",
+                    ),
                     matched_lines=_clamp_lines(lines, cfg),
                     salt=f"{ip}|{ev.time_key}|{len(q)}",
                 )
@@ -1007,7 +1127,10 @@ def analyze_log_content(log_text: str) -> List[Dict[str, Any]]:
     """
     if not isinstance(log_text, str):
         raise LogAnalyzerError(
-            user_message="Invalid input type for log text.",
+            user_message=_t(
+                "Invalid input type for log text.",
+                "Ogiltig indatatyp för loggtext.",
+            ),
             status_code=400,
             technical_message=str(type(log_text)),
         )

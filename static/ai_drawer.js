@@ -4,13 +4,13 @@ static/ai_drawer.js v4
 static/ai_drawer.js v4 builds on v3
 
 Key changes
-• Persistent history in sessionStorage (global per tab)
-• Floating AI button to reopen the drawer after closing
-• Command explain button is only in the Command Library details panel
-• Command explain sends better minimal context (title, syntax, short description)
-• Selection explain works on Toolbox, Tools, Concepts, and Defend subpages
-• Requests append to history and never reset it
-• Transcript shows only You and AI lines
+- Persistent history in sessionStorage (global per tab)
+- Floating AI button to reopen the drawer after closing
+- Command explain button is only in the Command Library details panel
+- Command explain sends better minimal context (title, syntax, short description)
+- Selection explain works on Toolbox, Tools, Concepts, and Defend subpages
+- Requests append to history and never reset it
+- Transcript shows only You and AI lines
 */
 
 (function () {
@@ -35,6 +35,12 @@ Key changes
   const API_PATH = "/api/ai";
   const CHAT_API_PATH = "/api/ai/chat";
   const SESSION_KEY = "cb_ai_session_id_v1";
+  const AI_I18N = (window.cbI18n && window.cbI18n.ai) || {};
+
+  function t(key, fallback) {
+    const v = AI_I18N[key];
+    return typeof v === "string" && v.trim().length ? v : fallback;
+  }
 
   let drawerEl;
   let backdropEl;
@@ -64,17 +70,17 @@ Key changes
     if (!text) return "";
     const t = String(text).trim();
     if (t.length <= maxChars) return t;
-    return t.slice(0, Math.max(0, maxChars - 1)) + "…";
+    return t.slice(0, Math.max(0, maxChars - 1)) + "...";
   }
 
   function inferPageTopic() {
     const path = (window.location.pathname || "").toLowerCase();
 
-    let section = "CyberBase";
-    if (path.startsWith("/command-library") || path.startsWith("/commands")) section = "Command Library";
-    else if (path.startsWith("/toolbox") || path.startsWith("/tools")) section = "Toolbox";
-    else if (path.startsWith("/concepts")) section = "Concepts";
-    else if (path.startsWith("/defend")) section = "Defend";
+    let section = t("cyberbase", "CyberBase");
+    if (path.startsWith("/command-library") || path.startsWith("/commands")) section = t("commandLibrary", "Command Library");
+    else if (path.startsWith("/toolbox") || path.startsWith("/tools")) section = t("toolbox", "Toolbox");
+    else if (path.startsWith("/concepts")) section = t("concepts", "Concepts");
+    else if (path.startsWith("/defend")) section = t("defend", "Defend");
 
     const h1 = document.querySelector("main h1") || document.querySelector("h1");
     let title = (h1 && h1.textContent ? h1.textContent : "").trim();
@@ -122,7 +128,7 @@ Key changes
     const lines = [];
 
     for (const item of historyItems) {
-      const who = item.role === "assistant" ? "AI" : "You";
+      const who = item.role === "assistant" ? "AI" : t("youLabel", "You");
       const content = String(item.content || "").replace(/\r\n/g, "\n").trimEnd();
       if (!content) continue;
 
@@ -221,7 +227,7 @@ Key changes
     }
 
     if (!data || typeof data !== "object") {
-      throw new Error("Bad response from server.");
+      throw new Error(t("badResponse", "Bad response from server."));
     }
 
     return { status: res.status, data };
@@ -244,15 +250,15 @@ Key changes
       /* ignore */
     }
     if (!data || typeof data !== "object") {
-      throw new Error("Bad response from server.");
+      throw new Error(t("badResponse", "Bad response from server."));
     }
     if (!res.ok) {
       if (res.status === 401 && data && data.error === "AUTH_REQUIRED") {
-        const err = new Error(data.message || "AUTH_REQUIRED");
+        const err = new Error(data.message || t("authRequired", "You need to be logged in to use the AI assistant."));
         err.code = "AUTH_REQUIRED";
         throw err;
       }
-      const msg = data && (data.error || data.message) ? (data.error || data.message) : "Chat failed.";
+      const msg = data && (data.error || data.message) ? (data.error || data.message) : t("chatFailed", "Chat failed.");
       throw new Error(String(msg));
     }
     return data;
@@ -324,14 +330,14 @@ Key changes
     appendHistory("user", contextTitle, userLine);
 
     setSending(true);
-    setStatus("Thinking…");
+    setStatus(t("thinking", "Thinking..."));
 
     try {
       // All AI requires login; check Firebase auth state first
       const idToken = await getIdTokenOrNull();
       if (!idToken) {
         setStatus("");
-        appendHistory("assistant", contextTitle, "You need to be logged in to use the AI assistant.");
+        appendHistory("assistant", contextTitle, t("authRequired", "You need to be logged in to use the AI assistant."));
         return;
       }
 
@@ -353,7 +359,7 @@ Key changes
         if (data && data.reply) {
           appendHistory("assistant", contextTitle, String(data.reply || ""));
         } else {
-          appendHistory("assistant", contextTitle, "No reply received.");
+          appendHistory("assistant", contextTitle, t("noReply", "No reply received."));
         }
       } else {
         // Legacy explain endpoints: block if not logged in (already checked)
@@ -370,16 +376,16 @@ Key changes
         if (data.ok) {
           appendHistory("assistant", contextTitle, String(data.text || ""));
         } else {
-          const msg = (data.error && data.error.message) ? String(data.error.message) : "AI request failed.";
+          const msg = (data.error && data.error.message) ? String(data.error.message) : t("aiRequestFailed", "AI request failed.");
           appendHistory("assistant", contextTitle, msg);
         }
       }
     } catch (e) {
       setStatus("");
       if (e && e.code === "AUTH_REQUIRED") {
-        appendHistory("assistant", contextTitle, "You need to be logged in to use the AI assistant.");
+        appendHistory("assistant", contextTitle, t("authRequired", "You need to be logged in to use the AI assistant."));
       } else {
-        appendHistory("assistant", contextTitle, "AI request failed. Please try again.");
+        appendHistory("assistant", contextTitle, t("aiRequestFailedRetry", "AI request failed. Please try again."));
       }
     } finally {
       setSending(false);
@@ -411,8 +417,8 @@ Key changes
     if (!sel) return;
 
     const page = inferPageTopic();
-    const contextTitle = page.topic ? page.topic : "Selected text";
-    const userLine = `Explain: "${trimText(sel, 140)}"`;
+    const contextTitle = page.topic ? page.topic : t("selectedText", "Selected text");
+    const userLine = `${t("explainPrefix", "Explain:")} "${trimText(sel, 140)}"`;
 
     runAiRequest({
       mode: "explain_selection",
@@ -446,15 +452,15 @@ Key changes
 
   function explainCurrentCommand(fromEl) {
     const details = extractCommandDetailsFromDom(fromEl);
-    const titleOrFallback = details.title || "Command";
+    const titleOrFallback = details.title || t("command", "Command");
 
-    const contextTitle = `Command Library: ${titleOrFallback}`;
-    const userLine = `Explain: ${titleOrFallback}`;
+    const contextTitle = `${t("commandLibrary", "Command Library")}: ${titleOrFallback}`;
+    const userLine = `${t("explainPrefix", "Explain:")} ${titleOrFallback}`;
 
     const parts = [];
-    if (details.title) parts.push(`Command title: ${details.title}`);
-    if (details.desc) parts.push(`Short description: ${details.desc}`);
-    if (details.syntax) parts.push(`Syntax:\n${details.syntax}`);
+    if (details.title) parts.push(`${t("commandTitlePrefix", "Command title:")} ${details.title}`);
+    if (details.desc) parts.push(`${t("shortDescriptionPrefix", "Short description:")} ${details.desc}`);
+    if (details.syntax) parts.push(`${t("syntaxPrefix", "Syntax:")}\n${details.syntax}`);
 
     const snippetText = parts.join("\n\n").trim();
 
@@ -464,7 +470,7 @@ Key changes
       userLine,
       snippetText,
       syntaxText: details.syntax,
-      pageTopic: "Command Library",
+      pageTopic: t("commandLibrary", "Command Library"),
     });
   }
 
@@ -474,7 +480,7 @@ Key changes
     if (!msg) return;
 
     const page = inferPageTopic();
-    const contextTitle = page.topic ? page.topic : "CyberBase";
+    const contextTitle = page.topic ? page.topic : t("cyberbase", "CyberBase");
     const userLine = msg;
 
     inputEl.value = "";
@@ -579,7 +585,7 @@ Key changes
       fabEl.addEventListener("click", (e) => {
         e.preventDefault();
         const page = inferPageTopic();
-        openDrawer(page.topic || "CyberBase");
+        openDrawer(page.topic || t("cyberbase", "CyberBase"));
       });
     }
 
@@ -656,3 +662,4 @@ Key changes
     init();
   }
 })();
+

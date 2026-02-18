@@ -1,7 +1,7 @@
 <!-- templates/commands.html v15 builds on v14 -->
 {% extends "base.html" %}
 
-{% block title %}Command Library - CyberBase{% endblock %}
+{% block title %}{{ _('Command Library') }} - CyberBase{% endblock %}
 
 {% block main_classes %}flex-1 w-full px-4 sm:px-6 lg:px-10 py-8{% endblock %}
 {% block content %}
@@ -113,8 +113,8 @@
 </style>
 
   <div class="text-center mb-8">
-    <h1 class="text-4xl font-bold mb-2">Command Library</h1>
-    <p class="text-gray-300">Docker, Git, GitHub CLI, and MongoDB with clear syntax and examples</p>
+    <h1 class="text-4xl font-bold mb-2">{{ _('Command Library') }}</h1>
+    <p class="text-gray-300">{{ _('Docker, Git, GitHub CLI, and MongoDB with clear syntax and examples') }}</p>
   </div>
 
   <div class="mb-6">
@@ -122,7 +122,7 @@
       <input
         type="text"
         x-model="search"
-        placeholder="Search commands..."
+        placeholder="{{ _('Search commands...') }}"
         class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
       >
       <svg class="absolute right-3 top-3 h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,27 +132,27 @@
   </div>
 
   <div class="flex flex-wrap gap-2 mb-6 border-b border-slate-700 pb-4">
-    <span class="text-xs text-gray-500 self-center mr-4">TOOLS:</span>
+    <span class="text-xs text-gray-500 self-center mr-4">{{ _('TOOLS:') }}</span>
     <template x-for="category in categories" :key="category">
       <button
         @click="selectedCategory = category; selectedWorkflow = null"
         :class="selectedCategory === category ? 'border-b-2 border-blue-400 text-blue-400' : 'text-gray-400 hover:text-gray-300'"
         class="pb-2 px-4 smooth-hover transition-colors text-sm"
-        x-text="category"
+        x-text="category === 'All' ? i18n.all : category"
       ></button>
     </template>
   </div>
 
   <template x-if="selectedCategory !== 'All'">
     <div class="flex flex-wrap gap-2 mb-6 border-b border-slate-700/50 pb-4 min-h-[52px] items-center">
-      <span class="text-xs text-gray-500 self-center mr-4">WORKFLOWS:</span>
+      <span class="text-xs text-gray-500 self-center mr-4">{{ _('WORKFLOWS:') }}</span>
 
       <button
         @click="selectedWorkflow = null"
         :class="selectedWorkflow === null ? 'bg-blue-600 text-white' : 'bg-slate-700 text-gray-300 hover:bg-slate-600'"
         class="px-3 py-1 rounded text-xs smooth-hover transition-colors"
       >
-        All Workflows
+        {{ _('All Workflows') }}
       </button>
 
       <template x-if="workflowsForCategory.length > 0">
@@ -167,7 +167,7 @@
       </template>
 
       <template x-if="workflowsForCategory.length === 0">
-        <span class="text-xs text-gray-500 italic">No workflows for this tool</span>
+        <span class="text-xs text-gray-500 italic">{{ _('No workflows for this tool') }}</span>
       </template>
     </div>
   </template>
@@ -234,7 +234,7 @@
 
             <template x-if="(pinnedInView.length + nonPinnedInView.length) === 0">
               <div class="h-full flex items-center justify-center py-12">
-                <p class="text-gray-300 text-lg">No commands found. Try a different search.</p>
+                <p class="text-gray-300 text-lg">{{ _('No commands found. Try a different search.') }}</p>
               </div>
             </template>
         </div>
@@ -246,8 +246,8 @@
               <template x-if="!selected">
                 <div class="min-h-[40vh] flex items-center justify-center text-center text-gray-300">
                   <div>
-                    <h3 class="text-xl font-semibold text-gray-300">No command selected</h3>
-                    <p class="mt-2 text-sm leading-relaxed">Pick a command from the left to see syntax, flags and examples here.</p>
+                    <h3 class="text-xl font-semibold text-gray-300">{{ _('No command selected') }}</h3>
+                    <p class="mt-2 text-sm leading-relaxed">{{ _('Pick a command from the left to see syntax, flags and examples here.') }}</p>
                   </div>
                 </div>
               </template>
@@ -262,13 +262,13 @@
                         data-cb-ai-explain-command
                         class="cb-ai-cta text-[11px] px-3 py-1 rounded border border-cyan-700 bg-slate-900 text-cyan-200 hover:bg-slate-800 font-mono smooth-hover"
                       >
-                        Explain with AI
+                        {{ _('Explain with AI') }}
                       </button>
                     </div>
 
                     <div class="flex items-start gap-3 relative">
                       <div class="pr-12">
-                        <h2 data-cb-command-title class="font-mono font-bold text-blue-300 text-base md:text-lg leading-snug" x-text="selected.name || 'Command'"></h2>
+                        <h2 data-cb-command-title class="font-mono font-bold text-blue-300 text-base md:text-lg leading-snug" x-text="selected.name || i18n.command"></h2>
                         <div class="flex flex-wrap gap-1.5 mt-1.5">
                           <template x-if="selected.workflow">
                             <span class="inline-flex items-center rounded bg-cyan-500/10 text-cyan-300/80 text-[10px] px-1.5 py-0.5" x-text="selected.workflow"></span>
@@ -282,8 +282,8 @@
                       <div class="absolute right-3 top-0 flex items-center gap-2">
                         <button @click="togglePin(selected)" :aria-pressed="isPinned(selected)"
                                 class="text-[11px] px-2 py-0.5 rounded border border-slate-600 bg-slate-800 hover:bg-slate-700 smooth-hover">
-                          <span x-show="!isPinned(selected)">Pin</span>
-                          <span x-show="isPinned(selected)">Unpin</span>
+                          <span x-show="!isPinned(selected)" x-text="i18n.pin"></span>
+                          <span x-show="isPinned(selected)" x-text="i18n.unpin"></span>
                         </button>
                       </div>
                     </div>
@@ -291,14 +291,14 @@
 
                   <!-- Short description -->
                   <div class="border-b border-slate-700/60 pb-2">
-                    <h4 class="sr-only">Short description</h4>
-                    <p data-cb-command-desc class="text-slate-300 text-sm leading-relaxed" x-text="(selected.description && selected.description.trim()) || 'No description available.'"></p>
+                    <h4 class="sr-only">{{ _('Short description') }}</h4>
+                    <p data-cb-command-desc class="text-slate-300 text-sm leading-relaxed" x-text="(selected.description && selected.description.trim()) || i18n.noDescription"></p>
                   </div>
 
                   <!-- Syntax -->
                   <div>
                     <div class="flex items-center gap-2 mb-2">
-                      <h4 class="ct-detail-title">Syntax</h4>
+                      <h4 class="ct-detail-title">{{ _('Syntax') }}</h4>
                       <div class="ct-popover-wrap">
                         <button
                           class="ct-popover-btn"
@@ -307,16 +307,16 @@
                           @click="pinSyntaxHelp($event.currentTarget)"
                           @keydown.escape.stop="closeSyntaxHelp(true)"
                           :aria-expanded="syntaxHelp.open"
-                          aria-label="How to read syntax"
+                          aria-label="{{ _('How to read syntax') }}"
                         >?</button>
                       </div>
                     </div>
                     <div class="ct-codeblock-wrap">
-                      <pre class="ct-codeblock"><code data-cb-command-syntax x-text="displayCommand(selected.command) || 'Not provided'"></code></pre>
+                      <pre class="ct-codeblock"><code data-cb-command-syntax x-text="displayCommand(selected.command) || i18n.notProvided"></code></pre>
                       <button
                         @click="copyToClipboard(displayCommand(selected.command) || '', $event.currentTarget)"
                         class="ct-codeblock-copy smooth-hover"
-                        title="Copy syntax"
+                        title="{{ _('Copy syntax') }}"
                       >
                         <svg class="ct-copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -328,13 +328,13 @@
                   <!-- Minimal usage (only if different) -->
                   <template x-if="(minimalUsageText(selected).trim() || '') !== (displayCommand(selected.command)).trim()">
                     <div>
-                      <h4 class="ct-detail-title mb-2">Minimal usage</h4>
+                      <h4 class="ct-detail-title mb-2">{{ _('Minimal usage') }}</h4>
                       <div class="ct-codeblock-wrap">
-                        <pre class="ct-codeblock"><code x-text="minimalUsageText(selected) || 'Not available'"></code></pre>
+                        <pre class="ct-codeblock"><code x-text="minimalUsageText(selected) || i18n.notAvailable"></code></pre>
                         <button
                           @click="copyToClipboard(minimalUsageText(selected) || '', $event.currentTarget)"
                           class="ct-codeblock-copy smooth-hover"
-                          title="Copy minimal usage"
+                          title="{{ _('Copy minimal usage') }}"
                         >
                           <svg class="ct-copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -346,7 +346,7 @@
 
                   <!-- Common flags -->
                   <div>
-                    <h4 class="ct-detail-title mb-2">Common flags</h4>
+                    <h4 class="ct-detail-title mb-2">{{ _('Common flags') }}</h4>
                     <div class="space-y-2" x-show="(selected.flags || []).length > 0">
                       <template x-for="flag in (selected.flags || [])" :key="flag.flag">
                         <div class="bg-slate-900/60 p-2.5 rounded-md text-[12px] border border-slate-700">
@@ -355,21 +355,21 @@
                             <button
                               @click="copyToClipboard(flag.flag, $event.currentTarget)"
                               class="text-[11px] bg-slate-700 hover:bg-blue-600 text-gray-300 px-2 py-0.5 rounded transition-colors"
-                              title="Copy"
+                              title="{{ _('Copy') }}"
                             >
-                              Copy
+                              {{ _('Copy') }}
                             </button>
                           </div>
                           <p class="text-gray-400 text-[11px] leading-relaxed mt-1" x-text="flag.description"></p>
                         </div>
                       </template>
                     </div>
-                    <div class="text-xs text-gray-400 leading-relaxed" x-show="!(selected.flags || []).length">No common flags available.</div>
+                    <div class="text-xs text-gray-400 leading-relaxed" x-show="!(selected.flags || []).length">{{ _('No common flags available.') }}</div>
                   </div>
 
                   <!-- Examples -->
                   <div>
-                    <h4 class="ct-detail-title mb-2">Examples</h4>
+                    <h4 class="ct-detail-title mb-2">{{ _('Examples') }}</h4>
                     <template x-if="selected.examples && selected.examples.length > 0">
                       <div class="space-y-2">
                         <template x-for="(example, index) in selected.examples" :key="index">
@@ -378,7 +378,7 @@
                             <button
                               @click="copyToClipboard(example, $event.currentTarget)"
                               class="ct-codeblock-copy smooth-hover"
-                              title="Copy"
+                              title="{{ _('Copy') }}"
                             >
                               <svg class="ct-copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -388,27 +388,27 @@
                         </template>
                       </div>
                     </template>
-                    <div class="text-xs text-gray-400 leading-relaxed" x-show="!(selected.examples && selected.examples.length)">No examples available.</div>
+                    <div class="text-xs text-gray-400 leading-relaxed" x-show="!(selected.examples && selected.examples.length)">{{ _('No examples available.') }}</div>
                   </div>
 
                   <!-- Verify with (moved above Recent to attach to command info) -->
                   <div class="text-xs text-gray-300 leading-relaxed">
-                    Verify with:
+                    {{ _('Verify with:') }}
                     <span class="font-mono" x-text="verifyWith(selected)"></span>
                   </div>
 
                   <!-- Recent (accordion, collapsed by default) -->
                   <div>
                     <button @click="recentOpen = !recentOpen" class="w-full text-left flex items-center justify-between py-2">
-                      <h4 class="ct-detail-title">Recent</h4>
+                      <h4 class="ct-detail-title">{{ _('Recent') }}</h4>
                       <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-400 leading-relaxed" x-text="recent.length + ' items'"></span>
+                        <span class="text-xs text-gray-400 leading-relaxed" x-text="recent.length + ' ' + i18n.items"></span>
                         <svg x-bind:class="{'rotate-180': recentOpen}" class="h-4 w-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                       </div>
                     </button>
                     <div x-show="recentOpen" x-transition x-cloak>
                       <div class="flex items-center justify-end mb-2" x-show="recent.length">
-                        <button class="text-xs px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600" @click="clearRecent()">Clear recent</button>
+                        <button class="text-xs px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600" @click="clearRecent()">{{ _('Clear recent') }}</button>
                       </div>
                       <div class="space-y-2" x-show="recent.length">
                         <template x-for="r in recent" :key="r.id">
@@ -418,22 +418,22 @@
                             </button>
                             <div class="flex items-center gap-2">
                               <button class="text-xs px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600" @click="togglePinById(r.id)">
-                                <span x-show="!isPinnedId(r.id)">Pin</span>
-                                <span x-show="isPinnedId(r.id)">Unpin</span>
+                                <span x-show="!isPinnedId(r.id)" x-text="i18n.pin"></span>
+                                <span x-show="isPinnedId(r.id)" x-text="i18n.unpin"></span>
                               </button>
                               <button class="text-xs px-2 py-1 rounded bg-slate-800 hover:bg-red-700/60 border border-slate-600 text-red-300" @click="removeFromRecent(r.id)">X</button>
                             </div>
                           </div>
                         </template>
                       </div>
-                      <div class="text-xs text-gray-400 leading-relaxed" x-show="!recent.length">No recent items.</div>
+                      <div class="text-xs text-gray-400 leading-relaxed" x-show="!recent.length">{{ _('No recent items.') }}</div>
                     </div>
                   </div>
 
                   <!-- Notes or Pitfalls -->
                   <template x-if="(coerceArray(selected.notes).length > 0) || (coerceArray(selected.pitfalls).length > 0)">
                     <div>
-                      <h4 class="ct-detail-title mb-2" x-text="coerceArray(selected.notes).length ? 'Notes' : 'Pitfalls'"></h4>
+                      <h4 class="ct-detail-title mb-2" x-text="coerceArray(selected.notes).length ? i18n.notes : i18n.pitfalls"></h4>
                       <ul class="list-disc list-inside space-y-1 text-sm text-slate-300 leading-relaxed">
                         <template x-for="(n, i) in (coerceArray(selected.notes).length ? coerceArray(selected.notes) : coerceArray(selected.pitfalls))" :key="i">
                           <li x-text="n"></li>
@@ -482,21 +482,21 @@
                     data-cb-ai-explain-command
                     class="cb-ai-cta text-[11px] px-3 py-1 rounded border border-cyan-700 bg-slate-900 text-cyan-200 hover:bg-slate-800 font-mono smooth-hover"
                   >
-                    Explain with AI
+                    {{ _('Explain with AI') }}
                   </button>
                 </div>
 
                 
                 <!-- Short description -->
                 <div class="border-b border-slate-700/60 pb-2">
-                  <h4 class="sr-only">Short description</h4>
-                  <p data-cb-command-desc class="text-slate-300 text-sm leading-relaxed" x-text="(selected?.description && selected.description.trim()) || 'No description available.'"></p>
+                  <h4 class="sr-only">{{ _('Short description') }}</h4>
+                  <p data-cb-command-desc class="text-slate-300 text-sm leading-relaxed" x-text="(selected?.description && selected.description.trim()) || i18n.noDescription"></p>
                 </div>
 
                 <!-- Syntax -->
                 <div>
                   <div class="flex items-center gap-2 mb-2">
-                    <h4 class="ct-detail-title">Syntax</h4>
+                    <h4 class="ct-detail-title">{{ _('Syntax') }}</h4>
                     <div class="ct-popover-wrap">
                       <button
                         class="ct-popover-btn"
@@ -505,16 +505,16 @@
                         @click="pinSyntaxHelp($event.currentTarget)"
                         @keydown.escape.stop="closeSyntaxHelp(true)"
                         :aria-expanded="syntaxHelp.open"
-                        aria-label="How to read syntax"
+                        aria-label="{{ _('How to read syntax') }}"
                       >?</button>
                     </div>
                   </div>
                   <div class="ct-codeblock-wrap">
-                    <pre class="ct-codeblock"><code data-cb-command-syntax x-text="displayCommand(selected.command) || 'Not provided'"></code></pre>
+                    <pre class="ct-codeblock"><code data-cb-command-syntax x-text="displayCommand(selected.command) || i18n.notProvided"></code></pre>
                     <button
                       @click="copyToClipboard(displayCommand(selected.command), $event.currentTarget)"
                       class="ct-codeblock-copy smooth-hover"
-                      title="Copy syntax pattern"
+                      title="{{ _('Copy syntax') }}"
                     >
                       <svg class="ct-copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -526,13 +526,13 @@
                 <!-- Minimal usage (only if different) -->
                 <template x-if="(minimalUsageText(selected).trim() || '') !== (displayCommand(selected.command)).trim()">
                   <div>
-                    <h4 class="ct-detail-title mb-2">Minimal usage</h4>
+                    <h4 class="ct-detail-title mb-2">{{ _('Minimal usage') }}</h4>
                     <div class="ct-codeblock-wrap">
-                    <pre class="ct-codeblock"><code x-text="minimalUsageText(selected) || 'Not available'"></code></pre>
+                    <pre class="ct-codeblock"><code x-text="minimalUsageText(selected) || i18n.notAvailable"></code></pre>
                     <button
                       @click="copyToClipboard(minimalUsageText(selected) || '', $event.currentTarget)"
                       class="ct-codeblock-copy smooth-hover"
-                      title="Copy minimal usage"
+                      title="{{ _('Copy minimal usage') }}"
                     >
                       <svg class="ct-copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -544,24 +544,24 @@
 
                 <!-- Common flags -->
                 <div>
-                  <h4 class="ct-detail-title mb-2">Common flags</h4>
+                  <h4 class="ct-detail-title mb-2">{{ _('Common flags') }}</h4>
                   <div class="space-y-2" x-show="(selected.flags || []).length > 0">
                     <template x-for="flag in (selected.flags || [])" :key="flag.flag">
                       <div class="bg-slate-900/70 p-2.5 rounded-md text-[12px] border border-slate-700">
                         <div class="flex justify-between items-start gap-2">
                           <code class="text-cyan-300 font-mono" x-text="flag.flag"></code>
-                          <button @click="copyToClipboard(flag.flag, $event.currentTarget)" class="text-[11px] bg-slate-700 hover:bg-blue-600 text-gray-300 px-2 py-0.5 rounded transition-colors" title="Copy">Copy</button>
+                          <button @click="copyToClipboard(flag.flag, $event.currentTarget)" class="text-[11px] bg-slate-700 hover:bg-blue-600 text-gray-300 px-2 py-0.5 rounded transition-colors" title="{{ _('Copy') }}">{{ _('Copy') }}</button>
                         </div>
                         <p class="text-gray-400 text-[11px] leading-relaxed mt-1" x-text="flag.description"></p>
                       </div>
                     </template>
                   </div>
-                  <div class="text-xs text-gray-400 leading-relaxed" x-show="!(selected.flags || []).length">No common flags available.</div>
+                  <div class="text-xs text-gray-400 leading-relaxed" x-show="!(selected.flags || []).length">{{ _('No common flags available.') }}</div>
                 </div>
 
                 <!-- Examples -->
                 <div>
-                  <h4 class="ct-detail-title mb-2">Examples</h4>
+                  <h4 class="ct-detail-title mb-2">{{ _('Examples') }}</h4>
                   <template x-if="selected.examples && selected.examples.length > 0">
                     <div class="space-y-2">
                       <template x-for="(example, index) in selected.examples" :key="index">
@@ -570,7 +570,7 @@
                     <button
                       @click="copyToClipboard(example, $event.currentTarget)"
                       class="ct-codeblock-copy smooth-hover"
-                      title="Copy"
+                      title="{{ _('Copy') }}"
                     >
                       <svg class="ct-copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -580,13 +580,13 @@
                       </template>
                     </div>
                   </template>
-                  <div class="text-xs text-gray-400 leading-relaxed" x-show="!(selected.examples && selected.examples.length)">No examples available.</div>
+                  <div class="text-xs text-gray-400 leading-relaxed" x-show="!(selected.examples && selected.examples.length)">{{ _('No examples available.') }}</div>
                 </div>
 
                 <!-- Notes or Pitfalls -->
                 <template x-if="(coerceArray(selected.notes).length > 0) || (coerceArray(selected.pitfalls).length > 0)">
                   <div>
-                    <h4 class="ct-detail-title mb-2" x-text="coerceArray(selected.notes).length ? 'Notes' : 'Pitfalls'"></h4>
+                    <h4 class="ct-detail-title mb-2" x-text="coerceArray(selected.notes).length ? i18n.notes : i18n.pitfalls"></h4>
                     <ul class="list-disc list-inside space-y-1 text-sm text-slate-300 leading-relaxed">
                       <template x-for="(n, i) in (coerceArray(selected.notes).length ? coerceArray(selected.notes) : coerceArray(selected.pitfalls))" :key="i">
                         <li x-text="n"></li>
@@ -596,7 +596,7 @@
                 </template>
 
                 <div class="text-xs text-gray-300 leading-relaxed pb-2">
-                  Verify with:
+                  {{ _('Verify with:') }}
                   <span class="font-mono" x-text="verifyWith(selected)"></span>
                 </div>
               </div>
@@ -624,6 +624,22 @@ function ctCommands(){
     recent: [], // array of {id, name}
     recentOpen: false,
     pinned: [], // array of {id, name}
+    i18n: {
+      all: {{ _('All')|tojson }},
+      command: {{ _('Command')|tojson }},
+      pin: {{ _('Pin')|tojson }},
+      unpin: {{ _('Unpin')|tojson }},
+      items: {{ _('items')|tojson }},
+      notes: {{ _('Notes')|tojson }},
+      pitfalls: {{ _('Pitfalls')|tojson }},
+      noDescription: {{ _('No description available.')|tojson }},
+      notProvided: {{ _('Not provided')|tojson }},
+      notAvailable: {{ _('Not available')|tojson }},
+      copy: {{ _('Copy')|tojson }},
+      copied: {{ _('Copied')|tojson }},
+      syntaxHelpTitle: {{ _('How to read syntax')|tojson }},
+      pinLimit: {{ _('You can pin up to 3 items.')|tojson }}
+    },
 
     // Syntax help tooltip (rendered in a portal to avoid clipping)
     syntaxHelp: { open:false, pinned:false, anchor:null, hoveringBtn:false, hoveringTip:false },
@@ -632,67 +648,67 @@ function ctCommands(){
     syntaxHelpBound: false,
     syntaxHelpMap: {
       all: [
-        '[options] means optional flags you can add',
-        '<arg> is a placeholder, replace it with a real value',
-        '[<arg>...] means you can repeat it for multiple values',
-        'A | B inside <...> means choose one of the alternatives',
-        '... means “repeat as needed”'
+        {{ _('[options] means optional flags you can add')|tojson }},
+        {{ _('<arg> is a placeholder, replace it with a real value')|tojson }},
+        {{ _('[<arg>...] means you can repeat it for multiple values')|tojson }},
+        {{ _('A | B inside <...> means choose one of the alternatives')|tojson }},
+        {{ _('... means \"repeat as needed\"')|tojson }}
       ],
       docker: [
-        '[options] means optional flags you can add, like -p or --name',
-        '<container> and <image> are placeholders, replace them with real names',
-        '[<container>...] means you can repeat it for multiple containers',
-        '<command> [<arg>...] means a command to run inside the container plus optional arguments',
-        'A | B inside <...> means choose one of the alternatives'
+        {{ _('[options] means optional flags you can add, like -p or --name')|tojson }},
+        {{ _('<container> and <image> are placeholders, replace them with real names')|tojson }},
+        {{ _('[<container>...] means you can repeat it for multiple containers')|tojson }},
+        {{ _('<command> [<arg>...] means a command to run inside the container plus optional arguments')|tojson }},
+        {{ _('A | B inside <...> means choose one of the alternatives')|tojson }}
       ],
       git: [
-        '[options] means optional flags you can add',
-        '<arg>, <path>, <name> are placeholders, replace them with real values',
-        '[<arg>...] means you can repeat it for multiple values',
-        '<subcommand> means choose exactly one subcommand',
-        '... means “repeat as needed”'
+        {{ _('[options] means optional flags you can add')|tojson }},
+        {{ _('<arg>, <path>, <name> are placeholders, replace them with real values')|tojson }},
+        {{ _('[<arg>...] means you can repeat it for multiple values')|tojson }},
+        {{ _('<subcommand> means choose exactly one subcommand')|tojson }},
+        {{ _('... means \"repeat as needed\"')|tojson }}
       ],
       github: [
-        '[options] means optional flags you can add',
-        '<arg>, <path>, <name> are placeholders, replace them with real values',
-        '[<arg>...] means you can repeat it for multiple values',
-        '<subcommand> means choose exactly one subcommand',
-        '... means “repeat as needed”'
+        {{ _('[options] means optional flags you can add')|tojson }},
+        {{ _('<arg>, <path>, <name> are placeholders, replace them with real values')|tojson }},
+        {{ _('[<arg>...] means you can repeat it for multiple values')|tojson }},
+        {{ _('<subcommand> means choose exactly one subcommand')|tojson }},
+        {{ _('... means \"repeat as needed\"')|tojson }}
       ],
       mongodb: [
-        'db.<collection> means replace <collection> with a real collection name, like db.users',
-        '( ... ) contains method arguments, separated by commas',
-        '<query>, <filter>, <projection> are placeholders for MongoDB query documents',
-        '{ } is a document (object), [ ] is an array',
-        'Some parameters are optional depending on the method, check the examples'
+        {{ _('db.<collection> means replace <collection> with a real collection name, like db.users')|tojson }},
+        {{ _('( ... ) contains method arguments, separated by commas')|tojson }},
+        {{ _('<query>, <filter>, <projection> are placeholders for MongoDB query documents')|tojson }},
+        {{ _('{ } is a document (object), [ ] is an array')|tojson }},
+        {{ _('Some parameters are optional depending on the method, check the examples')|tojson }}
       ],
       nmap: [
-        '<targets> can be a host, IP, CIDR, range, or a hostname',
-        '-p <ports> supports lists and ranges like 22,80,443 or 1-1024, and -p- means all ports',
-        'Scan types are flags like -sT (connect), -sU (UDP), -sV (version), -O (OS)',
-        'Scripts use --script <scripts> and optional --script-args <k=v,...>',
-        'Output flags like -oN, -oX, or -oA write results to files for reports'
+        {{ _('<targets> can be a host, IP, CIDR, range, or a hostname')|tojson }},
+        {{ _('-p <ports> supports lists and ranges like 22,80,443 or 1-1024, and -p- means all ports')|tojson }},
+        {{ _('Scan types are flags like -sT (connect), -sU (UDP), -sV (version), -O (OS)')|tojson }},
+        {{ _('Scripts use --script <scripts> and optional --script-args <k=v,...>')|tojson }},
+        {{ _('Output flags like -oN, -oX, or -oA write results to files for reports')|tojson }}
       ],
       auditd: [
-        'auditctl manages kernel audit rules, while ausearch and aureport query the logs',
-        'File watches use: -w <path> -p <r|w|x|a> -k <key>',
-        'Syscall rules use: -a always,exit -F arch=b64 -S <syscall> -F <field>=<value> -k <key>',
-        'Keys are used for searching later with: ausearch -k <key>',
-        'Time filters often use -ts <start> and -te <end>, and -i interprets IDs to names'
+        {{ _('auditctl manages kernel audit rules, while ausearch and aureport query the logs')|tojson }},
+        {{ _('File watches use: -w <path> -p <r|w|x|a> -k <key>')|tojson }},
+        {{ _('Syscall rules use: -a always,exit -F arch=b64 -S <syscall> -F <field>=<value> -k <key>')|tojson }},
+        {{ _('Keys are used for searching later with: ausearch -k <key>')|tojson }},
+        {{ _('Time filters often use -ts <start> and -te <end>, and -i interprets IDs to names')|tojson }}
       ],
       lynis: [
-        'Lynis uses subcommands like: lynis audit system, lynis show <topic>',
-        'Common automation flags are --quick and --quiet',
-        'Profiles can be selected with --profile <profile> to apply custom baselines',
-        'Cron automation is supported via --cronjob',
-        'Use show commands like: lynis show profiles, lynis show settings, lynis show options'
+        {{ _('Lynis uses subcommands like: lynis audit system, lynis show <topic>')|tojson }},
+        {{ _('Common automation flags are --quick and --quiet')|tojson }},
+        {{ _('Profiles can be selected with --profile <profile> to apply custom baselines')|tojson }},
+        {{ _('Cron automation is supported via --cronjob')|tojson }},
+        {{ _('Use show commands like: lynis show profiles, lynis show settings, lynis show options')|tojson }}
       ],
       clamav: [
-        'ClamAV has on demand scanning (clamscan), daemon based scanning (clamdscan), and updates (freshclam)',
-        '<path> can be a file or directory, and scanning directories usually needs --recursive',
-        'Use --infected to only list infected files',
-        'Logging uses --log=<file>, and quarantine actions include --move=<dir> or --copy=<dir>',
-        'Daemon scans can use --multiscan and optional --fdpass depending on permissions'
+        {{ _('ClamAV has on demand scanning (clamscan), daemon based scanning (clamdscan), and updates (freshclam)')|tojson }},
+        {{ _('<path> can be a file or directory, and scanning directories usually needs --recursive')|tojson }},
+        {{ _('Use --infected to only list infected files')|tojson }},
+        {{ _('Logging uses --log=<file>, and quarantine actions include --move=<dir> or --copy=<dir>')|tojson }},
+        {{ _('Daemon scans can use --multiscan and optional --fdpass depending on permissions')|tojson }}
       ]
     },
     toolKeyFromCategory(category){
@@ -760,7 +776,7 @@ function ctCommands(){
 
         el.innerHTML = `
           <div class="ct-popover-inner">
-            <h5>HOW TO READ SYNTAX</h5>
+            <h5>${this.i18n.syntaxHelpTitle}</h5>
             <div class="ct-divider"></div>
             <div class="ct-popover-body space-y-2"></div>
           </div>
@@ -991,11 +1007,11 @@ function ctCommands(){
           // If button already contains an svg, swap it; else replace content
           btn.innerHTML = checkSvg;
           btn.setAttribute('aria-live', 'polite');
-          btn.setAttribute('aria-label', 'Copied');
+          btn.setAttribute('aria-label', this.i18n.copied);
           setTimeout(() => {
             btn.innerHTML = original;
             btn.removeAttribute('aria-live');
-            btn.setAttribute('aria-label', btn.getAttribute('title') || 'Copy');
+            btn.setAttribute('aria-label', btn.getAttribute('title') || this.i18n.copy);
           }, 600);
         }).catch(() => {
           // Best-effort fallback without notifications per requirements
@@ -1018,7 +1034,7 @@ function ctCommands(){
     togglePin(cmd){ if(!cmd) return; this.togglePinById(cmd.id, cmd.name); },
     togglePinById(id, name){
       if(this.isPinnedId(id)) { this.unpin(id); return; }
-      if(this.pinned.length >= 3) { alert('You can pin up to 3 items.'); return; }
+      if(this.pinned.length >= 3) { alert(this.i18n.pinLimit); return; }
       const cmd = this.findById(id);
       const nm = name || (cmd ? cmd.name : '');
       this.pinned = [...this.pinned, {id, name: nm}];

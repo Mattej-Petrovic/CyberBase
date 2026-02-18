@@ -18,7 +18,8 @@ from datetime import datetime, timedelta
 from typing import Any, Optional
 from auth_routes import auth_bp, set_current_user_from_session_cookie, api_login_required
 
-from flask import Flask, render_template, request, redirect, url_for, jsonify, abort, g
+from flask import Flask, render_template, request, redirect, url_for, jsonify, abort, g, has_request_context
+from flask_babel import Babel, get_locale, gettext as _
 
 _BASE_DIR = os.path.dirname(__file__)
 if _BASE_DIR not in sys.path:
@@ -39,6 +40,35 @@ _LOG_ANALYZER_INFLIGHT: dict[str, threading.Event] = {}
 _LOG_ANALYZER_LOCK = threading.Lock()
 
 app = Flask(__name__)
+app.json.ensure_ascii = False
+
+_SUPPORTED_LOCALES = ("en", "sv")
+_LANG_COOKIE_NAME = "cb_lang"
+_PORT_DETAILS_SV_CACHE: Optional[dict[int, dict[str, Any]]] = None
+
+
+def _normalize_locale_code(raw: str) -> str:
+    code = (raw or "").strip().lower().replace("_", "-")
+    if code.startswith("sv"):
+        return "sv"
+    if code.startswith("en"):
+        return "en"
+    return ""
+
+
+def _select_locale() -> str:
+    saved = _normalize_locale_code(request.cookies.get(_LANG_COOKIE_NAME) or "")
+    if saved:
+        return saved
+
+    matched = _normalize_locale_code(request.accept_languages.best_match(_SUPPORTED_LOCALES) or "")
+    return matched or "en"
+
+
+app.config["BABEL_DEFAULT_LOCALE"] = "en"
+app.config["BABEL_SUPPORTED_LOCALES"] = list(_SUPPORTED_LOCALES)
+babel = Babel()
+babel.init_app(app, locale_selector=_select_locale)
 
 app.register_blueprint(auth_bp)
 
@@ -75,7 +105,18 @@ def _attach_profile():
 def _inject_profile():
     # Expose `profile` to all templates for compatibility with existing usage
     from flask import g
-    return {"profile": getattr(g, "profile", None)}
+    locale_code = _normalize_locale_code(str(get_locale() or "")) or "en"
+    return {
+        "profile": getattr(g, "profile", None),
+        "current_locale_code": locale_code,
+    }
+
+
+@app.after_request
+def _ensure_utf8_html(response):
+    if response.mimetype == "text/html":
+        response.mimetype_params["charset"] = "utf-8"
+    return response
 
 
 @app.get("/admin")
@@ -88,6 +129,24 @@ def admin_page():
         return abort(403)
     return render_template("admin.html")
 
+
+@app.get("/set-language/<lang_code>")
+def set_language(lang_code: str):
+    chosen = _normalize_locale_code(lang_code) or "en"
+    next_path = (request.args.get("next") or "").strip()
+    if (not next_path.startswith("/")) or next_path.startswith("//"):
+        next_path = "/"
+
+    resp = redirect(next_path)
+    resp.set_cookie(
+        _LANG_COOKIE_NAME,
+        chosen,
+        max_age=60 * 60 * 24 * 365,
+        samesite="Lax",
+        secure=request.is_secure,
+    )
+    return resp
+
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
 
@@ -98,22 +157,72 @@ def load_json(filename: str) -> Any:
 
 
 def load_tools() -> Any:
+    if _current_locale_code() == "sv":
+        sv_path = os.path.join(DATA_DIR, "tools_sv.json")
+        if os.path.exists(sv_path):
+            return load_json("tools_sv.json")
     return load_json("tools.json")
 
 
 def load_concepts() -> Any:
+    if _current_locale_code() == "sv":
+        sv_path = os.path.join(DATA_DIR, "concepts_sv.json")
+        if os.path.exists(sv_path):
+            return load_json("concepts_sv.json")
     return load_json("concepts.json")
 
 
+def _load_port_details_sv() -> dict[int, dict[str, Any]]:
+    global _PORT_DETAILS_SV_CACHE
+    if _PORT_DETAILS_SV_CACHE is not None:
+        return _PORT_DETAILS_SV_CACHE
+
+    path = os.path.join(DATA_DIR, "port_details_sv.json")
+    if not os.path.exists(path):
+        _PORT_DETAILS_SV_CACHE = {}
+        return _PORT_DETAILS_SV_CACHE
+
+    raw = load_json("port_details_sv.json")
+    out: dict[int, dict[str, Any]] = {}
+    if isinstance(raw, dict):
+        for k, v in raw.items():
+            try:
+                port_num = int(str(k))
+            except Exception:
+                continue
+            if isinstance(v, dict):
+                out[port_num] = v
+    _PORT_DETAILS_SV_CACHE = out
+    return _PORT_DETAILS_SV_CACHE
+
+
 def load_defend() -> Any:
+    if _current_locale_code() == "sv":
+        sv_path = os.path.join(DATA_DIR, "defend_sv.json")
+        if os.path.exists(sv_path):
+            return load_json("defend_sv.json")
     return load_json("defend.json")
 
 
+def _current_locale_code() -> str:
+    if not has_request_context():
+        return "en"
+    return _normalize_locale_code(str(get_locale() or "")) or "en"
+
+
 def load_commands() -> Any:
+    if _current_locale_code() == "sv":
+        sv_path = os.path.join(DATA_DIR, "commands_sv.json")
+        if os.path.exists(sv_path):
+            return load_json("commands_sv.json")
     return load_json("commands.json")
 
 
 def load_quiz() -> Any:
+    if _current_locale_code() == "sv":
+        sv_path = os.path.join(DATA_DIR, "quiz_sv.json")
+        if os.path.exists(sv_path):
+            return load_json("quiz_sv.json")
     return load_json("quiz.json")
 
 
@@ -619,10 +728,22 @@ _PORT_DETAILS: dict[int, dict[str, Any]] = {
 }
 
 
+def _get_port_details(port_num: Optional[int]) -> dict[str, Any]:
+    if port_num is None:
+        return {}
+    en_details = _PORT_DETAILS.get(port_num, {})
+    if _current_locale_code() != "sv":
+        return en_details
+    sv_details = _load_port_details_sv().get(port_num, {})
+    if isinstance(sv_details, dict) and sv_details:
+        return sv_details
+    return en_details
+
+
 def _build_port_learn(item: dict[str, Any]) -> dict[str, Any]:
     """Build 'learn' content for Ports pages (content only, no routing or layout changes)."""
     port_num = item.get("port")
-    details: dict[str, Any] = _PORT_DETAILS.get(port_num, {}) if port_num is not None else {}
+    details: dict[str, Any] = _get_port_details(port_num)
 
     def _get_text(key: str, fallback: str = "") -> str:
         return (details.get(key) or item.get(key) or fallback or "").strip()
@@ -735,7 +856,7 @@ def _snippet(text: str, n: int = 120) -> str:
     s = re.sub(r"\s+", " ", s)
     if len(s) <= n:
         return s
-    return s[: n - 1].rstrip() + "…"
+    return s[: n - 1].rstrip() + "..."
 
 
 def _limit(items: Any, n: int = 10) -> list[Any]:
@@ -787,11 +908,11 @@ def home():
         for c in commands:
             if not isinstance(c, dict):
                 continue
-            name = c.get("name") or "Command"
+            name = c.get("name") or _("Command")
             desc = c.get("description") or c.get("command") or ""
             candidates.append(
                 {
-                    "kind": "Command",
+                    "kind": _("Command"),
                     "title": name,
                     "desc": desc,
                     "href": "/command-library#cmd-" + slugify(str(name)),
@@ -808,8 +929,8 @@ def home():
             continue
         candidates.append(
             {
-                "kind": "Tool (CLI)",
-                "title": t.get("name") or "Tool",
+                "kind": _("Tool (CLI)"),
+                "title": t.get("name") or _("Tool"),
                 "desc": t.get("description") or t.get("desc") or "",
                 "href": f"/tools/{tid}",
             }
@@ -823,8 +944,8 @@ def home():
             continue
         candidates.append(
             {
-                "kind": "Tool (GUI)",
-                "title": t.get("name") or "Tool",
+                "kind": _("Tool (GUI)"),
+                "title": t.get("name") or _("Tool"),
                 "desc": t.get("description") or t.get("desc") or "",
                 "href": f"/tools/{tid}",
             }
@@ -835,8 +956,8 @@ def home():
         suggests = det2.get("description") or det2.get("desc") or ""
         candidates.append(
             {
-                "kind": "Tool (Detection)",
-                "title": det2.get("name") or "Tool",
+                "kind": _("Tool (Detection)"),
+                "title": det2.get("name") or _("Tool"),
                 "desc": suggests,
                 "href": f"/tools/{det2.get('id')}",
             }
@@ -850,8 +971,8 @@ def home():
             continue
         candidates.append(
             {
-                "kind": "Tool (Detection)",
-                "title": t.get("name") or "Tool",
+                "kind": _("Tool (Detection)"),
+                "title": t.get("name") or _("Tool"),
                 "desc": t.get("description") or t.get("desc") or "",
                 "href": f"/tools/{tid}",
             }
@@ -876,11 +997,11 @@ def home():
                     cid_val = it.get("port")
                 if cid_val is None:
                     continue
-                title = it.get("title") or it.get("name") or "Concept"
+                title = it.get("title") or it.get("name") or _("Concept")
                 desc = it.get("summary") or it.get("desc") or it.get("intro") or ""
                 candidates.append(
                     {
-                        "kind": "Concept",
+                        "kind": _("Concept"),
                         "title": title,
                         "desc": desc,
                         "href": f"/concepts/{cat_slug}/{cid_val}",
@@ -904,8 +1025,8 @@ def home():
                     continue
                 candidates.append(
                     {
-                        "kind": "Defend",
-                        "title": it.get("title") or it.get("name") or "Defend",
+                        "kind": _("Defend"),
+                        "title": it.get("title") or it.get("name") or _("Defend"),
                         "desc": it.get("intro") or "",
                         "href": f"/defend/{section}/{tid}",
                     }
@@ -1020,7 +1141,7 @@ def api_search():
                     results["commands"].append(
                         {
                             "title": name,
-                            "category": "Command",
+                            "category": _("Command"),
                             "href": "/command-library#cmd-" + slugify(str(name)),
                             "snippet": _snippet(str(c.get("description") or c.get("command") or "")),
                         }
@@ -1037,7 +1158,7 @@ def api_search():
                 results["tools"].append(
                     {
                         "title": name,
-                        "category": f"Tool • {kind}",
+                        "category": _("Tool - %(kind)s", kind=kind),
                         "href": f"/tools/{tid}",
                         "snippet": _snippet(str(t.get("description") or t.get("desc") or "")),
                     }
@@ -1059,9 +1180,9 @@ def api_search():
 
         concepts = load_concepts()
         mapping = [
-            ("frameworksAndStandards", "Concept • Frameworks", "frameworks-and-standards", "id"),
-            ("principlesAndIdentity", "Concept • Principles", "principles-and-identity", "id"),
-            ("networkingAndProtocols", "Concept • Networking", "networking-and-protocols", "id"),
+            ("frameworksAndStandards", _("Concept - Frameworks"), "frameworks-and-standards", "id"),
+            ("principlesAndIdentity", _("Concept - Principles"), "principles-and-identity", "id"),
+            ("networkingAndProtocols", _("Concept - Networking"), "networking-and-protocols", "id"),
         ]
         if isinstance(concepts, dict):
             for key, cat_label, cat_slug, id_field in mapping:
@@ -1093,7 +1214,7 @@ def api_search():
                     results["ports"].append(
                         {
                             "title": title,
-                            "category": "Concept • Ports",
+                            "category": _("Concept - Ports"),
                             "href": f"/concepts/ports/{port}",
                             "snippet": _snippet(str(it.get("desc") or "")),
                         }
@@ -1109,7 +1230,7 @@ def api_search():
                     results["defend"].append(
                         {
                             "title": title,
-                            "category": "Defend • Detection",
+                            "category": _("Defend - Detection"),
                             "href": f"/defend/detection-and-logging/{it.get('id')}",
                             "snippet": _snippet(str(it.get("intro") or "")),
                         }
@@ -1122,7 +1243,7 @@ def api_search():
                     results["defend"].append(
                         {
                             "title": title,
-                            "category": "Defend • Hardening",
+                            "category": _("Defend - Hardening"),
                             "href": f"/defend/hardening/{it.get('id')}",
                             "snippet": _snippet(str(it.get("intro") or "")),
                         }
@@ -1157,9 +1278,9 @@ def api_ai():
     """AI assistant endpoint for the right side drawer.
 
     Modes
-    • explain_command: page_url, snippet_text
-    • explain_selection: page_url, snippet_text
-    • chat: page_url, message_text, optional context
+    - explain_command: page_url, snippet_text
+    - explain_selection: page_url, snippet_text
+    - chat: page_url, message_text, optional context
     """
 
     payload = request.get_json(silent=True) or {}
@@ -1195,6 +1316,7 @@ def api_ai():
             syntax_text=syntax_text,
             message_text=message_text,
             context=context,
+            fallback_language=_normalize_locale_code(str(get_locale() or "")) or "en",
             debug=debug,
         )
 
@@ -1214,7 +1336,7 @@ def api_ai():
     except Exception as e:  # pragma: no cover
         if debug:
             logger.exception("AI endpoint error: %s", str(e))
-        resp = jsonify({"ok": False, "error": {"code": "server_error", "message": "AI request failed."}})
+        resp = jsonify({"ok": False, "error": {"code": "server_error", "message": _("AI request failed.")}})
         resp.status_code = 500
 
     if is_new_session:
@@ -1250,16 +1372,17 @@ def api_ai_chat():
     id_token = ""
     if authz.lower().startswith("bearer "):
         id_token = authz[7:].strip()
+    auth_required_message = _("Please log in to use the AI assistant.")
     if not id_token:
-        return jsonify({"error": "AUTH_REQUIRED", "message": "Please log in to use the AI assistant."}), 401
+        return jsonify({"error": "AUTH_REQUIRED", "message": auth_required_message}), 401
 
     try:
         decoded = verify_id_token(id_token)
         user_id = (decoded or {}).get("uid")
         if not user_id:
-            return jsonify({"error": "AUTH_REQUIRED", "message": "Please log in to use the AI assistant."}), 401
+            return jsonify({"error": "AUTH_REQUIRED", "message": auth_required_message}), 401
     except Exception:
-        return jsonify({"error": "AUTH_REQUIRED", "message": "Please log in to use the AI assistant."}), 401
+        return jsonify({"error": "AUTH_REQUIRED", "message": auth_required_message}), 401
 
     payload = request.get_json(silent=True) or {}
     prompt = (payload.get("prompt") or "").strip()
@@ -1268,12 +1391,12 @@ def api_ai_chat():
     model = (payload.get("model") or "").strip()
 
     if not prompt:
-        return jsonify({"error": "Missing prompt"}), 400
+        return jsonify({"error": _("Missing prompt")}), 400
 
     try:
         safe_page = (page_path or "")
         if len(safe_page) > 120:
-            safe_page = safe_page[:119] + "…"
+            safe_page = safe_page[:119] + "..."
         logger.info("AI_CHAT start userId=%s sessionId=%s page=%s", user_id, (session_id or "<new>"), safe_page)
     except Exception:
         logger.info("AI_CHAT start userId=%s sessionId=%s", user_id, (session_id or "<new>"))
@@ -1310,6 +1433,7 @@ def api_ai_chat():
             page_topic="",
             message_text=prompt,
             context=context_msgs,
+            fallback_language=_normalize_locale_code(str(get_locale() or "")) or "en",
             debug=debug,
         )
     except AiAssistantError as e:
@@ -1317,7 +1441,7 @@ def api_ai_chat():
     except Exception:
         if debug:
             logger.exception("/api/ai/chat failure")
-        return jsonify({"error": "AI request failed"}), 502
+        return jsonify({"error": _("AI request failed.")}), 502
 
     finished = time.time()
     reply = (result or {}).get("text") or ""
@@ -1441,10 +1565,10 @@ def concept_detail(cat: str, cid: str):
     try:
         data = load_concepts()
         mapping = {
-            "frameworks-and-standards": ("Frameworks and Standards", "frameworksAndStandards", "id"),
-            "principles-and-identity": ("Principles and Identity", "principlesAndIdentity", "id"),
-            "networking-and-protocols": ("Networking and Protocols", "networkingAndProtocols", "id"),
-            "ports": ("Ports", "ports", "port"),
+            "frameworks-and-standards": (_("Frameworks and Standards"), "frameworksAndStandards", "id"),
+            "principles-and-identity": (_("Principles and Identity"), "principlesAndIdentity", "id"),
+            "networking-and-protocols": (_("Networking and Protocols"), "networkingAndProtocols", "id"),
+            "ports": (_("Ports"), "ports", "port"),
         }
 
         if cat not in mapping:
@@ -1452,9 +1576,10 @@ def concept_detail(cat: str, cid: str):
                 render_template(
                     "concept_detail.html",
                     item={},
-                    title="Not found",
-                    category="Concepts",
+                    title=_("Not found"),
+                    category=_("Concepts"),
                     not_found=True,
+                    is_ports=False,
                 ),
                 404,
             )
@@ -1468,20 +1593,21 @@ def concept_detail(cat: str, cid: str):
                 render_template(
                     "concept_detail.html",
                     item={},
-                    title="Not found",
+                    title=_("Not found"),
                     category=title_cat,
                     not_found=True,
+                    is_ports=False,
                 ),
                 404,
             )
 
         if key == "ports":
             port_num = _as_int(item.get("port"))
-            details = _PORT_DETAILS.get(port_num, {}) if port_num is not None else {}
+            details = _get_port_details(port_num)
 
-            service = details.get("service") or item.get("name") or "Service"
+            service = details.get("service") or item.get("name") or _("Service")
             port_str = str(item.get("port") or "")
-            title = f"Port {port_str}: {service}"
+            title = _("Port %(port)s: %(service)s", port=port_str, service=service)
 
             item = {
                 **item,
@@ -1492,8 +1618,8 @@ def concept_detail(cat: str, cid: str):
             item["references"] = _unique_list((item.get("references") or []) + (item["learn"].get("references") or []))
 
             where_when = (
-                "You will see this in scans, firewall rules, vulnerability reports, and service configs. "
-                "Treat open ports as exposure points and verify the service is expected, hardened, and restricted."
+                _("You will see this in scans, firewall rules, vulnerability reports, and service configs. ")
+                + _("Treat open ports as exposure points and verify the service is expected, hardened, and restricted.")
             )
 
             return render_template(
@@ -1503,6 +1629,7 @@ def concept_detail(cat: str, cid: str):
                 category=title_cat,
                 where_when=where_when,
                 not_found=False,
+                is_ports=True,
             )
 
         item = _apply_concept_learn_override(item)
@@ -1511,19 +1638,26 @@ def concept_detail(cat: str, cid: str):
         where_when = item.get("where") or item.get("when") or item.get("used") or ""
         if not where_when:
             if key == "frameworksAndStandards":
-                where_when = "Used in governance, risk, and compliance work: control selection, audits, reporting, and security roadmaps."
+                where_when = _(
+                    "Used in governance, risk, and compliance work: control selection, audits, reporting, and security roadmaps."
+                )
             elif key == "principlesAndIdentity":
-                where_when = "Used when designing and operating access control, authentication, authorization, and identity lifecycle."
+                where_when = _(
+                    "Used when designing and operating access control, authentication, authorization, and identity lifecycle."
+                )
             elif key == "networkingAndProtocols":
-                where_when = "Shows up in packet captures, network diagrams, firewall rules, and system or network logs."
+                where_when = _(
+                    "Shows up in packet captures, network diagrams, firewall rules, and system or network logs."
+                )
 
         return render_template(
             "concept_detail.html",
             item=item,
-            title=item.get("name", "Concept"),
+            title=item.get("name", _("Concept")),
             category=title_cat,
             where_when=where_when,
             not_found=False,
+            is_ports=False,
         )
 
     except Exception as e:
@@ -1540,8 +1674,8 @@ def defend_hub():
 def defend_detail(section: str, topic: str):
     defend = load_defend()
     mapping = {
-        "detection-and-logging": ("Detection and Logging", "detectionAndLogging"),
-        "hardening": ("Hardening", "hardening"),
+        "detection-and-logging": (_("Detection and Logging"), "detectionAndLogging"),
+        "hardening": (_("Hardening"), "hardening"),
     }
 
     if section not in mapping:
@@ -1549,8 +1683,8 @@ def defend_detail(section: str, topic: str):
             render_template(
                 "defend_detail.html",
                 item={},
-                title="Not found",
-                category="Defend",
+                title=_("Not found"),
+                category=_("Defend"),
                 not_found=True,
             ),
             404,
@@ -1565,7 +1699,7 @@ def defend_detail(section: str, topic: str):
             render_template(
                 "defend_detail.html",
                 item={},
-                title="Not found",
+                title=_("Not found"),
                 category=title_section,
                 not_found=True,
             ),
@@ -1575,7 +1709,7 @@ def defend_detail(section: str, topic: str):
     return render_template(
         "defend_detail.html",
         item=item,
-        title=item.get("title", "Defend"),
+        title=item.get("title", _("Defend")),
         category=title_section,
         not_found=False,
     )
@@ -1595,52 +1729,53 @@ def _log_analyzer_cleanup(now: float) -> None:
         _LOG_ANALYZER_CACHE.pop(k, None)
 
 
-def _log_analyzer_run_guarded(*, fingerprint: str, log_text: str) -> dict:
+def _log_analyzer_run_guarded(*, fingerprint: str, log_text: str, locale_code: str) -> dict:
     """Short cache and in flight guard to avoid double triggering."""
 
+    cache_key = f"{fingerprint}|{locale_code}"
     now = time.monotonic()
     with _LOG_ANALYZER_LOCK:
         _log_analyzer_cleanup(now)
 
-        cached = _LOG_ANALYZER_CACHE.get(fingerprint)
+        cached = _LOG_ANALYZER_CACHE.get(cache_key)
         if cached and now - cached[0] <= _LOG_ANALYZER_CACHE_TTL_SECONDS:
-            logger.info("[LogAnalyzer] cache_hit fp=%s", fingerprint[:12])
+            logger.info("[LogAnalyzer] cache_hit fp=%s locale=%s", fingerprint[:12], locale_code)
             return cached[1]
 
-        event = _LOG_ANALYZER_INFLIGHT.get(fingerprint)
+        event = _LOG_ANALYZER_INFLIGHT.get(cache_key)
         if event is None:
             event = threading.Event()
-            _LOG_ANALYZER_INFLIGHT[fingerprint] = event
+            _LOG_ANALYZER_INFLIGHT[cache_key] = event
             is_owner = True
         else:
             is_owner = False
 
     if not is_owner:
         # Wait briefly for the in progress analysis
-        logger.info("[LogAnalyzer] inflight_wait fp=%s", fingerprint[:12])
+        logger.info("[LogAnalyzer] inflight_wait fp=%s locale=%s", fingerprint[:12], locale_code)
         event.wait(timeout=8.0)
         now2 = time.monotonic()
         with _LOG_ANALYZER_LOCK:
-            cached2 = _LOG_ANALYZER_CACHE.get(fingerprint)
+            cached2 = _LOG_ANALYZER_CACHE.get(cache_key)
             if cached2 and now2 - cached2[0] <= _LOG_ANALYZER_CACHE_TTL_SECONDS:
-                logger.info("[LogAnalyzer] inflight_return fp=%s", fingerprint[:12])
+                logger.info("[LogAnalyzer] inflight_return fp=%s locale=%s", fingerprint[:12], locale_code)
                 return cached2[1]
         raise LogAnalyzerError(
-            user_message="Analysis is already running for the same log. Please try again in a moment.",
+            user_message=_("Analysis is already running for the same log. Please try again in a moment."),
             status_code=409,
         )
 
-    # Owner kör analysen
+    # Owner runs the analysis
     try:
         findings = analyze_log_content(log_text)
         result = {"findings": findings}
         now3 = time.monotonic()
         with _LOG_ANALYZER_LOCK:
-            _LOG_ANALYZER_CACHE[fingerprint] = (now3, result)
+            _LOG_ANALYZER_CACHE[cache_key] = (now3, result)
         return result
     finally:
         with _LOG_ANALYZER_LOCK:
-            ev = _LOG_ANALYZER_INFLIGHT.pop(fingerprint, None)
+            ev = _LOG_ANALYZER_INFLIGHT.pop(cache_key, None)
             if ev:
                 ev.set()
 
@@ -1655,12 +1790,12 @@ def analyze():
         if "file" in request.files:
             uploaded = request.files.get("file")
             if not uploaded or not uploaded.filename:
-                return jsonify({"error": "No file provided"}), 400
+                return jsonify({"error": _("No file provided.")}), 400
 
             data = uploaded.read() or b""
             # Enforce 5MB max (same as UI)
             if len(data) > 5 * 1024 * 1024:
-                return jsonify({"error": "File too large (max 5MB)"}), 413
+                return jsonify({"error": _("File too large (max 5MB).")}), 413
 
             fp = _log_analyzer_fingerprint(data)
             req_id = request.headers.get("X-LogAnalyzer-Request-ID")
@@ -1673,7 +1808,8 @@ def analyze():
                 # Fallback decode
                 text = data.decode(errors="replace")
 
-            result = _log_analyzer_run_guarded(fingerprint=fp, log_text=text)
+            locale_code = _normalize_locale_code(str(get_locale() or "")) or "en"
+            result = _log_analyzer_run_guarded(fingerprint=fp, log_text=text, locale_code=locale_code)
             return jsonify(result), 200
 
         # Handle JSON body for text analysis (AJAX)
@@ -1681,17 +1817,18 @@ def analyze():
             payload = request.get_json(silent=True) or {}
             raw = payload.get("log_text") or payload.get("log_content") or ""
             if not isinstance(raw, str) or not raw.strip():
-                return jsonify({"error": "Missing log_text"}), 400
+                return jsonify({"error": _("Missing log text.")}), 400
 
             # UI limit: max 200k characters
             if len(raw) > 200_000:
-                return jsonify({"error": "Input too large (max 200k characters)"}), 413
+                return jsonify({"error": _("Input too large (max 200,000 characters).")}), 413
 
             fp = _log_analyzer_fingerprint(raw.encode("utf-8", errors="ignore"))
             req_id = request.headers.get("X-LogAnalyzer-Request-ID") or payload.get("request_id")
             if req_id:
                 logger.info("[LogAnalyzer] request text req_id=%s fp=%s", req_id, fp[:12])
-            result = _log_analyzer_run_guarded(fingerprint=fp, log_text=raw)
+            locale_code = _normalize_locale_code(str(get_locale() or "")) or "en"
+            result = _log_analyzer_run_guarded(fingerprint=fp, log_text=raw, locale_code=locale_code)
             return jsonify(result), 200
 
         # Fallback: traditional form post renders the page with results
@@ -1700,8 +1837,8 @@ def analyze():
         return render_template("analyze.html", result=result_list, log_content=content)
     except LogAnalyzerError as e:
         return jsonify({"error": e.to_display_string()}), e.status_code
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": _("Unexpected analyzer error.")}), 500
 
 
 @app.route("/analyze-text", methods=["POST"])
@@ -1710,21 +1847,22 @@ def analyze_text():
         payload = request.get_json(silent=True) or {}
         raw = payload.get("log_text") or payload.get("log_content") or ""
         if not isinstance(raw, str) or not raw.strip():
-            return jsonify({"error": "Missing log_text"}), 400
+            return jsonify({"error": _("Missing log text.")}), 400
 
         if len(raw) > 200_000:
-            return jsonify({"error": "Input too large (max 200k characters)"}), 413
+            return jsonify({"error": _("Input too large (max 200,000 characters).")}), 413
 
         fp = _log_analyzer_fingerprint(raw.encode("utf-8", errors="ignore"))
         req_id = request.headers.get("X-LogAnalyzer-Request-ID") or payload.get("request_id")
         if req_id:
             logger.info("[LogAnalyzer] request analyze-text req_id=%s fp=%s", req_id, fp[:12])
-        result = _log_analyzer_run_guarded(fingerprint=fp, log_text=raw)
+        locale_code = _normalize_locale_code(str(get_locale() or "")) or "en"
+        result = _log_analyzer_run_guarded(fingerprint=fp, log_text=raw, locale_code=locale_code)
         return jsonify(result), 200
     except LogAnalyzerError as e:
         return jsonify({"error": e.to_display_string()}), e.status_code
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    except Exception:
+        return jsonify({"error": _("Unexpected analyzer error.")}), 500
 
 
 @app.route("/quiz", methods=["GET"])
@@ -1749,3 +1887,4 @@ def health():
 
 if __name__ == "__main__":
     app.run(debug=True)
+

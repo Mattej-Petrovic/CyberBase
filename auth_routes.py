@@ -12,6 +12,7 @@ from user_profile import (
 )
 
 from flask import Blueprint, jsonify, redirect, render_template, request, g, current_app, make_response
+from flask_babel import gettext as _
 
 from firebase_admin_init import (
     create_session_cookie,
@@ -102,7 +103,7 @@ def api_login_required(view_func):
     def wrapper(*args, **kwargs):
         user = get_request_user()
         if not user:
-            return jsonify({"ok": False, "error": "Unauthorized"}), 401
+            return jsonify({"ok": False, "error": _("Unauthorized")}), 401
         # attach for downstream handlers
         g.user = user
         return view_func(*args, **kwargs)
@@ -149,25 +150,25 @@ def session_login():
     data = request.get_json(silent=True) or {}
     id_token = (data.get("idToken") or "").strip()
     if not id_token:
-        return jsonify({"ok": False, "error": "Missing idToken"}), 400
+        return jsonify({"ok": False, "error": _("Missing idToken")}), 400
 
     try:
         decoded = verify_id_token(id_token)
         uid = decoded.get("uid")
         if not uid:
-            return jsonify({"ok": False, "error": "Invalid token"}), 401
+            return jsonify({"ok": False, "error": _("Invalid token")}), 401
         if not decoded.get("email_verified", False):
-            return jsonify({"ok": False, "error": "Email not verified"}), 403
+            return jsonify({"ok": False, "error": _("Email not verified")}), 403
     except Exception as e:
         current_app.logger.exception("Token verification failed: %s", e)
-        return jsonify({"ok": False, "error": "Token verification failed"}), 401
+        return jsonify({"ok": False, "error": _("Token verification failed")}), 401
 
     expires_in_seconds = SESSION_EXPIRES_DAYS * 24 * 60 * 60
 
     try:
         session_cookie = create_session_cookie(id_token, expires_in_seconds)
     except Exception:
-        return jsonify({"ok": False, "error": "Could not create session"}), 500
+        return jsonify({"ok": False, "error": _("Could not create session")}), 500
 
     resp = jsonify({"ok": True})
     resp.set_cookie(
@@ -259,13 +260,13 @@ def update_avatar_route():
     avatar_key = (data.get("avatar_key") or "").strip()
     allowed = {f"avatar_{i:02d}" for i in range(1, 9)}
     if avatar_key not in allowed:
-        return jsonify({"ok": False, "error": "Invalid avatar"}), 400
+        return jsonify({"ok": False, "error": _("Invalid avatar")}), 400
     try:
         update_avatar(g.user.get("uid"), avatar_key)
         return jsonify({"ok": True})
     except Exception:
         current_app.logger.exception("Avatar update failed")
-        return jsonify({"ok": False, "error": "Update failed"}), 400
+        return jsonify({"ok": False, "error": _("Update failed")}), 400
 
 
 @auth_bp.post("/profile/display-name")
@@ -282,11 +283,11 @@ def update_display_name_route():
 
     # Length 4..16
     if not (4 <= len(norm) <= 16):
-        return jsonify({"ok": False, "error": "Display name must be 4-16 characters."}), 400
+        return jsonify({"ok": False, "error": _("Display name must be 4-16 characters.")}), 400
 
     # Allowed chars check (letters, numbers, space, underscore, dot)
     if not re.fullmatch(r"[A-Za-z0-9 _\.]+", norm):
-        return jsonify({"ok": False, "error": "Only letters, numbers, space, underscore and dot are allowed."}), 400
+        return jsonify({"ok": False, "error": _("Only letters, numbers, space, underscore and dot are allowed.")}), 400
 
     # Blocklist and token rules
     blocked = {
@@ -295,9 +296,9 @@ def update_display_name_route():
     low = norm.lower().strip()
     tokens = re.findall(r"[a-z0-9]+", low)
     if any(t in blocked for t in tokens):
-        return jsonify({"ok": False, "error": "That name is not allowed."}), 400
+        return jsonify({"ok": False, "error": _("That name is not allowed.")}), 400
     if low.startswith(("admin", "root", "sys", "system")):
-        return jsonify({"ok": False, "error": "That name is not allowed."}), 400
+        return jsonify({"ok": False, "error": _("That name is not allowed.")}), 400
 
     uid = g.user.get("uid")
 
@@ -325,7 +326,7 @@ def update_display_name_route():
                 elapsed = now - changed_at
                 if elapsed < timedelta(days=7):
                     remaining = 7 - max(0, int(elapsed.days))
-                    return jsonify({"ok": False, "error": f"You can change your name again in {remaining} day(s)."}), 429
+                    return jsonify({"ok": False, "error": _("You can change your name again in %(days)s day(s).", days=remaining)}), 429
             except Exception:
                 # If parsing fails, allow update and reset the marker
                 pass
@@ -336,4 +337,4 @@ def update_display_name_route():
         return jsonify({"ok": True})
     except Exception:
         current_app.logger.exception("Display name update failed")
-        return jsonify({"ok": False, "error": "Update failed"}), 400
+        return jsonify({"ok": False, "error": _("Update failed")}), 400

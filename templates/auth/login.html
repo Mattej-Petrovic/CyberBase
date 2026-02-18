@@ -3,8 +3,8 @@
 <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <div class="cb-card p-6">
     <div class="mb-4">
-      <h1 class="text-2xl font-bold">Welcome back</h1>
-      <p class="text-sm text-gray-400">Sign in or create your account.</p>
+      <h1 class="text-2xl font-bold">{{ _('Welcome back') }}</h1>
+      <p class="text-sm text-gray-400">{{ _('Sign in or create your account.') }}</p>
     </div>
 
     <div id="status" class="hidden mb-3"></div>
@@ -12,34 +12,38 @@
     <div class="mb-3">
       <button id="btnGoogle" class="cb-btn cb-btn-secondary w-full flex items-center justify-center gap-2" data-loading="0">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-5 h-5"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12 c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20 s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,16.108,18.961,13,24,13c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657 C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.197l-6.19-5.238C29.211,35.091,26.715,36,24,36 c-5.202,0-9.619-3.317-11.283-7.946l-6.536,5.036C9.494,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-3.994,5.565c0.001-0.001,0.002-0.001,0.003-0.002 l6.19,5.238C36.951,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
-        Continue with Google
+        {{ _('Continue with Google') }}
       </button>
     </div>
 
     <div class="grid gap-3">
       <label class="block">
-        <span class="text-sm text-gray-300">Email</span>
-        <input id="email" type="email" autocomplete="email" class="cb-input mt-1" placeholder="you@example.com" />
+        <span class="text-sm text-gray-300">{{ _('Email') }}</span>
+        <input
+          id="email"
+          type="email"
+          autocomplete="email"
+          class="cb-input mt-1"
+          placeholder="{{ 'du@exempel.com' if (current_locale_code or 'en') == 'sv' else 'you@example.com' }}"
+        />
       </label>
 
       <label class="block">
-        <span class="text-sm text-gray-300">Password</span>
+        <span class="text-sm text-gray-300">{{ _('Password') }}</span>
         <div class="relative mt-1">
-          <input id="password" type="password" autocomplete="current-password" class="cb-input pr-10" placeholder="••••••••" />
-          <button type="button" id="togglePw" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-200">Show</button>
+          <input id="password" type="password" autocomplete="current-password" class="cb-input pr-10" placeholder="{{ _('Enter your password') }}" />
+          <button type="button" id="togglePw" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-200">{{ _('Show') }}</button>
         </div>
       </label>
 
-      <div class="flex gap-3 mt-1">
-        <button id="btnLogin" class="cb-btn cb-btn-primary w-full" data-loading="0">Login</button>
-        <button id="btnSignup" class="cb-btn cb-btn-secondary w-full" data-loading="0">Create account</button>
+      <div class="grid grid-cols-2 gap-3 mt-1">
+        <button id="btnLogin" class="cb-btn cb-btn-primary w-full min-h-11 text-sm" data-loading="0">{{ _('Login') }}</button>
+        <button id="btnSignup" class="cb-btn cb-btn-secondary w-full min-h-11 text-sm" data-loading="0">{{ _('Create account') }}</button>
       </div>
 
       <div class="mt-1 text-right">
-        <a href="#" id="forgotPw" class="text-xs text-blue-300 hover:text-blue-200">Forgot password?</a>
+        <a href="#" id="forgotPw" class="text-xs text-blue-300 hover:text-blue-200">{{ _('Forgot password?') }}</a>
       </div>
-
-      <p class="text-xs text-gray-500 mt-2">By continuing you accept our basic usage and privacy terms.</p>
     </div>
   </div>
 </div>
@@ -94,6 +98,51 @@
     .then((ok) => { if (ok) getAnalytics(app); })
     .catch(() => {});
 
+  const i18n = {
+    verifyEmailIntro: {{ _('We sent a verification email to ')|tojson }},
+    verifyEmailOutro: {{ _('. Verify it to continue.')|tojson }},
+    resend: {{ _('Resend')|tojson }},
+    iVerified: {{ _('I verified')|tojson }},
+    passwordPolicy: {{ _('Password must be 12 to 30 characters and include uppercase, lowercase, a number, and a special character.')|tojson }},
+    invalidEmail: {{ _('Please enter a valid email address.')|tojson }},
+    missingPassword: {{ _('Please enter your password.')|tojson }},
+    invalidCredentials: {{ _('Incorrect email or password.')|tojson }},
+    noAccountFound: {{ _('No account found with that email.')|tojson }},
+    tooManyRequests: {{ _('Too many attempts. Please try again later.')|tojson }},
+    networkError: {{ _('Network error. Check your connection and try again.')|tojson }},
+    emailAlreadyInUse: {{ _('An account with this email already exists.')|tojson }},
+    unauthorizedDomain: {{ _('Sign-in is not enabled for this domain.')|tojson }},
+    operationNotAllowed: {{ _('This sign-in method is not enabled.')|tojson }},
+    invalidApiKey: {{ _('Configuration error. Please contact support.')|tojson }},
+    passwordNeedsReset: {{ _('Your password no longer meets the security requirements. Please reset your password to continue.')|tojson }},
+    genericError: {{ _('Something went wrong. Please try again.')|tojson }},
+    googleOperationNotAllowed: {{ _('Google sign-in is not enabled for this project.')|tojson }},
+    popupBlocked: {{ _('Your browser blocked the sign-in popup. We will use a redirect instead.')|tojson }},
+    popupClosed: {{ _('The sign-in window was closed. Please try again.')|tojson }},
+    popupCanceled: {{ _('Another sign-in attempt was canceled. Please try again.')|tojson }},
+    invalidGoogleCredential: {{ _('Could not use the provided Google credential. Try again.')|tojson }},
+    accountExistsWithEmail: {{ _('An account already exists for {email}. Sign in with your password to link Google.')|tojson }},
+    googleSignInFailed: {{ _('Google sign-in failed. Please try again.')|tojson }},
+    loading: {{ _('Loading...')|tojson }},
+    show: {{ _('Show')|tojson }},
+    hide: {{ _('Hide')|tojson }},
+    sessionLoginFailed: {{ _('Session login failed')|tojson }},
+    accountLinkingFailed: {{ _('Account linking failed. You can reset your password and try again.')|tojson }},
+    loggedInRedirecting: {{ _('Logged in. Redirecting...')|tojson }},
+    verificationEmailSent: {{ _('We sent a verification email. Please verify to continue.')|tojson }},
+    enterCredentialsToResend: {{ _('Please enter your email and password to resend the verification.')|tojson }},
+    verificationEmailResent: {{ _('Verification email resent.')|tojson }},
+    stillNotVerified: {{ _('Still not verified yet. Please check your inbox.')|tojson }},
+    enterEmailToReset: {{ _('Please enter your email to reset your password.')|tojson }},
+    passwordResetSent: {{ _('Password reset email sent. Check your inbox.')|tojson }}
+  };
+
+  function formatMessage(template, values = {}) {
+    return (template || '').replace(/\{(\w+)\}/g, (_, key) => {
+      if (values[key] === null || values[key] === undefined) return '';
+      return String(values[key]);
+    });
+  }
 
   const statusEl = document.getElementById("status");
   const emailEl = document.getElementById("email");
@@ -106,15 +155,15 @@
     verifyCard.id = 'verifyCard';
     verifyCard.className = 'hidden mt-4 p-4 rounded border border-slate-700 bg-slate-900';
     verifyCard.innerHTML = `
-      <div class="mb-2 text-sm text-gray-300">We sent a verification email to <span id="verifyEmailValue" class="font-semibold text-gray-100"></span>. Verify it to continue.</div>
+      <div class="mb-2 text-sm text-gray-300">${i18n.verifyEmailIntro}<span id="verifyEmailValue" class="font-semibold text-gray-100"></span>${i18n.verifyEmailOutro}</div>
       <div class="verify-actions">
-        <button id="resendBtn" class="verify-btn cb-btn cb-btn-secondary" data-cd="0">Resend <span id="resendCountdown" class="ml-1 text-xs text-gray-400"></span></button>
-        <button id="verifyContinueBtn" class="verify-btn cb-btn cb-btn-primary">I verified</button>
+        <button id="resendBtn" class="verify-btn cb-btn cb-btn-secondary" data-cd="0">${i18n.resend} <span id="resendCountdown" class="ml-1 text-xs text-gray-400"></span></button>
+        <button id="verifyContinueBtn" class="verify-btn cb-btn cb-btn-primary">${i18n.iVerified}</button>
       </div>`;
     grid.parentNode.appendChild(verifyCard);
   })();
 
-  const PW_POLICY_MSG = "Password must be 12 to 30 characters and include uppercase, lowercase, a number, and a special character.";
+  const PW_POLICY_MSG = i18n.passwordPolicy;
 
   function validatePassword(pw) {
     if (typeof pw !== 'string') return false;
@@ -129,26 +178,26 @@
   function mapAuthError(err, context) {
     const code = (err && err.code) || '';
     const byCode = {
-      'auth/invalid-email': 'Please enter a valid email address.',
-      'auth/missing-password': 'Please enter your password.',
-      'auth/invalid-credential': 'Incorrect email or password.',
-      'auth/wrong-password': 'Incorrect email or password.',
-      'auth/user-not-found': 'No account found with that email.',
-      'auth/too-many-requests': 'Too many attempts. Please try again later.',
-      'auth/network-request-failed': 'Network error. Check your connection and try again.',
+      'auth/invalid-email': i18n.invalidEmail,
+      'auth/missing-password': i18n.missingPassword,
+      'auth/invalid-credential': i18n.invalidCredentials,
+      'auth/wrong-password': i18n.invalidCredentials,
+      'auth/user-not-found': i18n.noAccountFound,
+      'auth/too-many-requests': i18n.tooManyRequests,
+      'auth/network-request-failed': i18n.networkError,
       'auth/weak-password': PW_POLICY_MSG,
       'auth/password-does-not-meet-requirements': PW_POLICY_MSG,
-      'auth/email-already-in-use': 'An account with this email already exists.',
-      'auth/unauthorized-domain': 'Sign-in is not enabled for this domain.',
-      'auth/operation-not-allowed': 'This sign-in method is not enabled.',
-      'auth/invalid-api-key': 'Configuration error. Please contact support.'
+      'auth/email-already-in-use': i18n.emailAlreadyInUse,
+      'auth/unauthorized-domain': i18n.unauthorizedDomain,
+      'auth/operation-not-allowed': i18n.operationNotAllowed,
+      'auth/invalid-api-key': i18n.invalidApiKey
     };
 
     // Force-upgrade message on sign-in only
     if (context === 'login' && (code === 'auth/password-does-not-meet-requirements' || code === 'auth/weak-password')) {
-      return 'Your password no longer meets the security requirements. Please reset your password to continue.';
+      return i18n.passwordNeedsReset;
     }
-    return byCode[code] || 'Something went wrong. Please try again.';
+    return byCode[code] || i18n.genericError;
   }
 
   function setStatus(type, msg) {
@@ -183,18 +232,20 @@
 
   function mapGoogleError(err) {
     const code = (err && err.code) || '';
+    if (code === 'auth/account-exists-with-different-credential') {
+      return formatMessage(i18n.accountExistsWithEmail, { email: err?.customData?.email || '' });
+    }
     const byCode = {
-      'auth/unauthorized-domain': 'Sign-in is not enabled for this domain.',
-      'auth/operation-not-allowed': 'Google sign-in is not enabled for this project.',
-      'auth/popup-blocked': 'Your browser blocked the sign-in popup. We’ll use a redirect instead.',
-      'auth/popup-closed-by-user': 'The sign-in window was closed. Please try again.',
-      'auth/cancelled-popup-request': 'Another sign-in attempt was canceled. Please try again.',
-      'auth/network-request-failed': 'Network error. Check your connection and try again.',
-      'auth/invalid-api-key': 'Configuration error. Please contact support.',
-      'auth/invalid-credential': 'Could not use the provided Google credential. Try again.',
-      'auth/account-exists-with-different-credential': 'An account with this email already exists. Sign in with your password to link Google.'
+      'auth/unauthorized-domain': i18n.unauthorizedDomain,
+      'auth/operation-not-allowed': i18n.googleOperationNotAllowed,
+      'auth/popup-blocked': i18n.popupBlocked,
+      'auth/popup-closed-by-user': i18n.popupClosed,
+      'auth/cancelled-popup-request': i18n.popupCanceled,
+      'auth/network-request-failed': i18n.networkError,
+      'auth/invalid-api-key': i18n.invalidApiKey,
+      'auth/invalid-credential': i18n.invalidGoogleCredential
     };
-    return byCode[code] || 'Google sign-in failed. Please try again.';
+    return byCode[code] || i18n.googleSignInFailed;
   }
 
   function setLoading(button, loading) {
@@ -202,7 +253,7 @@
     button.dataset.loading = loading ? '1' : '0';
     if (loading) {
       button.dataset.label = button.textContent;
-      button.textContent = 'Loading...';
+      button.textContent = i18n.loading;
     } else if (button.dataset.label) {
       button.textContent = button.dataset.label;
       delete button.dataset.label;
@@ -213,7 +264,7 @@
     const el = document.getElementById('password');
     const isPw = el.getAttribute('type') === 'password';
     el.setAttribute('type', isPw ? 'text' : 'password');
-    document.getElementById('togglePw').textContent = isPw ? 'Hide' : 'Show';
+    document.getElementById('togglePw').textContent = isPw ? i18n.hide : i18n.show;
   });
 
   // Auth persistence best practice: prefer local persistence for full web apps
@@ -232,7 +283,7 @@
     showDevErrorDetails(e, 'redirect');
     if (e && e.code === 'auth/account-exists-with-different-credential') {
       const email = e.customData?.email;
-      setStatus('error', `An account already exists for ${email}. Sign in with your password to link Google.`);
+      setStatus('error', formatMessage(i18n.accountExistsWithEmail, { email }));
       window.__PENDING_LINK__ = { email, credential: GoogleAuthProvider.credentialFromError(e) };
     } else {
       setStatus('error', mapGoogleError(e));
@@ -259,7 +310,7 @@
     const data = await res.json().catch(() => ({}));
     if (IS_DEV) console.info('[auth] sessionLogin', { reason, status: res.status, ok: data?.ok });
     if (!res.ok || !data.ok) {
-      const err = new Error(data.error || "Session login failed");
+      const err = new Error(data.error || i18n.sessionLoginFailed);
       err.status = res.status;
       throw err;
     }
@@ -303,7 +354,7 @@
       showDevErrorDetails(e, 'popup');
       if (e && e.code === 'auth/account-exists-with-different-credential') {
         const email = e.customData?.email;
-        setStatus('error', `An account already exists for ${email}. Sign in with your password to link Google.`);
+        setStatus('error', formatMessage(i18n.accountExistsWithEmail, { email }));
         window.__PENDING_LINK__ = {
           email,
           credential: GoogleAuthProvider.credentialFromError(e)
@@ -328,7 +379,7 @@
           }
         } catch (linkErr) {
           showDevErrorDetails(linkErr, 'link');
-          setStatus('error', 'Account linking failed. You can reset your password and try again.');
+          setStatus('error', i18n.accountLinkingFailed);
           setLoading(btn, false);
           return;
         }
@@ -340,7 +391,7 @@
         await auth.signOut();
       } else {
         await exchangeForSession(cred.user, 'password');
-        setStatus('success', 'Logged in. Redirecting...');
+        setStatus('success', i18n.loggedInRedirecting);
         window.location.assign(getNextUrl());
       }
     } catch (e) {
@@ -365,7 +416,7 @@
       await sendEmailVerification(cred.user, { url: `${SITE_URL}/login` });
       document.getElementById('verifyEmailValue').textContent = cred.user.email || emailEl.value.trim();
       verifyCard.classList.remove('hidden');
-      setStatus('success', 'We sent a verification email. Please verify to continue.');
+      setStatus('success', i18n.verificationEmailSent);
     } catch (e) {
       setStatus('error', mapAuthError(e, 'signup'));
     }
@@ -384,9 +435,9 @@
       if (!u && email && pw) {
         try { u = (await signInWithEmailAndPassword(auth, email, pw)).user; } catch {}
       }
-      if (!u) { setStatus('error', 'Please enter your email and password to resend the verification.'); return; }
+      if (!u) { setStatus('error', i18n.enterCredentialsToResend); return; }
       await sendEmailVerification(u, { url: `${SITE_URL}/login` });
-      setStatus('success', 'Verification email resent.');
+      setStatus('success', i18n.verificationEmailResent);
       // Start cooldown
       btn.dataset.cd = '1';
       const cd = document.getElementById('resendCountdown');
@@ -411,7 +462,7 @@
         await exchangeForSession(cred.user, 'verify-continue');
         window.location.assign(getNextUrl());
       } else {
-        setStatus('error', 'Still not verified yet. Please check your inbox.');
+        setStatus('error', i18n.stillNotVerified);
         await auth.signOut();
       }
     } catch (e) {
@@ -425,10 +476,10 @@
     if (!a) return;
     ev.preventDefault();
     const email = emailEl.value.trim();
-    if (!email) { setStatus('error', 'Please enter your email to reset your password.'); return; }
+    if (!email) { setStatus('error', i18n.enterEmailToReset); return; }
     try {
       await sendPasswordResetEmail(auth, email, { url: `${SITE_URL}/login?reset=1` });
-      setStatus('success', 'Password reset email sent. Check your inbox.');
+      setStatus('success', i18n.passwordResetSent);
     } catch (e) {
       setStatus('error', mapAuthError(e, 'reset'));
     }

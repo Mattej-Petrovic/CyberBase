@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-\{# tool_view.html v8 bygger vidare på v7 #\}
+{# tool_view.html v8 bygger vidare på v7 #}
 
-{% block title %}{{ tool.name }} · Toolbox{% endblock %}
+{% block title %}{{ tool.name }} - {{ _('Toolbox') }}{% endblock %}
 
 {# Derive a short takeaway from existing hero text (no extra data fields needed).
    Purpose: fill balanced card height without feeling like empty space.
@@ -12,9 +12,9 @@
   {% set parts = t.split('. ') %}
   {% set first = parts[0] if parts and parts[0] else t %}
   {% if '.' in t and not first.endswith('.') %}
-    {{ (first ~ '.') | truncate(max_chars, True, '…') }}
+    {{ (first ~ '.') | truncate(max_chars, True, '...') }}
   {% else %}
-    {{ first | truncate(max_chars, True, '…') }}
+    {{ first | truncate(max_chars, True, '...') }}
   {% endif %}
 {%- endmacro %}
 
@@ -31,17 +31,17 @@
 {# Small helper to provide short explanations for common Wireshark filters #}
 {% macro ws_filter_explain(expr) -%}
   {%- set e = (expr or '')|trim -%}
-  {%- if e == 'http' -%}HTTP protocol traffic
-  {%- elif e == 'dns' -%}DNS protocol traffic
-  {%- elif e == 'tls.handshake' -%}TLS handshake messages
-  {%- elif e == 'tcp.analysis.retransmission' -%}TCP retransmissions
-  {%- elif e == 'tcp.flags.reset == 1' -%}TCP reset (RST) packets
-  {%- elif e.startswith('tcp.flags.syn') -%}TCP SYN packets (handshake start)
-  {%- elif e.startswith('ip.addr ==') -%}Traffic to or from the specified IP
-  {%- elif e.startswith('tcp.port ==') -%}TCP traffic on the specified port
-  {%- elif e.startswith('http.response.code') -%}HTTP error responses (4xx/5xx)
-  {%- elif e.startswith('dns.flags.response') -%}DNS responses with an error code
-  {%- else -%}Filter expression
+  {%- if e == 'http' -%}{{ _('HTTP protocol traffic') }}
+  {%- elif e == 'dns' -%}{{ _('DNS protocol traffic') }}
+  {%- elif e == 'tls.handshake' -%}{{ _('TLS handshake messages') }}
+  {%- elif e == 'tcp.analysis.retransmission' -%}{{ _('TCP retransmissions') }}
+  {%- elif e == 'tcp.flags.reset == 1' -%}{{ _('TCP reset (RST) packets') }}
+  {%- elif e.startswith('tcp.flags.syn') -%}{{ _('TCP SYN packets (handshake start)') }}
+  {%- elif e.startswith('ip.addr ==') -%}{{ _('Traffic to or from the specified IP') }}
+  {%- elif e.startswith('tcp.port ==') -%}{{ _('TCP traffic on the specified port') }}
+  {%- elif e.startswith('http.response.code') -%}{{ _('HTTP error responses (4xx/5xx)') }}
+  {%- elif e.startswith('dns.flags.response') -%}{{ _('DNS responses with an error code') }}
+  {%- else -%}{{ _('Filter expression') }}
   {%- endif -%}
 {%- endmacro %}
 
@@ -59,14 +59,14 @@
 
   {% if has_cli or has_gui or has_det %}
   <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 {{ extra_classes }}">
-    <h2 class="text-lg font-semibold text-white">Usage</h2>
+    <h2 class="text-lg font-semibold text-white">{{ _('Usage') }}</h2>
 
     {% if tool.kind == 'GUI' and has_gui %}
-      <p class="mt-1 text-sm text-slate-400/90 max-w-[68ch] leading-6 tracking-[0.01em]">A fast GUI cheat sheet: quick actions, common views/filters, and exports.</p>
+      <p class="mt-1 text-sm text-slate-400/90 max-w-[68ch] leading-6 tracking-[0.01em]">{{ _('A fast GUI cheat sheet: quick actions, common views/filters, and exports.') }}</p>
 
       {% if qa %}
       <div class="mt-4">
-        <p class="text-sm text-slate-300">Quick actions</p>
+        <p class="text-sm text-slate-300">{{ _('Quick actions') }}</p>
         <ul class="mt-3 space-y-3 text-sm text-slate-200/90 leading-6 tracking-[0.01em] max-w-[68ch]">
           {% for a in qa %}
           <li class="rounded-xl bg-black/30 px-4 py-3 ring-1 ring-white/5">{{ a }}</li>
@@ -77,7 +77,7 @@
 
       {% if cf %}
       <div class="mt-4">
-        <p class="text-sm text-slate-300">Common filters or views</p>
+        <p class="text-sm text-slate-300">{{ _('Common filters or views') }}</p>
         {% if tool.id == 'wireshark' %}
         <div class="mt-3 space-y-3 max-w-[68ch]">
           {% for f in cf %}
@@ -96,7 +96,7 @@
 
       {% if ex %}
       <div class="mt-4">
-        <p class="text-sm text-slate-300">Exports</p>
+        <p class="text-sm text-slate-300">{{ _('Exports') }}</p>
         <ul class="mt-3 space-y-3 text-sm text-slate-200/90 leading-6 tracking-[0.01em] max-w-[68ch]">
           {% for e in ex %}
           <li class="rounded-xl bg-black/30 px-4 py-3 ring-1 ring-white/5">{{ e }}</li>
@@ -106,11 +106,11 @@
       {% endif %}
 
     {% elif tool.kind == 'Detection' and has_det %}
-      <p class="mt-1 text-sm text-slate-400/90 max-w-[68ch] leading-6 tracking-[0.01em]">Quick setup steps and common actions.</p>
+      <p class="mt-1 text-sm text-slate-400/90 max-w-[68ch] leading-6 tracking-[0.01em]">{{ _('Quick setup steps and common actions.') }}</p>
 
       {% if tool.quickSetup %}
       <div class="mt-4">
-        <p class="text-sm text-slate-300">Quick setup</p>
+        <p class="text-sm text-slate-300">{{ _('Quick setup') }}</p>
         {% if tool.id == 'suricata' %}
         <ul class="mt-3 space-y-3 text-sm text-slate-200/90 leading-6 tracking-[0.01em] max-w-[68ch]">
           {% for s in tool.quickSetup %}
@@ -154,7 +154,7 @@
 
       {% if tool.actions %}
       <div class="mt-4">
-        <p class="text-sm text-slate-300">Actions</p>
+        <p class="text-sm text-slate-300">{{ _('Actions') }}</p>
         <div class="mt-3 space-y-3 max-w-[68ch]">
           {% for a in tool.actions %}
             {% if a is string %}
@@ -176,18 +176,18 @@
       {% endif %}
 
     {% else %}
-      <p class="mt-1 text-sm text-slate-400/90 max-w-[68ch] leading-6 tracking-[0.01em]">Minimal usage, a general pattern, common flags, and examples you can adapt in authorized environments.</p>
+      <p class="mt-1 text-sm text-slate-400/90 max-w-[68ch] leading-6 tracking-[0.01em]">{{ _('Minimal usage, a general pattern, common flags, and examples you can adapt in authorized environments.') }}</p>
 
       {% if tool.minimal %}
       <div class="mt-4">
-        <p class="text-sm text-slate-300">Minimal</p>
+        <p class="text-sm text-slate-300">{{ _('Minimal') }}</p>
         <code class="cb-code-slab cb-code-text mt-2 block rounded-xl bg-black/50 px-4 py-3 text-sm font-mono text-slate-100 ring-1 ring-white/10 overflow-x-auto whitespace-nowrap">{{ tool.minimal }}</code>
       </div>
       {% endif %}
 
       {% if tool.syntax %}
       <div class="mt-4">
-        <p class="text-sm text-slate-300">General pattern</p>
+        <p class="text-sm text-slate-300">{{ _('General pattern') }}</p>
         <code class="cb-code-slab cb-code-text mt-2 block rounded-xl bg-black/50 px-4 py-3 text-sm font-mono text-slate-100 ring-1 ring-white/10 overflow-x-auto whitespace-nowrap">{{ tool.syntax }}</code>
         {% if tool.syntaxHelp %}
         {% if tool.syntaxHelp is string %}
@@ -205,7 +205,7 @@
 
       {% if tool.flags %}
       <div class="mt-4">
-        <p class="text-sm text-slate-300">Common flags</p>
+        <p class="text-sm text-slate-300">{{ _('Common flags') }}</p>
         <ul class="mt-3 space-y-3 text-sm text-slate-200/90 leading-6 tracking-[0.01em] max-w-[68ch]">
           {% for flag in tool.flags %}
           <li class="rounded-xl bg-black/30 px-4 py-3 ring-1 ring-white/5">
@@ -219,7 +219,7 @@
 
       {% if tool.examples %}
       <div class="mt-4">
-        <p class="text-sm text-slate-300">Examples</p>
+        <p class="text-sm text-slate-300">{{ _('Examples') }}</p>
         <div class="mt-3 space-y-3 max-w-[80ch]">
           {% for ex in tool.examples %}
           <div class="rounded-xl bg-black/30 px-4 py-3 ring-1 ring-white/5">
@@ -248,7 +248,7 @@
 
       {% if tool.id in ['nmap','auditd','lynis','clamav'] %}
       <p class="mt-3 text-slate-200/90 text-sm leading-6 tracking-[0.01em] max-w-[68ch]">
-        Check <a href="/command-library" class="underline underline-offset-2 hover:text-blue-300">Command Library</a> for more commands
+        {{ _('Check') }} <a href="/command-library" class="underline underline-offset-2 hover:text-blue-300">{{ _('Command Library') }}</a> {{ _('for more commands') }}
       </p>
       {% endif %}
     {% endif %}
@@ -260,13 +260,13 @@
   {% set has_qp = tool.quickPanel or tool.notes %}
   {% if has_qp %}
   <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 ct-quick-panel {{ extra_classes }}">
-    <h2 class="text-lg font-semibold text-white">Quick panel</h2>
+    <h2 class="text-lg font-semibold text-white">{{ _('Quick panel') }}</h2>
 
     {% set qpSub = {
-      "Notes": "Meaning and caveats that change what you see",
-      "Pro tips": "Small habits that prevent bad reads",
-      "Common mistakes": "Patterns that create false confidence",
-      "Fun fact": "Optional trivia, nothing you should rely on"
+      "Notes": _("Meaning and caveats that change what you see"),
+      "Pro tips": _("Small habits that prevent bad reads"),
+      "Common mistakes": _("Patterns that create false confidence"),
+      "Fun fact": _("Optional trivia, nothing you should rely on")
     } %}
 
     {% set qp = tool.quickPanel if tool.quickPanel else {} %}
@@ -278,7 +278,7 @@
 
     {% if notes %}
     <div class="mt-4 ct-qp-section">
-      <p class="text-sm font-semibold text-slate-200">Notes</p>
+      <p class="text-sm font-semibold text-slate-200">{{ _('Notes') }}</p>
       <ul class="mt-3 ct-qp-list space-y-3 text-sm text-slate-200/90 leading-7 tracking-[0.01em] max-w-[62ch]">
         {% for n in notes %}
         <li>{{ n }}</li>
@@ -289,7 +289,7 @@
 
     {% if proTips %}
     <div class="mt-4 ct-qp-section">
-      <p class="text-sm font-semibold text-slate-200">Pro tips</p>
+      <p class="text-sm font-semibold text-slate-200">{{ _('Pro tips') }}</p>
       <ul class="mt-3 ct-qp-list space-y-3 text-sm text-slate-200/90 leading-7 tracking-[0.01em] max-w-[62ch]">
         {% for n in proTips %}
         <li>{{ n }}</li>
@@ -300,7 +300,7 @@
 
     {% if commonMistakes %}
     <div class="mt-4 ct-qp-section">
-      <p class="text-sm font-semibold text-slate-200">Common mistakes</p>
+      <p class="text-sm font-semibold text-slate-200">{{ _('Common mistakes') }}</p>
       <ul class="mt-3 ct-qp-list space-y-3 text-sm text-slate-200/90 leading-7 tracking-[0.01em] max-w-[62ch]">
         {% for n in commonMistakes %}
         <li>{{ n }}</li>
@@ -311,14 +311,14 @@
 
     {% if goodLooks %}
     <div class="mt-4 ct-qp-section">
-      <p class="text-sm font-semibold text-slate-200">What good looks like</p>
+      <p class="text-sm font-semibold text-slate-200">{{ _('What good looks like') }}</p>
       <p class="mt-3 text-sm text-slate-200/90 leading-7 tracking-[0.01em] max-w-[62ch]">{{ goodLooks }}</p>
     </div>
     {% endif %}
 
     {% if funFact %}
     <div class="mt-4 ct-qp-section">
-      <p class="text-sm font-semibold text-slate-200">Fun fact</p>
+      <p class="text-sm font-semibold text-slate-200">{{ _('Fun fact') }}</p>
       <p class="mt-3 text-sm text-slate-200/90 leading-7 tracking-[0.01em] max-w-[62ch]">{{ funFact }}</p>
     </div>
     {% endif %}
@@ -331,10 +331,10 @@
   {% if not sections and tool.kind == 'Detection' %}
     {% set derived = [] %}
     {% if tool.workflow %}
-      {% set _ = derived.append({'title': 'Workflow', 'paragraphs': tool.workflow}) %}
+      {% set _ = derived.append({'title': _('Workflow'), 'paragraphs': tool.workflow}) %}
     {% endif %}
     {% if tool.features %}
-      {% set _ = derived.append({'title': 'Features', 'paragraphs': tool.features}) %}
+      {% set _ = derived.append({'title': _('Features'), 'paragraphs': tool.features}) %}
     {% endif %}
     {% set sections = derived %}
   {% endif %}
@@ -342,9 +342,9 @@
   <details class="group rounded-2xl border border-white/10 bg-white/[0.03] ct-deepdive {{ extra_classes }}">
     <summary class="cursor-pointer list-none p-6 hover:bg-white/[0.02] transition rounded-2xl">
       <div class="flex flex-col items-center text-center gap-1">
-        <h2 class="text-xl font-semibold text-white uppercase tracking-[0.08em]">DEEP DIVE</h2>
+        <h2 class="text-xl font-semibold text-white uppercase tracking-[0.08em]">{{ _('Deep Dive') | upper }}</h2>
         <div class="ct-dd-chevron">
-          <span class="ct-dd-icon text-slate-200 text-2xl transition-transform duration-200 group-open:rotate-180">▾</span>
+          <span class="ct-dd-icon text-slate-200 text-2xl transition-transform duration-200 group-open:rotate-180">&#9662;</span>
         </div>
       </div>
     </summary>
@@ -376,7 +376,7 @@
 
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 py-10 ct-tool-page">
-  <a href="{{ url_for('toolbox_hub') }}" class="text-slate-400 hover:text-white transition">← Back to Toolbox</a>
+  <a href="{{ url_for('toolbox_hub') }}" class="text-slate-400 hover:text-white transition">&larr; {{ _('Back to Toolbox') }}</a>
 
   <div class="mt-6">
     <h1 class="text-3xl font-bold text-white">{{ tool.name }}</h1>
@@ -387,23 +387,23 @@
 
       <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 ct-hero-card">
         <div>
-          <h2 class="text-lg font-semibold text-white text-center">What it is</h2>
+          <h2 class="text-lg font-semibold text-white text-center">{{ _('What it is') }}</h2>
           <div class="mx-auto mt-2 h-px w-11/12 bg-white/10"></div>
-          <p class="mt-3 text-slate-200/90 leading-7 tracking-[0.01em] max-w-[60ch]">{{ tool.overview.what }}{% if tool.kind == "CLI" %} It aims to be fast and transparent, returning plain output you can verify and reuse.{% endif %}</p>
+          <p class="mt-3 text-slate-200/90 leading-7 tracking-[0.01em] max-w-[60ch]">{{ tool.overview.what }}{% if tool.kind == "CLI" %} {{ _('It aims to be fast and transparent, returning plain output you can verify and reuse.') }}{% endif %}</p>
         </div>
       </div>
 
       <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 ct-hero-card">
         <div>
-          <h2 class="text-lg font-semibold text-white text-center">How it works</h2>
+          <h2 class="text-lg font-semibold text-white text-center">{{ _('How it works') }}</h2>
           <div class="mx-auto mt-2 h-px w-11/12 bg-white/10"></div>
-          <p class="mt-3 text-slate-200/90 leading-7 tracking-[0.01em] max-w-[60ch]">{{ tool.overview.how }}{% if tool.kind == "CLI" %} You steer behavior with clear flags and inputs, which keeps results reproducible and easy to compare.{% endif %}</p>
+          <p class="mt-3 text-slate-200/90 leading-7 tracking-[0.01em] max-w-[60ch]">{{ tool.overview.how }}{% if tool.kind == "CLI" %} {{ _('You steer behavior with clear flags and inputs, which keeps results reproducible and easy to compare.') }}{% endif %}</p>
         </div>
       </div>
 
       <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 ct-hero-card">
         <div>
-          <h2 class="text-lg font-semibold text-white text-center">Use it for</h2>
+          <h2 class="text-lg font-semibold text-white text-center">{{ _('Use it for') }}</h2>
           <div class="mx-auto mt-2 h-px w-11/12 bg-white/10"></div>
           {% if tool.overview.useCases %}
           <ul class="mt-3 list-disc pl-5 space-y-3 text-slate-200/90 leading-7 tracking-[0.01em] marker:text-slate-500">
@@ -444,14 +444,14 @@
 
     {% if tool.kind == 'CLI' and tool.actions %}
     <div class="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-      <h2 class="text-lg font-semibold text-white">Next steps</h2>
+      <h2 class="text-lg font-semibold text-white">{{ _('Next steps') }}</h2>
       <ul class="mt-3 space-y-3 text-slate-200">
         {% for action in tool.actions %}
           {% if action is string %}
             <li class="list-disc pl-5">{{ action }}</li>
           {% elif action.title or action.cmd or action.path %}
             <li class="rounded-xl bg-black/30 px-4 py-3 ring-1 ring-white/5">
-              <div class="text-sm text-slate-100 font-medium">{{ action.title or 'Action' }}</div>
+              <div class="text-sm text-slate-100 font-medium">{{ action.title or _('Action') }}</div>
               {% set path = action.cmd or action.path or action.how or action.action %}
               {% if path %}
               <div class="mt-1 text-sm text-slate-300/90">{{ path }}</div>
