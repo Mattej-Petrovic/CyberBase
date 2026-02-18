@@ -16,11 +16,15 @@
           {{ _('No quiz topics available right now.') }}
         </div>
       </template>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="mx-auto w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
         <template x-for="g in topics" :key="g.id">
-          <a :href="'/quiz?topic=' + encodeURIComponent(g.id)" @click.prevent="start(g.id)" class="block p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition">
-            <h3 class="text-xl font-semibold" x-text="g.title"></h3>
-            <p class="text-gray-400 text-sm mt-1" x-text="i18n.tenQuestions"></p>
+          <a
+            :href="'/quiz?topic=' + encodeURIComponent(g.id)"
+            @click.prevent="start(g.id)"
+            class="group flex h-full flex-col rounded-xl border border-slate-700/60 bg-slate-900/45 p-5 shadow-lg transition hover:-translate-y-0.5 hover:border-slate-500/70 hover:bg-slate-800/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+          >
+            <h3 class="text-xl font-semibold leading-tight text-slate-100" x-text="g.title"></h3>
+            <p class="mt-3 text-xs text-slate-400" x-text="i18n.tenQuestions"></p>
           </a>
         </template>
       </div>

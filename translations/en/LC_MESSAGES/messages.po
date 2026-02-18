@@ -1200,7 +1200,7 @@ msgstr ""
 
 #: templates/quiz.html:37
 msgid "New topic"
-msgstr "Defend topics"
+msgstr "New topic"
 
 #: templates/quiz.html:54
 msgid "Prev"
