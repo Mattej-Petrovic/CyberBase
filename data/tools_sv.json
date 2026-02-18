@@ -1,0 +1,2310 @@
+{
+  "cliTools": [
+    {
+      "id": "nmap",
+      "name": "nmap",
+      "description": "Nätverkskartläggare för värdupptäckt, portskanning och tjänst-/versionsidentifiering.",
+      "overview": {
+        "what": "Ett nätverksskanningsverktyg som upptäcker värdar och kartlägger exponerade tjänster genom att undersöka portar och tolka svar.",
+        "how": "Skickar specialutformade paket (TCP, UDP, ICMP) och analyserar svaren för att avgöra vilka värdar som är uppe, vilka portar som är öppna och vilka tjänster som körs.",
+        "useCases": [
+          "Hitta live-värdar på ett subnät innan djupare undersökningar",
+          "Identifiera öppna portar och tjänsterna bakom dem",
+          "Kör säkra standardskript för att samla in banners och grundläggande felkonfigurationer"
+        ],
+        "use": "Hitta live-värdar på ett subnät innan djupare undersökningar; Identifiera öppna portar och tjänsterna bakom dem; Kör säkra standardskript för att samla in banners och grundläggande felkonfigurationer."
+      },
+      "minimal": "nmap <target>",
+      "syntax": "nmap [discovery] [scan] [ports] [timing] [output] <target>",
+      "syntaxHelp": [
+        "<target> kan vara ett värdnamn, IP, CIDR (10.0.0.0/24) eller ett intervall (10.0.0.10-50)",
+        "[discovery] bestämmer hur man hittar livevärdar (ex: -sn, -Pn)",
+        "[scan] väljer skanningstyp (ex: -sS, -sT, -sU) och anrikning (ex: -sV, -sC)",
+        "[ports] väljer portar (ex: -p 22,80,443 eller -p- för alla)",
+        "[output] skriver resultat till en fil (ex: -oN scan.txt)"
+      ],
+      "flags": [
+        {
+          "flag": "-sn",
+          "takesValue": false,
+          "description": "Endast värdupptäckt (ingen portskanning)"
+        },
+        {
+          "flag": "-Pn",
+          "takesValue": false,
+          "description": "Behandla värdar som upp (hoppa över värdupptäckt)"
+        },
+        {
+          "flag": "-sS",
+          "takesValue": false,
+          "description": "TCP SYN skanning (kräver ofta privilegier)"
+        },
+        {
+          "flag": "-sT",
+          "takesValue": false,
+          "description": "TCP connect() scan (fungerar utan raw socket-privilegier)"
+        },
+        {
+          "flag": "-sU",
+          "takesValue": false,
+          "description": "UDP skanning (långsammare, användbar för DNS/SNMP/NTP etc.)"
+        },
+        {
+          "flag": "-sV",
+          "takesValue": false,
+          "description": "Service/versionsdetektering på öppna portar"
+        },
+        {
+          "flag": "-sC",
+          "takesValue": false,
+          "description": "Kör standardskript (NSE)"
+        },
+        {
+          "flag": "--script <name|category>",
+          "takesValue": true,
+          "description": "Kör specifika skript eller kategorier"
+        },
+        {
+          "flag": "-p <ports>",
+          "takesValue": true,
+          "description": "Portval (ex: -p 22,80,443 eller -p 1-1024)"
+        },
+        {
+          "flag": "-p-",
+          "takesValue": false,
+          "description": "Skanna alla 65535 TCP-portar"
+        },
+        {
+          "flag": "--top-ports <N>",
+          "takesValue": true,
+          "description": "Skanna de N vanligaste portarna"
+        },
+        {
+          "flag": "-T<0-5>",
+          "takesValue": true,
+          "description": "Timingmall (högre är snabbare, bullrigare)"
+        },
+        {
+          "flag": "--open",
+          "takesValue": false,
+          "description": "Visa endast öppna (eller möjligen öppna) portar"
+        },
+        {
+          "flag": "-oN <file>",
+          "takesValue": true,
+          "description": "Normal utdata till fil"
+        },
+        {
+          "flag": "-oX <file>",
+          "takesValue": true,
+          "description": "XML utdata till fil"
+        }
+      ],
+      "examples": [
+        {
+          "command": "nmap -sn 192.168.1.0/24",
+          "explanation": "Värdupptäckt sveper över ett undernät utan att skanna portar."
+        },
+        {
+          "command": "nmap -sS -sV --top-ports 200 <target>",
+          "explanation": "Skanna snabbt de vanligaste portarna och fingeravtryckstjänsterna efter vad som svarar."
+        },
+        {
+          "command": "nmap -p 22,80,443 -sV <target>",
+          "explanation": "Fokuserad skanning på vanliga serviceportar med versionsdetektering."
+        },
+        {
+          "command": "nmap -p- -T4 --open <target>",
+          "explanation": "Fullständigt TCP-portintervall med en snabbare timingmall och endast öppna resultat visas."
+        },
+        {
+          "command": "nmap -sU -p 53,67,68,123,161 <target>",
+          "explanation": "UDP genomsökning av typiska infrastrukturportar som DNS, DHCP, NTP och SNMP."
+        },
+        {
+          "command": "nmap -sC -sV -oN nmap_scan.txt <target>",
+          "explanation": "Standardskript plus versionsidentifiering, sparade i en läsbar rapportfil."
+        },
+        {
+          "command": "nmap --script http-title,http-headers -p 80,443 <target>",
+          "explanation": "Kör specifika HTTP-skript mot webbportar för att samla in lättviktsmetadata."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Effekten beror på utsiktspunkten. Brandväggar, hastighetsgränser och IDS-regler kan dölja eller omforma det du ser.",
+          "Behörigheter är viktiga. Vissa skanningstyper förlitar sig på råpaket och beter sig olika mellan operativsystem och behörighetsnivåer.",
+          "Stängt är fortfarande signal. Det bevisar att värden svarade på den porten, även om tjänsten inte finns där.",
+          "Öva i labb eller nätverk du äger. Att skanna utan uttryckligt tillstånd är inte ok."
+        ],
+        "proTips": [
+          "Tänk i lager: upptäck värdar, sedan portar och berika sedan. Att blanda allt gör resultatet svårare att lita på.",
+          "Spara utdata tidigt. Strukturerade format gör jämförelser, skillnader och repriser tillförlitliga.",
+          "Behandla fingeravtryck som hypoteser. Bekräfta med en andra signal som en banner eller en sond på applikationsnivå.",
+          "Snabbhet är en handel. Aggressiv timing kan släppa sonder och ändra historien du drar slutsatsen."
+        ],
+        "commonMistakes": [
+          "Likställande av \"inga öppna portar\" med \"värd ner\". Det kan också betyda filtrerad, hastighetsbegränsad eller oåtkomlig härifrån.",
+          "Överförtroende versionsdetektering. Proxies, NAT och anpassade banners kan lura fingeravtryck.",
+          "Läser UDP som TCP. Tystnad är normalt och kan betyda öppen, filtrerad eller helt enkelt att inte svara.",
+          "Att köra skript i blindo på produktionen. Även \"standard\" skript kan vara bullriga."
+        ],
+        "funFact": "Namnet är en förkortning för \"Network Mapper\", och det behandlar verkligen ett nätverk som en karta."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Vad verktyget egentligen gör under huven",
+            "paragraphs": [
+              "Nmap är en paketkoreografimotor. Du ger den en måluppsättning och ett mål, och den bestämmer vilka sonder som ska skickas, i vilken ordning och hur svaren ska tolkas. \"Skanningsportar\" är den synliga utgången, men det dolda arbetet bygger en modell av nåbarhet och beteende från ofullkomliga signaler.",
+              "För TCP, lutar sig Nmap på det faktum att olika svar innebär olika tillstånd. En SYN-sond som tar emot en SYN/ACK föreslår en lyssningstjänst, medan en RST föreslår en nåbar värd utan att något lyssnar på den porten. Om ingenting kommer tillbaka måste Nmap bestämma om det tappades, filtrerades, hastighetsbegränsades eller förlorades på vägen. Det beslutet är anledningen till att timing, återförsök och val av värdupptäckt spelar så stor roll.",
+              "Värdupptäckt är sin egen fas. Nmap kan använda ICMP, TCP, UDP eller kombinationer för att avgöra vilka värdar som är \"upp\". Att hoppa över upptäckt ändrar innebörden av senare resultat, eftersom du nu antar att värden existerar och trycker direkt till portsonder. I praktiken är gränsen mellan upptäckt och skanning otydlig: ett \"stängt\" svar kan också vara en upptäcktssignal.",
+              "Versionsdetektering och skriptning är ett andra lager av sondering. När en port ser ut att nås kan Nmap prata precis tillräckligt med applikationsprotokoll för att gissa vad som körs där. Den använder en databas med sonder och matchningsregler, så resultatet är i huvudsak \"det här svarsmönstret ser ut som X\". Skript lägger till ytterligare ett lager: de kör målinriktade applikationsnivåkontroller för att extrahera metadata eller testa för kända förhållanden. Detta är kraftfullt, men det ökar också antaganden och brus.",
+              "En mental modell som hjälper: Nmap läser inte en statisk sanning. Det tar prover på ett levande system under begränsningar. Varje sond du skickar kan ändra hur målet beter sig, eftersom mellanlådor och värdar reagerar olika under belastning, under strypning eller när de märker ovanlig trafik."
+            ]
+          },
+          {
+            "title": "Tolka resultat utan att lura dig själv",
+            "paragraphs": [
+              "Den största fällan är att behandla Nmap-utdata som marksanning. Det är bevis, och bevis har felstaplar. \"Filtrerad\" betyder att Nmap inte fick det definitiva svaret den förväntade sig, inte att porten inte existerar. \"Stängt\" betyder vanligtvis att värden var tillräckligt tillgänglig för att säga nej. \"Öppna\" betyder att du fick ett svar som starkt föreslår en lyssnare, men även det kan förfalskas av en brandväggspolicy, en tarpiteringstjänst eller en proxy framför.",
+              "Falskt negativ inträffar när nätverket släpper sonder, när en brandväggshastighet begränsas eller när du skannar från en väg som är asymmetrisk. Ett klassiskt exempel är att skanna en värd genom en VPN eller NAT där returtrafiken utformas annorlunda. Skanningen ser ren ut från en sida och \"filtrerad överallt\" från en annan, även om värden inte ändrades.",
+              "Falska positiva är sällsynta men verkliga. Vidarebefordran av portar kan få många värdar att se ut som om de \"delar\" öppna portar. Transparenta proxyservrar kan få en HTTP-tjänst att visas på portar där ursprungsvärden aldrig talade HTTP. Med versionsidentifiering kan anpassade banners lura fingeravtryck, och lastbalanserare kan avslöja en backends banner samtidigt som du dirigerar dig till en annan backends beteende.",
+              "Behandla varje rad som ett påstående du borde kunna försvara. Om du ser en öppen port, fråga: är värden definitivt nåbar och är portstatusen stabil över tiden. Om du ser en gissad tjänst, fråga: vad matchade Nmap egentligen på och kan en mellanlåda svara. När du bygger upp den vanan blir Nmap ett resonemangsverktyg istället för ett magiskt orakel."
+            ]
+          },
+          {
+            "title": "Formen på verktygets kapacitet",
+            "paragraphs": [
+              "Nmaps kapacitetsutrymme förstås bäst som en uppsättning rattar som handlar om smyg, hastighet och säkerhet. Skanningstyp ändrar vilka paket som används och därmed vilka bevis du samlar in. Portval ändrar täckning och tid. Timing ändrar hur hårt du pressar nätverket och målet, vilket påverkar både upptäcktsrisk och noggrannhet.",
+              "Flaggor och funktioner grupperas i kategorier. Upptäckningsalternativ avgör om du lägger tid på att bevisa att en värd lever. Genomsökningsalternativ avgör hur du frågar om portar och hur du behandlar de privilegier du har. Anrikningsalternativ avgör om du accepterar \"öppen\" som tillräckligt, eller om du försöker identifiera tjänster, versioner och skript. Utdataalternativ avgör om skanningen är en engångsblick eller en återanvändbar artefakt.",
+              "Ju mer berikning du lägger till, desto mer går du från observation på transportnivå till interaktion på applikationsnivå. Det är där du kan utvinna verkligt värde, men det är också där du kan orsaka biverkningar. Även en enkel banner kan utlösa loggar, autentiseringsbanners eller hastighetsgränser. Skriptkategorier går vidare till \"aktiv testning\", vilket är anledningen till att separering av upptäckt från anrikning är ett rent sätt att kontrollera risker.",
+              "En annan dimension är utsiktspunkt. Nmap-körning inifrån ett nätverk är ett annat instrument än Nmap-körning utifrån. Skillnaden är inte bara \"fler portar öppnar internt\". Det är att intern skanning interagerar med olika ACL:er, olika routing och ofta olika DNS och tjänsteupptäckt. Samma värd kan se ut som två olika maskiner beroende på var du står."
+            ]
+          },
+          {
+            "title": "Sammanhang och gränser",
+            "paragraphs": [
+              "Nmap används bäst när du behöver en karta, inte ett mikroskop. Den svarar \"vad som verkar nås härifrån\" och \"hur ser det ut\", vilket är idealiskt för tillgångsupptäckt, omfattning och snabb verifiering. Det är inte en sårbarhetsskanner som standard, och den ersätter inte protokollspecifika verktyg när du behöver djup applikationssäkerhet.",
+              "Eftersom skanning är aktiv är gränsen auktorisering. Använd Nmap endast på system du äger, driver eller har uttryckligt skriftligt tillstånd att testa. I de flesta miljöer kan även intern skanning utlösa varningar och incidentarbetsflöden, så att vara auktoriserad är inte bara ett juridiskt problem, det är ett operativt.",
+              "Konceptexempel: en värd som bara visar en öppen port kanske inte är \"säker\", den kan vara \"frontad\". En omvänd proxy kan exponera en enda ingångspunkt samtidigt som den döljer en stor inre yta. Nmap hjälper fortfarande, men du tolkar det som \"kantexponering\", inte \"total capability\".",
+              "Konceptexempel: om UDP-resultaten ser tomma ut är det ofta normalt. UDP är tyst av design om inte tjänsten väljer att svara, så \"inget svar\" är inte detsamma som \"ingen tjänst\". Rätt slutsats är \"Jag har svaga bevis åt båda hållen\", inte \"det är stängt\"."
+            ]
+          }
+        ]
+      },
+      "tagline": "Kartlägg värdar, portar och tjänster snabbt och verifiera resultaten metodiskt."
+    },
+    {
+      "id": "curl",
+      "name": "curl",
+      "description": "Överför data över HTTP(S) och många andra protokoll från kommandoraden.",
+      "overview": {
+        "what": "En kommandoradsklient för att göra webbförfrågningar och ladda ner eller ladda upp data över många protokoll, oftast HTTP och HTTPS.",
+        "how": "Bygger en förfrågan (metod, rubriker och brödtext) och skriver ut svaret till stdout eller sparar det i fil, med detaljerad kontroll över omdirigeringar, autentisering, timeouts och TLS.",
+        "useCases": [
+          "Testa snabbt en API-slutpunkt (status, rubriker, JSON-kropp)",
+          "Ladda ner filer med omdirigeringar och omförsök",
+          "Felsökningsförfrågningar med utförlig TLS och huvudutgång"
+        ],
+        "use": "Testa snabbt en API-slutpunkt (status, rubriker, JSON-kropp); Ladda ner filer med omdirigeringar och omförsök; Felsökningsförfrågningar med utförlig TLS och huvudutgång."
+      },
+      "minimal": "curl <url>",
+      "syntax": "curl [options] <url>",
+      "syntaxHelp": [
+        "<url> är vanligtvis https://… eller http://…",
+        "Använd -X/-H/-d när du behöver bygga en API-förfrågan",
+        "Använd -I/-v när du behöver inspektera rubriker eller felsöka"
+      ],
+      "flags": [
+        {
+          "flag": "-I",
+          "takesValue": false,
+          "description": "Hämta endast rubriker (HEAD-begäran)"
+        },
+        {
+          "flag": "-L",
+          "takesValue": false,
+          "description": "Följ omdirigeringar"
+        },
+        {
+          "flag": "-X <METHOD>",
+          "takesValue": true,
+          "description": "Begärningsmetod (GET, POST, PUT, DELETE...)"
+        },
+        {
+          "flag": "-H \"Header: value\"",
+          "takesValue": true,
+          "description": "Lägg till en begäransrubrik"
+        },
+        {
+          "flag": "-d \"data\"",
+          "takesValue": true,
+          "description": "Skicka förfrågningstext (standard till POST för HTTP)"
+        },
+        {
+          "flag": "--data-urlencode \"k=v\"",
+          "takesValue": true,
+          "description": "URL-encode data före sändning"
+        },
+        {
+          "flag": "-F \"name=@file\"",
+          "takesValue": true,
+          "description": "Uppladdning av flera delar"
+        },
+        {
+          "flag": "-u user:pass",
+          "takesValue": true,
+          "description": "Grundläggande autentiseringsuppgifter"
+        },
+        {
+          "flag": "-o <file>",
+          "takesValue": true,
+          "description": "Skriv svarstext till filen"
+        },
+        {
+          "flag": "-O",
+          "takesValue": false,
+          "description": "Skriv utdata till en lokal fil som heter som fjärrfilen"
+        },
+        {
+          "flag": "-sS",
+          "takesValue": false,
+          "description": "Tyst men visar fortfarande fel"
+        },
+        {
+          "flag": "-v",
+          "takesValue": false,
+          "description": "Utförlig (rubriker + anslutningsdetaljer)"
+        },
+        {
+          "flag": "--compressed",
+          "takesValue": false,
+          "description": "Begär ett komprimerat svar och dekomprimera det"
+        },
+        {
+          "flag": "--connect-timeout <sec>",
+          "takesValue": true,
+          "description": "Max tid för att upprätta anslutning"
+        },
+        {
+          "flag": "--retry <N>",
+          "takesValue": true,
+          "description": "Försök igen med övergående fel"
+        }
+      ],
+      "examples": [
+        {
+          "command": "curl -I https://example.com",
+          "explanation": "Skicka en HEAD-förfrågan för att bara hämta svarsrubriker."
+        },
+        {
+          "command": "curl -L -o file.zip https://example.com/file.zip",
+          "explanation": "Följ omdirigeringar och spara svarstexten till file.zip."
+        },
+        {
+          "command": "curl -sS https://api.example.com/health",
+          "explanation": "Hämta en URL tyst men fortfarande utskriftsfel (hälsokontroll)."
+        },
+        {
+          "command": "curl --json '{\"name\":\"test\"}' https://httpbin.org/post",
+          "explanation": "POST en JSON text och skriv ut serverns JSON svar."
+        },
+        {
+          "command": "curl -u user:pass https://api.example.com/private",
+          "explanation": "Skicka en begäran med HTTP Grundläggande autentiseringsuppgifter."
+        },
+        {
+          "command": "curl -v https://example.com",
+          "explanation": "Visa detaljerad anslutningsinformation och HTTP-rubriker."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Curl är en protokollklient, inte bara \"ladda ner en sida\". Den kan tala HTTP, HTTPS och mer beroende på konstruktion.",
+          "En lyckad överföring kan fortfarande vara ett programfel. Läs alltid statuskoder och rubriker.",
+          "Omdirigeringar ändrar betydelse. Den slutliga webbadressen kanske inte är den du började med.",
+          "Var försiktig med hemligheter. Rubriker och utförlig utdata kan läcka tokens till loggar."
+        ],
+        "proTips": [
+          "Använd rubriker som din sanning. De förklarar cachning, autentiseringsutmaningar och innehållsförhandling.",
+          "Vid felsökning, separera transport från applogik. TLS och DNS fel är inte \"API buggar\".",
+          "Föredrar explicita timeouts. Hängande förfrågningar döljer verkliga fellägen.",
+          "Håll förfrågningar reproducerbara. Samma URL med olika rubriker kan vara ett annat API-anrop."
+        ],
+        "commonMistakes": [
+          "Att anta \"200\" betyder framgång. Vissa API:er kodar fel inuti JSON med ett 200-omslag.",
+          "Kopiera webbläsarhuvuden blint. Det lägger till brus och kan utlösa olika serverbeteende.",
+          "Glömde kompression. Svarsstorlek och timing kan ändras när innehåll gzippas.",
+          "Lägger upp JSON utan rubriken för innehållstyp. Servrar kan analysera det som formulärdata."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Vad verktyget egentligen gör under huven",
+            "paragraphs": [
+              "curl är en protokollmotor insvept i en CLI. För HTTP konstruerar den en begäranrad, rubriker och en valfri text, och hanterar sedan anslutningsinställningar, omdirigeringar och svarsanalys. För HTTPS förhandlar den också om en TLS-session innan några HTTP-byte bytes.",
+              "En begäran är inte bara \"GET en URL\". Det är en sekvens: lös namn till en adress, öppna en TCP-anslutning, uppgradera eventuellt till TLS, skicka HTTP-förfrågan och läs sedan svarsströmmen. Fel kan inträffa i vilket som helst av dessa lager, och curl är värdefullt eftersom det låter dig se vilket lager som gick sönder utan att behöva ett webbläsargränssnitt.",
+              "När du aktiverar utförlig utdata rapporterar curl anslutningshändelser, förhandlingsdetaljer och rubriker. Den strömmen är skild från responskroppen, vilket är anledningen till att du fortfarande kan fånga kroppen medan du inspekterar vad som hände på tråden."
+            ]
+          },
+          {
+            "title": "Tolka resultat utan att lura dig själv",
+            "paragraphs": [
+              "Det vanligaste självbedrägeriet är att likställa \"Jag fick ett svar\" med \"systemet är friskt\". HTTP status är bara en ledtråd. En 200 kan ha ett programfel, en 401 kan förväntas och en 500 kan vara en proxy som klagar snarare än att ursprungsservern misslyckas.",
+              "Omdirigeringar är en annan fälla. Om du följer omdirigeringar automatiskt kan du av misstag testa en annan värd, ett annat protokoll eller en annan väg än du tror. Om du inte följer omdirigeringar kan du felmärka en fungerande tjänst som trasig. Det säkra tänkesättet är att behandla omdirigeringar som en del av det observerade beteendet, inte som en bekvämlighetsfunktion.",
+              "TLS fel förtjänar exakt tolkning. Ett certifikatvalideringsfel innebär vanligtvis problem med förtroendekedjan, värdnamn som inte matchar eller en avlyssnings proxy. Det betyder sällan \"TLS är trasig\" i allmän mening. Den meningsfulla frågan är: trasig för vilken förtroendebutik och för vilket värdnamn.",
+              "Konceptexempel: två förfrågningar till samma URL kan ge olika resultat om en inkluderar rätt värdhuvud och en inte. När du testar med IP, hoppar du över namnbaserad routing, vilket ändrar vilken server du faktiskt når."
+            ]
+          },
+          {
+            "title": "Formen på verktygets kapacitet",
+            "paragraphs": [
+              "curls kraft kommer från att styra begäranformen. Du kan ändra metod, rubriker, kroppskodning, cookies, autentisering, proxybeteende och anslutningstidsgränser. Det gör curl till ett labbinstrument för att reproducera en exakt HTTP-interaktion.",
+              "Alternativen samlas i några mentala hinkar. Begäran konstruktion styr vad du skickar. Transport och TLS styr hur du ansluter. Utdata styr vad du fångar och vart det går. Debug styr hur mycket du observerar om processen. När du väl ser dessa kategorier slutar curl-alternativen kännas som en slumpmässig vägg av flaggor.",
+              "Det finns också en handel mellan trohet och bekvämlighet. Att följa omdirigeringar och automatiska dekomprimeringssvar gör att curl känns \"som webbläsare\", men det kan dölja viktigt beteende. Att hålla utdata minimal är bra för skript, men det kan dölja orsaken till misslyckande. Du bestämmer vilken handel du vill ha för frågan du svarar på."
+            ]
+          },
+          {
+            "title": "Sammanhang och gränser",
+            "paragraphs": [
+              "curl passar bäst när du behöver repeterbara, transparenta nätverksförfrågningar. Den är perfekt för API-testning, felsökning, automatisering och validering av vad en server faktiskt returnerar. Det är inte en komplett webbläsare, så det kommer inte att köra JavaScript eller modellera komplexa klienttillstånd åt dig.",
+              "Använd den endast mot endpoints som du är behörig att testa. Även \"ofarliga\" förfrågningar kan utlösa hastighetsgränser, WAF-regler eller incidentvarningar i produktionen, så gränsen är fortfarande omfattning och tillstånd."
+            ]
+          }
+        ]
+      },
+      "tagline": "Ett skarpt protokollverktyg för API-testning, nedladdningar och felsökning av förfrågningar."
+    },
+    {
+      "id": "dig",
+      "name": "dig",
+      "description": "DNS-frågeverktyg för uppslag av specifika posttyper och felsökning av namnupplösning.",
+      "overview": {
+        "what": "Ett DNS frågeverktyg som visar detaljerade svar, auktoritets- och tidsinformation direkt från DNS-servrar.",
+        "how": "Skickar DNS-frågor för specifika posttyper (A, AAAA, MX, TXT, NS...) till din resolver eller en vald server och skriver sedan ut svarssektionerna.",
+        "useCases": [
+          "Kontrollera vilka DNS-poster som finns för en domän och vilka namnservrar som svarar",
+          "Jämför svar från olika resolvers (offentlig DNS vs intern)",
+          "Spåra delegering och felsök NXDOMAIN eller felkonfigurerade zoner"
+        ],
+        "use": "Kontrollera vilka DNS-poster som finns för en domän och vilka namnservrar som svarar; Jämför svar från olika resolvers (offentlig DNS vs intern); Spåra delegering och felsök NXDOMAIN eller felkonfigurerade zoner."
+      },
+      "minimal": "dig <name>",
+      "syntax": "dig [@server] <name> [type] [options]",
+      "syntaxHelp": [
+        "[@server] åsidosätter DNS-servern (ex: @1.1.1.1)",
+        "[type] är posttypen (A, AAAA, MX, TXT, NS, SOA, PTR...)",
+        "Använd +kort för ett rent svar och +spåra för att följa delegering"
+      ],
+      "flags": [
+        {
+          "flag": "@<server>",
+          "takesValue": true,
+          "description": "Fråga en specifik DNS-server (ex: @8.8.8.8)"
+        },
+        {
+          "flag": "<name> <type>",
+          "takesValue": true,
+          "description": "Namn och posttyp (ex: example.com MX)"
+        },
+        {
+          "flag": "+short",
+          "takesValue": false,
+          "description": "Minimal utdata (bra för skript)"
+        },
+        {
+          "flag": "+trace",
+          "takesValue": false,
+          "description": "Spåra delegering från rot till auktoritativa servrar"
+        },
+        {
+          "flag": "-x <ip>",
+          "takesValue": true,
+          "description": "Omvänd sökning (PTR)"
+        },
+        {
+          "flag": "+noall +answer",
+          "takesValue": false,
+          "description": "Visa endast svarsdelen"
+        },
+        {
+          "flag": "+dnssec",
+          "takesValue": false,
+          "description": "Begär DNSSEC-related poster"
+        },
+        {
+          "flag": "+tcp",
+          "takesValue": false,
+          "description": "Tvinga TCP (istället för UDP)"
+        },
+        {
+          "flag": "+time=<sec>",
+          "takesValue": true,
+          "description": "Timeout per fråga"
+        },
+        {
+          "flag": "+tries=<N>",
+          "takesValue": true,
+          "description": "Antal återförsök"
+        }
+      ],
+      "examples": [
+        {
+          "command": "dig example.com",
+          "explanation": "Fråga A registrerar exempel.com med standardupplösaren."
+        },
+        {
+          "command": "dig example.com AAAA",
+          "explanation": "Fråga AAAA (IPv6) poster för example.com."
+        },
+        {
+          "command": "dig example.com MX +short",
+          "explanation": "Visa endast MX-poster för example.com i en kompakt form."
+        },
+        {
+          "command": "dig @1.1.1.1 example.com A",
+          "explanation": "Fråga 1.1.1.1 om A-poster till exempel.com."
+        },
+        {
+          "command": "dig -x 8.8.8.8",
+          "explanation": "Utför en omvänd DNS-sökning (PTR) för 8.8.8.8."
+        },
+        {
+          "command": "dig +trace example.com",
+          "explanation": "Gå delegering från rot till auktoritativa servrar till exempel.com."
+        },
+        {
+          "command": "dig example.com TXT +noall +answer",
+          "explanation": "Skriv endast ut TXT-svarsektionen för example.com."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Dig visar vad en DNS-server svarade, inte en absolut sanning. Olika resolvers kan vara osynkroniserade.",
+          "Caching är viktigt. Du kanske ser ett cachat svar, inte en ny uppslagning.",
+          "Vissa posttyper filtreras efter policy. \"ANY\" är vanligtvis begränsad av missbruksskäl.",
+          "DNS är distribuerad. Ett \"fel\" svar kan vara en delegeringsfråga uppströms."
+        ],
+        "proTips": [
+          "Jämför resolver med triangulering. Lokala, offentliga och auktoritativa åsikter kan skilja sig åt.",
+          "Använd kort utgång när du bara behöver nyttolasten. Behåll full utdata för felsökningskontext.",
+          "Spår är för att bygga upp förtroende. Den avslöjar var kedjan går av utan att gissa.",
+          "Titta på TTL. De tipsar om cachebeteende och hur snabbt förändringar ska spridas."
+        ],
+        "commonMistakes": [
+          "Förvirrande rekursiva och auktoritativa svar. Sanningens källa beror på vilken server du frågade.",
+          "Ignorerar CNAME-kedjor. Den slutliga adressen kan vara flera steg bort från namnet du skrev.",
+          "Tar en enda uppslag som sista. DNS kan variera beroende på region, tid och resolver.",
+          "Att glömma att UDP trunkering händer. Stora svar kan kräva TCP."
+        ],
+        "funFact": "Namnet är historiskt utökat som \"Domain Information Groper\", vilket är precis vad det känns som när du gräver i DNS."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Vad verktyget egentligen gör under huven",
+            "paragraphs": [
+              "dig är en DNS meddelandekonstruktor och avkodare. Den skickar en förfrågan om ett namn och posttyp och skriver sedan ut svarssektionerna på ett sätt som människor kan resonera om. Till skillnad från en webbläsare döljer den inte DNS-maskineriet. Den visar dig råvarorna: svar, auktoritet, tillägg, flaggor och timing.",
+              "En normal dig fråga går vanligtvis till din konfigurerade resolver, som kan svara från cacheminnet, kan återkomma å dina vägnar eller kan tillämpa policy. När du riktar dig mot en specifik server kringgår du delar av det beteendet och frågar en enda synvinkel direkt, vilket är avgörande för diagnosen.",
+              "Spårningsläget förändrar spelet. Istället för att förlita sig på rekursion går dig genom delegeringskedjan med iterativa frågor, med början vid roten och följer hänvisningar ner till auktoritativa servrar. Det avslöjar var kedjan är bruten, inte bara att den är bruten."
+            ]
+          },
+          {
+            "title": "Tolka resultat utan att lura dig själv",
+            "paragraphs": [
+              "Nyckeln är att skilja \"vad jag fick tillbaka\" från \"varför jag fick det\". Ett snabbt svar kan vara en varm cache. Ett långsamt svar kan vara ett misslyckat uppströms eller en timeout och ett nytt försök. Samma domän kan se stabil ut medan din resolver tyst visar inaktuella data.",
+              "Var uppmärksam på om svaret är auktoritativt. Ett auktoritativt svar säger \"det här kom från en server som hävdar auktoritet för zonen\". Ett icke auktoritativt svar kan fortfarande vara korrekt, men det förmedlas av cachning och rekursion. Den skillnaden spelar roll när du jagar spridning, kapningar eller felkonfigurationer.",
+              "Konceptexempel: om du frågar två resolvers och en returnerar en adress och en returnerar ingenting, har du inte bevisat att posten finns eller inte. Du har bevisat att upplösarna inte håller med, vilket vanligtvis pekar på cachning, policy eller delad horisont DNS."
+            ]
+          },
+          {
+            "title": "Formen på verktygets kapacitet",
+            "paragraphs": [
+              "dig är starkast när du behandlar DNS som en uppsättning lager. Det finns namnhierarkin, det finns posttyper och det finns transportbeteenden. dig låter dig skära längs dessa dimensioner: olika posttyper, olika servrar, olika utdatasektioner och olika rekursionslägen.",
+              "Flaggor grupperas i: val av frågemål, utdatakontroll och beteendeväxlingar som spårning och DNSSEC-relaterad utdata. Den huvudsakliga kompromissen är mångfald kontra tydlighet. Minimal produktion är bra när du skriptar. Full utdata är vad du behöver när du felsöker hur en resolver fattade ett beslut."
+            ]
+          },
+          {
+            "title": "Sammanhang och gränser",
+            "paragraphs": [
+              "dig hör hemma i alla felsökningsverktyg eftersom DNS är ett beroende för nästan allt. När en app \"inte kan ansluta\" är DNS ofta det första osynliga felet. dig ger dig ett sätt att testa namnupplösning utan att involvera resten av stacken.",
+              "Använd det ansvarsfullt. Att fråga offentliga resolvers går vanligtvis bra, men att fråga interna zoner eller räkna upp stora namnrymder kan fortfarande vara känsligt. Håll dig inom räckhåll och behandla DNS som operativ data, inte bara trivia."
+            ]
+          }
+        ]
+      },
+      "tagline": "DNS frågeverktyg som visar resolverns tänkande, inte bara det slutliga svaret."
+    },
+    {
+      "id": "nslookup",
+      "name": "nslookup",
+      "description": "DNS-frågeverktyg (interaktivt eller i engångsläge) för snabba uppslag och grundläggande felsökning.",
+      "overview": {
+        "what": "Ett klassiskt DNS uppslagsverktyg som kan köras som ett enda kommando eller en interaktiv session.",
+        "how": "Frågar en DNS-server för poster och skriver ut svaret; interaktivt läge låter dig ändra frågetyp, server och alternativ mitt-session.",
+        "useCases": [
+          "Kontrollera snabbt om ett namn löser sig och till vilket IP",
+          "Fråga en specifik DNS-server utan att ändra systemlösare",
+          "Grundläggande post-type kontroller (MX, NS, TXT) i interaktivt läge"
+        ],
+        "use": "Kontrollera snabbt om ett namn löser sig och till vilket IP; Fråga en specifik DNS-server utan att ändra systemlösare; Grundläggande post-type kontroller (MX, NS, TXT) i interaktivt läge."
+      },
+      "minimal": "nslookup <name>",
+      "syntax": "nslookup [options] <name> [server]",
+      "syntaxHelp": [
+        "[server] låter dig välja resolver för den här frågan (ex: 8.8.8.8)",
+        "Använd interaktivt läge för att ändra frågetyp: nslookup sedan 'set type=MX'"
+      ],
+      "flags": [
+        {
+          "flag": "<name> <server>",
+          "takesValue": true,
+          "description": "Fråga en specifik DNS-server (ex: nslookup example.com 8.8.8.8)"
+        },
+        {
+          "flag": "-type=<TYPE>",
+          "takesValue": true,
+          "description": "Ställ in frågetyp (varierar beroende på implementering; ofta A, AAAA, MX, NS, TXT)"
+        },
+        {
+          "flag": "-debug",
+          "takesValue": false,
+          "description": "Visa felsökningsinformation (implementeringsberoende)"
+        },
+        {
+          "flag": "-timeout=<sec>",
+          "takesValue": true,
+          "description": "Ställ in frågetidsgräns (implementeringsberoende)"
+        }
+      ],
+      "examples": [
+        {
+          "command": "nslookup example.com",
+          "explanation": "Lös exempel.com med hjälp av systemets nuvarande DNS resolver."
+        },
+        {
+          "command": "nslookup example.com 1.1.1.1",
+          "explanation": "Lös exempel.com med 1.1.1.1 istället för standardresolver."
+        },
+        {
+          "command": "nslookup -type=MX example.com",
+          "explanation": "Fråga postutväxlare (MX) poster till exempel.com."
+        },
+        {
+          "command": "nslookup -type=NS example.com",
+          "explanation": "Fråga auktoritativa namnserverposter (NS) till exempel.com."
+        },
+        {
+          "command": "nslookup -type=TXT example.com",
+          "explanation": "Fråga TXT-poster till exempel.com."
+        }
+      ],
+      "notes": [
+        "Olika operativsystem levererar olika nslookup-versioner, så flaggor kan variera. Om en flagga inte fungerar, använd interaktivt läge."
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Nslookup är bra för snabba DNS-kontroller. Den är mindre detaljerad än dig och varierar lite mellan olika plattformar.",
+          "Standardbeteendet beror på din konfigurerade resolver. Det valet kan påverka svaret.",
+          "Omvända sökningar är namngivning, inte identitet. PTR-data saknas ofta eller är generisk.",
+          "Interaktivt läge kan ändra inställningar. Var uppmärksam på vad du redan ställt in."
+        ],
+        "proTips": [
+          "Fråga en specifik server vid felsökning. Det hjälper till att skilja lösareproblem från journalproblem.",
+          "Frågetyper uttryckligen. Standardinställningar kan dölja vad du verkligen ville testa.",
+          "Om resultaten ser udda ut, korskontrollera med en annan resolver. DNS är inte alltid konsekvent.",
+          "Läs myndighetens avsnitt när det finns tillgängligt. Den antyder varifrån svaret kom."
+        ],
+        "commonMistakes": [
+          "Behandlar NXDOMAIN som permanent. Det kan vara delad horisont, policy eller helt enkelt fel lösare.",
+          "Förutsatt att den första IP är \"den\" IP. Många namn är lastbalanserade.",
+          "Blandar IPv4 och IPv6 omedvetet. Dubbel stack kan få tester att kännas inkonsekventa.",
+          "Lita på interaktiva inställningar över sessioner. De återställs om du inte ansöker igen."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Vad verktyget egentligen gör under huven",
+            "paragraphs": [
+              "nslookup är en DNS frågeklient som pratar med en resolver och skriver ut svaret på ett mänskligt vänligt sätt. Undertill bygger den fortfarande en DNS-fråga för ett namn och en typ, skickar den över nätverket och avkodar sedan serverns svar.",
+              "Dess viktigaste \"under huven\" beteende är vilken server du frågar. När du använder standardinställningar pratar du vanligtvis med en lokal stub-resolver eller en rekursiv resolver för företag. Den servern kan svara från cacheminnet, kan återkomma till auktoritativa servrar och kan tillämpa filtrerings- eller delad horisontpolicy.",
+              "I interaktivt läge behåller nslookup en aktuell server och aktuella frågeinställningar. Den statefulnessen är bekväm, men den gör det också lätt att glömma vilket sammanhang man befinner sig i och av misstag jämföra två svar som faktiskt inte ställdes på samma sätt."
+            ]
+          },
+          {
+            "title": "Tolka resultat utan att lura dig själv",
+            "paragraphs": [
+              "DNS är skiktad, så ett enda svar är sällan hela bilden. Om du får en adress måste du fortfarande fråga om den är auktoritativ, cachad eller policyformad. Om du inte får något svar måste du fråga om det verkligen var negativt, eller om resolvern vägrade, tog timeout eller blockerade frågan.",
+              "En praktisk skepsis: när du felsöker \"DNS är trasig\", anta att den första utgången bara berättar vad din valda resolver tror. Det är användbart, men det kanske inte matchar vad ett annat nätverk ser. Split DNS och villkorlig vidarebefordran är vanliga och kan göra båda sidor \"rätta\" inom sitt eget sammanhang.",
+              "Konceptexempel: en domän kan lösas internt till en privat adress men externt till en offentlig adress. nslookup kan avslöja den skillnaden snabbt, men bara om du kommer ihåg att jämföra servrar, inte bara upprepa samma fråga."
+            ]
+          },
+          {
+            "title": "Formen på verktygets kapacitet",
+            "paragraphs": [
+              "nslookup är avsiktligt smalare än dig. Dess styrka är hastighet och tillgänglighet, särskilt på Windows-system där den redan finns. Du kan byta server, välja posttyper och utföra snabba omvända sökningar, vilket täcker en stor andel av verkliga kontroller.",
+              "Avvägningen är precision. Sättet som nslookup skriver ut svar på kan dölja avsnitt och flaggor som är viktiga när du diagnostiserar delegering, DNSSEC eller komplexa svar. Se det som en snabb sond som talar om för dig var du ska fokusera, inte som det sista ordet i en DNS-undersökning."
+            ]
+          },
+          {
+            "title": "Sammanhang och gränser",
+            "paragraphs": [
+              "nslookup passar i det tidiga skedet av felsökning: bekräfta om ett namn löser sig, jämför lösare och upptäck uppenbara felkonfigurationer. För djup DNS-diagnos uppgraderar du vanligtvis till dig eller paketinsamling, eftersom de visar mer av protokollets yta.",
+              "Notering om auktoriserad användning: att fråga efter DNS-servrar som du kontrollerar eller får använda går bra. Massuppräkning av tredje parts namnområden eller interna domäner som du inte äger korsar etiska och juridiska gränser. Behandla DNS som infrastruktur, inte som en lekplats."
+            ]
+          }
+        ]
+      },
+      "tagline": "Snabba DNS-uppslagningar när du vill ha enkel utdata och snabba kontroller."
+    },
+    {
+      "id": "ping",
+      "name": "ping",
+      "description": "Testa nåbarhet och latens med ICMP ekoförfrågningar.",
+      "overview": {
+        "what": "En anslutningskontroll som visar om en värd svarar och hur lång tur- och returtiden är.",
+        "how": "Skickar ICMP ECHO_REQUEST-paket och mäter ECHO_REPLY-svar för att uppskatta latens och paketförlust.",
+        "useCases": [
+          "Bekräfta grundläggande nåbarhet till en värd eller gateway",
+          "Kontrollera latens och paketförlust under nätverksproblem",
+          "Jämför snabbt anslutning via Wi-Fi vs Ethernet"
+        ],
+        "use": "Bekräfta grundläggande nåbarhet till en värd eller gateway; Kontrollera latens och paketförlust under nätverksproblem; Jämför snabbt anslutning via Wi-Fi vs Ethernet."
+      },
+      "minimal": "ping <host>",
+      "syntax": "ping [options] <host>",
+      "syntaxHelp": [
+        "På många Linux-system körs ping tills den stoppas. Använd -c för att skicka ett fast antal.",
+        "Alternativen skiljer sig något mellan olika operativsystem (Linux, macOS, Windows)."
+      ],
+      "flags": [
+        {
+          "flag": "-c <count>",
+          "takesValue": true,
+          "description": "Antal ekoförfrågningar att skicka"
+        },
+        {
+          "flag": "-i <sec>",
+          "takesValue": true,
+          "description": "Intervall mellan paket"
+        },
+        {
+          "flag": "-s <bytes>",
+          "takesValue": true,
+          "description": "Nyttolaststorlek"
+        },
+        {
+          "flag": "-W <sec>",
+          "takesValue": true,
+          "description": "Tidsgräns per paket (Linux)"
+        },
+        {
+          "flag": "-t <ttl>",
+          "takesValue": true,
+          "description": "Ställ in IP TTL (varierar beroende på OS)"
+        },
+        {
+          "flag": "-4 / -6",
+          "takesValue": false,
+          "description": "Force IPv4 eller IPv6 (implementeringsberoende)"
+        }
+      ],
+      "examples": [
+        {
+          "command": "ping -c 4 8.8.8.8",
+          "explanation": "Skicka 4 ICMP ekoförfrågningar till 8.8.8.8 och rapportera latens/förlust."
+        },
+        {
+          "command": "ping -c 5 -i 0.2 <host>",
+          "explanation": "Skicka 5 ping med 0,2s intervaller för att sampla kort-term jitter."
+        },
+        {
+          "command": "ping -c 3 -s 1200 <host>",
+          "explanation": "Sonder med 1200-byte nyttolaster för att ytbehandla MTU eller fragmenteringsproblem."
+        },
+        {
+          "command": "ping -4 -c 4 <host>",
+          "explanation": "Tvinga IPv4 och skicka 4 sonder till värden."
+        },
+        {
+          "command": "ping -6 -c 4 <host>",
+          "explanation": "Tvinga IPv6 och skicka 4 sonder till värden."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Ping mäter en typ av nåbarhet. Det bevisar inte att en applikationsport är användbar.",
+          "ICMP kan vara hastighetsbegränsad eller blockerad. Förlust betyder inte alltid att vägen är bruten.",
+          "Latens är sammanhang. WiFi och mobila nätverk ger naturligtvis jitter.",
+          "Mycket korta tester ljuger. Ett rent prov betyder inte att länken är stabil."
+        ],
+        "proTips": [
+          "Titta på paketförlust och varians, inte bara genomsnittet. Spikes spelar roll för riktiga appar.",
+          "Tvinga IPv4 eller IPv6 vid diagnos. Dubbel stack kan maskera den verkliga vägen.",
+          "Använd nyttolaststorlek för att undersöka MTU-problem. Vissa fel visas bara med större paket.",
+          "Använd en fast räkning för repeterbarhet. Oändliga pingar är lätta att felläsa."
+        ],
+        "commonMistakes": [
+          "Förutsatt att \"ping fungerar\" betyder \"service fungerar\". Brandväggar kan tillåta ICMP men blockera TCP.",
+          "Att anta att \"ping misslyckas\" betyder \"värd nere\". Många värdar släpper ICMP enligt policy.",
+          "Jämföra latenser från olika nätverk utan sammanhang. Rutter ändrar numren.",
+          "Överreagerar på en enda timeout. Ett missat svar kan vara normalt på upptagna länkar."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Vad verktyget egentligen gör under huven",
+            "paragraphs": [
+              "Ping skickar ICMP Echo Request-meddelanden och väntar på Echo Replies. Det är ett minimalt test av nåbarhet på nätverkslagret. Det involverar inte TCP-portar, applikationsprotokoll eller autentisering på användarnivå, vilket är anledningen till att det är både användbart och begränsat.",
+              "Varje svar ger dig tidsinformation och några metadatafält som TTL. Timing speglar hela vägen: din värd, ditt lokala nätverk, rutten och fjärrvärdens vilja att svara. Om någon av dessa komponenter nedprioriterar ICMP, blir din mätning en policymätning snarare än en prestationsmätning.",
+              "Eftersom ICMP hanteras olika mellan enheter, mäter ping ofta policy lika mycket som fysik. Vissa routrar och värdar behandlar ICMP som lågprioriterad bakgrundstrafik, så svaret du får är ibland den överblivna kapaciteten, inte den sanna latens som dina TCP-flöden kommer att uppleva."
+            ]
+          },
+          {
+            "title": "Tolka resultat utan att lura dig själv",
+            "paragraphs": [
+              "Ett ping-svar bevisar att minst ett paket kom dit och tillbaka, men det bevisar inte att sökvägen är stabil under belastning. Låg förlust vid låg hastighet kan dölja förlust under verklig trafik. På samma sätt kan en lång tur och retur vara att fjärrvärdens hastighet begränsar ICMP snarare än ett långsamt nätverk.",
+              "Ett saknat svar är tvetydigt. Det kan betyda att värden är nere, men det kan också betyda att ICMP är blockerad, nedprioriterad eller filtrerad på returvägen. Det är därför ping bäst tolkas som \"bevis på nåbarhet\" snarare än \"bevis på misslyckande\" när det är tyst.",
+              "Konceptexempel: en server kan svara på ping medan dess HTTPS-tjänst är trasig. Nätverksvägen är bra, men applikationsstacken är det inte. Det omvända kan också vara sant: ICMP är blockerad, men tjänsten kan nås på sina portar.",
+              "När du ser paketförlust, fråga om det är symmetriskt. Förlust på vägen ut och förlust på vägen tillbaka ser identiska ut i ping-utgången, men de innebär olika korrigeringar. Det är en anledning till att ping är bra för upptäckt och varning, men svagare för att fastställa rotorsaken på egen hand."
+            ]
+          },
+          {
+            "title": "Formen på verktygets kapacitet",
+            "paragraphs": [
+              "Pings knoppar ändrar mestadels sondmönstret. Antal, intervall och paketstorlek påverkar hur hårt du testar sökvägen och vilka fellägen du avslöjar. Vissa varianter kan också ställa in \"fragmentera inte\"-biten för att hjälpa till att upptäcka MTU-problem. Ingen av dessa gör ping till en tjänstekontroll, de ändrar bara känsligheten för nätverkslagertestet.",
+              "Kärnan avvägning är intrång kontra insikt. En mild ping är säker men kan missa intermittenta problem. Aggressiv sondering kan avslöja förlust och formning, men det kan också se ut som brus och utlösa larm i övervakade miljöer."
+            ]
+          },
+          {
+            "title": "Sammanhang och gränser",
+            "paragraphs": [
+              "Ping är det första verktyget du använder när du behöver svara \"finns det någon väg alls\". Det paras naturligt med traceroute och portspecifika kontroller när du behöver lokalisera var problemet bor.",
+              "Notering om auktoriserad användning: att skicka några ICMP-sonder till system du äger eller har tillåtelse att testa är normalt. Översvämning, stresstestning eller sondering av orelaterade system är det inte. Behandla det som ett diagnostiskt instrument, inte ett vapen."
+            ]
+          }
+        ]
+      },
+      "tagline": "Den enklaste latens- och nåbarhetssignalen, med massor av nyanser."
+    },
+    {
+      "id": "traceroute",
+      "name": "traceroute",
+      "description": "Spåra nätverksvägen (hopp) till en destination genom att variera TTL och observera svar.",
+      "overview": {
+        "what": "Ett sökvägsspårningsverktyg som avslöjar mellanliggande routrar mellan dig och en destination.",
+        "how": "Skickar sondpaket med ökande TTL-värden; varje hopp som löper ut TTL returnerar ICMP tid överskriden, bygger en hopplista och timing.",
+        "useCases": [
+          "Hitta var latensen börjar öka (problem hop)",
+          "Se om trafik går genom oväntade nätverk",
+          "Jämför sökvägsskillnader från olika nätverk eller VPN"
+        ],
+        "use": "Hitta var latensen börjar öka (problem hop); Se om trafik går genom oväntade nätverk; Jämför sökvägsskillnader från olika nätverk eller VPN."
+      },
+      "minimal": "traceroute <host>",
+      "syntax": "traceroute [options] <host>",
+      "syntaxHelp": [
+        "Standardprobmetoden beror på OS/bygge (ofta UDP).",
+        "Använd -I för ICMP sonder eller -T för TCP SYN (användbart bakom vissa brandväggar)."
+      ],
+      "flags": [
+        {
+          "flag": "-n",
+          "takesValue": false,
+          "description": "Lös inte värdnamn (snabbare, mindre DNS brus)"
+        },
+        {
+          "flag": "-m <max_ttl>",
+          "takesValue": true,
+          "description": "Max humle"
+        },
+        {
+          "flag": "-q <nqueries>",
+          "takesValue": true,
+          "description": "Sonder per hopp"
+        },
+        {
+          "flag": "-w <wait>",
+          "takesValue": true,
+          "description": "Väntetid per sond"
+        },
+        {
+          "flag": "-p <port>",
+          "takesValue": true,
+          "description": "Destinationsport för UDP/TCP sonder"
+        },
+        {
+          "flag": "-I",
+          "takesValue": false,
+          "description": "Använd ICMP eko för sonder"
+        },
+        {
+          "flag": "-T",
+          "takesValue": false,
+          "description": "Använd TCP SYN för sonder"
+        }
+      ],
+      "examples": [
+        {
+          "command": "traceroute -n <host>",
+          "explanation": "Inaktivera DNS namnsökningar så att utdata blir snabbare och tydligare."
+        },
+        {
+          "command": "traceroute -m 20 <host>",
+          "explanation": "Begränsa det maximala antalet hopp för att hålla löpningarna korta."
+        },
+        {
+          "command": "traceroute -I <host>",
+          "explanation": "Använd ICMP eko stil sonder, användbart när UDP filtreras."
+        },
+        {
+          "command": "traceroute -T -p 443 <host>",
+          "explanation": "Spåra sökväg med TCP SYN sonder till port 443 (HTTPS-like)."
+        },
+        {
+          "command": "traceroute -q 1 -w 1 <host>",
+          "explanation": "Skicka 1 sond per hopp med 1s timeout för att påskynda löpningarna."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Traceroute härleder humle via TTL utgångsdatum. Humlelistan är en modell, inte en perfekt karta.",
+          "Vissa routrar svarar inte, eller svarar långsamt. Asterisker kan vara normala.",
+          "Lastbalansering kan skapa förskjutningsvägar. Två körningar kan se olika ut.",
+          "Det sista hoppet kan blockera sonder. Det betyder inte alltid att målet inte går att nå."
+        ],
+        "proTips": [
+          "Använd numerisk utdata för att undvika långsamma DNS-uppslagningar. Namn är trevliga, men kan vilseleda.",
+          "Tolka latens per hopp noggrant. Routerns svarstid är inte detsamma som vidarebefordranstid.",
+          "Upprepa från flera utsiktspunkter. Vägproblem är ofta asymmetriska.",
+          "Tänk på sondtyp. Varianter ICMP, UDP och TCP kan bete sig olika genom brandväggar."
+        ],
+        "commonMistakes": [
+          "Att anta ett \"slow hop\" är flaskhalsen. Det kanske bara prioriterar bort svaren.",
+          "Behandla asterisker som ett misslyckande som standard. Många enheter tappar TTL överskridna svar.",
+          "Att glömma NAT och tunnlar. Den synliga hoppsekvensen kan dölja verklig topologi.",
+          "Avslutande \"ISP-problem\" från en körning. Vägarna kan variera beroende på tid och destination."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Vad verktyget egentligen gör under huven",
+            "paragraphs": [
+              "Traceroute utnyttjar IP TTL eller hoppgränsen. Den skickar sonder med en låg TTL så att den första routern förfaller paketet och returnerar ett ICMP Time Exceeded-meddelande. Sedan höjer den TTL och upprepar, vilket tvingar varje på varandra följande hopp att avslöja sig själv genom att generera samma typ av ICMP-svar.",
+              "Själva sonderna kan vara UDP, ICMP eller TCP beroende på plattform och alternativ. Nyckelmekanismen är konsekvent: verktyget förlitar sig på ICMP Time Exceeded från mellanliggande routrar och någon form av slutlig respons från destinationen när sonden äntligen anländer.",
+              "Varje hopptid mäts som en tur och retur för en sond som löpte ut vid det hoppet. Det är inte en enkelriktad fördröjning, och det är inte vidarebefordran för dina applikationspaket. Det är \"hur lång tid tog det för den här enheten att berätta för mig att min sond gått ut\"."
+            ]
+          },
+          {
+            "title": "Tolka resultat utan att lura dig själv",
+            "paragraphs": [
+              "Traceroute-utgång blandar två typer av sanning: routingväg och kontrollplansbeteende. Routrar vidarebefordrar paket i dataplanet, men traceroute mäter svar från kontrollplanet. En router kan vidarebefordra trafik perfekt samtidigt som den besvarar traceroute-sonder långsamt, inkonsekvent eller inte alls.",
+              "Lastbalansering komplicerar tolkningen. Om nätverket hashflöden kan olika prober skickas längs olika nästa hopp. Det kan skapa sken av \"förgrenade\" vägar eller fluktuerande latens. Den rätta slutsatsen är ofta \"det finns flera lika kostnadsvägar\", inte \"nätverket är instabilt\".",
+              "Konceptexempel: du kan se ett hopp med hög latens i mitten av banan, men senare hopp ser normala ut. Det betyder vanligtvis att routern nedprioriterar ICMP svar, inte att länken faktiskt är långsam."
+            ]
+          },
+          {
+            "title": "Formen på verktygets kapacitet",
+            "paragraphs": [
+              "Traceroutes kapacitetsutrymme handlar mest om sondtyp och upplösning. Sondtyp ändrar vad brandväggar och routrar släpper igenom. Upplösning och numerisk utdata ändrar läsbarheten. Vissa varianter kan också göra mer avancerad sondering för att hålla flödena konsekventa så att vägen är lättare att tolka.",
+              "Kärnan är synlighet kontra realism. Att sondera med något som är nära din applikations trafik kan visa en sökväg som matchar ditt verkliga problem, men den kan vara blockerad. Att använda standardsonder är ofta tillåtet, men det kanske inte representerar hur din specifika tjänstetrafik behandlas.",
+              "En annan dimension är hur traceroute håller flöden konsekventa. Vissa implementeringar varierar portar eller identifierare per sond, vilket kan göra att lastbalanserare skickar olika sonder längs olika vägar. Verktyg som håller en stabil flödesnyckel kan ge en renare, mer tolkningsbar väg till bekostnad av flexibilitet."
+            ]
+          },
+          {
+            "title": "Sammanhang och gränser",
+            "paragraphs": [
+              "Traceroute passar när du vet att \"något är långsamt eller misslyckas\" och du måste lokalisera var längs vägen beteendet förändras. Det är ett nätverkslagerverktyg, så du kopplar ihop det med DNS-kontroller, portkontroller och programloggar för att få en komplett bild.",
+              "Notering om auktoriserad användning: traceroute har i allmänhet låg effekt, men den är fortfarande aktiv sondering. Håll dig inom räckhåll, undvik översvämningar och kom ihåg att vissa organisationer behandlar upprepade spår som misstänkt skanning."
+            ]
+          }
+        ]
+      },
+      "tagline": "Se var paket saktar ner eller försvinner längs vägen."
+    },
+    {
+      "id": "ss",
+      "name": "ss",
+      "description": "Inspektera uttag och anslutningstillstånd (modern netstat-ersättning på Linux).",
+      "overview": {
+        "what": "Ett socketstatistikverktyg för att visa lyssningsportar, aktiva anslutningar och per-process ägande.",
+        "how": "Läser kärnsockettabeller och skriver ut tillstånd, adresser, portar och (valfritt) processinformation, ofta snabbare än netstat.",
+        "useCases": [
+          "Se vad som lyssnar på en port och vilken process som äger den",
+          "Lista etablerade anslutningar och deras fjärranslutningar",
+          "Kontrollera snabbt om en tjänst är bunden till rätt gränssnitt"
+        ],
+        "use": "Se vad som lyssnar på en port och vilken process som äger den; Lista etablerade anslutningar och deras fjärranslutna kamrater; Kontrollera snabbt om en tjänst är bunden till rätt gränssnitt."
+      },
+      "minimal": "ss -tulpn",
+      "syntax": "ss [options] [filter]",
+      "syntaxHelp": [
+        "Kombinera protokollflaggor (-t/-u) med -l för att visa lyssnare och -p för processinformation.",
+        "Använd ett filter för att begränsa utdata (ex: 'sport = :443' eller 'state etablerad')."
+      ],
+      "flags": [
+        {
+          "flag": "-t",
+          "takesValue": false,
+          "description": "TCP uttag"
+        },
+        {
+          "flag": "-u",
+          "takesValue": false,
+          "description": "UDP uttag"
+        },
+        {
+          "flag": "-l",
+          "takesValue": false,
+          "description": "Lyssningsuttag"
+        },
+        {
+          "flag": "-a",
+          "takesValue": false,
+          "description": "Alla uttag (lyssnande och icke-listening)"
+        },
+        {
+          "flag": "-p",
+          "takesValue": false,
+          "description": "Visa processen med hjälp av uttaget"
+        },
+        {
+          "flag": "-n",
+          "takesValue": false,
+          "description": "Lös inte tjänstnamn"
+        },
+        {
+          "flag": "-s",
+          "takesValue": false,
+          "description": "Sammanfattande statistik"
+        },
+        {
+          "flag": "-r",
+          "takesValue": false,
+          "description": "Lös DNS namn (långsammare)"
+        },
+        {
+          "flag": "-o",
+          "takesValue": false,
+          "description": "Visa timerinformation"
+        },
+        {
+          "flag": "-H",
+          "takesValue": false,
+          "description": "Ingen rubrikrad"
+        }
+      ],
+      "examples": [
+        {
+          "command": "ss -tulpn",
+          "explanation": "Lista TCP/UDP uttag med lyssnare och processägande (numeriskt)."
+        },
+        {
+          "command": "ss -ltn",
+          "explanation": "Visa lyssnande TCP-uttag utan DNS/tjänstnamnupplösning."
+        },
+        {
+          "command": "ss -atunp",
+          "explanation": "Lista alla TCP/UDP sockets, inklusive icke-listening, med processer."
+        },
+        {
+          "command": "ss -s",
+          "explanation": "Sammanfattning av uttagsstatistik på hög nivå."
+        },
+        {
+          "command": "ss -tn state established",
+          "explanation": "Visa endast etablerade TCP-anslutningar (numeriska adresser)."
+        },
+        {
+          "command": "ss -tn sport = :443",
+          "explanation": "Visa TCP-anslutningar med lokal källport 443."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Ss rapporterar socket state från kärnan. Det är en ögonblicksbild som förändras ögonblick till ögonblick.",
+          "Namnupplösning kan förvränga hastighet och tydlighet. Numerisk utdata är ofta bäst för felsökning.",
+          "Processtillskrivning beror på behörigheter. Utan privilegier förblir vissa ägare dolda.",
+          "Ett lyssningsuttag är inte detsamma som en fungerande tjänst. Processen kan fortfarande vara bruten."
+        ],
+        "proTips": [
+          "Filtrera efter tillstånd för att minska brus. Etablerade och lyssnande synpunkter svarar på olika frågor.",
+          "Använd processinformation när du jagar \"vem som äger denna port\". Det förvandlar produktion till handling.",
+          "Se upp för oväntade bindningar. Tjänster som lyssnar på 0.0.0.0 eller :: exponeras brett.",
+          "Para ihop med stockar. Ss berättar vad som finns, loggar berättar varför."
+        ],
+        "commonMistakes": [
+          "Förvirrande lokala och avlägsna kolumner. Det är lätt att misstolka vilken sida som äger porten.",
+          "Att glömma IPv6. En tjänst kan lyssna på :: och fortfarande acceptera IPv4 via v6-mappning.",
+          "Att anta att \"inga anslutningar\" betyder \"ingen trafik\". Kortlivade anslutningar kan komma och gå snabbt.",
+          "Förutsatt att PID-utmatningen är komplett utan behörighet. Vissa detaljer kräver förhöjda rättigheter."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Vad verktyget egentligen gör under huven",
+            "paragraphs": [
+              "ss är ett fönster till kärnans sockettabeller. Istället för att sondera nätverket frågar den operativsystemet vilka sockets som finns, vilka adresser och portar de är bundna till och vilka tillstånd de befinner sig i. Det gör det fundamentalt annorlunda än skanningsverktyg: ss är introspektion, inte observation.",
+              "Eftersom den pratar med kärndatastrukturer kan ss dyka upp detaljer som är svåra att avgöra utifrån, som vilken process som äger en socket och vilka tillståndsövergångar som sker. Det kan också avslöja när kärnan har många anslutningar i övergående tillstånd, vilket ofta är ett symptom på belastning eller felaktigt beteende.",
+              "ss är en del av iproute2-familjen och frågar vanligtvis kärnan genom moderna gränssnitt snarare än att förlita sig på äldre analysmetoder. Det är därför det kan avslöja rikare tillstånd, såsom TCP-timers och överbelastningsrelaterade detaljer, när du ber om dem."
+            ]
+          },
+          {
+            "title": "Tolka resultat utan att lura dig själv",
+            "paragraphs": [
+              "Socket-tillstånd är lätta att misstolka om du behandlar dem som moraliska bedömningar. Ett stort antal anslutningar i ett givet tillstånd är inte automatiskt dåliga. Det blir meningsfullt när det är nytt, växande eller korrelerat med användaren synliga misslyckanden.",
+              "Kom ihåg gränsen för vad ss kan bevisa. Det kan bevisa att en process lyssnar på en port på den här maskinen. Det kan inte bevisa att fjärrklienter kan nå det. Brandväggar, routing och NAT sitter utanför kärnans lokala sockettabell.",
+              "Konceptexempel: en app kan lyssna på 0.0.0.0 men fortfarande vara oåtkomlig från internet om en perimeterbrandvägg blockerar porten. ss visar lokal sanning, inte perimetersanning."
+            ]
+          },
+          {
+            "title": "Formen på verktygets kapacitet",
+            "paragraphs": [
+              "ss-funktionerna delas in i: vilka socketfamiljer du tittar på, vilket protokoll du filtrerar och hur mycket detaljer du skriver ut. Du kan fokusera på lyssningsuttag, etablerade sessioner eller sammanfattande statistik. Du kan också filtrera efter adress, port eller process för att minska brus.",
+              "Avvägningen är mellan fullständighet och läsbarhet. Att dumpa allt kan vara överväldigande. Om du filtrerar för hårt kan du missa den ovanliga kopplingen som förklarar händelsen. Färdigheten är att välja ett filter som matchar din hypotes utan att göra dig blind.",
+              "Förmågan varierar också beroende på vad kärnan exponerar. På vissa system kan du se köstorlekar, minnesanvändning och TCP-diagnostik. På andra får du en enklare vy. Det viktiga är att ss är begränsad av lokal kärntelemetri, inte av vad nätverket väljer att avslöja."
+            ]
+          },
+          {
+            "title": "Sammanhang och gränser",
+            "paragraphs": [
+              "ss passar när du felsöker ett lokalt system: vilken tjänst som äger den här porten, varför finns det så många anslutningar, är kärnan igensatt med halvstängda sockets. Det är en perfekt följeslagare till externa kontroller som curl eller nmap eftersom den visar den interna vyn som förklarar de yttre symptomen.",
+              "Notering om auktoriserad användning: ss är lokal introspektion, så huvudgränsen är systemåtkomst. Använd den på system du får administrera, och kom ihåg att process- och anslutningsmetadata kan vara känsliga i delade miljöer."
+            ]
+          }
+        ]
+      },
+      "tagline": "Socketöversikt för Linux: vem lyssnar, vem är ansluten och varför."
+    },
+    {
+      "id": "lsof",
+      "name": "lsof",
+      "description": "Lista öppna filer och de processer som håller dem, inklusive nätverksuttag.",
+      "overview": {
+        "what": "Ett verktyg för process- och filsynlighet: på Unix är allt en fil, inklusive nätverksuttag och enheter.",
+        "how": "Inspekterar systemets öppna filtabeller och skriver ut vilka processer som har vilka filer, sockets, portar eller kataloger som öppnas.",
+        "useCases": [
+          "Hitta vilken process som lyssnar på en port",
+          "Identifiera vem som håller en fil öppen (kan inte ta bort/avmontera)",
+          "Lista alla nätverksanslutningar som ägs av en process"
+        ],
+        "use": "Hitta vilken process som lyssnar på en port; Identifiera vem som håller en fil öppen (kan inte ta bort/avmontera); Lista alla nätverksanslutningar som ägs av en process."
+      },
+      "minimal": "lsof -i :<port>",
+      "syntax": "lsof [selection] [options]",
+      "syntaxHelp": [
+        "Använd -i för att filtrera nätverksfiler/sockets och lägg till :PORT eller @HOST för precision.",
+        "Lägg till -n -P för att undvika långsamma DNS/tjänstnamnssökningar."
+      ],
+      "flags": [
+        {
+          "flag": "-i",
+          "takesValue": false,
+          "description": "Välj Internet-nätverksfiler"
+        },
+        {
+          "flag": "-i :<port>",
+          "takesValue": true,
+          "description": "Filtrera efter port (ex: -i :80)"
+        },
+        {
+          "flag": "-iTCP",
+          "takesValue": false,
+          "description": "Endast TCP uttag"
+        },
+        {
+          "flag": "-iUDP",
+          "takesValue": false,
+          "description": "Endast UDP uttag"
+        },
+        {
+          "flag": "-p <pid>",
+          "takesValue": true,
+          "description": "Välj efter process-ID"
+        },
+        {
+          "flag": "-u <user>",
+          "takesValue": true,
+          "description": "Välj efter användare"
+        },
+        {
+          "flag": "-n",
+          "takesValue": false,
+          "description": "Lös inte värdnamn"
+        },
+        {
+          "flag": "-P",
+          "takesValue": false,
+          "description": "Lös inte portnamn (visa nummer)"
+        },
+        {
+          "flag": "+D <dir>",
+          "takesValue": true,
+          "description": "Sök efter öppna filer under en katalog (kan vara långsam)"
+        },
+        {
+          "flag": "-t",
+          "takesValue": false,
+          "description": "Kortfattad utdata: skriv endast ut PID"
+        }
+      ],
+      "examples": [
+        {
+          "command": "lsof -i :8080",
+          "explanation": "Visa processer med sockets bundna till lokal port 8080."
+        },
+        {
+          "command": "lsof -nP -iTCP:443 -sTCP:LISTEN",
+          "explanation": "Lista TCP-lyssnare på port 443 utan DNS/tjänstuppslagningar."
+        },
+        {
+          "command": "lsof -p <pid>",
+          "explanation": "Visa öppna filer som innehas av ett specifikt process-ID."
+        },
+        {
+          "command": "lsof -u <user>",
+          "explanation": "Lista öppna filer och sockets som ägs av den givna användaren."
+        },
+        {
+          "command": "lsof -nP -i",
+          "explanation": "Lista alla nätverksfiler utan att lösa namn eller portar."
+        },
+        {
+          "command": "lsof +D /var/log",
+          "explanation": "Lista processer med öppna filer under /var/log (kan vara tunga)."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Lsof kartlägger processer för att öppna filer. På upptagna system kan ofiltrerad produktion vara enorm.",
+          "\"Fil\" inkluderar uttag, rör och enheter. Det är bredare än de flesta förväntar sig.",
+          "Katalogsökningar kan vara tunga. Rekursiva lägen kan bli dyra på stora träd.",
+          "Behörigheter påverkar synligheten. Vissa processer kommer att dölja detaljer om du inte har rättigheter."
+        ],
+        "proTips": [
+          "Filtrera tidigt. Port-, PID-, användar- eller sökvägsfilter gör resultaten användbara.",
+          "Använd det för \"varför kan jag inte ta bort detta\". Öppna handtag är den vanliga boven.",
+          "Behandla uttag som filer. Den mentala modellen gör hamnägandet intuitivt.",
+          "Inaktivera namnupplösning vid felsökning av bindningar. Numerisk utdata är snabbare och tydligare."
+        ],
+        "commonMistakes": [
+          "Kör det ofiltrerat och går vilse. Börja smalt och bredda sedan.",
+          "Misstag \"ingen utgång\" för \"ingen problem\". Du kanske saknar tillstånd att se ägaren.",
+          "Överanvändning av rekursiva katalogsökningar vid produktion. Det kan påverka prestandan.",
+          "Att glömma att behållare och namnutrymmen ändrar synlighet. Värdvyn kan skilja sig åt."
+        ],
+        "funFact": "Namnet utökas för att lista öppna filer, och på Unix inkluderar det saker du inte intuitivt tänker på som filer, som nätverksuttag."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Vad verktyget egentligen gör under huven",
+            "paragraphs": [
+              "lsof korrelerar processtillstånd med operativsystemets öppna filtabeller. Varje process innehåller filbeskrivningar som pekar på kärnobjekt: vanliga filer, kataloger, enheter, pipes och sockets. lsof går igenom dessa tabeller och skriver ut en join: bearbeta metadata på ena sidan, öppna handtag på den andra.",
+              "Den designen är anledningen till att lsof kan svara på frågor som känns magiska: vem använder den här porten, varför kan jag inte avmontera det här filsystemet, vad gör att den här raderade filen konsumerar disk. Det är inte att gissa. Det är att läsa kärnans bokföring.",
+              "Nätverksrelaterad utdata är ett specialfall av samma mekanism. En lyssnande TCP-port är bara en socket-beskrivning. Filtrering efter nätverkskriterier ändrar inte vad lsof gör, det ändrar bara vilka deskriptorer den skriver ut.",
+              "På Linux samlar lsof vanligtvis in detta genom att läsa process- och deskriptorinformation som exponeras av operativsystemet och sedan lösa dessa kärnobjekt till något läsbart. Den exakta rörläggningen varierar beroende på plattform, men tanken är konsekvent: den korrelerar levande kärntillstånd, inte analyserar loggar eller gissningar från symptom."
+            ]
+          },
+          {
+            "title": "Tolka resultat utan att lura dig själv",
+            "paragraphs": [
+              "Utgången är tät, och densitet inbjuder till övertro. lsof visar att en process har ett öppet handtag. Det visar inte automatiskt hur viktigt det handtaget är eller om det är aktivt för närvarande. En process kan hålla en fil öppen i timmar utan att röra den igen.",
+              "Var försiktig med innebörden av den här porten som används av PID X. I containeriserade miljöer och miljöer med flera namnområden kan samma portnummer existera i olika namnområden. lsof visar vad den kan se från namnutrymmet och privilegier du befinner dig i, vilket kan vara en delvis sanning.",
+              "Konceptexempel: en loggfil kan tas bort, men diskanvändningen minskar inte eftersom en process fortfarande innehåller deskriptorn. lsof kan avslöja den dolda länken mellan raderad och fortfarande förbrukar utrymme.",
+              "Se även efter handtag som pekar på \"borttagna\" sökvägar. Filsystemposten är borta, men inoden kan förbli allokerad medan processen håller deskriptorn öppen. Det är därför diskanvändning och fillistor inte kan överensstämma tills processen släpper handtaget."
+            ]
+          },
+          {
+            "title": "Formen på verktygets kapacitet",
+            "paragraphs": [
+              "lsof handlar om urval och projektion. Valet avgör vilka processer och vilka typer av filer du bryr dig om: användare, PID, filsökväg, nätverksuttag eller en mix. Projektion bestämmer hur omfattande utmatningen är. Det är de två axlarna som gör det till antingen en skalpell eller en brandslang.",
+              "Den huvudsakliga kompromissen är kostnaden. Smala frågor är snabba. Breda frågor kan vara dyra eftersom lsof måste inspektera många processer och många deskriptorer. Den kostnaden är inte bara tid, det kan vara mätbar belastning på ett upptaget system. I incidentrespons spelar det roll."
+            ]
+          },
+          {
+            "title": "Sammanhang och gränser",
+            "paragraphs": [
+              "lsof passar när din fråga är vem som äger resursen. Det kompletterar ss och netstat-stilverktyg genom att knyta sockets till processer, och det kompletterar filsystemverktyg genom att knyta sökvägar till öppna handtag.",
+              "Notering om auktoriserad användning: lsof avslöjar processnamn, användare, öppna sökvägar och nätverksslutpunkter. På delade system som kan vara känsliga. Använd den bara där du har administratörsbehörighet och var avsiktlig med vad du fångar och delar i rapporter."
+            ]
+          }
+        ]
+      },
+      "tagline": "Se vilken process som håller en fil, port eller katalog öppen."
+    },
+    {
+      "id": "lynis",
+      "name": "Lynis",
+      "description": "Kör en strukturerad lokal säkerhetsgranskning och få prioriterade härdningsrekommendationer.",
+      "overview": {
+        "what": "Lynis är ett lokalt säkerhetsgranskningsverktyg som granskar din systemkonfiguration, installerad programvara och säkerhetskontroller. Det lyfter fram svagheter, saknade härdningssteg och potentiella felkonfigurationer inom områden som autentisering, loggning, nätverk och filbehörigheter.",
+        "how": "Lynis kör en stor uppsättning kontroller grupperade efter kategori och producerar två utdata: en logg med tekniska detaljer och en rapport som sammanfattar varningar och förslag. Du kan köra den interaktivt, i snabbläge eller som en schemalagd körning för att spåra förbättringar över tid.",
+        "useCases": [
+          "Basera en ny serverbyggnad innan den går live.",
+          "Revision efter större förändringar, patchcykler eller konfigurationshärdning.",
+          "Stöd granskningar av efterlevnadsstil genom att föra rapporter och jämföra revisioner över tid."
+        ]
+      },
+      "minimal": "sudo lynis audit system",
+      "syntax": "lynis audit system [options]",
+      "examples": [
+        {
+          "command": "sudo lynis audit system",
+          "explanation": "Kör en fullständig lokal revision med maximal täckning (rekommenderas för din baslinje)."
+        },
+        {
+          "command": "sudo lynis audit system --quick",
+          "explanation": "Kör utan interaktiva pauser så det är lättare att automatisera eller upprepa."
+        },
+        {
+          "command": "sudo lynis audit system --cronjob --report-file /var/log/lynis-report.dat",
+          "explanation": "Generera en förutsägbar rapportfil för schemalagda körningar och spårning."
+        },
+        {
+          "command": "sudo lynis audit system --profile /etc/lynis/custom.prf",
+          "explanation": "Tillämpa organisationsspecifik justering, till exempel för att ignorera accepterade risker eller fokusera på nyckelkontroller."
+        },
+        {
+          "command": "lynis --help",
+          "explanation": "Se tillgängliga skanningslägen och vanliga alternativ direkt från den installerade versionen."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Kör med sudo för de mest kompletta resultaten. Utan förhöjda privilegier kommer vissa kontroller att hoppas över.",
+          "Behandla resultatet som vägledning, inte som ett omdöme. Förslag bör valideras mot din hotmodell och operativa behov.",
+          "Spara rapporter för jämförelse. Det verkliga värdet visar sig när du kan bevisa att härdningen förbättras med tiden."
+        ],
+        "proTips": [
+          "Börja med snabbläge för frekventa körningar, kör sedan en hel löpning efter större förändringar.",
+          "Använd en profil för att dämpa brus och fokusera på kontroller du faktiskt planerar att tillämpa.",
+          "Förvandla nyckelresultat till repeterbara härdningsuppgifter och kör sedan Lynis igen för att bekräfta stängningen."
+        ],
+        "commonMistakes": [
+          "Försöker fixa allt på en gång. Prioritera varningar med hög påverkan först.",
+          "Kör bara en gång och glömmer det. Lynis är mest användbar när den används som en återkommande kontrollpunkt.",
+          "Ignorera sammanhang. Ett härdningsförslag kan vara korrekt generellt men fel för din arbetsbelastning."
+        ],
+        "funFact": "Lynis skriver både en detaljerad logg och en separat rapport så att du kan hålla en ren sammanfattning samtidigt som du behåller tekniska bevis."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Hur Lynis granskar ett system",
+            "paragraphs": [
+              "Lynis utför en serie kategoriserade tester som inspekterar konfigurationsfiler, paketinställningar, behörigheter, kärnparametrar och säkerhetskontroller. Testerna är utformade för att endast läsas, så verktyget hårdnar inte systemet för dig, det förklarar vad det hittade och vad du bör tänka på att ändra.",
+              "Eftersom det är lokalt kan Lynis korrelera detaljer som fjärrskannrar ofta missar, såsom lokala autentiseringspolicyer, filägandemönster, sudo-konfiguration och loggnings- och revisionstäckning. Detta gör den till en stark följeslagare till nätverksskanning och sårbarhetsskanning.",
+              "Granskningen är mer komplett när du kör som root, eftersom privilegierad åtkomst tillåter Lynis att inspektera begränsade filer och systeminställningar. Om du måste köra oprivilegierat, behandla resultaten som partiella och fokusera på vad det fortfarande kan verifiera säkert."
+            ]
+          },
+          {
+            "title": "Rapporter, varningar och härdningsindex",
+            "paragraphs": [
+              "Lynis producerar en logg med råresultat och en rapportfil som sammanfattar varningar och förslag. Rapporten är den del du vanligtvis lagrar för baselining och granskningsmöten, medan loggen är vad du konsulterar när du behöver tekniska detaljer bakom ett fynd.",
+              "Varningar är vanligtvis mer brådskande och är bra kandidater för omedelbar triage. Förslag kan variera från snabba vinster till djupare arkitekturval. Ett praktiskt arbetsflöde är att konvertera objekt med högst värde till uppgifter, tillämpa ändringar på ett kontrollerat sätt och sedan köra Lynis igen för att validera effekten.",
+              "Många miljöer använder härdningsindex som en enkel trendindikator. Det är inte ett efterlevnadspoäng, men det är användbart att visa att säkerhetsställningen förbättras när du kombinerar den med bevis från rapportfilerna."
+            ]
+          },
+          {
+            "title": "Att göra Lynis handlingsbar",
+            "paragraphs": [
+              "Det största hoppet i värde kommer när du behandlar Lynis utdata som en eftersläpning. Välj ett litet antal förbättringar, implementera dem och verifiera. Detta förvandlar revisionen från en engångsrapport till en kontinuerlig härdningsslinga.",
+              "Profiler hjälper till att minska buller. Om en rekommendation avsiktligt inte är tillämplig, fånga det beslutet i en profil så att framtida körningar förblir fokuserade och konsekventa i systemen.",
+              "När du arbetar över flottor, kör Lynis på representativa värdar först. Använd resultaten för att definiera en baslinjekonfiguration, standardisera och automatisera sedan härdningsstegen genom dina konfigurationshanteringsverktyg."
+            ]
+          },
+          {
+            "title": "Automatisering och säkra återkommande körningar",
+            "paragraphs": [
+              "För schemalagda granskningar är cronjob-läget utformat för icke-interaktivt exekvering. Kombinera det med en stabil rapportväg och en logghanteringsmetod så att rapporter kan samlas in eller jämföras centralt.",
+              "Var uppmärksam på känsliga utdata. Granskningsloggar och rapporter kan innehålla systeminformation som du inte vill ha allmänt tillgänglig. Lagra dem med lämpliga behörigheter och lagringspolicyer.",
+              "En praktisk kadens är frekventa snabbkörningar plus djupare fullständiga granskningar efter patchning, konfigurationsändringar eller större uppgraderingar. Detta håller signalen hög och ansträngningen förutsägbar."
+            ]
+          }
+        ]
+      },
+      "tagline": "Säkerhetsgranskning och härdningsvägledning för Unix- och Linux-system.",
+      "syntaxHelp": [
+        "Använd revisionssystem för en fullständig lokal revision (vanligast).",
+        "Använd --quick eller --cronjob för icke-interaktiva körningar.",
+        "Använd --profile <file> för att justera kontroller och rapportering till din miljö."
+      ],
+      "flags": [
+        {
+          "flag": "--quick (-Q)",
+          "takesValue": false,
+          "description": "Kör i snabbläge och pausa inte för användarinmatning."
+        },
+        {
+          "flag": "--cronjob",
+          "takesValue": false,
+          "description": "Cron säker körning: inga färger, inga uppmaningar, inga avbrott."
+        },
+        {
+          "flag": "--profile <file>",
+          "takesValue": true,
+          "description": "Använd en alternativ profil för att aktivera eller inaktivera kontroller och inställningar."
+        },
+        {
+          "flag": "--tests TEST-IDs",
+          "takesValue": true,
+          "description": "Kör endast utvalda tester efter ID (användbart för fokuserad verifiering)."
+        },
+        {
+          "flag": "--logfile <path>",
+          "takesValue": true,
+          "description": "Skriv den tekniska loggen till en anpassad plats."
+        },
+        {
+          "flag": "--report-file <file>",
+          "takesValue": true,
+          "description": "Skriv rapporten till ett anpassat filnamn eller plats."
+        },
+        {
+          "flag": "--warnings-only",
+          "takesValue": false,
+          "description": "Tyst utdata förutom varningar, användbart i skript."
+        },
+        {
+          "flag": "--no-log",
+          "takesValue": false,
+          "description": "Inaktivera loggning till disk för att minska känslig data som skrivs till filer."
+        },
+        {
+          "flag": "--verbose",
+          "takesValue": false,
+          "description": "Visa mer detaljer på skärmen medan du kör kontroller."
+        }
+      ]
+    },
+    {
+      "id": "auditd",
+      "name": "auditd",
+      "description": "Samla in och fråga efter manipuleringssäkra granskningsloggar för autentisering, filåtkomst och adminaktivitet.",
+      "overview": {
+        "what": "auditd är Linux Audit-demonen som registrerar säkerhetsrelevanta händelser från kärngranskningsramverket. Det används vanligtvis för att spåra autentiseringsaktivitet, privilegieanvändning, filintegritetskänsliga sökvägar och policyupptvingad övervakning för efterlevnad.",
+        "how": "Regler definierar vad som loggas. Kärnan genererar revisionshändelser, auditd skriver dem till /var/log/audit/audit.log, och verktyg som auditctl, ausearch och aureport hjälper dig att hantera regler och förvandla råhändelser till läsbara svar.",
+        "useCases": [
+          "Upptäck ändringar i viktiga filer som passwd, sudoers eller SSH-konfiguration.",
+          "Skapa granskningsspår för privilegierade kommandon och administratörsåtgärder.",
+          "Generera periodiska revisionsrapporter för att stödja utredningar och efterlevnadsgranskningar."
+        ]
+      },
+      "minimal": "sudo auditctl -l",
+      "syntax": "auditctl [rule and control options]",
+      "examples": [
+        {
+          "command": "sudo auditctl -l",
+          "explanation": "Bekräfta vilka regler som är aktiva för närvarande. Gör detta innan du lägger till fler regler."
+        },
+        {
+          "command": "sudo auditctl -w /etc/sudoers -p wa -k sudoers-change",
+          "explanation": "Titta på sudoers för skriv- och attributändringar och tagghändelser med en nyckel för snabba sökningar."
+        },
+        {
+          "command": "sudo ausearch -k sudoers-change -i",
+          "explanation": "Hitta händelser för sudoers ändra nyckel och tolka fält till läsbar utdata."
+        },
+        {
+          "command": "sudo aureport -l -i -ts yesterday -te now",
+          "explanation": "Skapa en läsbar rapport över inloggningsaktivitet i ett tidsfönster."
+        },
+        {
+          "command": "sudo systemctl status auditd",
+          "explanation": "Verifiera att demonen körs och loggar skrivs."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Håll reglerna fokuserade. Revisionsvolymen växer snabbt och kan skapa brus och prestandapåverkan.",
+          "Nycklar är viktiga. Tagga dina regler med nycklar så att du kan söka pålitligt under incidenter.",
+          "Bevara regler i filer, inte bara i minnet. I minnet kan regler som ställts in via auditctl gå förlorade efter omstart."
+        ],
+        "proTips": [
+          "Börja med en liten uppsättning högvärdiga klockor, upprepa sedan baserat på vad du faktiskt undersöker.",
+          "Använd ausearch med -i när du presenterar resultat för människor och råläge när du matar skript.",
+          "Skydda revisionsloggar med strikta behörigheter och en tydlig lagringsplan så att spåret förblir pålitligt."
+        ],
+        "commonMistakes": [
+          "Övervakning för brett, till exempel hela filsystem, vilket producerar oanvändbara volymer av loggar.",
+          "Att glömma att bevara regler, vilket gör att övervakningen tyst försvinner efter omstart eller omstart av tjänsten.",
+          "Hoppa över filter som auid eller framgång, vilket kan blåsa upp brus och dölja meningsfulla händelser."
+        ],
+        "funFact": "Granskningshändelser genereras av kärnan, vilket är en anledning till att granskningsspår kan vara mer tillförlitliga än loggning av endast applikationer."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Mental modell: från syscall till audit.log",
+            "paragraphs": [
+              "Linux Audit-ramverket är inbyggt i kärnan. När en övervakad åtgärd inträffar, till exempel ett syscall du har regler för, avger kärnan en granskningshändelse med fält som beskriver vem som gjorde vad, varifrån och om den lyckades.",
+              "auditd tar emot dessa händelser och skriver dem till /var/log/audit/audit.log. Den loggen är strukturerad text, vilket är bra för integritet och analys men inte alltid trevligt att läsa direkt.",
+              "Det är därför som ekosystemet inkluderar frågeverktyg. ausearch hjälper dig att filtrera händelser efter tid, användare, nyckel eller många andra attribut. aureport förvandlar samlingar av händelser till sammanfattande rapporter som du kan lämna till en granskare."
+            ]
+          },
+          {
+            "title": "Regeltyper: bevakningsregler och syscall-regler",
+            "paragraphs": [
+              "Klockregler (stilen -w) är den enklaste ingången. Du övervakar en fil- eller katalogsökväg och väljer vilka behörighetstyper som ska spelas in. De är perfekta för att spåra ändringar i konfigurationsfiler och andra värdefulla tillgångar.",
+              "Syscall-regler (stilen -a alltid, avsluta) är mer flexibla och kraftfulla. Du kan rikta in dig på syscalls som open eller execve och sedan filtrera efter användar-ID, körbara filer, framgång eller misslyckande med mera. Så här skapar du exakt detektering för beteende, inte bara en filsökväg.",
+              "Nycklar limmar ihop allt. När du tilldelar -k till en regel bär varje matchande händelse den taggen, vilket gör incidentresponsen mycket snabbare eftersom du kan söka efter avsikt, inte genom att gissa vilka råfält som matchar."
+            ]
+          },
+          {
+            "title": "Söka och rapportera som faktiskt svarar på frågor",
+            "paragraphs": [
+              "Under utredningar, utgå från en nyckel eller ett tidsfönster. Använd ausearch för att begränsa loggen till de händelser du bryr dig om, lägg sedan till tolkning så att numeriska ID:n blir användarnamn och sökvägar blir läsbara.",
+              "För återkommande recensioner är aureport ofta det bättre gränssnittet. Inloggningsrapporter, autentiseringsrapporter och körbara sammanfattningar kan snabbt berätta vad som ändrades eller vad som stack ut under en viss period.",
+              "En bra praxis är att testa dina regler. Utlösa beteendet på ett kontrollerat sätt, bekräfta att händelserna dyker upp och dokumentera sedan nyckeln och förväntad utdata så att andra kan upprepa processen."
+            ]
+          },
+          {
+            "title": "Driftshygien: prestanda, retention och integritet",
+            "paragraphs": [
+              "Revision är kraftfullt, men det är inte gratis. Regeluppsättningar för hög volym kan öka CPU-användningen och I O, och de kan fylla diskar. Justera regler medvetet och övervaka både händelsehastighet och loggtillväxt.",
+              "Konfiguration i /etc/audit/auditd.conf styr beteenden som loggrotation och vad som ska göras när diskutrymmet är litet. Dessa inställningar spelar roll, för att förlora revisionsspåret under en incident slår poängen.",
+              "Behandla revisionsdata som bevis. Begränsa åtkomst, skicka kopior till ett centraliserat loggsystem om möjligt och definiera kvarhållning och rotation så att du kan svara på frågor veckor eller månader senare."
+            ]
+          }
+        ]
+      },
+      "tagline": "Granskning på kärnnivå för säkerhetsrelevanta händelser på Linux.",
+      "syntaxHelp": [
+        "Använd auditctl för att lista och hantera i minnesrevisionsregler.",
+        "Använd ausearch för att söka i granskningsloggen efter tid, användare eller nyckel.",
+        "Använd aureport för att generera läsbara sammanfattningar, till exempel inloggningar eller autentiseringsfel."
+      ],
+      "flags": [
+        {
+          "flag": "auditctl -l",
+          "takesValue": false,
+          "description": "Lista de för närvarande inlästa revisionsreglerna."
+        },
+        {
+          "flag": "auditctl -w <path>",
+          "takesValue": true,
+          "description": "Titta på en fil eller katalogsökväg för åtkomst och ändringar."
+        },
+        {
+          "flag": "auditctl -p <rwx a>",
+          "takesValue": true,
+          "description": "Behörighetsfilter för bevakningsregler (läsa, skriva, köra, ändra attribut)."
+        },
+        {
+          "flag": "auditctl -k <key>",
+          "takesValue": true,
+          "description": "Tagga matchande händelser med en nyckel så att du kan söka efter dem senare."
+        },
+        {
+          "flag": "auditctl -a <list,action>",
+          "takesValue": true,
+          "description": "Lägg till en syscall-regel, till exempel alltid,exit för att logga på syscall exit."
+        },
+        {
+          "flag": "auditctl -S <syscall>",
+          "takesValue": true,
+          "description": "Välj den syscall som ska övervakas i en syscall-regel (upprepa för flera)."
+        },
+        {
+          "flag": "auditctl -F <field=value>",
+          "takesValue": true,
+          "description": "Lägg till fältfilter som auid, uid, exe, success eller sökvägsfilter."
+        },
+        {
+          "flag": "ausearch -k <key>",
+          "takesValue": true,
+          "description": "Sök granskningsloggar efter nyckel (använd -i för att tolka ID till namn)."
+        },
+        {
+          "flag": "aureport -l -i",
+          "takesValue": false,
+          "description": "Skapa en inloggningsrapport och tolka numeriska fält."
+        }
+      ]
+    },
+    {
+      "id": "clamav",
+      "name": "ClamAV",
+      "description": "Skanna filer och kataloger efter skadlig programvara med hjälp av signaturer, med alternativ för demonläge och uppdateringar.",
+      "overview": {
+        "what": "ClamAV är en antivirusmotor med öppen källkod som vanligtvis används på Unix-liknande system. Den fokuserar på filbaserad upptäckt av skadlig programvara med hjälp av signaturdatabaser och kan användas för skanningar på begäran, schemalagda skanningar eller integrerad skanning i tjänster som hanterar opålitliga filer.",
+        "how": "Använd freshclam för att hålla virussignaturerna uppdaterade. För skanning kan du köra clamscan som en fristående skanner, eller köra clamd-demonen och använda clamdscan för snabbare upprepade skanningar. Skanningsbeteendet och loggningen kan justeras med konfigurations- och kommandoalternativ.",
+        "useCases": [
+          "Skanna uppladdningar i webbappar eller filresurser innan du lagrar eller distribuerar innehåll.",
+          "Kör schemalagda filsystemsökningar för att minska uppehållstiden för skadlig programvara.",
+          "Integrera med e-postgateways och innehållspipelines som behöver automatisk genomsökning."
+        ]
+      },
+      "minimal": "clamscan -r -i /path/to/scan",
+      "syntax": "clamscan [options] <file|dir>",
+      "examples": [
+        {
+          "command": "sudo freshclam",
+          "explanation": "Uppdatera signaturer före skanning så att resultaten återspeglar den senaste databasen."
+        },
+        {
+          "command": "clamscan -r -i /home",
+          "explanation": "Skanna en katalog rekursivt och visa endast infekterade fynd."
+        },
+        {
+          "command": "clamscan -r --log=/var/log/clamav/clamscan.log /srv/uploads",
+          "explanation": "Skanna en känslig katalog och för en logg för granskningsspår."
+        },
+        {
+          "command": "clamscan -r -i --move=/var/quarantine /srv/uploads",
+          "explanation": "Sätt infekterade filer i karantän genom att flytta dem till en kontrollerad katalog."
+        },
+        {
+          "command": "clamdscan --multiscan --fdpass /srv/uploads",
+          "explanation": "Använd clamd-demonen för snabbare skanningar på större kataloger (kräver att clamd körs)."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Signaturskanning är bra för känd skadlig programvara, men det kommer inte att fånga allt. Använd försvar på djupet med minsta privilegium och övervakning.",
+          "Håll alltid signaturerna uppdaterade. Föråldrade databaser är en vanlig orsak till missade upptäckter.",
+          "Föredrar karantän (flytta eller kopiera) framför radering tills du är säker på din falska positiva hantering."
+        ],
+        "proTips": [
+          "Uteslut virtuella filsystem som proc och sys och andra bullriga vägar i stora skanningar.",
+          "Använd clamd för upprepade skanningsbelastningar. Den undviker att ladda om signaturer för varje körning.",
+          "Logga till en dedikerad sökväg och inkludera skanningskadens i din operativa spelbok."
+        ],
+        "commonMistakes": [
+          "Kör långa rekursiva skanningar utan undantag, vilket slösar tid och ger irrelevanta fel.",
+          "Ta bort infekterade filer omedelbart, vilket kan förstöra bevis eller bryta system om ett falskt positivt inträffar.",
+          "Att anta en ren skanning bevisar säkerhet. Skanningar är en punkt i tid."
+        ],
+        "funFact": "ClamAV används i stor utsträckning som en motor i andra produkter, speciellt där automatiserad genomsökning av opålitliga filer behövs."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Vad ClamAV kan och inte kan göra bra",
+            "paragraphs": [
+              "ClamAV är i första hand en signaturbaserad skanning av skadlig programvara. Det är mycket effektivt för att upptäcka kända hot och familjer med skadlig programvara när signaturdatabasen är aktuell.",
+              "Det är inte en slutpunktsskyddssvit med beteendebaserat förebyggande som standard. Behandla det som ett lager i en större kontrolluppsättning som inkluderar lappning, härdning, minsta privilegium och loggning.",
+              "I praktiken lyser ClamAV i pipelines: skanning av filuppladdning, e-postskanning och hygienkontroller på serversidan där du vill ha en automatiserad dom med ett tydligt granskningsspår."
+            ]
+          },
+          {
+            "title": "Fristående skanning kontra demonläge",
+            "paragraphs": [
+              "clamscan körs som en fristående process. Det är enkelt och bra för engångskontroller, men det måste ladda signaturdatabaser varje körning, vilket kan vara långsamt för upprepade arbetsbelastningar.",
+              "clamd körs som en långlivad demon som håller signaturer i minnet och kan skanna parallellt. clamdscan är klienten som skickar skanningsförfrågningar till demonen. Detta tillvägagångssätt är vanligtvis snabbare för stora kataloger eller frekventa skanningar.",
+              "Om du distribuerar clamd, behandla demonen som en tjänst: definiera tydliga sockets, behörigheter och loggning, och se till att ditt uppdateringsarbetsflöde håller signaturerna aktuella utan att avbryta kritiska skanningar."
+            ]
+          },
+          {
+            "title": "Signaturuppdateringar och hantering av falska positiva",
+            "paragraphs": [
+              "freshclam uppdaterar de officiella signaturdatabaserna. I produktionen, schemalägg uppdateringar och övervaka efter fel, eftersom ett tyst uppdateringsproblem kan lämna dig bakom dig i veckor.",
+              "Arbetsflöden i karantän är viktiga. Genom att flytta eller kopiera infekterade filer till en dedikerad katalog kan du undersöka, validera och återställa om det visar sig vara ett falskt positivt.",
+              "Om du ser upprepade falska positiva resultat i kända godartade filer, dokumentera mönstret och bestäm hur du ska hantera det. Ibland är uteslutningsregler lämpliga, men undantag bör vara noggrant avgränsade och ses över."
+            ]
+          },
+          {
+            "title": "Driftsmönster för servrar och pipelines",
+            "paragraphs": [
+              "För filsystemsskanning, definiera hur framgång ser ut: vilka sökvägar är inom omfattningen, vilka är uteslutna, vart loggar går och vad som händer vid upptäckt. Utan detta blir skanningar brus.",
+              "För programpipelines, skanna innan filen är betrodd. Skanna till exempel vid uppladdning och igen innan du distribuerar eller kör innehåll. Detta minskar risken även när användare tillhandahåller opålitliga nyttolaster.",
+              "Kombinera skanningsresultat med övervakning. Enbart ett skanningsresultat förklarar inte hur en fil kom, vem som rörde den eller vad den gjorde. Det sammanhanget kommer från loggning, granskning och åtkomstkontroller."
+            ]
+          }
+        ]
+      },
+      "tagline": "Öppen källkods-antivirus för filskanning i klienter, servrar och e-postflöden.",
+      "syntaxHelp": [
+        "Använd -r för att skanna kataloger rekursivt och -i för att endast visa infekterade resultat.",
+        "Använd freshclam för att uppdatera signaturer innan du kör större skanningar.",
+        "Använd clamd plus clamdscan för bättre prestanda vid frekventa skanningar."
+      ],
+      "flags": [
+        {
+          "flag": "-r, --recursive",
+          "takesValue": false,
+          "description": "Skanna kataloger rekursivt."
+        },
+        {
+          "flag": "-i, --infected",
+          "takesValue": false,
+          "description": "Skriv endast ut infekterade filer (minskar brus)."
+        },
+        {
+          "flag": "--log=<file>",
+          "takesValue": true,
+          "description": "Skriv skannade utdata till en loggfil för granskning och granskning."
+        },
+        {
+          "flag": "--move=<dir>",
+          "takesValue": true,
+          "description": "Flytta infekterade filer till en karantänkatalog (katalogen måste vara skrivbar)."
+        },
+        {
+          "flag": "--copy=<dir>",
+          "takesValue": true,
+          "description": "Kopiera infekterade filer till en karantänkatalog (katalogen måste vara skrivbar)."
+        },
+        {
+          "flag": "--exclude-dir=<regex>",
+          "takesValue": true,
+          "description": "Uteslut kataloger som matchar ett regexmönster."
+        },
+        {
+          "flag": "--max-filesize=<size>",
+          "takesValue": true,
+          "description": "Hoppa över filer som är större än den angivna storleksgränsen."
+        },
+        {
+          "flag": "--detect-pua",
+          "takesValue": false,
+          "description": "Upptäck potentiellt oönskade applikationer utöver klassisk skadlig programvara."
+        },
+        {
+          "flag": "freshclam",
+          "takesValue": false,
+          "description": "Uppdatera virussignaturdatabaserna som används av ClamAV."
+        }
+      ]
+    }
+  ],
+  "guiTools": [
+    {
+      "id": "wireshark",
+      "name": "Wireshark",
+      "description": "Paketfångst och protokollanalys för att granska nätverkstrafik.",
+      "overview": {
+        "what": "En nätverksprotokollanalysator för att se vad som faktiskt hände på nätet. Du kan fånga live-trafik från ett valt gränssnitt eller öppna en befintlig PCAP och sedan analysera varje lager i varje paket (Ethernet, IP, TCP/UDP, TLS, HTTP, DNS med flera) med tidsstämplar, samtal och flödeskontext.",
+        "how": "Wireshark läser in paket från ett live-gränssnitt eller en PCAP-fil och dekoderar fält lager för lager med hjälp av protokolldissektorer. Capture-filter (BPF) styr vilka paket som sparas; display-filter används i efterhand på dekoderade fält för att visa eller dölja det du vill fokusera på. Med återuppbyggnad och stream-följning kan du analysera hela samtal i stället för enstaka paket.",
+        "useCases": [
+          "Felsöka latens, omsändningar och återställda anslutningar",
+          "Verifiera DNS-frågor, HTTP-anrop och TLS-handskakningar",
+          "Undersöka misstänkt trafik i en PCAP från en incident"
+        ]
+      },
+      "workflow": [
+        "Välj rätt gränssnitt (Wi-Fi, Ethernet, VPN) och starta fångst",
+        "Använd ett capture-filter (valfritt) för att minska brus innan inspelning",
+        "Använd display-filter för att fokusera på rätt protokoll eller värd",
+        "Följ strömmar (TCP/HTTP) för att återskapa samtal",
+        "Exportera objekt eller spara filtrerade fångster för rapportering"
+      ],
+      "features": [
+        "Capture-filter (BPF) och kraftfulla display-filter",
+        "Protokolldekodering med djup inspektion av fält",
+        "Återuppbyggnad av strömmar, statistik och grafer"
+      ],
+      "usageTitle": "Användbara filter",
+      "usage": [
+        {
+          "label": "Display-filter (visa endast HTTP)",
+          "value": "http"
+        },
+        {
+          "label": "Display-filter (trafik till/från värd)",
+          "value": "ip.addr == 10.0.0.5"
+        },
+        {
+          "label": "Display-filter (TCP-port)",
+          "value": "tcp.port == 443"
+        },
+        {
+          "label": "Capture-filter (endast port 53)",
+          "value": "port 53"
+        }
+      ],
+      "guiCheatSheet": {
+        "quickActions": [
+          "Starta fångst på rätt nätverksgränssnitt",
+          "Använd ett display-filter (t.ex. http)",
+          "Följ TCP-ström för att läsa hela samtal",
+          "Stoppa och spara fångst till PCAP",
+          "Stäng av namnuppslagning för bättre hastighet (Resolve Names off)",
+          "Markera intressanta paket och exportera endast markerade",
+          "Använd Statistics → Conversations / Endpoints för att hitta mest aktiva parter",
+          "Använd tidsförskjutning eller Time Display Format för att synka med loggar"
+        ],
+        "commonFilters": [
+          "http",
+          "ip.addr == 10.0.0.5",
+          "tcp.port == 443",
+          "dns",
+          "tcp.flags.syn == 1 and tcp.flags.ack == 0",
+          "tcp.flags.reset == 1",
+          "tcp.analysis.retransmission",
+          "tls.handshake",
+          "http.response.code >= 400",
+          "dns.flags.response == 1 and dns.rcode != 0"
+        ],
+        "exports": [
+          "File → Export Objects → HTTP",
+          "File → Export Specified Packets…",
+          "File → Export Packet Dissections → As Plain Text"
+        ]
+      },
+      "when": [
+        "Du har en PCAP och behöver förstå vad som faktiskt hände på nätet",
+        "Du misstänker problem i DNS, TLS eller HTTP och behöver paketnivåns facit",
+        "Du behöver verifiera vad en applikation verkligen skickar"
+      ],
+      "notes": [
+        "Capture-filter minskar vad som spelas in. Display-filter visar eller döljer bara paket efter fångst.",
+        "I många miljöer krävs admin/root-behörighet för att fånga trafik från gränssnitt."
+      ],
+      "quickPanel": {
+        "notes": [
+          "Display-filter ändrar inte vad som fångades, bara vad du ser.",
+          "TLS döljer payload men inte metadata: SNI, certifikat och handskakningsdetaljer är fortfarande värdefulla.",
+          "Timing är bevis. Titta på omsändningar, out-of-order-segment och RTT.",
+          "Filternamn är skiftlägeskänsliga; värden är ofta inte det."
+        ],
+        "proTips": [
+          "Börja brett (dns, tcp) och smalna av med addr/port för att undvika tunnelseende.",
+          "Använd Follow Stream för att bygga berättelsen: SYN → handskakning → begäran → svar → FIN.",
+          "Högerklicka på fält för att snabbare skapa och tillämpa display-filter.",
+          "Spara filtrerade vyer som ny PCAP för tydliga överlämningar."
+        ],
+        "commonMistakes": [
+          "Använda display-filter i tron att det minskar storleken på inspelningen.",
+          "Läsa TCP som enstaka paket i stället för som strömmar.",
+          "Ignorera fångstposition (SPAN, tap, klient, server), vilket förändrar tolkningen.",
+          "Glömma att stänga av namnuppslagning när du behöver fart och tydlighet."
+        ],
+        "whatGoodLooksLike": "Du kan beskriva ett flöde från handskakning till nedstängning med 2–3 paket som bevisar varje påstående."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Capture-filter kontra display-filter: välj var kostnaden ska tas",
+            "paragraphs": [
+              "Wireshark ger dig två helt olika filterspakar. Capture-filter avgör vad som över huvud taget samlas in. Display-filter avgör vad du ser och analyserar efter att paketen redan finns inspelade.",
+              "Capture-filter är starkt när du måste minska volymen på en belastad länk, eller när lagringsutrymmet är begränsat och du vet vilken trafik du behöver. Nackdelen är att du inte kan få tillbaka paket som aldrig fångades.",
+              "Display-filter är arbetsverktyget i analysen. De gör att du snabbt kan iterera mellan hypoteser och förfina vyn i takt med att du lär dig mer. En bra vana är att fånga brett när det går och sedan smalna av systematiskt."
+            ]
+          },
+          {
+            "title": "Dissekering och strömmar: hur Wireshark gör paket begripliga",
+            "paragraphs": [
+              "Wireshark visar inte bara råa bytes. Verktyget dissekerar protokoll och mappar fält till en strukturerad modell. Det är därför du kan filtrera på semantik i stället för byte-offsets.",
+              "Vid felsökning är det ofta mer värdefullt att tänka i samtal och strömmar än i enstaka paket. Funktioner som Follow TCP Stream hjälper dig att återskapa applikationsdialoger och se var beteendet avviker.",
+              "Var uppmärksam på återuppbyggnad och kryptering. Återuppbyggnad kan ändra hur applikationslagret ser ut, och kryptering kan dölja payload helt. Då blir metadata, timing, storlekar och handskakningsdetaljer dina viktigaste ledtrådar."
+            ]
+          },
+          {
+            "title": "En repeterbar analysloop som skalar",
+            "paragraphs": [
+              "En praktisk metod är: börja brett, identifiera vilka parter som pratar, och smalna sedan av. Använd översiktsstatistik för att se dominerande protokoll och mest aktiva endpoints innan du går ner på detaljnivå.",
+              "När du smalnar av, verifiera varje steg. Om du misstänker en specifik värd, bekräfta den i endpoints eller conversations. Om du misstänker ett protokollbeteende, bevisa det med fälten i protokollträdet.",
+              "Det här arbetssättet minskar risken att fastna i paketbrus och gör analysen spårbar: varje filter är ett tydligt analysteg som går att förklara i efterhand."
+            ]
+          },
+          {
+            "title": "Statistik är inte sidofunktioner, de är din kompass",
+            "paragraphs": [
+              "Wiresharks statistikvyer bygger snabbt intuition. Protocol Hierarchy ger en snabb baslinje över vad som finns i materialet. Conversations och Endpoints visar vilka som driver trafiken. I/O-grafer och tidsvyer hjälper dig att upptäcka toppar, stopp och omsändningsmönster.",
+              "Vid prestandafelsökning behöver du ofta inte payload alls. Det viktiga är timing, reset-paket, omsändningar, fönsterbeteende och var fördröjningar uppstår. Statistik kombinerat med riktade paketvyer är normalt den snabbaste vägen framåt."
+            ]
+          },
+          {
+            "title": "När GUI:t inte räcker: ta in TShark och automation",
+            "paragraphs": [
+              "Wireshark-ekosystemet innehåller kommandoradsverktyg för repeterbart arbete. Med TShark kan du läsa pcap-filer, extrahera fält, använda filter och generera sammanfattningar i script.",
+              "Ett bra mönster är att utforska interaktivt i Wireshark tills du hittar rätt filter och fält, och sedan kodifiera det i TShark. Då blir GUI:t din analysyta och automationen din stabila produktionsprocess."
+            ]
+          }
+        ]
+      },
+      "category": "GUI"
+    },
+    {
+      "id": "burp",
+      "name": "Burp Suite",
+      "description": "Plattform för webbsäkerhetstestning med intercept och analys av HTTP(S)-trafik.",
+      "overview": {
+        "what": "Ett arbetsflöde med intercepting proxy för webbtestning. Burp ligger mellan din webbläsare och applikationen så att du kan observera, ändra och spela upp HTTP(S)- och WebSocket-trafik, samtidigt som mål och fynd hålls samlade.",
+        "how": "Burp kör en lokal proxy och skickar webbläsarens trafik genom den. Du kan avlyssna och redigera requests och responses, skicka vidare till Repeater för kontrollerad manuell testning eller till Intruder för automatiserad payload-utforskning. När Burps CA är installerad i webbläsaren kan HTTPS-trafik inom testomfånget inspekteras.",
+        "useCases": [
+          "Förstå hur en webbapplikation fungerar genom att granska requests och responses",
+          "Spela upp och ändra requests för att testa behörighet, indatahantering och affärslogik",
+          "Organisera mål och håll fokus på trafik inom scope"
+        ]
+      },
+      "workflow": [
+        "Starta Burp och använd Burps inbyggda webbläsare eller konfigurera extern webbläsarproxy",
+        "Installera Burps CA-certifikat om du behöver inspektera HTTPS",
+        "Sätt target scope så att Burp markerar de sajter som är relevanta",
+        "Använd Proxy för att avlyssna och ändra requests",
+        "Skicka requests till Repeater för manuell testning och till Intruder för automation"
+      ],
+      "features": [
+        "Proxy-intercept och historik",
+        "Repeater för manuell iteration av requests",
+        "Intruder för automatiserad payload-testning (funktioner varierar mellan versioner)"
+      ],
+      "quickSetup": [
+        "Öppna Burp → Proxy-tabben → bekräfta att en listener kör på 127.0.0.1:8080",
+        "Använd Open Browser i Burp, eller konfigurera din webbläsare att använda Burp som HTTP-proxy",
+        "Installera Burps CA-certifikat i webbläsaren för att dekryptera HTTPS (endast för egen testning)"
+      ],
+      "guiCheatSheet": {
+        "quickActions": [
+          "Öppna Burps webbläsare med proxy förkonfigurerad",
+          "Växla Intercept on/off i Proxy → Intercept",
+          "Skicka requests till Repeater för manuell testning",
+          "Lägg mål i Scope för att fokusera arbetet",
+          "Filtrera Proxy history till endast in-scope",
+          "Skicka till Intruder för säker, avgränsad payload-iteration",
+          "Lägg kommentarer/markeringar på viktiga objekt",
+          "Spara projektet ofta (burp project file)"
+        ],
+        "commonFilters": [
+          "Proxy → HTTP history: In-scope only",
+          "Proxy → HTTP history: Methods = GET,POST",
+          "Proxy → HTTP history: Status = 4xx/5xx",
+          "Target → Site map: Group by host, hide out-of-scope",
+          "Search-tab: regexsökning i body/header/path"
+        ],
+        "exports": [
+          "Project options → Save project",
+          "Right-click → Save item (request/response)",
+          "Proxy/Repeater → Copy URL / Copy request as text"
+        ]
+      },
+      "when": [
+        "Du testar din egen webbapplikation eller en labbmiljö",
+        "Du behöver se exakt vad webbläsaren skickar och tar emot",
+        "Du vill reproducera en bugg eller verifiera en säkerhetskontroll"
+      ],
+      "notes": [
+        "Avlyssna och testa endast system du äger eller uttryckligen har tillstånd att testa.",
+        "Om HTTPS ser trasigt ut saknas oftast Burps CA-certifikat eller så är proxyinställningarna fel."
+      ],
+      "quickPanel": {
+        "notes": [
+          "Scope styr brusnivån. In-scope minskar risken för testning utanför tillåtet område.",
+          "HTTPS-inspektion kräver att Burps CA-certifikat är betrott i webbläsaren.",
+          "Tillägg kan ändra beteende. Ha kontroll på vad som är aktiverat."
+        ],
+        "proTips": [
+          "Använd Repeater för att göra hypoteser reproducerbara, en header eller parameter i taget.",
+          "Markera intressanta requests med kommentarer och highlights för bättre spårbarhet.",
+          "Filtrera Proxy history till in-scope innan du börjar söka och triagera."
+        ],
+        "commonMistakes": [
+          "Testa utanför scope på grund av otydlig scope-konfiguration.",
+          "Glömma att slå av Intercept och undra varför sidor hänger.",
+          "Anta att HTTP 200 betyder korrekt funktion utan att läsa svaret."
+        ],
+        "whatGoodLooksLike": "Du kan visa en minimal förfrågan som reproducerar problemet, förklara varför den fungerar och peka ut vilken header eller parameter som styr utfallet."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Burp som ett instrumenteringslager för webbapplikationer",
+            "paragraphs": [
+              "Burp Suite är enklast att använda när du ser verktyget som både lins och kontrollpanel för HTTP- och WebSocket-trafik. När Burp placeras mellan webbläsaren och målet kan du analysera vad applikationen faktiskt skickar och tar emot, inte vad du tror att den gör.",
+              "Att avlyssna requests och responses handlar inte bara om att ändra parametrar. Det är ett sätt att förstå tillståndsövergångar, cookie- och headerhantering och vilka anrop som är säkerhetskritiska. Den förståelsen gör senare testning snabbare och mer träffsäker."
+            ]
+          },
+          {
+            "title": "Manuell testloop: Proxy, Target, Repeater",
+            "paragraphs": [
+              "Ett signalstarkt arbetsflöde är att först bläddra i applikationen via Burp och sedan organisera observationerna i Target site map och historikvyer. Site map blir din samlade bild av applikationens yta.",
+              "När du hittar en intressant förfrågan flyttar du den till Repeater. Där gör du kontrollerade experiment: ändra en variabel i taget, skicka om och observera svaret. Det är så du verifierar beteenden, reproducerar problem och förstår serverns validering."
+            ]
+          },
+          {
+            "title": "Sessioner och autentisering: håll dig inloggad med avsikt",
+            "paragraphs": [
+              "Många testflöden tappar värde när verktyget tyst faller ur en autentiserad session. Burp har session handling för att definiera regler, hantera cookies och använda macros för att återställa inloggning vid behov.",
+              "Nyckeln är att tydligt definiera vad som räknas som inloggat läge och automatisera återställningsvägen. När detta är rätt konfigurerat får både manuell testning och automation jämn täckning av autentiserade delar."
+            ]
+          },
+          {
+            "title": "Out-of-band-detektering och Burp Collaborator",
+            "paragraphs": [
+              "Vissa sårbarheter syns inte i det omedelbara HTTP-svaret. De utlöser serversidesinteraktioner, till exempel DNS-uppslag eller HTTP-callbacks. Burp Collaborator är byggt för att fånga dessa out-of-band-signaler.",
+              "Det praktiska värdet är bekräftelse. När du ser en interaktion i Collaborator har du tydlig evidens för att payloaden gav effekt utanför den vanliga svarskanalen."
+            ]
+          },
+          {
+            "title": "Få Burp att fungera som en labbjournal",
+            "paragraphs": [
+              "Burp blir betydligt mer effektivt när arbetet hålls ordnat. Definiera scope tidigt så att historik och uppgifter inte fylls av irrelevant trafik. Filtrera på statuskoder, parametriserade endpoints och innehållstyper vid triage.",
+              "Behandla varje fynd som ett reproducerbart experiment. Spara exakt förfrågan, den minsta ändringen som triggar beteendet och tydlig evidens i svaret. Då går rå trafik från brus till åtgärdbara säkerhetsinsikter."
+            ]
+          }
+        ]
+      },
+      "category": "GUI"
+    },
+    {
+      "id": "owasp-zap",
+      "name": "OWASP ZAP",
+      "description": "Open source-verktyg för säkerhetstestning av webbapplikationer med intercept, utforskning och skanning av HTTP- och WebSocket-trafik.",
+      "overview": {
+        "what": "OWASP ZAP är en desktop-proxy och scanner för säkerhetstestning av webbapplikationer. Verktyget ligger mellan webbläsaren och målapplikationen, loggar trafiken och låter dig inspektera, ändra och spela upp requests. Utöver detta kan ZAP crawla applikationen och köra passiva och aktiva kontroller för att hitta vanliga säkerhetsbrister.",
+        "how": "I praktiken fungerar ZAP bäst när man kombinerar manuell utforskning med kontrollerad automation. Utforska först applikationen via proxyn, definiera vad som är in scope och låt passiv skanning analysera den trafik du genererar. Kör sedan Spider och, för moderna JS-appar, AJAX Spider för bättre täckning. Avsluta med Active Scan mot bekräftade mål inom scope och granska fynden i kontext av verkliga requests, responses och evidens.",
+        "useCases": [
+          "Utvecklarvänliga DAST-kontroller under utveckling och i CI-pipelines med automationsplaner.",
+          "Lära sig webbapplikationssäkerhet genom att observera verklig trafik och förstå var brister uppstår.",
+          "Säkerhetstestning i stagingmiljöer, inklusive autentiserade delar med korrekt sessionhantering."
+        ]
+      },
+      "workflow": [
+        "Sätt scope: definiera mål-domäner och vad som ska exkluderas (logout, destruktiva endpoints, tredjepartstjänster).",
+        "Kör webbläsaren via ZAP-proxyn och använd applikationen normalt för att skapa realistisk trafik.",
+        "Granska Sites-trädet och historiken för att verifiera täckning, och justera passiva regler vid behov.",
+        "Crawla för täckning: kör Spider för klassiska appar och AJAX Spider för JS-tunga appar; kombinera vid behov.",
+        "Konfigurera autentisering och sessionhantering om inloggning krävs, och kontrollera att sessionen hålls under crawl.",
+        "Kör Active Scan endast mot mål inom scope där du har tillstånd, och validera fynd genom att reproducera requests.",
+        "Exportera rapporter eller spara sessionen och triagera med utvecklare utifrån förfrågnings- och svarsdetaljer."
+      ],
+      "features": [
+        "Intercepting proxy för HTTP- och WebSocket-trafik med redigering och replay av requests.",
+        "Passiv skanning som analyserar proxad trafik utan att angripa målet.",
+        "Spider och AJAX Spider för att upptäcka innehåll, endpoints och parametrar.",
+        "Aktiv skanning för att testa sårbarheter mot bekräftade mål inom scope.",
+        "Contexts, users och sessionhantering för autentiserad testning.",
+        "Automation Framework för repeterbara skanningar med en planfil och jobbaserade flöden."
+      ],
+      "usageTitle": "Användning",
+      "guiCheatSheet": {
+        "quickActions": [
+          "Quick Start: kör en Automated Scan mot en URL för en snabb första genomgång.",
+          "Spider och AJAX Spider: bygg täckning innan du skannar aktivt.",
+          "Active Scan: angrip endast mål som är tillåtna och inom scope.",
+          "Context-setup: definiera scope, autentisering och sessionhantering för repeterbarhet."
+        ],
+        "commonFilters": [
+          "Scope only: fokusera vyer och resultat på det du faktiskt äger och avser att testa.",
+          "Historik- och alertfilter: smalna av på URL, statuskod, typ och risknivå vid triage.",
+          "Exkludera brusiga sökvägar: logout, health checks, analytics och stora träd med statiska resurser."
+        ],
+        "exports": [
+          "Generera en rapport till intressenter med evidens och berörda URL:er.",
+          "Exportera alerts för integration med ärendehantering eller jämförelse mellan körningar.",
+          "Spara sessionen för att behålla historik, sites tree och skanningsresultat för senare analys."
+        ]
+      },
+      "when": [
+        "Du behöver ett open source-verktyg för webbtestning som stödjer både manuella och automatiserade arbetsflöden.",
+        "Du vill förstå hur requests, responses, cookies och headers hänger ihop med vanliga sårbarheter.",
+        "Du bygger en repeterbar DAST-kontroll i CI och vill arbeta planbaserat."
+      ],
+      "notes": [
+        "Kör aktiv skanning endast mot mål du har tillstånd att testa, och börja helst i stagingmiljö.",
+        "Täckning är viktigare än knapptryckning. Utforska och crawla först, skanna sedan.",
+        "Om applikationen kräver inloggning: lägg tid på Context, users och sessionhantering. Det ger direkt effekt."
+      ],
+      "quickPanel": {
+        "notes": [
+          "Tänk i faser: scope, utforska, crawla, skanna, validera.",
+          "Passiv skanning är låg risk, aktiv skanning är intrusiv och kan påverka systemet."
+        ],
+        "proTips": [
+          "Kombinera Spider och AJAX Spider i moderna appar. En crawler räcker sällan ensam.",
+          "Behandla Context-konfiguration som kod: håll den stabil och återanvänd den i automationsplaner."
+        ],
+        "commonMistakes": [
+          "Skanna utan definierat scope och drunkna i tredjepartsbrus.",
+          "Köra aktiv skanning innan du har täckning och få falsk trygghet.",
+          "Ignorera autentiseringskonfiguration och råka testa nästan bara inloggningssidan."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Tankemodell: proxy först, scanner sen",
+            "paragraphs": [
+              "ZAP är lättast att förstå som två samverkande system. Det första är proxyn, som fångar och organiserar verklig trafik. Det andra är scannern, som bygger på den insamlade ytan för att testa sårbarheter.",
+              "Om du hoppar direkt till skanning utan proxyförståelse tappar du kontext. Då blir det svårt att avgöra om ett fynd är relevant, reproducerbart eller bara ett brusigt utfall.",
+              "En praktisk vana är att hela tiden fråga: förstår jag requesten som orsakade detta resultat? Om svaret är nej, gå tillbaka till proxyn och bygg förståelsen där först."
+            ]
+          },
+          {
+            "title": "Passiv skanning kontra aktiv skanning",
+            "paragraphs": [
+              "Passiv skanning granskar den trafik du redan genererar när du surfar eller replayar requests. Den angriper inte målet och fungerar därför bra tidigt i processen.",
+              "Aktiv skanning gör tvärtom: ZAP skickar payloads och variationer för att försöka trigga sårbarheter. Det ger djupare testning men kräver tydligt scope och god kontroll.",
+              "Ett robust flöde är att använda passiva fynd som kompass. Om passiv analys pekar på svaga headers, osäkra cookies eller läckande metadata kan du sedan rikta den aktiva skanningen mer träffsäkert."
+            ]
+          },
+          {
+            "title": "Täckning är allt: Spider och AJAX Spider",
+            "paragraphs": [
+              "Många svaga skanningsresultat beror på täckning, inte på scannerkvalitet. Om ZAP aldrig ser en sida, parameter eller ett autentiserat flöde kan den delen inte utvärderas.",
+              "Classic Spider fungerar bra på länkdrivna webbplatser. I moderna appar byggs routing och innehåll ofta dynamiskt i JavaScript, och då behövs AJAX Spider för att nå rätt tillstånd.",
+              "Se crawlerresultat som data. Granska vad som hittades, vad som saknas och vad som ska exkluderas. Först när attackytan känns korrekt är det värt att lägga tid på aktiv skanning och triage."
+            ]
+          },
+          {
+            "title": "Contexts, autentisering och sessionhantering",
+            "paragraphs": [
+              "Autentiserad skanning är ofta avgörande för värde. ZAP använder Contexts för att definiera scope, användare, autentiseringsmetod och sessionhantering så att inloggat läge blir reproducerbart.",
+              "Sessionhantering styr hur ZAP avgör om den fortfarande är autentiserad, vanligtvis via cookies eller HTTP-auth, och kan vid behov utökas med script för specialflöden.",
+              "Det är också här du styr säkerhet i testningen. Genom att exkludera logout-länkar, destruktiva funktioner och känsliga adminflöden minskar du risken för oavsiktlig påverkan."
+            ]
+          },
+          {
+            "title": "Automation Framework: repeterbar skanning som plan",
+            "paragraphs": [
+              "I större testning är repeterbarhet central. ZAPs Automation Framework låter dig definiera en jobbkedja, exempelvis spidering följt av aktiv skanning, i en gemensam planfil.",
+              "Ett fungerande mönster är desktop-to-automate: konfigurera och verifiera Context och autentisering i GUI först, exportera sedan samma logik till en automationsplan för CI.",
+              "När planen behandlas som en del av säkerhetspipelinen kan du börja smått med passiva kontroller och crawling och successivt lägga till aktiva jobb när miljö och exkluderingar är mogna."
+            ]
+          }
+        ]
+      },
+      "category": "GUI"
+    }
+  ],
+  "detectionTool": {
+    "id": "suricata",
+    "name": "Suricata",
+    "desc": "Inspektera nätverkstrafik för hot med en IDS-motor som använder regler, loggar och EVE JSON-telemetri.",
+    "quickSetup": [
+      "Sätt HOME_NET och fångstmetod i /etc/suricata/suricata.yaml så motorn vet vad som är internt och vilka gränssnitt som ska övervakas.",
+      "Hämta standardregler med sudo suricata-update, och bekräfta att regler finns i /var/lib/suricata/rules.",
+      "Starta om tjänsten (sudo systemctl restart suricata) och verifiera ren uppstart i /var/log/suricata/suricata.log.",
+      "Bekräfta att paket behandlas genom att följa /var/log/suricata/stats.log och kontrollera att räknare ökar (processed packets, decoded protocols, drops).",
+      "Validera konfiguration och regler innan djupare tuning: sudo suricata -T -c /etc/suricata/suricata.yaml.",
+      "Trigga en känd testalert och följ fast.log samt EVE JSON för att verifiera både läsbar alert och strukturerad eventdata."
+    ],
+    "actions": [
+      "Visa bygginformation och aktiverade fångstfunktioner: sudo suricata --build-info",
+      "Testa konfiguration och regelladdning: sudo suricata -T -c /etc/suricata/suricata.yaml",
+      "Kör på ett gränssnitt i IDS-läge: sudo suricata -c /etc/suricata/suricata.yaml -i eth0",
+      "Kör som daemon från terminal: sudo suricata -D -c /etc/suricata/suricata.yaml -i eth0",
+      "Spela upp en capture för offline-triage: sudo suricata -r traffic.pcap -c /etc/suricata/suricata.yaml",
+      "Fortsätt bearbeta en katalog med PCAP-filer när nya filer anländer: sudo suricata -r /pcaps --pcap-file-continuous -c /etc/suricata/suricata.yaml",
+      "Filtrera alert-händelser ur EVE JSON: sudo tail -f /var/log/suricata/eve.json | jq 'select(.event_type==\"alert\")'",
+      "Ladda om regler utan omstart (socket): sudo suricatasc -c reload-rules",
+      "Ladda om regler utan omstart (signal): sudo kill -USR2 $(pidof suricata)",
+      "Sätt ett enkelt runtime-värde vid start: sudo suricata --set default-log-dir=/var/tmp -c /etc/suricata/suricata.yaml -i eth0"
+    ],
+    "category": "Detection",
+    "description": "IDS/IPS-motor för nätverkstrafik med regelbaserad detektering och rik JSON-loggning.",
+    "overview": {
+      "what": "Suricata är en open source-motor för intrångsdetektering och intrångsskydd som inspekterar nätverkstrafik i realtid. Den genererar larm via signaturregler och kan samtidigt producera rik nätverkstelemetri som strukturerade händelser.",
+      "how": "Paket fångas från gränssnitt eller spelas upp från PCAP, dekoderas till protokoll- och flödesinformation och utvärderas mot regeluppsättningar. Utdata skrivs till alertloggar och EVE JSON så att händelser kan filtreras, skickas till SIEM och korreleras med andra datakällor.",
+      "useCases": [
+        "Detektera kända exploits, malware-C2-mönster och misstänkt scanning med signaturer.",
+        "Skapa DNS-, HTTP-, TLS-, fil- och flödestelemetri för threat hunting och incidenthantering.",
+        "Köra retrospektiv analys av paketfångster för snabb bekräftelse eller triage av incidenter."
+      ]
+    },
+    "features": [
+      "Signaturbaserad detektering med regeluppsättningar som kan uppdateras och styras.",
+      "Rik telemetri via EVE JSON för alerts, DNS, HTTP, TLS, filer och statistik.",
+      "Flera utdataformat inklusive fast.log och strukturerad JSON för automation.",
+      "Konfigurerbar fångst- och prestandastyrning för miljöer med låg till hög trafikvolym."
+    ],
+    "workflow": [
+      "Fånga paket från gränssnitt eller PCAP och dekodera protokoll och flöden.",
+      "Matcha trafik mot signaturregler och följ tillstånd över sessioner.",
+      "Skriv alerts och metadata till loggutdata som kan matas in i SIEM eller analystjänster.",
+      "Trimma regler och konfiguration för att minska brus och öka signal i din miljö."
+    ],
+    "when": [
+      "Du vill ha IDS-synlighet och strukturerade loggar från nätverkstrafik",
+      "Du lär dig detection engineering eller arbetar med blue team-triage",
+      "Du behöver bekräfta om ett mönster syns i nätverkstelemetrin"
+    ],
+    "notes": [
+      "Bäst resultat får du genom att trimma HOME_NET och regelurval. Standardregler är en bra start, men varje nätverk behöver anpassning för att minska falsklarm.",
+      "Se Suricata-utdata som telemetri. Alerts är bara en del; protokollmetadata är ofta den största jaktnyttan.",
+      "Börja enkelt och skala upp. Verifiera fångst och loggning först, lägg sedan på prestandatuning och integrationer."
+    ],
+    "tagline": "Hotdetektering i nätverk med signaturer och rik strukturerad händelsedata.",
+    "quickPanel": {
+      "notes": [
+        "Börja med synlighet. Bekräfta paketbehandling och loggflöde innan du jagar alerts.",
+        "Använd EVE JSON för arbetsflöden som kräver automation, korrelation och långsiktig analys.",
+        "Regeltuning är kontinuerligt arbete. Planera tid för triage, suppressions och miljöspecifik detektering."
+      ],
+      "proTips": [
+        "Kör suricata-update regelbundet så regler hålls aktuella och förändringar kan följas kontrollerat.",
+        "Följ stats.log vid prestandatuning. Paketdrop och decode-fel syns där tidigt.",
+        "Skicka EVE JSON till central loggplattform så Suricata kan korreleras med värdloggar och identitetsdata."
+      ],
+      "commonMistakes": [
+        "Låta HOME_NET vara för brett eller för smalt, vilket ger brus eller missad detektering.",
+        "Förlita sig enbart på fast.log och missa kontext som finns i EVE JSON.",
+        "Aktivera alla regler utan tuning, vilket leder till alert-trötthet och låg signal/brus-kvot."
+      ],
+      "funFact": "Suricata kan ge både hög nivå-alerts och låg nivå-protokollmetadata, vilket gör verktyget användbart för både detektering och nätverkssynlighet."
+    },
+    "deepDive": {
+      "sections": [
+        {
+          "title": "Från paket till händelser",
+          "paragraphs": [
+            "Suricata börjar med paketfångst. Trafik läses från live-gränssnitt eller inspelade pcap-filer och dekoderas till protokoll- och flödeskontext så analysen kan göras på sessionsnivå.",
+            "Regler arbetar mot denna dekoderade kontext. Matchning kan ske på payload, protokollfält, flödesriktning och andra attribut, vilket möjliggör meningsfulla alerts som exploitförsök eller misstänkta C2-mönster.",
+            "Parallellt kan Suricata emittera protokollmetadata. Även när ingen signatur triggar ger dessa händelser viktig synlighet för threat hunting och incidenttidslinjer."
+          ]
+        },
+        {
+          "title": "Regler, uppdateringar och tuning",
+          "paragraphs": [
+            "Regeluppsättningar är detekteringsmotorns kärna. Många börjar med ET Open och går sedan mot ett mer kuraterat urval baserat på egen miljö och hotmodell.",
+            "suricata-update hämtar och hanterar regelkällor och hjälper till att hålla distribuerade regler i synk med konfigurationen. Behandla uppdateringar som kodändringar: testa, rulla ut, övervaka.",
+            "Det är i tuning värdet skapas. Undertryck kända legitima mönster, stäng av irrelevanta kategorier och lägg till anpassade regler för egna tillgångar."
+          ]
+        },
+        {
+          "title": "Förstå utdata: fast.log kontra EVE JSON",
+          "paragraphs": [
+            "fast.log är en mänskligt läsbar alertlogg. Den är bra för snabb verifiering men mindre lämpad för automation eftersom formatet inte är strikt strukturerat.",
+            "EVE JSON är strukturerad eventdata som kan innehålla alerts, protokollposter, file events och statistik. JSON-formatet gör filtrering, transformation och SIEM-ingest enklare.",
+            "En praktisk modell är att använda fast.log för omedelbar felsökning och EVE JSON för allt du vill behålla, korrelera och analysera i skala."
+          ]
+        },
+        {
+          "title": "Driftsättning och prestandagrunder",
+          "paragraphs": [
+            "De flesta team startar i IDS-läge på ett gränssnitt med standardloggning och skalar senare till fler sensorer, dedikerad capture-hårdvara eller inline-IPS beroende på behov och risk.",
+            "Prestanda handlar i grunden om pålitlig fångst. Bevaka paketdrop, trådbeteende och decode-statistik. Missade paket betyder missad detektering.",
+            "Håll konfigurationer explicita. Dokumentera HOME_NET, regelkällor och utdata och hantera förändringar i ordinarie change management för stabil och förklarbar detektering."
+          ]
+        }
+      ]
+    }
+  },
+  "detectionTools": [
+    {
+      "id": "zeek",
+      "name": "Zeek",
+      "desc": "Protokollmedveten nätverksanalysmotor som genererar strukturerad telemetri (loggar) och stödjer anpassad detektering via ett händelsedrivet scriptspråk.",
+      "category": "Detection",
+      "description": "Nätverkssäkerhetsmonitor som analyserar trafik och producerar rika, protokollmedvetna loggar med ett händelsedrivet lager för anpassad detektering.",
+      "overview": {
+        "what": "Zeek observerar nätverkstrafik och extraherar protokollmetadata till strukturerade loggar som connections, DNS, HTTP, TLS och filer. I stället för att enbart jaga signaturträffar bygger Zeek högkvalitativ telemetri som hjälper dig svara på vem som pratade med vem, när och hur.",
+        "how": "Zeek parser trafik med protokollanalysatorer. När protokollelement känns igen triggas events i scriptskiktet och loggar skrivs via logging framework. Med scripts och paket kan du utöka beteendet: lägga till fält, skapa nya loggar, höja notices, enricha med hotindikatorer och justera vad som är intressant.",
+        "useCases": [
+          "Incidenthantering och threat hunting genom pivotering mellan conn-, dns-, http-, ssl-, files- och notice-loggar.",
+          "Bygga detekteringar som baseras på protokollbeteende i stället för sköra payload-signaturer.",
+          "Skapa långsiktiga nätverksbaslinjer och avvikelseanalyser med konsekventa, sökbara loggar."
+        ]
+      },
+      "quickSetup": [
+        "Placera Zeek på en sensor som ser trafiken du bryr dig om (SPAN, TAP eller host-baserad capture).",
+        "Börja med standardscript och verifiera att kärnloggar (conn, dns, http, ssl, notice) faktiskt genereras.",
+        "Välj utdataformat och rotationsstrategi som passar din pipeline (text eller JSON, rotationsintervall).",
+        "Integrera med SIEM eller data lake och lägg sedan till paket eller anpassade script för din miljö."
+      ],
+      "actions": [
+        "Börja i conn.log för att kartlägga anslutningar och pivotera sedan till protokollspecifika loggar som dns.log och http.log.",
+        "Skapa notices för misstänkta beteenden och skicka dem vidare till alerting-pipelinen.",
+        "Mata in hotindikatorer i Intel framework för matchning mot observerad trafik.",
+        "Aktivera file analysis för att extrahera metadata och hashar från överförda filer.",
+        "Trimma loggning genom filtrering, relevanta extrafält samt justerad rotation och retention."
+      ],
+      "features": [
+        "Protokollmedvetna loggar för vanliga nätverksprotokoll, anpassade för jakt och incidenthantering.",
+        "Händelsedrivet scriptspråk för att anpassa detekteringar och utöka Zeeks utdata.",
+        "Logging framework med flexibel rotation, filtrering och valfri efterbearbetning.",
+        "Notice framework som gör scriptlogik till strukturerade och åtgärdbara alerts.",
+        "Intelligence framework för inläsning och matchning av indikatorer.",
+        "File analysis framework för metadatautvinning över stödda protokoll.",
+        "Pakethanterare (zkg) för installation och hantering av tredjepartsscript och plugins."
+      ],
+      "workflow": [
+        "Samla trafik på sensorn och verifiera att tidsstämplar, gränssnitt och capture-synlighet stämmer.",
+        "Bygg en baslinje: granska conn.log tillsammans med ett litet urval protokolloggar (dns, http, ssl).",
+        "Lägg till jaktpivoter: använd notice-, files- och software-loggar för mer kontext kring misstänkta värdar.",
+        "Implementera detekteringar med script: prenumerera på events, skapa härledda fält och höj notices för relevanta mönster.",
+        "Operationalisera: skicka loggar till plattformen, trimma filter och iterera utifrån falsklarm och täckningsluckor."
+      ],
+      "when": [
+        "Du behöver högkvalitativ nätverkstelemetri för utredningar, inte bara alerts.",
+        "Du vill skriva detekteringar baserade på protokollbeteende och metadata i stor skala.",
+        "Du bygger en SOC-pipeline och behöver konsekventa loggar som fungerar väl för sök och analys."
+      ],
+      "notes": [
+        "Zeek är bara så bra som din synlighet. Fel i SPAN, asymmetrisk routing eller saknade VLAN kan tyst förstöra analysen.",
+        "Börja smått. Ett fåtal välförstådda loggar är bättre än att aktivera allt och drunkna i brus.",
+        "Anpassade script är kraftfulla, men prestanda och datavolymer måste hanteras. Behandla script som produktionskod och testa ändringar."
+      ],
+      "quickPanel": {
+        "notes": [
+          "Zeek genererar loggar av design. Detektering uppstår genom hur du frågar, enrichar och skriptar telemetrin."
+        ],
+        "proTips": [
+          "Lär dig conn.log ordentligt. Den är navet i de flesta utredningar och kopplar naturligt till andra loggar.",
+          "Använd Notice framework för att standardisera alerts och göra detektionslogiken spårbar."
+        ],
+        "commonMistakes": [
+          "Anta att missad detektering är ett scriptproblem när grundorsaken är bristande sensorsynlighet eller capture-förluster.",
+          "Aktivera för många loggar och ramverk dag ett utan att först etablera en användbar baslinje.",
+          "Inte planera för rotation och ingest, vilket leder till dataförlust eller flaskhalsar i pipeline."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Varför Zeek känns annorlunda: telemetri före signaturer",
+            "paragraphs": [
+              "Många verktyg försöker direkt svara på om något är skadligt. Zeeks styrka är i stället att svara på vad som hände med hög precision. Verktyget loggar strukturerade fakta om anslutningar och protokoll, vilket gör korrelation och hållbar detektering möjlig.",
+              "Exempelvis visar conn.log vem som kommunicerade, när, hur länge och över vilket transportlager. Protokolloggar tillför sedan semantik: dns.log visar namnupplösning, http.log visar metoder och URI:er, och TLS-loggar visar certifikat- och handskakningsmetadata."
+            ]
+          },
+          {
+            "title": "Loggar som språk: hur Zeek skriver evidens",
+            "paragraphs": [
+              "Zeeks logging framework styr vad som skrivs, hur det roteras och hur efterbearbetning kan ske. Rotation är inte bara driftstädning; den påverkar ingest, batchning och tidslinjekvalitet i utredningar.",
+              "Kärnloggar är medvetet stabila. Du kan bygga dashboards och sparade sökningar på dem över tid. När mer kontext krävs kan du utöka loggarna via script eller extra analysatorer och paket."
+            ]
+          },
+          {
+            "title": "Händelsedrivet scriptande: från protokollparsing till detektering",
+            "paragraphs": [
+              "Zeeks scriptspråk är händelsedrivet. Protokollanalysatorer höjer events medan trafiken parsas och script kan reagera nära realtid. Därför kan du bygga avancerade detekteringar utan att själv skriva fulla parsers.",
+              "Ett praktiskt tankesätt är prenumerera, enricha, besluta. Prenumerera på ett meningsfullt event, enricha med lokal kontext eller hotdata och besluta sedan om loggning, taggning eller notice. Den uppdelningen gör script enklare att tunna och säkrare att drifta."
+            ]
+          },
+          {
+            "title": "Ramverk: Notice, Intel och File Analysis",
+            "paragraphs": [
+              "Ramverken är återanvändbara byggblock för script. Notice framework ger ett enhetligt sätt att emitera alerts med rätt kontextfält, och Intel framework möjliggör systematisk matchning mot indikatorer.",
+              "File Analysis framework gör Zeek extra värdefullt i incidentutredningar. Det kan identifiera filer i trafik, beräkna hashar, extrahera metadata och styra intressanta artefakter vidare till djupare analys."
+            ]
+          },
+          {
+            "title": "Operativ verklighet: synlighet, prestanda och integration",
+            "paragraphs": [
+              "Zeek kan driftsättas på flera sätt, men begränsningarna är desamma: stabil trafiksynlighet, förutsägbar prestanda och en loggpipeline som inte tappar data under last.",
+              "Behandla Zeek som en del av ett system. Capture, parsing, rotation, transport och lagring måste fungera tillsammans. När det sitter får du en långsiktig sanningskälla för nätverksbeteende i både vardagsdrift och incidenthantering."
+            ]
+          }
+        ]
+      },
+      "tagline": "Nätverkssäkerhetsmonitor som omvandlar paket till strukturerade loggar och händelser med hög detaljgrad."
+    }
+  ],
+  "_meta": {
+    "file": "data/tools.json",
+    "version": 3,
+    "based_on": 2,
+    "updated_ymd": "2026-02-11",
+    "scope": "Task 2 content rewrite: OWASP ZAP, Zeek; Deep Dive only: Wireshark, Burp Suite"
+  }
+}

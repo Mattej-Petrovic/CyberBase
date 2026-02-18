@@ -38,7 +38,7 @@
 
       <div class="grid grid-cols-2 gap-3 mt-1">
         <button id="btnLogin" class="cb-btn cb-btn-primary w-full min-h-11 text-sm" data-loading="0">{{ _('Login') }}</button>
-        <button id="btnSignup" class="cb-btn cb-btn-secondary w-full min-h-11 text-sm" data-loading="0">{{ _('Create account') }}</button>
+        <button id="btnSignup" class="cb-btn cb-btn-secondary w-full min-h-11 text-sm" data-loading="0">{{ 'Create account' if (current_locale_code or 'en') == 'en' else _('Create account') }}</button>
       </div>
 
       <div class="mt-1 text-right">
@@ -51,6 +51,7 @@
 <script>
   // Server can inject Firebase config to avoid hardcoding
   window.__FIREBASE_CONFIG__ = {{ firebase_config_json|default('null')|safe }};
+  window.__LOGIN_NEXT__ = {{ login_next|default('/dashboard')|tojson }};
 </script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -221,11 +222,7 @@
       statusEl.appendChild(small);
       // Console logging full object for development
       console.groupCollapsed('Firebase Auth Error');
-      console.log('flow:', flow);
       console.error(err);
-      console.log('code:', err?.code);
-      console.log('message:', err?.message);
-      console.log('customData:', err?.customData);
       console.groupEnd();
     } catch {}
   }
@@ -274,7 +271,6 @@
   try {
     const redirectResult = await getRedirectResult(auth);
     if (redirectResult && redirectResult.user) {
-      if (IS_DEV) console.info('[auth] redirect result user obtained');
       await exchangeForSession(redirectResult.user, 'redirect');
       window.location.assign(getNextUrl());
       // stop further handlers
@@ -290,12 +286,20 @@
     }
   }
 
+  function isSafeNextPath(path) {
+    const n = (path || '').trim();
+    if (!n) return false;
+    if (!n.startsWith('/')) return false;
+    if (n.startsWith('//')) return false;
+    if (n.includes('\\')) return false;
+    if (n.includes('://')) return false;
+    if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(n.replace(/^\/+/, ''))) return false;
+    return true;
+  }
+
   function getNextUrl() {
-    try {
-      const p = new URLSearchParams(window.location.search);
-      const n = p.get('next');
-      return (n && n.startsWith('/')) ? n : '/dashboard';
-    } catch { return '/dashboard'; }
+    const n = (window.__LOGIN_NEXT__ || '').toString();
+    return isSafeNextPath(n) ? n : '/dashboard';
   }
 
   async function exchangeForSession(user, reason = 'unknown') {
@@ -308,7 +312,6 @@
     });
 
     const data = await res.json().catch(() => ({}));
-    if (IS_DEV) console.info('[auth] sessionLogin', { reason, status: res.status, ok: data?.ok });
     if (!res.ok || !data.ok) {
       const err = new Error(data.error || i18n.sessionLoginFailed);
       err.status = res.status;
@@ -325,7 +328,6 @@
     const btn = e.currentTarget; setLoading(btn, true);
     try {
       if (shouldUseRedirect()) {
-        if (IS_DEV) console.info('[auth] using redirect on mobile');
         await signInWithRedirect(auth, googleProvider);
         return; // browser navigates away
       }
@@ -334,7 +336,6 @@
         showDevErrorDetails(err, 'popup');
         if (err && (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request')) {
           usedFlow = 'redirect-fallback';
-          if (IS_DEV) console.info('[auth] popup issue, falling back to redirect');
           await signInWithRedirect(auth, googleProvider);
           return null;
         }

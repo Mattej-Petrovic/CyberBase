@@ -894,7 +894,7 @@
                         {% else %}
                             <a href="/dashboard" class="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-slate-800" title="{{ _('Dashboard') }}" aria-label="{{ _('Dashboard') }}">
                                 {% if profile is defined and profile.avatar_key is defined and profile.avatar_key %}
-                                    <img src="/static/avatars/{{ profile.avatar_key }}.png" data-current-avatar="true" class="w-8 h-8 rounded-full object-cover" alt="{{ _('Avatar') }}"/>
+                                    <img src="/static/images/avatars/{{ profile.avatar_key }}.png" data-current-avatar="true" class="w-8 h-8 rounded-full object-cover" alt="{{ _('Avatar') }}"/>
                                 {% else %}
                                     <span class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-sm text-gray-300">A</span>
                                 {% endif %}
@@ -1183,7 +1183,7 @@
       };
     </script>
 
-    <script src="{{ url_for('static', filename='ai_drawer.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/ai_drawer.js') }}" defer></script>
 
 
   <script>

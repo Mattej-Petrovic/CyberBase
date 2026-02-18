@@ -1,0 +1,2310 @@
+{
+  "cliTools": [
+    {
+      "id": "nmap",
+      "name": "nmap",
+      "description": "Network mapper for host discovery, port scanning, and service/version detection.",
+      "overview": {
+        "what": "A network scanning tool that discovers hosts and maps exposed services by probing ports and interpreting responses.",
+        "how": "Sends crafted packets (TCP, UDP, ICMP) and analyzes replies to infer which hosts are up, which ports are open, and what services are running.",
+        "useCases": [
+          "Find live hosts on a subnet before deeper investigation",
+          "Identify open ports and the services behind them",
+          "Run safe default scripts to gather banners and basic misconfigurations"
+        ],
+        "use": "Find live hosts on a subnet before deeper investigation; Identify open ports and the services behind them; Run safe default scripts to gather banners and basic misconfigurations."
+      },
+      "minimal": "nmap <target>",
+      "syntax": "nmap [discovery] [scan] [ports] [timing] [output] <target>",
+      "syntaxHelp": [
+        "<target> can be a hostname, IP, CIDR (10.0.0.0/24), or a range (10.0.0.10-50)",
+        "[discovery] decides how to find live hosts (ex: -sn, -Pn)",
+        "[scan] chooses scan type (ex: -sS, -sT, -sU) and enrichment (ex: -sV, -sC)",
+        "[ports] selects ports (ex: -p 22,80,443 or -p- for all)",
+        "[output] writes results to a file (ex: -oN scan.txt)"
+      ],
+      "flags": [
+        {
+          "flag": "-sn",
+          "takesValue": false,
+          "description": "Host discovery only (no port scan)"
+        },
+        {
+          "flag": "-Pn",
+          "takesValue": false,
+          "description": "Treat hosts as up (skip host discovery)"
+        },
+        {
+          "flag": "-sS",
+          "takesValue": false,
+          "description": "TCP SYN scan (often requires privileges)"
+        },
+        {
+          "flag": "-sT",
+          "takesValue": false,
+          "description": "TCP connect() scan (works without raw socket privileges)"
+        },
+        {
+          "flag": "-sU",
+          "takesValue": false,
+          "description": "UDP scan (slower, useful for DNS/SNMP/NTP etc.)"
+        },
+        {
+          "flag": "-sV",
+          "takesValue": false,
+          "description": "Service/version detection on open ports"
+        },
+        {
+          "flag": "-sC",
+          "takesValue": false,
+          "description": "Run default scripts (NSE)"
+        },
+        {
+          "flag": "--script <name|category>",
+          "takesValue": true,
+          "description": "Run specific scripts or categories"
+        },
+        {
+          "flag": "-p <ports>",
+          "takesValue": true,
+          "description": "Port selection (ex: -p 22,80,443 or -p 1-1024)"
+        },
+        {
+          "flag": "-p-",
+          "takesValue": false,
+          "description": "Scan all 65535 TCP ports"
+        },
+        {
+          "flag": "--top-ports <N>",
+          "takesValue": true,
+          "description": "Scan the N most common ports"
+        },
+        {
+          "flag": "-T<0-5>",
+          "takesValue": true,
+          "description": "Timing template (higher is faster, noisier)"
+        },
+        {
+          "flag": "--open",
+          "takesValue": false,
+          "description": "Show only open (or possibly open) ports"
+        },
+        {
+          "flag": "-oN <file>",
+          "takesValue": true,
+          "description": "Normal output to file"
+        },
+        {
+          "flag": "-oX <file>",
+          "takesValue": true,
+          "description": "XML output to file"
+        }
+      ],
+      "examples": [
+        {
+          "command": "nmap -sn 192.168.1.0/24",
+          "explanation": "Host discovery sweep across a subnet without scanning ports."
+        },
+        {
+          "command": "nmap -sS -sV --top-ports 200 <target>",
+          "explanation": "Quickly scan the most common ports and fingerprint services on what responds."
+        },
+        {
+          "command": "nmap -p 22,80,443 -sV <target>",
+          "explanation": "Focused scan on common service ports with version detection."
+        },
+        {
+          "command": "nmap -p- -T4 --open <target>",
+          "explanation": "Full TCP port range with a faster timing template and only open results shown."
+        },
+        {
+          "command": "nmap -sU -p 53,67,68,123,161 <target>",
+          "explanation": "UDP scan of typical infrastructure ports like DNS, DHCP, NTP, and SNMP."
+        },
+        {
+          "command": "nmap -sC -sV -oN nmap_scan.txt <target>",
+          "explanation": "Default scripts plus version detection, saved to a readable report file."
+        },
+        {
+          "command": "nmap --script http-title,http-headers -p 80,443 <target>",
+          "explanation": "Run specific HTTP scripts against web ports to collect lightweight metadata."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Output depends on vantage point. Firewalls, rate limits, and IDS rules can hide or reshape what you see.",
+          "Permissions matter. Some scan types rely on raw packets and behave differently across OS and privilege levels.",
+          "Closed is still signal. It proves the host answered on that port, even if the service is not there.",
+          "Practice in labs or networks you own. Scanning without explicit permission is not ok."
+        ],
+        "proTips": [
+          "Think in layers: discover hosts, then ports, then enrich. Blending everything makes results harder to trust.",
+          "Save output early. Structured formats make comparisons, diffs, and reruns reliable.",
+          "Treat fingerprints as hypotheses. Confirm with a second signal like a banner or an application level probe.",
+          "Speed is a trade. Aggressive timing can drop probes and change the story you infer."
+        ],
+        "commonMistakes": [
+          "Equating “no open ports” with “host down”. It can also mean filtered, rate limited, or unreachable from here.",
+          "Over trusting version detection. Proxies, NAT, and custom banners can fool fingerprints.",
+          "Reading UDP like TCP. Silence is normal and can mean open, filtered, or simply not responding.",
+          "Running scripts blindly on production. Even “default” scripts can be noisy."
+        ],
+        "funFact": "The name is short for “Network Mapper”, and it really does treat a network like a map."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "What the tool is really doing under the hood",
+            "paragraphs": [
+              "Nmap is a packet choreography engine. You give it a target set and a goal, and it decides which probes to send, in what order, and how to interpret the replies. “Scanning ports” is the visible output, but the hidden work is building a model of reachability and behavior from imperfect signals.",
+              "For TCP, Nmap leans on the fact that different responses imply different states. A SYN probe that receives a SYN/ACK suggests a listening service, while an RST suggests a reachable host with nothing listening on that port. If nothing comes back, Nmap has to decide whether it was dropped, filtered, rate limited, or lost on the path. That decision is why timing, retries, and host discovery choices matter so much.",
+              "Host discovery is its own phase. Nmap can use ICMP, TCP, UDP, or combinations to decide which hosts are “up”. Skipping discovery changes the meaning of later results, because you are now assuming the host exists and pushing straight to port probes. In practice, the boundary between discovery and scanning is fuzzy: a “closed” reply can also be a discovery signal.",
+              "Version detection and scripting are a second layer of probing. Once a port looks reachable, Nmap can talk just enough application protocol to guess what is running there. It uses a database of probes and match rules, so the output is essentially “this response pattern looks like X”. Scripts add yet another layer: they run targeted application level checks to extract metadata or test for known conditions. This is powerful, but it also increases assumptions and noise.",
+              "One mental model that helps: Nmap is not reading a static truth. It is sampling a live system under constraints. Every probe you send can change how the target behaves, because middleboxes and hosts respond differently under load, under throttling, or when they notice unusual traffic."
+            ]
+          },
+          {
+            "title": "Interpreting results without fooling yourself",
+            "paragraphs": [
+              "The biggest trap is treating Nmap output as ground truth. It is evidence, and evidence has error bars. “Filtered” means Nmap did not get the definitive reply it expected, not that the port does not exist. “Closed” usually means the host was reachable enough to say no. “Open” means you got a reply that strongly suggests a listener, but even that can be spoofed by a firewall policy, a tarpitting service, or a proxy in front.",
+              "False negatives happen when the network drops probes, when a firewall rate limits, or when you scan from a path that is asymmetric. A classic example is scanning a host through a VPN or NAT where return traffic is shaped differently. The scan looks clean from one side and “filtered everywhere” from another, even though the host did not change.",
+              "False positives are rarer but real. Port forwarding can make many hosts appear to “share” open ports. Transparent proxies can make an HTTP service appear present on ports where the origin host never spoke HTTP. With version detection, custom banners can trick fingerprinting, and load balancers can expose one backend’s banner while routing you to another backend’s behavior.",
+              "Treat each line as a claim you should be able to defend. If you see an open port, ask: is the host definitely reachable, and is the port state stable across time. If you see a guessed service, ask: what did Nmap actually match on, and could a middlebox be answering. When you build that habit, Nmap becomes a reasoning tool instead of a magic oracle."
+            ]
+          },
+          {
+            "title": "The shape of the tool’s capabilities",
+            "paragraphs": [
+              "Nmap’s capability space is best understood as a set of knobs that trade stealth, speed, and certainty. Scan type changes what packets are used and therefore what evidence you collect. Port selection changes coverage and time. Timing changes how hard you push the network and the target, which affects both detection risk and accuracy.",
+              "Flags and features cluster into categories. Discovery options decide whether you spend time proving a host is alive. Scan options decide how you ask about ports, and how you treat the privileges you have. Enrichment options decide whether you accept “open” as enough, or whether you attempt to identify services, versions, and scripts. Output options decide whether the scan is a one off glance or a reusable artifact.",
+              "The more enrichment you add, the more you move from transport level observation into application level interaction. That is where you can extract real value, but it is also where you can cause side effects. Even a simple banner grab can trigger logs, authentication banners, or rate limits. Script categories push further into “active testing”, which is why separating discovery from enrichment is a clean way to control risk.",
+              "Another dimension is vantage point. Nmap run from inside a network is a different instrument than Nmap run from outside. The difference is not just “more ports open internally”. It is that internal scanning interacts with different ACLs, different routing, and often different DNS and service discovery. The same host can legitimately look like two different machines depending on where you stand."
+            ]
+          },
+          {
+            "title": "Context and boundaries",
+            "paragraphs": [
+              "Nmap is best used when you need a map, not a microscope. It answers “what appears reachable from here” and “what does it look like”, which is ideal for asset discovery, scoping, and quick verification. It is not a vulnerability scanner by default, and it does not replace protocol specific tooling when you need deep application certainty.",
+              "Because scanning is active, the boundary is authorization. Use Nmap only on systems you own, operate, or have explicit written permission to test. In most environments, even internal scanning can trigger alerts and incident workflows, so being authorized is not just a legal concern, it is an operational one.",
+              "Concept example: a host showing only one open port may not be “secure”, it may be “fronted”. A reverse proxy can expose a single entry point while hiding a large internal surface. Nmap still helps, but you interpret it as “edge exposure”, not “total capability”.",
+              "Concept example: if UDP results look empty, that is often normal. UDP is silent by design unless the service chooses to answer, so “no response” is not the same as “no service”. The right conclusion is “I have weak evidence either way”, not “it is closed”."
+            ]
+          }
+        ]
+      },
+      "tagline": "Map hosts, ports, and services fast, then validate what you think you saw."
+    },
+    {
+      "id": "curl",
+      "name": "curl",
+      "description": "Transfer data over HTTP(S) and many other protocols from the command line.",
+      "overview": {
+        "what": "A command line client for making web requests and downloading or uploading data over many protocols, most commonly HTTP and HTTPS.",
+        "how": "Builds a request (method, headers, body) and prints the response to stdout or saves it to a file, with rich control over redirects, auth, timeouts, and TLS.",
+        "useCases": [
+          "Quickly test an API endpoint (status, headers, JSON body)",
+          "Download files with redirects and retries",
+          "Debug requests with verbose TLS and header output"
+        ],
+        "use": "Quickly test an API endpoint (status, headers, JSON body); Download files with redirects and retries; Debug requests with verbose TLS and header output."
+      },
+      "minimal": "curl <url>",
+      "syntax": "curl [options] <url>",
+      "syntaxHelp": [
+        "<url> is usually https://… or http://…",
+        "Use -X/-H/-d when you need to build an API request",
+        "Use -I/-v when you need to inspect headers or debug"
+      ],
+      "flags": [
+        {
+          "flag": "-I",
+          "takesValue": false,
+          "description": "Fetch headers only (HEAD request)"
+        },
+        {
+          "flag": "-L",
+          "takesValue": false,
+          "description": "Follow redirects"
+        },
+        {
+          "flag": "-X <METHOD>",
+          "takesValue": true,
+          "description": "Request method (GET, POST, PUT, DELETE…)"
+        },
+        {
+          "flag": "-H \"Header: value\"",
+          "takesValue": true,
+          "description": "Add a request header"
+        },
+        {
+          "flag": "-d \"data\"",
+          "takesValue": true,
+          "description": "Send request body (defaults to POST for HTTP)"
+        },
+        {
+          "flag": "--data-urlencode \"k=v\"",
+          "takesValue": true,
+          "description": "URL-encode data before sending"
+        },
+        {
+          "flag": "-F \"name=@file\"",
+          "takesValue": true,
+          "description": "Multipart form upload"
+        },
+        {
+          "flag": "-u user:pass",
+          "takesValue": true,
+          "description": "Basic auth credentials"
+        },
+        {
+          "flag": "-o <file>",
+          "takesValue": true,
+          "description": "Write response body to file"
+        },
+        {
+          "flag": "-O",
+          "takesValue": false,
+          "description": "Write output to a local file named like the remote file"
+        },
+        {
+          "flag": "-sS",
+          "takesValue": false,
+          "description": "Silent but still show errors"
+        },
+        {
+          "flag": "-v",
+          "takesValue": false,
+          "description": "Verbose (headers + connection details)"
+        },
+        {
+          "flag": "--compressed",
+          "takesValue": false,
+          "description": "Request a compressed response and decompress it"
+        },
+        {
+          "flag": "--connect-timeout <sec>",
+          "takesValue": true,
+          "description": "Max time to establish connection"
+        },
+        {
+          "flag": "--retry <N>",
+          "takesValue": true,
+          "description": "Retry on transient errors"
+        }
+      ],
+      "examples": [
+        {
+          "command": "curl -I https://example.com",
+          "explanation": "Send a HEAD request to fetch response headers only."
+        },
+        {
+          "command": "curl -L -o file.zip https://example.com/file.zip",
+          "explanation": "Follow redirects and save the response body to file.zip."
+        },
+        {
+          "command": "curl -sS https://api.example.com/health",
+          "explanation": "Fetch a URL quietly but still print errors (health check)."
+        },
+        {
+          "command": "curl --json '{\"name\":\"test\"}' https://httpbin.org/post",
+          "explanation": "POST a JSON body and print the server’s JSON response."
+        },
+        {
+          "command": "curl -u user:pass https://api.example.com/private",
+          "explanation": "Send a request with HTTP Basic authentication credentials."
+        },
+        {
+          "command": "curl -v https://example.com",
+          "explanation": "Show verbose connection details and HTTP headers."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Curl is a protocol client, not just “download a page”. It can speak HTTP, HTTPS, and more depending on build.",
+          "A successful transfer can still be an application failure. Always read status codes and headers.",
+          "Redirects change meaning. The final URL might not be the one you started with.",
+          "Be careful with secrets. Headers and verbose output can leak tokens into logs."
+        ],
+        "proTips": [
+          "Use headers as your truth. They explain caching, auth challenges, and content negotiation.",
+          "When debugging, separate transport from app logic. TLS and DNS errors are not “API bugs”.",
+          "Prefer explicit timeouts. Hanging requests hide real failure modes.",
+          "Keep requests reproducible. The same URL with different headers can be a different API call."
+        ],
+        "commonMistakes": [
+          "Assuming “200” means success. Some APIs encode errors inside JSON with a 200 wrapper.",
+          "Copying browser headers blindly. It adds noise and can trigger different server behavior.",
+          "Forgetting compression. Response size and timing can change when content is gzipped.",
+          "Posting JSON without the content type header. Servers may parse it as form data."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "What the tool is really doing under the hood",
+            "paragraphs": [
+              "curl is a protocol engine wrapped in a CLI. For HTTP, it constructs a request line, headers, and an optional body, then manages connection setup, redirects, and response parsing. For HTTPS, it also negotiates a TLS session before any HTTP bytes are exchanged.",
+              "A request is not just “GET a URL”. It is a sequence: resolve name to an address, open a TCP connection, optionally upgrade to TLS, send the HTTP request, then read the response stream. Failures can happen at any of those layers, and curl is valuable because it lets you see which layer broke without needing a browser UI.",
+              "When you enable verbose output, curl reports connection events, negotiation details, and headers. That stream is separate from the response body, which is why you can still capture the body while inspecting what happened on the wire."
+            ]
+          },
+          {
+            "title": "Interpreting results without fooling yourself",
+            "paragraphs": [
+              "The most common self deception is equating “I got a response” with “the system is healthy”. HTTP status is only a hint. A 200 can carry an application error, a 401 can be expected, and a 500 can be a proxy complaining rather than the origin server failing.",
+              "Redirects are another trap. If you follow redirects automatically, you can accidentally test a different host, a different protocol, or a different path than you think. If you do not follow redirects, you can mislabel a working service as broken. The safe mindset is to treat redirects as part of the observed behavior, not as a convenience feature.",
+              "TLS errors deserve precise interpretation. A certificate validation failure usually means trust chain issues, hostname mismatch, or an intercepting proxy. It rarely means “TLS is broken” in a general sense. The meaningful question is: broken for which trust store, and for which hostname.",
+              "Concept example: two requests to the same URL can produce different results if one includes the right host header and one does not. When you test by IP, you are skipping name based routing, which changes what server you actually reach."
+            ]
+          },
+          {
+            "title": "The shape of the tool’s capabilities",
+            "paragraphs": [
+              "curl’s power comes from controlling the request shape. You can change method, headers, body encoding, cookies, auth, proxy behavior, and connection timeouts. That turns curl into a lab instrument for reproducing an exact HTTP interaction.",
+              "Options cluster into a few mental buckets. Request construction controls what you send. Transport and TLS controls how you connect. Output controls what you capture and where it goes. Debug controls how much you observe about the process. Once you see those categories, curl options stop feeling like a random wall of flags.",
+              "There is also a trade between fidelity and convenience. Following redirects and auto decompressing responses makes curl feel “browser like”, but it can hide important behavior. Keeping output minimal is great for scripting, but it can hide the reason for failure. You decide which trade you want for the question you are answering."
+            ]
+          },
+          {
+            "title": "Context and boundaries",
+            "paragraphs": [
+              "curl fits best when you need repeatable, transparent network requests. It is perfect for API testing, debugging, automation, and validating what a server actually returns. It is not a full browser, so it will not execute JavaScript or model complex client state for you.",
+              "Use it only against endpoints you are authorized to test. Even “harmless” requests can trigger rate limits, WAF rules, or incident alerts in production, so the boundary is still scope and permission."
+            ]
+          }
+        ]
+      },
+      "tagline": "A sharp HTTP and protocol probe for APIs, downloads, and request debugging."
+    },
+    {
+      "id": "dig",
+      "name": "dig",
+      "description": "DNS lookup tool for querying specific record types and troubleshooting resolution.",
+      "overview": {
+        "what": "A DNS query tool that shows detailed answers, authority, and timing information directly from DNS servers.",
+        "how": "Sends DNS queries for specific record types (A, AAAA, MX, TXT, NS…) to your resolver or a chosen server, then prints the response sections.",
+        "useCases": [
+          "Check what DNS records exist for a domain and which nameservers answer",
+          "Compare answers from different resolvers (public DNS vs internal)",
+          "Trace delegation and troubleshoot NXDOMAIN or misconfigured zones"
+        ],
+        "use": "Check what DNS records exist for a domain and which nameservers answer; Compare answers from different resolvers (public DNS vs internal); Trace delegation and troubleshoot NXDOMAIN or misconfigured zones."
+      },
+      "minimal": "dig <name>",
+      "syntax": "dig [@server] <name> [type] [options]",
+      "syntaxHelp": [
+        "[@server] overrides the DNS server (ex: @1.1.1.1)",
+        "[type] is the record type (A, AAAA, MX, TXT, NS, SOA, PTR…)",
+        "Use +short for a clean answer and +trace to follow delegation"
+      ],
+      "flags": [
+        {
+          "flag": "@<server>",
+          "takesValue": true,
+          "description": "Query a specific DNS server (ex: @8.8.8.8)"
+        },
+        {
+          "flag": "<name> <type>",
+          "takesValue": true,
+          "description": "Name and record type (ex: example.com MX)"
+        },
+        {
+          "flag": "+short",
+          "takesValue": false,
+          "description": "Minimal output (good for scripting)"
+        },
+        {
+          "flag": "+trace",
+          "takesValue": false,
+          "description": "Trace delegation from root to authoritative servers"
+        },
+        {
+          "flag": "-x <ip>",
+          "takesValue": true,
+          "description": "Reverse lookup (PTR)"
+        },
+        {
+          "flag": "+noall +answer",
+          "takesValue": false,
+          "description": "Show only the answer section"
+        },
+        {
+          "flag": "+dnssec",
+          "takesValue": false,
+          "description": "Request DNSSEC-related records"
+        },
+        {
+          "flag": "+tcp",
+          "takesValue": false,
+          "description": "Force TCP (instead of UDP)"
+        },
+        {
+          "flag": "+time=<sec>",
+          "takesValue": true,
+          "description": "Timeout per query"
+        },
+        {
+          "flag": "+tries=<N>",
+          "takesValue": true,
+          "description": "Number of retries"
+        }
+      ],
+      "examples": [
+        {
+          "command": "dig example.com",
+          "explanation": "Query A records for example.com using the default resolver."
+        },
+        {
+          "command": "dig example.com AAAA",
+          "explanation": "Query AAAA (IPv6) records for example.com."
+        },
+        {
+          "command": "dig example.com MX +short",
+          "explanation": "Show only MX records for example.com in a compact form."
+        },
+        {
+          "command": "dig @1.1.1.1 example.com A",
+          "explanation": "Ask 1.1.1.1 for A records for example.com."
+        },
+        {
+          "command": "dig -x 8.8.8.8",
+          "explanation": "Perform a reverse DNS lookup (PTR) for 8.8.8.8."
+        },
+        {
+          "command": "dig +trace example.com",
+          "explanation": "Walk delegation from root to authoritative servers for example.com."
+        },
+        {
+          "command": "dig example.com TXT +noall +answer",
+          "explanation": "Print only the TXT answer section for example.com."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Dig shows what a DNS server answered, not an absolute truth. Different resolvers can be out of sync.",
+          "Caching matters. You might be seeing a cached answer, not a fresh lookup.",
+          "Some record types are filtered by policy. “ANY” is commonly restricted for abuse reasons.",
+          "DNS is distributed. A “wrong” answer might be a delegation issue upstream."
+        ],
+        "proTips": [
+          "Compare resolvers to triangulate. Local, public, and authoritative views can differ.",
+          "Use short output when you only need the payload. Keep full output for debugging context.",
+          "Trace is for trust building. It reveals where the chain breaks without guessing.",
+          "Watch TTLs. They hint at cache behavior and how fast changes should propagate."
+        ],
+        "commonMistakes": [
+          "Confusing recursive and authoritative answers. The source of truth depends on which server you asked.",
+          "Ignoring CNAME chains. The final address may be several steps away from the name you typed.",
+          "Taking a single lookup as final. DNS can vary by region, time, and resolver.",
+          "Forgetting that UDP truncation happens. Large answers may require TCP."
+        ],
+        "funFact": "The name is historically expanded as “Domain Information Groper”, which is exactly what it feels like when you are digging into DNS."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "What the tool is really doing under the hood",
+            "paragraphs": [
+              "dig is a DNS message constructor and decoder. It sends a query for a name and record type, then prints back the response sections in a way humans can reason about. Unlike a browser, it does not hide the DNS machinery. It shows you the raw ingredients: answer, authority, additional, flags, and timing.",
+              "A normal dig query typically goes to your configured resolver, which may answer from cache, may recurse on your behalf, or may apply policy. When you target a specific server, you are bypassing parts of that behavior and asking a single viewpoint directly, which is crucial for diagnosis.",
+              "Trace mode changes the game. Instead of relying on recursion, dig walks the delegation chain using iterative queries, starting at the root and following referrals down to authoritative servers. That reveals where the chain is broken, not just that it is broken."
+            ]
+          },
+          {
+            "title": "Interpreting results without fooling yourself",
+            "paragraphs": [
+              "The key is separating “what I got back” from “why I got it”. A quick answer could be a warm cache. A slow answer could be a failing upstream or a timeout and retry. The same domain can look stable while your resolver is silently serving stale data.",
+              "Pay attention to whether the response is authoritative. An authoritative answer says “this came from a server that claims authority for the zone”. A non authoritative answer can still be correct, but it is mediated by caching and recursion. That distinction matters when you are chasing propagation, hijacks, or misconfigurations.",
+              "Concept example: if you query two resolvers and one returns an address and one returns nothing, you have not proven the record exists or not. You have proven the resolvers disagree, which usually points to caching, policy, or split horizon DNS."
+            ]
+          },
+          {
+            "title": "The shape of the tool’s capabilities",
+            "paragraphs": [
+              "dig is strongest when you treat DNS as a set of layers. There is the naming hierarchy, there are record types, and there are transport behaviors. dig lets you slice along those dimensions: different record types, different servers, different output sections, and different recursion modes.",
+              "Flags cluster into: query target selection, output control, and behavior toggles such as trace and DNSSEC related output. The main tradeoff is verbosity versus clarity. Minimal output is great when you are scripting. Full output is what you need when you are debugging how a resolver made a decision."
+            ]
+          },
+          {
+            "title": "Context and boundaries",
+            "paragraphs": [
+              "dig belongs in every troubleshooting toolkit because DNS is a dependency for almost everything. When an app “cannot connect”, DNS is often the first invisible failure. dig gives you a way to test name resolution without involving the rest of the stack.",
+              "Use it responsibly. Querying public resolvers is usually fine, but querying internal zones or enumerating large namespaces can still be sensitive. Stay within scope and treat DNS as operational data, not just trivia."
+            ]
+          }
+        ]
+      },
+      "tagline": "DNS query tool that shows the resolver’s thinking, not just the final answer."
+    },
+    {
+      "id": "nslookup",
+      "name": "nslookup",
+      "description": "DNS query tool (interactive or one-shot) for quick lookups and basic troubleshooting.",
+      "overview": {
+        "what": "A classic DNS lookup utility that can run as a single command or an interactive session.",
+        "how": "Queries a DNS server for records and prints the response; interactive mode lets you change query type, server, and options mid-session.",
+        "useCases": [
+          "Quickly check whether a name resolves and to which IP",
+          "Query a specific DNS server without changing system resolver",
+          "Basic record-type checks (MX, NS, TXT) in interactive mode"
+        ],
+        "use": "Quickly check whether a name resolves and to which IP; Query a specific DNS server without changing system resolver; Basic record-type checks (MX, NS, TXT) in interactive mode."
+      },
+      "minimal": "nslookup <name>",
+      "syntax": "nslookup [options] <name> [server]",
+      "syntaxHelp": [
+        "[server] lets you choose the resolver for this query (ex: 8.8.8.8)",
+        "Use interactive mode to change query type: nslookup then 'set type=MX'"
+      ],
+      "flags": [
+        {
+          "flag": "<name> <server>",
+          "takesValue": true,
+          "description": "Query a specific DNS server (ex: nslookup example.com 8.8.8.8)"
+        },
+        {
+          "flag": "-type=<TYPE>",
+          "takesValue": true,
+          "description": "Set query type (varies by implementation; often A, AAAA, MX, NS, TXT)"
+        },
+        {
+          "flag": "-debug",
+          "takesValue": false,
+          "description": "Show debugging information (implementation dependent)"
+        },
+        {
+          "flag": "-timeout=<sec>",
+          "takesValue": true,
+          "description": "Set query timeout (implementation dependent)"
+        }
+      ],
+      "examples": [
+        {
+          "command": "nslookup example.com",
+          "explanation": "Resolve example.com using the system’s current DNS resolver."
+        },
+        {
+          "command": "nslookup example.com 1.1.1.1",
+          "explanation": "Resolve example.com using 1.1.1.1 instead of the default resolver."
+        },
+        {
+          "command": "nslookup -type=MX example.com",
+          "explanation": "Query mail exchanger (MX) records for example.com."
+        },
+        {
+          "command": "nslookup -type=NS example.com",
+          "explanation": "Query authoritative name server (NS) records for example.com."
+        },
+        {
+          "command": "nslookup -type=TXT example.com",
+          "explanation": "Query TXT records for example.com."
+        }
+      ],
+      "notes": [
+        "Different operating systems ship different nslookup versions, so flags can vary. If a flag doesn't work, use interactive mode."
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Nslookup is great for quick DNS checks. It is less detailed than dig and varies a bit across platforms.",
+          "Default behavior depends on your configured resolver. That choice can bias the answer.",
+          "Reverse lookups are naming, not identity. PTR data is often missing or generic.",
+          "Interactive mode can change settings. Be mindful of what you already set."
+        ],
+        "proTips": [
+          "Ask a specific server when debugging. It helps separate resolver issues from record issues.",
+          "Query types explicitly. Defaults can hide what you really wanted to test.",
+          "If results look odd, cross check with another resolver. DNS is not always consistent.",
+          "Read the authority section when available. It hints at where the answer came from."
+        ],
+        "commonMistakes": [
+          "Treating NXDOMAIN as permanent. It can be split horizon, policy, or just the wrong resolver.",
+          "Assuming the first IP is “the” IP. Many names are load balanced.",
+          "Mixing IPv4 and IPv6 unknowingly. Dual stack can make tests feel inconsistent.",
+          "Relying on interactive settings across sessions. They reset unless you reapply."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "What the tool is really doing under the hood",
+            "paragraphs": [
+              "nslookup is a DNS query client that talks to a resolver and prints the response in a human friendly way. Underneath, it is still building a DNS question for a name and a type, sending it over the network, and then decoding the server’s reply.",
+              "Its most important “under the hood” behavior is which server you are asking. When you use default settings, you are usually talking to a local stub resolver or an enterprise recursive resolver. That server may answer from cache, may recurse to authoritative servers, and may apply filtering or split horizon policies.",
+              "In interactive mode, nslookup maintains a current server and current query settings. That statefulness is convenient, but it also makes it easy to forget what context you are in and accidentally compare two answers that were not actually asked the same way."
+            ]
+          },
+          {
+            "title": "Interpreting results without fooling yourself",
+            "paragraphs": [
+              "DNS is layered, so a single answer is rarely the whole picture. If you receive an address, you still need to ask whether it is authoritative, cached, or policy shaped. If you receive no answer, you need to ask whether it was truly negative, or whether the resolver refused, timed out, or blocked the query.",
+              "A practical skepticism: when you troubleshoot “DNS is broken”, assume the first output is telling you only what your chosen resolver believes. That is useful, but it may not match what another network sees. Split DNS and conditional forwarding are common and can make both sides “correct” within their own context.",
+              "Concept example: a domain might resolve internally to a private address but externally to a public address. nslookup can reveal that difference quickly, but only if you remember to compare servers, not just repeat the same query."
+            ]
+          },
+          {
+            "title": "The shape of the tool’s capabilities",
+            "paragraphs": [
+              "nslookup is intentionally narrower than dig. Its strength is speed and availability, especially on Windows systems where it is already present. You can switch servers, choose record types, and perform quick reverse lookups, which covers a large percentage of real world checks.",
+              "The tradeoff is precision. The way nslookup prints answers can hide sections and flags that matter when you are diagnosing delegation, DNSSEC, or complex responses. Think of it as a fast probe that tells you where to focus, not as the final word in a DNS investigation."
+            ]
+          },
+          {
+            "title": "Context and boundaries",
+            "paragraphs": [
+              "nslookup fits in the early stage of troubleshooting: confirm whether a name resolves, compare resolvers, and spot obvious misconfigurations. For deep DNS diagnosis, you usually graduate to dig or packet capture, because those show more of the protocol surface.",
+              "Authorized use note: querying DNS servers you control or are allowed to use is fine. Bulk enumeration of third party namespaces or internal domains you do not own crosses ethical and legal lines. Treat DNS like infrastructure, not like a playground."
+            ]
+          }
+        ]
+      },
+      "tagline": "Quick DNS lookups when you want simple output and fast checks."
+    },
+    {
+      "id": "ping",
+      "name": "ping",
+      "description": "Test reachability and latency using ICMP echo requests.",
+      "overview": {
+        "what": "A connectivity check that measures if a host responds and how long packets take to round-trip.",
+        "how": "Sends ICMP ECHO_REQUEST packets and measures ECHO_REPLY responses to estimate latency and packet loss.",
+        "useCases": [
+          "Confirm basic reachability to a host or gateway",
+          "Check latency and packet loss during network issues",
+          "Quickly compare connectivity over Wi-Fi vs Ethernet"
+        ],
+        "use": "Confirm basic reachability to a host or gateway; Check latency and packet loss during network issues; Quickly compare connectivity over Wi-Fi vs Ethernet."
+      },
+      "minimal": "ping <host>",
+      "syntax": "ping [options] <host>",
+      "syntaxHelp": [
+        "On many Linux systems ping runs until stopped. Use -c to send a fixed count.",
+        "Options differ slightly across OSes (Linux, macOS, Windows)."
+      ],
+      "flags": [
+        {
+          "flag": "-c <count>",
+          "takesValue": true,
+          "description": "Number of echo requests to send"
+        },
+        {
+          "flag": "-i <sec>",
+          "takesValue": true,
+          "description": "Interval between packets"
+        },
+        {
+          "flag": "-s <bytes>",
+          "takesValue": true,
+          "description": "Payload size"
+        },
+        {
+          "flag": "-W <sec>",
+          "takesValue": true,
+          "description": "Per-packet timeout (Linux)"
+        },
+        {
+          "flag": "-t <ttl>",
+          "takesValue": true,
+          "description": "Set IP TTL (varies by OS)"
+        },
+        {
+          "flag": "-4 / -6",
+          "takesValue": false,
+          "description": "Force IPv4 or IPv6 (implementation dependent)"
+        }
+      ],
+      "examples": [
+        {
+          "command": "ping -c 4 8.8.8.8",
+          "explanation": "Send 4 ICMP echo requests to 8.8.8.8 and report latency/loss."
+        },
+        {
+          "command": "ping -c 5 -i 0.2 <host>",
+          "explanation": "Send 5 pings at 0.2s intervals to sample short-term jitter."
+        },
+        {
+          "command": "ping -c 3 -s 1200 <host>",
+          "explanation": "Probe with 1200-byte payloads to surface MTU or fragmentation issues."
+        },
+        {
+          "command": "ping -4 -c 4 <host>",
+          "explanation": "Force IPv4 and send 4 probes to the host."
+        },
+        {
+          "command": "ping -6 -c 4 <host>",
+          "explanation": "Force IPv6 and send 4 probes to the host."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Ping measures one kind of reachability. It does not prove that an application port is usable.",
+          "ICMP can be rate limited or blocked. Loss does not always mean the path is broken.",
+          "Latency is context. WiFi and mobile networks naturally add jitter.",
+          "Very short tests lie. One clean sample does not mean the link is stable."
+        ],
+        "proTips": [
+          "Look at packet loss and variance, not just the average. Spikes matter for real apps.",
+          "Force IPv4 or IPv6 when diagnosing. Dual stack can mask the real path.",
+          "Use payload size to probe MTU issues. Some failures only appear with larger packets.",
+          "Use a fixed count for repeatability. Infinite pings are easy to misread."
+        ],
+        "commonMistakes": [
+          "Assuming “ping works” means “service works”. Firewalls can allow ICMP but block TCP.",
+          "Assuming “ping fails” means “host down”. Many hosts drop ICMP by policy.",
+          "Comparing latencies from different networks without context. Routes change the numbers.",
+          "Overreacting to a single timeout. One missed reply can be normal on busy links."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "What the tool is really doing under the hood",
+            "paragraphs": [
+              "Ping sends ICMP Echo Request messages and waits for Echo Replies. That is a minimal test of reachability at the network layer. It does not involve TCP ports, application protocols, or user level authentication, which is why it is both useful and limited.",
+              "Each reply gives you timing information and a few metadata fields such as TTL. Timing reflects the whole path: your host, your local network, the route, and the remote host’s willingness to answer. If any of those components deprioritize ICMP, your measurement becomes a policy measurement rather than a performance measurement.",
+              "Because ICMP is handled differently across devices, ping often measures policy as much as physics. Some routers and hosts treat ICMP as low priority background traffic, so the reply you get is sometimes the leftover capacity, not the true latency your TCP flows will experience."
+            ]
+          },
+          {
+            "title": "Interpreting results without fooling yourself",
+            "paragraphs": [
+              "A ping reply proves that at least one packet made it there and back, but it does not prove the path is stable under load. Low loss at low rate can hide loss under real traffic. Likewise, a long round trip time might be the remote host rate limiting ICMP rather than a slow network.",
+              "A missing reply is ambiguous. It can mean the host is down, but it can also mean ICMP is blocked, deprioritized, or filtered on the return path. That is why ping is best interpreted as “evidence of reachability” rather than “proof of failure” when it is silent.",
+              "Concept example: a server can respond to ping while its HTTPS service is broken. The network path is fine, but the application stack is not. The inverse can also be true: ICMP is blocked, but the service is reachable on its ports.",
+              "When you see packet loss, ask whether it is symmetric. Loss on the way out and loss on the way back look identical in ping output, but they imply different fixes. That is one reason ping is great for detection and alerting, but weaker for pinning down root cause on its own."
+            ]
+          },
+          {
+            "title": "The shape of the tool’s capabilities",
+            "paragraphs": [
+              "Ping’s knobs mostly change the probe pattern. Count, interval, and packet size affect how hard you test the path and what failure modes you reveal. Some variants can also set the “do not fragment” bit to help detect MTU problems. None of these turn ping into a service checker, they just change the sensitivity of the network layer test.",
+              "The core tradeoff is intrusion versus insight. A gentle ping is safe but can miss intermittent problems. Aggressive probing can reveal loss and shaping, but it can also look like noise and trigger alarms in monitored environments."
+            ]
+          },
+          {
+            "title": "Context and boundaries",
+            "paragraphs": [
+              "Ping is the first tool you use when you need to answer “is there any path at all”. It pairs naturally with traceroute and port specific checks when you need to localize where the problem lives.",
+              "Authorized use note: sending a few ICMP probes to systems you own or are permitted to test is normal. Flooding, stress testing, or probing unrelated systems is not. Treat it as a diagnostic instrument, not a weapon."
+            ]
+          }
+        ]
+      },
+      "tagline": "The simplest latency and reachability signal, with plenty of nuance."
+    },
+    {
+      "id": "traceroute",
+      "name": "traceroute",
+      "description": "Trace the network path (hops) to a destination by varying TTL and observing replies.",
+      "overview": {
+        "what": "A path tracing tool that reveals intermediate routers between you and a destination.",
+        "how": "Sends probe packets with increasing TTL values; each hop that expires TTL returns ICMP time exceeded, building a hop list and timing.",
+        "useCases": [
+          "Find where latency starts to increase (problem hop)",
+          "See if traffic goes through unexpected networks",
+          "Compare path differences from different networks or VPNs"
+        ],
+        "use": "Find where latency starts to increase (problem hop); See if traffic goes through unexpected networks; Compare path differences from different networks or VPNs."
+      },
+      "minimal": "traceroute <host>",
+      "syntax": "traceroute [options] <host>",
+      "syntaxHelp": [
+        "Default probe method depends on OS/build (often UDP).",
+        "Use -I for ICMP probes or -T for TCP SYN (useful behind some firewalls)."
+      ],
+      "flags": [
+        {
+          "flag": "-n",
+          "takesValue": false,
+          "description": "Do not resolve hostnames (faster, less DNS noise)"
+        },
+        {
+          "flag": "-m <max_ttl>",
+          "takesValue": true,
+          "description": "Max hops"
+        },
+        {
+          "flag": "-q <nqueries>",
+          "takesValue": true,
+          "description": "Probes per hop"
+        },
+        {
+          "flag": "-w <wait>",
+          "takesValue": true,
+          "description": "Wait time per probe"
+        },
+        {
+          "flag": "-p <port>",
+          "takesValue": true,
+          "description": "Destination port for UDP/TCP probes"
+        },
+        {
+          "flag": "-I",
+          "takesValue": false,
+          "description": "Use ICMP echo for probes"
+        },
+        {
+          "flag": "-T",
+          "takesValue": false,
+          "description": "Use TCP SYN for probes"
+        }
+      ],
+      "examples": [
+        {
+          "command": "traceroute -n <host>",
+          "explanation": "Disable DNS name lookups so output is faster and clearer."
+        },
+        {
+          "command": "traceroute -m 20 <host>",
+          "explanation": "Limit maximum hop count to keep runs short."
+        },
+        {
+          "command": "traceroute -I <host>",
+          "explanation": "Use ICMP echo style probes, helpful where UDP is filtered."
+        },
+        {
+          "command": "traceroute -T -p 443 <host>",
+          "explanation": "Trace path using TCP SYN probes to port 443 (HTTPS-like)."
+        },
+        {
+          "command": "traceroute -q 1 -w 1 <host>",
+          "explanation": "Send 1 probe per hop with 1s timeout to speed up runs."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Traceroute infers hops via TTL expiry. The hop list is a model, not a perfect map.",
+          "Some routers do not reply, or reply slowly. Asterisks can be normal.",
+          "Load balancing can create shifting paths. Two runs can look different.",
+          "The last hop can block probes. That does not always mean the target is unreachable."
+        ],
+        "proTips": [
+          "Use numeric output to avoid slow DNS lookups. Names are nice, but can mislead.",
+          "Interpret per hop latency carefully. The router’s reply time is not the same as forwarding time.",
+          "Repeat from multiple vantage points. Path problems are often asymmetric.",
+          "Consider probe type. ICMP, UDP, and TCP variants can behave differently through firewalls."
+        ],
+        "commonMistakes": [
+          "Assuming a “slow hop” is the bottleneck. It might just de prioritize replies.",
+          "Treating asterisks as failure by default. Many devices drop TTL exceeded replies.",
+          "Forgetting about NAT and tunnels. The visible hop sequence can hide real topology.",
+          "Concluding “ISP issue” from one run. Paths can vary by time and destination."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "What the tool is really doing under the hood",
+            "paragraphs": [
+              "Traceroute exploits the IP TTL or hop limit. It sends probes with a low TTL so that the first router expires the packet and returns an ICMP Time Exceeded message. Then it raises TTL and repeats, forcing each successive hop to reveal itself by generating the same kind of ICMP response.",
+              "The probes themselves can be UDP, ICMP, or TCP depending on platform and options. The key mechanism is consistent: the tool relies on ICMP Time Exceeded from intermediate routers and some form of final response from the destination when the probe finally arrives.",
+              "Each hop timing is measured as a round trip for a probe that expired at that hop. It is not a one way delay, and it is not the forwarding delay for your application packets. It is “how long did it take this device to tell me my probe expired”."
+            ]
+          },
+          {
+            "title": "Interpreting results without fooling yourself",
+            "paragraphs": [
+              "Traceroute output mixes two kinds of truth: routing path and control plane behavior. Routers forward packets in the data plane, but traceroute measures replies from the control plane. A router can forward traffic perfectly while answering traceroute probes slowly, inconsistently, or not at all.",
+              "Load balancing complicates interpretation. If the network hashes flows, different probes can be sent along different next hops. That can create the appearance of “branching” paths or fluctuating latency. The right conclusion is often “multiple equal cost paths exist”, not “the network is unstable”.",
+              "Concept example: you can see a hop with high latency in the middle of the path, but later hops look normal. That usually means the router is deprioritizing ICMP replies, not that the link is actually slow."
+            ]
+          },
+          {
+            "title": "The shape of the tool’s capabilities",
+            "paragraphs": [
+              "Traceroute’s capability space is mostly about probe type and resolution. Probe type changes what firewalls and routers will allow through. Resolution and numeric output changes readability. Some variants can also do more advanced probing to keep flows consistent so the path is easier to interpret.",
+              "The core trade is visibility versus realism. Probing with something close to your application’s traffic can show a path that matches your real problem, but it may be blocked. Using default probes is often allowed, but it may not represent how your specific service traffic is treated.",
+              "Another dimension is how traceroute keeps flows consistent. Some implementations vary ports or identifiers per probe, which can cause load balancers to send different probes down different paths. Tools that keep a stable flow key can produce a cleaner, more interpretable path at the cost of flexibility."
+            ]
+          },
+          {
+            "title": "Context and boundaries",
+            "paragraphs": [
+              "Traceroute fits when you know “something is slow or failing” and you need to localize where along the path the behavior changes. It is a network layer tool, so you pair it with DNS checks, port checks, and application logs to get a complete picture.",
+              "Authorized use note: traceroute is generally low impact, but it is still active probing. Stay within scope, avoid flooding, and remember that some organizations treat repeated traces as suspicious scanning."
+            ]
+          }
+        ]
+      },
+      "tagline": "See where packets slow down or disappear along the path."
+    },
+    {
+      "id": "ss",
+      "name": "ss",
+      "description": "Inspect sockets and connection state (modern netstat replacement on Linux).",
+      "overview": {
+        "what": "A socket statistics tool for viewing listening ports, active connections, and per-process ownership.",
+        "how": "Reads kernel socket tables and prints state, addresses, ports, and (optionally) process info, often faster than netstat.",
+        "useCases": [
+          "See what is listening on a port and which process owns it",
+          "List established connections and their remote peers",
+          "Quickly check if a service bound to the correct interface"
+        ],
+        "use": "See what is listening on a port and which process owns it; List established connections and their remote peers; Quickly check if a service bound to the correct interface."
+      },
+      "minimal": "ss -tulpn",
+      "syntax": "ss [options] [filter]",
+      "syntaxHelp": [
+        "Combine protocol flags (-t/-u) with -l to show listeners and -p for process info.",
+        "Use a filter to narrow output (ex: 'sport = :443' or 'state established')."
+      ],
+      "flags": [
+        {
+          "flag": "-t",
+          "takesValue": false,
+          "description": "TCP sockets"
+        },
+        {
+          "flag": "-u",
+          "takesValue": false,
+          "description": "UDP sockets"
+        },
+        {
+          "flag": "-l",
+          "takesValue": false,
+          "description": "Listening sockets"
+        },
+        {
+          "flag": "-a",
+          "takesValue": false,
+          "description": "All sockets (listening and non-listening)"
+        },
+        {
+          "flag": "-p",
+          "takesValue": false,
+          "description": "Show process using the socket"
+        },
+        {
+          "flag": "-n",
+          "takesValue": false,
+          "description": "Do not resolve service names"
+        },
+        {
+          "flag": "-s",
+          "takesValue": false,
+          "description": "Summary statistics"
+        },
+        {
+          "flag": "-r",
+          "takesValue": false,
+          "description": "Resolve DNS names (slower)"
+        },
+        {
+          "flag": "-o",
+          "takesValue": false,
+          "description": "Show timer information"
+        },
+        {
+          "flag": "-H",
+          "takesValue": false,
+          "description": "No header line"
+        }
+      ],
+      "examples": [
+        {
+          "command": "ss -tulpn",
+          "explanation": "List TCP/UDP sockets with listeners and process ownership (numeric)."
+        },
+        {
+          "command": "ss -ltn",
+          "explanation": "Show listening TCP sockets without DNS/service name resolution."
+        },
+        {
+          "command": "ss -atunp",
+          "explanation": "List all TCP/UDP sockets, including non-listening, with processes."
+        },
+        {
+          "command": "ss -s",
+          "explanation": "High level socket statistics summary."
+        },
+        {
+          "command": "ss -tn state established",
+          "explanation": "Show established TCP connections only (numeric addresses)."
+        },
+        {
+          "command": "ss -tn sport = :443",
+          "explanation": "Show TCP connections with local source port 443."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Ss reports socket state from the kernel. It is a snapshot that changes moment to moment.",
+          "Name resolution can distort speed and clarity. Numeric output is often best for debugging.",
+          "Process attribution depends on permissions. Without privilege, some owners stay hidden.",
+          "A listening socket is not the same as a working service. The process may still be broken."
+        ],
+        "proTips": [
+          "Filter by state to reduce noise. Established and listen views answer different questions.",
+          "Use process info when you are hunting “who owns this port”. It turns output into action.",
+          "Watch for unexpected binds. Services listening on 0.0.0.0 or :: are exposed broadly.",
+          "Pair with logs. Ss tells you what exists, logs tell you why."
+        ],
+        "commonMistakes": [
+          "Confusing local and remote columns. It is easy to misread which side owns the port.",
+          "Forgetting IPv6. A service can listen on :: and still accept IPv4 via v6 mapping.",
+          "Assuming “no connections” means “no traffic”. Short lived connections can come and go fast.",
+          "Assuming PID output is complete without privilege. Some details require elevated rights."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "What the tool is really doing under the hood",
+            "paragraphs": [
+              "ss is a window into the kernel’s socket tables. Instead of probing the network, it asks the OS what sockets exist, which addresses and ports they are bound to, and what states they are in. That makes it fundamentally different from scanning tools: ss is introspection, not observation.",
+              "Because it talks to kernel data structures, ss can surface details that are hard to infer from outside, such as which process owns a socket and which state transitions are happening. It can also reveal when the kernel is carrying lots of connections in transient states, which is often a symptom of load or misbehavior.",
+              "ss is part of the iproute2 family and typically queries the kernel through modern interfaces rather than relying on older parsing approaches. That is why it can expose richer state, such as TCP timers and congestion related details, when you ask for them."
+            ]
+          },
+          {
+            "title": "Interpreting results without fooling yourself",
+            "paragraphs": [
+              "Socket states are easy to misread if you treat them as moral judgments. A large number of connections in a given state is not automatically bad. It becomes meaningful when it is new, growing, or correlated with user visible failures.",
+              "Remember the boundary of what ss can prove. It can prove that a process is listening on a port on this machine. It cannot prove that remote clients can reach it. Firewalls, routing, and NAT sit outside the kernel’s local socket table.",
+              "Concept example: an app can be listening on 0.0.0.0 but still be unreachable from the internet if a perimeter firewall blocks the port. ss shows local truth, not perimeter truth."
+            ]
+          },
+          {
+            "title": "The shape of the tool’s capabilities",
+            "paragraphs": [
+              "ss capabilities cluster into: which socket families you look at, which protocol you filter, and how much detail you print. You can focus on listening sockets, established sessions, or summary statistics. You can also filter by address, port, or process to reduce noise.",
+              "The tradeoff is between completeness and readability. Dumping everything can be overwhelming. Filtering too hard can make you miss the unusual connection that explains the incident. The skill is choosing a filter that matches your hypothesis without blinding you.",
+              "Capabilities also vary by what the kernel exposes. On some systems you can see queue sizes, memory usage, and TCP diagnostics. On others you get a simpler view. The important point is that ss is constrained by local kernel telemetry, not by what the network chooses to reveal."
+            ]
+          },
+          {
+            "title": "Context and boundaries",
+            "paragraphs": [
+              "ss fits when you are debugging a local system: which service owns this port, why are there so many connections, is the kernel clogged with half closed sockets. It is a perfect companion to external checks like curl or nmap because it shows the internal view that explains the external symptoms.",
+              "Authorized use note: ss is local introspection, so the main boundary is system access. Use it on systems you are allowed to administer, and remember that process and connection metadata can be sensitive in shared environments."
+            ]
+          }
+        ]
+      },
+      "tagline": "Socket snapshot for Linux: who is listening, who is connected, and why."
+    },
+    {
+      "id": "lsof",
+      "name": "lsof",
+      "description": "List open files and the processes that hold them, including network sockets.",
+      "overview": {
+        "what": "A process and file visibility tool: on Unix, everything is a file, including network sockets and devices.",
+        "how": "Inspects the system's open file tables and prints which processes have which files, sockets, ports, or directories open.",
+        "useCases": [
+          "Find which process is listening on a port",
+          "Identify who is keeping a file open (cannot delete/unmount)",
+          "List all network connections owned by a process"
+        ],
+        "use": "Find which process is listening on a port; Identify who is keeping a file open (cannot delete/unmount); List all network connections owned by a process."
+      },
+      "minimal": "lsof -i :<port>",
+      "syntax": "lsof [selection] [options]",
+      "syntaxHelp": [
+        "Use -i to filter network files/sockets, and add :PORT or @HOST for precision.",
+        "Add -n -P to avoid slow DNS/service name lookups."
+      ],
+      "flags": [
+        {
+          "flag": "-i",
+          "takesValue": false,
+          "description": "Select Internet network files"
+        },
+        {
+          "flag": "-i :<port>",
+          "takesValue": true,
+          "description": "Filter by port (ex: -i :80)"
+        },
+        {
+          "flag": "-iTCP",
+          "takesValue": false,
+          "description": "Only TCP sockets"
+        },
+        {
+          "flag": "-iUDP",
+          "takesValue": false,
+          "description": "Only UDP sockets"
+        },
+        {
+          "flag": "-p <pid>",
+          "takesValue": true,
+          "description": "Select by process ID"
+        },
+        {
+          "flag": "-u <user>",
+          "takesValue": true,
+          "description": "Select by user"
+        },
+        {
+          "flag": "-n",
+          "takesValue": false,
+          "description": "Do not resolve hostnames"
+        },
+        {
+          "flag": "-P",
+          "takesValue": false,
+          "description": "Do not resolve port names (show numbers)"
+        },
+        {
+          "flag": "+D <dir>",
+          "takesValue": true,
+          "description": "Search for open files under a directory (can be slow)"
+        },
+        {
+          "flag": "-t",
+          "takesValue": false,
+          "description": "Terse output: print only PIDs"
+        }
+      ],
+      "examples": [
+        {
+          "command": "lsof -i :8080",
+          "explanation": "Show processes with sockets bound to local port 8080."
+        },
+        {
+          "command": "lsof -nP -iTCP:443 -sTCP:LISTEN",
+          "explanation": "List TCP listeners on port 443 without DNS/service lookups."
+        },
+        {
+          "command": "lsof -p <pid>",
+          "explanation": "Show open files held by a specific process ID."
+        },
+        {
+          "command": "lsof -u <user>",
+          "explanation": "List open files and sockets owned by the given user."
+        },
+        {
+          "command": "lsof -nP -i",
+          "explanation": "List all network files without resolving names or ports."
+        },
+        {
+          "command": "lsof +D /var/log",
+          "explanation": "List processes with open files under /var/log (can be heavy)."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Lsof maps processes to open files. On busy systems, unfiltered output can be huge.",
+          "“File” includes sockets, pipes, and devices. It is broader than most people expect.",
+          "Directory scans can be heavy. Recursive modes can get expensive on large trees.",
+          "Permissions affect visibility. Some processes will hide details unless you have rights."
+        ],
+        "proTips": [
+          "Filter early. Port, PID, user, or path filters make results usable.",
+          "Use it for “why can’t I delete this”. Open handles are the usual culprit.",
+          "Treat sockets like files. That mental model makes port ownership intuitive.",
+          "When debugging binds, disable name resolution. Numeric output is faster and clearer."
+        ],
+        "commonMistakes": [
+          "Running it unfiltered and getting lost. Start narrow, then widen.",
+          "Mistaking “no output” for “no issue”. You might lack permission to see the owner.",
+          "Overusing recursive directory scans on production. It can impact performance.",
+          "Forgetting that containers and namespaces change visibility. The host view may differ."
+        ],
+        "funFact": "The name expands to list open files, and on Unix that includes things you do not intuitively think of as files, like network sockets."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "What the tool is really doing under the hood",
+            "paragraphs": [
+              "lsof correlates process state with the operating system’s open file tables. Every process holds file descriptors that point to kernel objects: regular files, directories, devices, pipes, and sockets. lsof walks those tables and prints a join: process metadata on one side, open handles on the other.",
+              "That design is why lsof can answer questions that feel magical: who is using this port, why can’t I unmount this filesystem, what keeps this deleted file consuming disk. It is not guessing. It is reading the kernel’s bookkeeping.",
+              "Network related output is a special case of the same mechanism. A listening TCP port is just a socket descriptor. Filtering by network criteria does not change what lsof is doing, it only changes which descriptors it prints.",
+              "On Linux, lsof commonly collects this by reading process and descriptor information exposed by the OS, then resolving those kernel objects into something readable. The exact plumbing varies by platform, but the idea is consistent: it is correlating live kernel state, not parsing logs or guessing from symptoms."
+            ]
+          },
+          {
+            "title": "Interpreting results without fooling yourself",
+            "paragraphs": [
+              "The output is dense, and density invites overconfidence. lsof shows that a process has an open handle. It does not automatically show how important that handle is, or whether it is currently active. A process can keep a file open for hours without touching it again.",
+              "Be careful with the meaning of this port is used by PID X. In containerized and multi namespace environments, the same port number can exist in different namespaces. lsof shows what it can see from the namespace and privileges you are in, which might be a partial truth.",
+              "Concept example: a log file may be deleted, but disk usage does not drop because a process still holds the descriptor. lsof can reveal that hidden link between deleted and still consuming space.",
+              "Also watch for handles that point to “deleted” paths. The filesystem entry is gone, but the inode can stay allocated while the process keeps the descriptor open. That is why disk usage and file listings can disagree until the process releases the handle."
+            ]
+          },
+          {
+            "title": "The shape of the tool’s capabilities",
+            "paragraphs": [
+              "lsof is all about selection and projection. Selection decides which processes and which kinds of files you care about: user, PID, file path, network sockets, or a mix. Projection decides how verbose the output is. Those are the two axes that make it either a scalpel or a firehose.",
+              "The main tradeoff is cost. Narrow queries are fast. Wide queries can be expensive because lsof must inspect many processes and many descriptors. That cost is not just time, it can be measurable load on a busy system. In incident response, that matters."
+            ]
+          },
+          {
+            "title": "Context and boundaries",
+            "paragraphs": [
+              "lsof fits when your question is who owns the resource. It complements ss and netstat style tools by tying sockets to processes, and it complements filesystem tools by tying paths to open handles.",
+              "Authorized use note: lsof reveals process names, users, open paths, and network endpoints. On shared systems that can be sensitive. Use it only where you have admin authority, and be intentional about what you capture and share in reports."
+            ]
+          }
+        ]
+      },
+      "tagline": "See which process holds a file, port, or directory open."
+    },
+    {
+      "id": "lynis",
+      "name": "Lynis",
+      "description": "Run a structured local security audit and get prioritized hardening recommendations.",
+      "overview": {
+        "what": "Lynis is a local security auditing tool that reviews your system configuration, installed software, and security controls. It highlights weaknesses, missing hardening steps, and potential misconfigurations in areas like authentication, logging, networking, and file permissions.",
+        "how": "Lynis runs a large set of checks grouped by category and produces two outputs: a log with technical details and a report that summarizes warnings and suggestions. You can run it interactively, in quick mode, or as a scheduled run to track improvements over time.",
+        "useCases": [
+          "Baseline a new server build before it goes live.",
+          "Re audit after major changes, patch cycles, or configuration hardening.",
+          "Support compliance style reviews by keeping reports and comparing audits over time."
+        ]
+      },
+      "minimal": "sudo lynis audit system",
+      "syntax": "lynis audit system [options]",
+      "examples": [
+        {
+          "command": "sudo lynis audit system",
+          "explanation": "Run a full local audit with maximum coverage (recommended for your baseline)."
+        },
+        {
+          "command": "sudo lynis audit system --quick",
+          "explanation": "Run without interactive pauses so it is easier to automate or repeat."
+        },
+        {
+          "command": "sudo lynis audit system --cronjob --report-file /var/log/lynis-report.dat",
+          "explanation": "Generate a predictable report file for scheduled runs and tracking."
+        },
+        {
+          "command": "sudo lynis audit system --profile /etc/lynis/custom.prf",
+          "explanation": "Apply organization specific tuning, for example to ignore accepted risks or focus on key controls."
+        },
+        {
+          "command": "lynis --help",
+          "explanation": "See available scan modes and common options directly from the installed version."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Run with sudo for the most complete results. Without elevated privileges, some checks will be skipped.",
+          "Treat the output as guidance, not a verdict. Suggestions should be validated against your threat model and operational needs.",
+          "Keep reports for comparison. The real value shows up when you can prove that hardening is improving over time."
+        ],
+        "proTips": [
+          "Start with quick mode for frequent runs, then do a full run after major changes.",
+          "Use a profile to suppress noise and focus on controls you actually plan to enforce.",
+          "Turn key findings into repeatable hardening tasks, then re run Lynis to confirm closure."
+        ],
+        "commonMistakes": [
+          "Trying to fix everything at once. Prioritize high impact warnings first.",
+          "Running only once and forgetting it. Lynis is most useful when used as a recurring checkpoint.",
+          "Ignoring context. A hardening suggestion can be correct in general but wrong for your workload."
+        ],
+        "funFact": "Lynis writes both a detailed log and a separate report so you can keep a clean summary while still retaining technical evidence."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "How Lynis audits a system",
+            "paragraphs": [
+              "Lynis performs a series of categorized tests that inspect configuration files, package settings, permissions, kernel parameters, and security controls. The tests are designed to be read only, so the tool does not harden the system for you, it explains what it found and what to consider changing.",
+              "Because it is local, Lynis can correlate details that remote scanners often miss, such as local authentication policies, file ownership patterns, sudo configuration, and logging and auditing coverage. This makes it a strong companion to network scanning and vulnerability scanning.",
+              "The audit is more complete when you run as root, since privileged access allows Lynis to inspect restricted files and system settings. If you must run unprivileged, treat the results as partial and focus on what it can still verify safely."
+            ]
+          },
+          {
+            "title": "Reports, warnings, and the hardening index",
+            "paragraphs": [
+              "Lynis produces a log with raw findings and a report file that summarizes warnings and suggestions. The report is the part you typically store for baselining and review meetings, while the log is what you consult when you need technical details behind a finding.",
+              "Warnings are usually higher urgency and are good candidates for immediate triage. Suggestions can range from quick wins to deeper architecture choices. A practical workflow is to convert the highest value items into tasks, apply changes in a controlled way, and then re run Lynis to validate impact.",
+              "Many environments use the hardening index as a simple trend indicator. It is not a compliance score, but it is useful to show that security posture is improving when you combine it with evidence from the report files."
+            ]
+          },
+          {
+            "title": "Making Lynis actionable",
+            "paragraphs": [
+              "The biggest jump in value comes when you treat Lynis output as a backlog. Pick a small number of improvements, implement them, and verify. This turns the audit from a one time report into a continuous hardening loop.",
+              "Profiles help reduce noise. If a recommendation is intentionally not applicable, capture that decision in a profile so future runs stay focused and consistent across systems.",
+              "When working across fleets, run Lynis on representative hosts first. Use the results to define a baseline configuration, then standardize and automate the hardening steps through your configuration management tools."
+            ]
+          },
+          {
+            "title": "Automation and safe recurring runs",
+            "paragraphs": [
+              "For scheduled audits, cronjob mode is designed for non interactive execution. Combine it with a stable report path and a log management approach so reports can be collected or compared centrally.",
+              "Be mindful of sensitive output. Audit logs and reports can contain system information that you would not want broadly accessible. Store them with appropriate permissions and retention policies.",
+              "A practical cadence is frequent quick runs plus deeper full audits after patching, configuration changes, or major upgrades. This keeps the signal high and the effort predictable."
+            ]
+          }
+        ]
+      },
+      "tagline": "Security auditing and hardening guidance for Unix and Linux systems.",
+      "syntaxHelp": [
+        "Use audit system for a full local audit (most common).",
+        "Use --quick or --cronjob for non interactive runs.",
+        "Use --profile <file> to tune checks and reporting to your environment."
+      ],
+      "flags": [
+        {
+          "flag": "--quick (-Q)",
+          "takesValue": false,
+          "description": "Run in quick mode and do not pause for user input."
+        },
+        {
+          "flag": "--cronjob",
+          "takesValue": false,
+          "description": "Cron safe run: no colors, no prompts, no breaks."
+        },
+        {
+          "flag": "--profile <file>",
+          "takesValue": true,
+          "description": "Use an alternative profile to enable or disable checks and settings."
+        },
+        {
+          "flag": "--tests TEST-IDs",
+          "takesValue": true,
+          "description": "Run only selected tests by ID (useful for focused verification)."
+        },
+        {
+          "flag": "--logfile <path>",
+          "takesValue": true,
+          "description": "Write the technical log to a custom location."
+        },
+        {
+          "flag": "--report-file <file>",
+          "takesValue": true,
+          "description": "Write the report to a custom filename or location."
+        },
+        {
+          "flag": "--warnings-only",
+          "takesValue": false,
+          "description": "Quiet output except warnings, useful in scripts."
+        },
+        {
+          "flag": "--no-log",
+          "takesValue": false,
+          "description": "Disable logging to disk to reduce sensitive data written to files."
+        },
+        {
+          "flag": "--verbose",
+          "takesValue": false,
+          "description": "Show more detail on screen while running checks."
+        }
+      ]
+    },
+    {
+      "id": "auditd",
+      "name": "auditd",
+      "description": "Collect and query tamper resistant audit logs for authentication, file access, and admin activity.",
+      "overview": {
+        "what": "auditd is the Linux Audit daemon that records security relevant events from the kernel audit framework. It is commonly used to track authentication activity, privilege use, file integrity sensitive paths, and policy enforced monitoring for compliance.",
+        "how": "Rules define what gets logged. The kernel generates audit events, auditd writes them to /var/log/audit/audit.log, and tools like auditctl, ausearch, and aureport help you manage rules and turn raw events into readable answers.",
+        "useCases": [
+          "Detect changes to critical files such as passwd, sudoers, or SSH configuration.",
+          "Create audit trails for privileged commands and admin actions.",
+          "Generate periodic audit reports to support investigations and compliance reviews."
+        ]
+      },
+      "minimal": "sudo auditctl -l",
+      "syntax": "auditctl [rule and control options]",
+      "examples": [
+        {
+          "command": "sudo auditctl -l",
+          "explanation": "Confirm what rules are currently active. Do this before adding more rules."
+        },
+        {
+          "command": "sudo auditctl -w /etc/sudoers -p wa -k sudoers-change",
+          "explanation": "Watch sudoers for write and attribute changes and tag events with a key for fast searches."
+        },
+        {
+          "command": "sudo ausearch -k sudoers-change -i",
+          "explanation": "Find events for the sudoers change key and interpret fields into readable output."
+        },
+        {
+          "command": "sudo aureport -l -i -ts yesterday -te now",
+          "explanation": "Produce a readable report of login activity in a time window."
+        },
+        {
+          "command": "sudo systemctl status auditd",
+          "explanation": "Verify the daemon is running and logs are being written."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Keep rules focused. Audit volume grows quickly and can create noise and performance impact.",
+          "Keys are essential. Tag your rules with keys so you can search reliably during incidents.",
+          "Persist rules in files, not only in memory. In memory rules set via auditctl can be lost after reboot."
+        ],
+        "proTips": [
+          "Start with a small set of high value watches, then iterate based on what you actually investigate.",
+          "Use ausearch with -i when presenting results to humans and raw mode when feeding scripts.",
+          "Protect audit logs with strict permissions and a clear retention plan so the trail stays trustworthy."
+        ],
+        "commonMistakes": [
+          "Monitoring too broadly, for example entire filesystems, which produces unusable volumes of logs.",
+          "Forgetting to persist rules, causing monitoring to silently disappear after reboots or service restarts.",
+          "Skipping filters like auid or success, which can inflate noise and hide meaningful events."
+        ],
+        "funFact": "Audit events are generated by the kernel, which is one reason audit trails can be more reliable than application only logging."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Mental model: from syscall to audit.log",
+            "paragraphs": [
+              "The Linux Audit framework is built into the kernel. When a monitored action happens, such as a syscall you have rules for, the kernel emits an audit event with fields that describe who did what, from where, and whether it succeeded.",
+              "auditd receives those events and writes them to /var/log/audit/audit.log. That log is structured text, which is great for integrity and parsing but not always pleasant to read directly.",
+              "This is why the ecosystem includes query tools. ausearch helps you filter events by time, user, key, or many other attributes. aureport turns collections of events into summary reports you can hand to a reviewer."
+            ]
+          },
+          {
+            "title": "Rule types: watch rules and syscall rules",
+            "paragraphs": [
+              "Watch rules (the -w style) are the easiest entry point. You monitor a file or directory path and select which permission types to record. They are perfect for tracking changes to configuration files and other high value assets.",
+              "Syscall rules (the -a always,exit style) are more flexible and powerful. You can target syscalls like open or execve and then filter by user IDs, executables, success or failure, and more. This is how you create precise detection for behavior, not just a file path.",
+              "Keys glue everything together. When you assign -k to a rule, every matching event carries that tag, making incident response far faster because you can search by intent, not by guessing which raw fields will match."
+            ]
+          },
+          {
+            "title": "Searching and reporting that actually answers questions",
+            "paragraphs": [
+              "During investigations, start from a key or a time window. Use ausearch to narrow the log to the events you care about, then add interpretation so numeric IDs become usernames and paths become readable.",
+              "For recurring reviews, aureport is often the better interface. Login reports, authentication reports, and executable summaries can quickly tell you what changed or what stood out in a given period.",
+              "A good practice is to test your rules. Trigger the behavior in a controlled way, confirm the events appear, and then document the key and expected output so others can repeat the process."
+            ]
+          },
+          {
+            "title": "Operational hygiene: performance, retention, and integrity",
+            "paragraphs": [
+              "Audit is powerful, but it is not free. High volume rule sets can increase CPU usage and I O, and they can fill disks. Tune rules deliberately and monitor both event rate and log growth.",
+              "Configuration in /etc/audit/auditd.conf controls behavior such as log rotation and what to do when disk space is low. Those settings matter, because losing the audit trail during an incident defeats the point.",
+              "Treat audit data as evidence. Restrict access, ship copies to a centralized log system if possible, and define retention and rotation so you can answer questions weeks or months later."
+            ]
+          }
+        ]
+      },
+      "tagline": "Kernel level auditing for security relevant events on Linux.",
+      "syntaxHelp": [
+        "Use auditctl to list and manage in memory audit rules.",
+        "Use ausearch to search the audit log by time, user, or key.",
+        "Use aureport to generate readable summaries, for example logins or authentication failures."
+      ],
+      "flags": [
+        {
+          "flag": "auditctl -l",
+          "takesValue": false,
+          "description": "List the currently loaded audit rules."
+        },
+        {
+          "flag": "auditctl -w <path>",
+          "takesValue": true,
+          "description": "Watch a file or directory path for access and changes."
+        },
+        {
+          "flag": "auditctl -p <rwx a>",
+          "takesValue": true,
+          "description": "Permission filter for watch rules (read, write, execute, attribute change)."
+        },
+        {
+          "flag": "auditctl -k <key>",
+          "takesValue": true,
+          "description": "Tag matching events with a key so you can search them later."
+        },
+        {
+          "flag": "auditctl -a <list,action>",
+          "takesValue": true,
+          "description": "Add a syscall rule, for example always,exit to log on syscall exit."
+        },
+        {
+          "flag": "auditctl -S <syscall>",
+          "takesValue": true,
+          "description": "Select the syscall to monitor in a syscall rule (repeat for multiple)."
+        },
+        {
+          "flag": "auditctl -F <field=value>",
+          "takesValue": true,
+          "description": "Add field filters like auid, uid, exe, success, or path filters."
+        },
+        {
+          "flag": "ausearch -k <key>",
+          "takesValue": true,
+          "description": "Search audit logs by key (use -i to interpret IDs into names)."
+        },
+        {
+          "flag": "aureport -l -i",
+          "takesValue": false,
+          "description": "Generate a login report and interpret numeric fields."
+        }
+      ]
+    },
+    {
+      "id": "clamav",
+      "name": "ClamAV",
+      "description": "Scan files and directories for malware using signatures, with options for daemon mode and updates.",
+      "overview": {
+        "what": "ClamAV is an open source antivirus engine commonly used on Unix like systems. It focuses on file based malware detection using signature databases and can be used for on demand scans, scheduled scans, or integrated scanning in services that handle untrusted files.",
+        "how": "Use freshclam to keep virus signatures up to date. For scanning, you can run clamscan as a standalone scanner, or run the clamd daemon and use clamdscan for faster repeated scans. The scanning behavior and logging can be tuned with configuration and command options.",
+        "useCases": [
+          "Scan uploads in web apps or file shares before storing or distributing content.",
+          "Run scheduled filesystem scans to reduce dwell time for commodity malware.",
+          "Integrate with mail gateways and content pipelines that need automated scanning."
+        ]
+      },
+      "minimal": "clamscan -r -i /path/to/scan",
+      "syntax": "clamscan [options] <file|dir>",
+      "examples": [
+        {
+          "command": "sudo freshclam",
+          "explanation": "Update signatures before scanning so results reflect the latest database."
+        },
+        {
+          "command": "clamscan -r -i /home",
+          "explanation": "Recursively scan a directory and show only infected findings."
+        },
+        {
+          "command": "clamscan -r --log=/var/log/clamav/clamscan.log /srv/uploads",
+          "explanation": "Scan a sensitive directory and keep a log for audit trails."
+        },
+        {
+          "command": "clamscan -r -i --move=/var/quarantine /srv/uploads",
+          "explanation": "Quarantine infected files by moving them to a controlled directory."
+        },
+        {
+          "command": "clamdscan --multiscan --fdpass /srv/uploads",
+          "explanation": "Use the clamd daemon for faster scans on larger directories (requires clamd running)."
+        }
+      ],
+      "category": "CLI",
+      "quickPanel": {
+        "notes": [
+          "Signature scanning is great for known malware, but it will not catch everything. Use defense in depth with least privilege and monitoring.",
+          "Always keep signatures updated. Outdated databases are a common reason for missed detections.",
+          "Prefer quarantine (move or copy) over delete until you are confident in your false positive handling."
+        ],
+        "proTips": [
+          "Exclude virtual filesystems like proc and sys and other noisy paths in large scans.",
+          "Use clamd for repeated scanning workloads. It avoids reloading signatures for every run.",
+          "Log to a dedicated path and include scan cadence in your operational playbook."
+        ],
+        "commonMistakes": [
+          "Running long recursive scans without exclusions, which wastes time and produces irrelevant errors.",
+          "Deleting infected files immediately, which can destroy evidence or break systems if a false positive occurs.",
+          "Assuming one clean scan proves safety. Scans are a point in time view."
+        ],
+        "funFact": "ClamAV is widely used as an engine inside other products, especially where automated scanning of untrusted files is needed."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "What ClamAV can and cannot do well",
+            "paragraphs": [
+              "ClamAV is primarily a signature based malware scanner. It is very effective for detecting known threats and commodity malware families when the signature database is current.",
+              "It is not an endpoint protection suite with behavior based prevention by default. Treat it as one layer in a larger control set that includes patching, hardening, least privilege, and logging.",
+              "In practice, ClamAV shines in pipelines: file upload scanning, mail scanning, and server side hygiene checks where you want an automated verdict with a clear audit trail."
+            ]
+          },
+          {
+            "title": "Standalone scanning versus daemon mode",
+            "paragraphs": [
+              "clamscan runs as a standalone process. It is simple and great for one off checks, but it must load signature databases each run, which can be slow for repeated workloads.",
+              "clamd runs as a long lived daemon that keeps signatures in memory and can scan in parallel. clamdscan is the client that sends scan requests to the daemon. This approach is usually faster for large directories or frequent scans.",
+              "If you deploy clamd, treat the daemon like a service: define clear sockets, permissions, and logging, and make sure your update workflow keeps signatures current without interrupting critical scans."
+            ]
+          },
+          {
+            "title": "Signature updates and handling false positives",
+            "paragraphs": [
+              "freshclam updates the official signature databases. In production, schedule updates and monitor for failures, because a silent update problem can leave you behind for weeks.",
+              "Quarantine workflows matter. Moving or copying infected files to a dedicated directory allows you to investigate, validate, and restore if it turns out to be a false positive.",
+              "If you see repeated false positives in known benign files, document the pattern and decide how to handle it. Sometimes exclusion rules are appropriate, but exclusions should be tightly scoped and reviewed."
+            ]
+          },
+          {
+            "title": "Operational patterns for servers and pipelines",
+            "paragraphs": [
+              "For filesystem scanning, define what success looks like: which paths are in scope, which are excluded, where logs go, and what happens on detection. Without this, scans become noise.",
+              "For application pipelines, scan before the file is trusted. For example, scan on upload and again before distributing or executing content. This reduces risk even when users supply untrusted payloads.",
+              "Combine scanning results with monitoring. A scan result alone does not explain how a file arrived, who touched it, or what it did. That context comes from logging, auditing, and access controls."
+            ]
+          }
+        ]
+      },
+      "tagline": "Open source malware scanning for files, mail, and server workloads.",
+      "syntaxHelp": [
+        "Use -r to scan directories recursively and -i to show only infected results.",
+        "Use freshclam to update signatures before running larger scans.",
+        "Use clamd plus clamdscan for better performance on frequent scans."
+      ],
+      "flags": [
+        {
+          "flag": "-r, --recursive",
+          "takesValue": false,
+          "description": "Scan directories recursively."
+        },
+        {
+          "flag": "-i, --infected",
+          "takesValue": false,
+          "description": "Only print infected files (reduces noise)."
+        },
+        {
+          "flag": "--log=<file>",
+          "takesValue": true,
+          "description": "Write scan output to a log file for auditing and review."
+        },
+        {
+          "flag": "--move=<dir>",
+          "takesValue": true,
+          "description": "Move infected files to a quarantine directory (directory must be writable)."
+        },
+        {
+          "flag": "--copy=<dir>",
+          "takesValue": true,
+          "description": "Copy infected files to a quarantine directory (directory must be writable)."
+        },
+        {
+          "flag": "--exclude-dir=<regex>",
+          "takesValue": true,
+          "description": "Exclude directories matching a regex pattern."
+        },
+        {
+          "flag": "--max-filesize=<size>",
+          "takesValue": true,
+          "description": "Skip files larger than the specified size limit."
+        },
+        {
+          "flag": "--detect-pua",
+          "takesValue": false,
+          "description": "Detect potentially unwanted applications in addition to classic malware."
+        },
+        {
+          "flag": "freshclam",
+          "takesValue": false,
+          "description": "Update the virus signature databases used by ClamAV."
+        }
+      ]
+    }
+  ],
+  "guiTools": [
+    {
+      "id": "wireshark",
+      "name": "Wireshark",
+      "description": "Packet capture and protocol analyzer for inspecting network traffic.",
+      "overview": {
+        "what": "A network protocol analyzer for reading what actually happened on the wire. You can capture live traffic from a chosen interface or open an existing PCAP and then inspect each layer of every packet (Ethernet, IP, TCP/UDP, TLS, HTTP, DNS and many more) with timestamps, conversations, and flow context.",
+        "how": "Wireshark ingests packets from a live interface or a PCAP file and runs them through protocol dissectors that decode fields at each layer. Capture filters (BPF) control which packets are recorded; display filters work after the fact on decoded fields to show or hide what you care about. With reassembly and stream following, you can reconstruct conversations and reason across packets rather than reading them one by one.",
+        "useCases": [
+          "Troubleshoot latency, retransmissions, and connection resets",
+          "Verify DNS queries, HTTP requests, and TLS handshakes",
+          "Investigate suspicious traffic in a PCAP from an incident"
+        ]
+      },
+      "workflow": [
+        "Choose the correct interface (Wi-Fi, Ethernet, VPN) and start capture",
+        "Apply a capture filter (optional) to reduce noise before capturing",
+        "Use display filters to focus on the protocol or host you care about",
+        "Follow streams (TCP/HTTP) to reconstruct conversations",
+        "Export objects or save filtered captures for reporting"
+      ],
+      "features": [
+        "Capture filters (BPF) and powerful display filters",
+        "Protocol decoding with deep per-field inspection",
+        "Stream reconstruction, statistics, and graphs"
+      ],
+      "usageTitle": "Useful filters",
+      "usage": [
+        {
+          "label": "Display filter (only show HTTP)",
+          "value": "http"
+        },
+        {
+          "label": "Display filter (traffic to host)",
+          "value": "ip.addr == 10.0.0.5"
+        },
+        {
+          "label": "Display filter (TCP port)",
+          "value": "tcp.port == 443"
+        },
+        {
+          "label": "Capture filter (only port 53)",
+          "value": "port 53"
+        }
+      ],
+      "guiCheatSheet": {
+        "quickActions": [
+          "Start capture on the correct interface",
+          "Apply a display filter (e.g., http)",
+          "Follow TCP stream to read conversations",
+          "Stop and save capture to PCAP",
+          "Disable name resolution for speed (Resolve Names off)",
+          "Mark interesting packets and export only marked",
+          "Use Statistics → Conversations / Endpoints for top talkers",
+          "Time shift or change Time Display Format to align with logs"
+        ],
+        "commonFilters": [
+          "http",
+          "ip.addr == 10.0.0.5",
+          "tcp.port == 443",
+          "dns",
+          "tcp.flags.syn == 1 and tcp.flags.ack == 0",
+          "tcp.flags.reset == 1",
+          "tcp.analysis.retransmission",
+          "tls.handshake",
+          "http.response.code >= 400",
+          "dns.flags.response == 1 and dns.rcode != 0"
+        ],
+        "exports": [
+          "File → Export Objects → HTTP",
+          "File → Export Specified Packets…",
+          "File → Export Packet Dissections → As Plain Text"
+        ]
+      },
+      "when": [
+        "You have a PCAP and need to understand what happened on the wire",
+        "You suspect DNS, TLS, or HTTP issues and want packet-level truth",
+        "You need to validate what an app is actually sending"
+      ],
+      "notes": [
+        "Capture filters reduce what gets recorded. Display filters only hide or show packets after capture.",
+        "Many environments require admin/root privileges to capture from interfaces."
+      ],
+      "quickPanel": {
+        "notes": [
+          "Display filters do not change what was captured; they change what you see.",
+          "TLS hides payloads but not metadata: SNI, certs, and handshake details still help.",
+          "Timing is evidence. Look at retransmissions, out-of-order segments, and RTT.",
+          "Filters are case sensitive for field names; values often are not."
+        ],
+        "proTips": [
+          "Start broad (dns, tcp) then narrow by addr/port to avoid tunnel vision.",
+          "Use Follow Stream to build narrative: SYN → handshake → request → response → FIN.",
+          "Right-click fields to apply or prepare display filters faster.",
+          "Save filtered views to a new PCAP for clean handoffs."
+        ],
+        "commonMistakes": [
+          "Using a display filter expecting it to reduce capture size.",
+          "Reading TCP like single packets; always reason in streams.",
+          "Ignoring capture vantage point (SPAN, tap, client, server) which changes truth.",
+          "Forgetting to disable name resolution when you need speed and clarity."
+        ],
+        "whatGoodLooksLike": "You can narrate a flow from handshake to teardown with 2–3 packets that prove each claim."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Capture filters versus display filters: decide where you want to pay the cost",
+            "paragraphs": [
+              "Wireshark gives you two fundamentally different filtering levers. Capture filters decide what gets collected in the first place. Display filters decide what you see and analyze after the packets are already captured.",
+              "Capture filters are powerful when you need to reduce volume on a busy link, or when you are collecting with limited disk and you already know what traffic you want. The tradeoff is that you cannot get back what you never captured. If you guess wrong, you may have to re capture.",
+              "Display filters are the workhorse for investigation. They let you iterate quickly, pivot between hypotheses, and refine your view as you learn more. A strong habit is to capture broadly when you can, then use display filters to narrow down in a disciplined way."
+            ]
+          },
+          {
+            "title": "Dissection and streams: how Wireshark turns packets into meaning",
+            "paragraphs": [
+              "Wireshark is not just showing bytes. It is dissecting protocols and mapping fields into a structured model. That model is what makes filtering and searching possible, because you can filter on protocol fields instead of raw offsets.",
+              "When troubleshooting, it is often more useful to think in conversations and streams than in individual packets. Features like following a TCP stream help you reconstruct application layer exchanges, validate assumptions about request and response order, and spot where a conversation goes off the rails.",
+              "Be mindful of reassembly and encryption. Reassembly can change what you see at the application layer, and encryption can hide payloads entirely. In those cases, metadata, timing, sizes, and handshake details become the clues you use."
+            ]
+          },
+          {
+            "title": "A repeatable investigation loop that scales",
+            "paragraphs": [
+              "A practical workflow is: start wide, identify the talking parties, then narrow. Use high level statistics to see which protocols dominate and which endpoints are most active. Then drill into a single conversation or a small set of flows.",
+              "As you narrow, validate each step. If you suspect a specific host, confirm it appears in endpoints or conversations. If you suspect a specific protocol behavior, confirm it in the protocol tree and then filter down to the exact fields that prove or disprove the hypothesis.",
+              "This approach keeps you from getting lost in packet noise and makes your analysis auditable: each filter you apply represents a decision you can explain."
+            ]
+          },
+          {
+            "title": "Statistics are not a side feature: they are your compass",
+            "paragraphs": [
+              "Wireshark’s statistics views help you build intuition fast. Protocol hierarchy gives you a quick baseline of what is present. Conversations and endpoints show who is driving the traffic. I O graphs and timing views help you align events in time and spot bursts, stalls, and retransmission patterns.",
+              "When you are diagnosing performance issues, you often do not need to look at payloads at all. You need to understand timing, resets, retransmissions, window behavior, and where delays appear. Statistics plus targeted packet views are the fastest path."
+            ]
+          },
+          {
+            "title": "When you outgrow the GUI: bring in TShark and automation",
+            "paragraphs": [
+              "The Wireshark ecosystem includes command line tooling for repeatable work. TShark lets you capture or read pcap files and extract fields, apply filters, and generate summaries in scripts. This is how you scale analysis beyond a single workstation.",
+              "A good pattern is: explore interactively in Wireshark to find the exact display filter and the exact fields you need, then codify that in TShark for repeatable extraction. That way the GUI becomes your research environment and automation becomes your production workflow."
+            ]
+          }
+        ]
+      },
+      "category": "GUI"
+    },
+    {
+      "id": "burp",
+      "name": "Burp Suite",
+      "description": "Web security testing platform for intercepting and analyzing HTTP(S) traffic.",
+      "overview": {
+        "what": "An intercepting proxy workflow for web testing. Burp sits between your browser and the application so you can observe, modify, and replay HTTP(S) and WebSocket traffic while organizing targets and findings in one place.",
+        "how": "Burp runs a local proxy and routes your browser’s requests through it. You can intercept and edit requests and responses, then send items to Repeater for controlled manual testing or to Intruder for automated payload exploration. With the Burp CA installed in your browser, HTTPS traffic is decrypted inside your testing scope for inspection.",
+        "useCases": [
+          "Understand how a web app works by inspecting requests and responses",
+          "Replay and modify requests to test authorization, input handling, and logic",
+          "Organize targets and keep only in-scope traffic"
+        ]
+      },
+      "workflow": [
+        "Start Burp and use Burp's built-in browser or configure an external browser proxy",
+        "Install Burp's CA certificate if you need to inspect HTTPS",
+        "Set target scope so Burp highlights only the sites you care about",
+        "Use Proxy to intercept and modify requests",
+        "Send requests to Repeater for manual testing and to Intruder for automation"
+      ],
+      "features": [
+        "Proxy intercept and history",
+        "Repeater for manual request iteration",
+        "Intruder for automated payload testing (capabilities vary by edition)"
+      ],
+      "quickSetup": [
+        "Open Burp → Proxy tab → confirm a listener is running on 127.0.0.1:8080",
+        "Use 'Open Browser' in Burp, or configure your browser to use Burp as an HTTP proxy",
+        "Install Burp's CA certificate in the browser to decrypt HTTPS (only for your own testing)"
+      ],
+      "guiCheatSheet": {
+        "quickActions": [
+          "Open Burp’s browser with the proxy preconfigured",
+          "Toggle Intercept on/off in Proxy → Intercept",
+          "Send requests to Repeater for manual testing",
+          "Add targets to Scope to focus your work",
+          "Filter Proxy history to in-scope only",
+          "Send to Intruder for safe, scoped payload iteration",
+          "Add comments/highlights to important items",
+          "Save the project frequently (burp project file)"
+        ],
+        "commonFilters": [
+          "Proxy → HTTP history: In-scope only",
+          "Proxy → HTTP history: Methods = GET,POST",
+          "Proxy → HTTP history: Status = 4xx/5xx",
+          "Target → Site map: Group by host, hide out-of-scope",
+          "Search tab: Regex body/header/path search"
+        ],
+        "exports": [
+          "Project options → Save project",
+          "Right-click → Save item (request/response)",
+          "Proxy/Repeater → Copy URL / Copy request as text"
+        ]
+      },
+      "when": [
+        "You are testing your own web app or a lab environment",
+        "You need to see exactly what the browser sends and receives",
+        "You want to reproduce a bug or verify a security control"
+      ],
+      "notes": [
+        "Only intercept and test systems you own or are explicitly authorized to test.",
+        "If HTTPS looks broken, the CA certificate usually isn't installed or proxy settings are wrong."
+      ],
+      "quickPanel": {
+        "notes": [
+          "Scope controls noise. Keeping targets in-scope prevents accidental testing out of bounds.",
+          "HTTPS inspection requires the Burp CA trusted in your browser.",
+          "Extensions can change behavior; know what is enabled."
+        ],
+        "proTips": [
+          "Use Repeater to make hypotheses reproducible one header at a time.",
+          "Mark interesting requests with comments and highlights to build your story.",
+          "Filter Proxy history to in-scope before searching."
+        ],
+        "commonMistakes": [
+          "Testing out of scope due to missing scope config.",
+          "Forgetting to turn Intercept off and wondering why pages hang.",
+          "Assuming a 200 means success; read the response body."
+        ],
+        "whatGoodLooksLike": "You can show a minimal request that reproduces the issue, explain why it works, and list the header or parameter that controls it."
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Burp as an instrumentation layer for web applications",
+            "paragraphs": [
+              "Burp Suite is easiest to use when you treat it as a lens and a control surface for HTTP and WebSocket traffic. By placing Burp between your browser and the target, you can observe what the application actually sends and receives, not what you assume it sends and receives.",
+              "Intercepting requests and responses is not just for changing parameters. It is a way to learn the application’s state transitions, how it uses cookies and headers, and which requests are security critical. That understanding is what makes later testing efficient instead of random."
+            ]
+          },
+          {
+            "title": "Manual testing loop: Proxy, Target, Repeater",
+            "paragraphs": [
+              "A high signal workflow is to browse the target through Burp, then use the Target site map and history views to organize what you discovered. The site map represents Burp’s accumulated knowledge of the application, collected from your browsing and other tools.",
+              "Once you have an interesting request, move it into Repeater. Repeater is where you do controlled experimentation: adjust one variable at a time, resend, and observe the response. This is how you confirm behavior, reproduce issues, and understand how the server validates input."
+            ]
+          },
+          {
+            "title": "Sessions and authentication: staying logged in on purpose",
+            "paragraphs": [
+              "Many testing workflows fail because the tool silently falls out of an authenticated session. Burp provides session handling functionality so you can define rules for maintaining a valid session, manage cookies, and use macros to refresh authentication when needed.",
+              "The key is to define what “logged in” looks like, then automate the recovery path. When configured correctly, your manual testing and any automated steps will keep consistent access to authenticated areas, which dramatically improves coverage and reduces false negatives."
+            ]
+          },
+          {
+            "title": "Out of band detection and Burp Collaborator",
+            "paragraphs": [
+              "Some vulnerabilities do not show up in the immediate HTTP response. They trigger server side interactions such as DNS lookups or HTTP callbacks. Burp Collaborator is designed to detect those out of band interactions and is used by Burp’s scanning features and extensions where available.",
+              "The practical value is confirmation. When you see an interaction in Collaborator, you have evidence that a payload caused an external effect, which is often stronger than a subtle difference in an on page response."
+            ]
+          },
+          {
+            "title": "Make Burp work like a lab notebook",
+            "paragraphs": [
+              "Burp becomes far more effective when you keep it organized. Define target scope early so history and tasks do not fill with unrelated traffic. Use filtering to focus on status codes, parameterized endpoints, or specific content types when you triage.",
+              "Treat each finding as a reproducible experiment. Keep the exact request that demonstrates the issue, the minimal change that triggers it, and the evidence in the response. That discipline turns a pile of traffic into actionable security work."
+            ]
+          }
+        ]
+      },
+      "category": "GUI"
+    },
+    {
+      "id": "owasp-zap",
+      "name": "OWASP ZAP",
+      "description": "Open source web application security testing tool for intercepting, exploring, and scanning HTTP and WebSocket traffic.",
+      "overview": {
+        "what": "OWASP ZAP is a desktop proxy and scanner for web application security testing. It sits between your browser and a target application, records traffic, and lets you inspect, modify, and replay requests. On top of that, it can crawl an application and run passive and active checks to help you discover common security issues.",
+        "how": "In practice, ZAP works best when you combine manual exploration with controlled automation. You explore the app through ZAP’s proxy, define what is in scope, and let passive scanning analyze the traffic you generate. Then you crawl the target (Spider and, for modern JS apps, AJAX Spider) to expand coverage. Finally, you run active scanning against the confirmed in scope targets and review findings in context of the actual requests, responses, and evidence ZAP captured.",
+        "useCases": [
+          "Developer friendly DAST checks during development and in CI pipelines using automation plans.",
+          "Learning web app security by observing real traffic and understanding where issues come from.",
+          "Security testing on staging environments, including authenticated areas with session handling configured."
+        ]
+      },
+      "workflow": [
+        "Set your scope: define the target domain(s) and what should be excluded (logouts, destructive endpoints, third party services).",
+        "Proxy your browser through ZAP and browse the application normally to generate realistic traffic.",
+        "Review the Sites tree and History to confirm coverage, then enable or tune passive scan rules as needed.",
+        "Crawl for coverage: run Spider for classic apps and AJAX Spider for JS heavy apps; combine both when needed.",
+        "Configure authentication and session management if the app requires login, then verify you can stay authenticated while crawling.",
+        "Run Active Scan only against in scope targets you have permission to test, then validate findings by reproducing requests and checking evidence.",
+        "Export reports or save the session and triage issues with developers using request/response details."
+      ],
+      "features": [
+        "Intercepting proxy for HTTP and WebSocket traffic, with request editing and replay driven workflows.",
+        "Passive scanning that analyzes proxied traffic without attacking the target.",
+        "Spider and AJAX Spider crawling to discover content, endpoints, and parameters.",
+        "Active scanning to probe for vulnerabilities against confirmed in scope targets.",
+        "Contexts, users, and session management to support authenticated testing.",
+        "Automation Framework for repeatable scans using a single plan file and job based workflows."
+      ],
+      "usageTitle": "Usage",
+      "guiCheatSheet": {
+        "quickActions": [
+          "Quick Start: run an Automated Scan against a URL when you need a fast first pass.",
+          "Spider and AJAX Spider: expand coverage before scanning.",
+          "Active Scan: attack only what is in scope and permitted.",
+          "Context setup: define scope, authentication, and session handling for repeatability."
+        ],
+        "commonFilters": [
+          "Scope only: focus views and results on what you actually own and intend to test.",
+          "History and alerts filters: narrow by URL, status code, type, and risk level when triaging.",
+          "Exclude noisy paths: logouts, health checks, analytics, and large static asset trees."
+        ],
+        "exports": [
+          "Generate a report for stakeholders, including evidence and affected URLs.",
+          "Export alerts to integrate with issue tracking or to compare between runs.",
+          "Save the session to preserve history, sites tree, and scan results for later review."
+        ]
+      },
+      "when": [
+        "You need an open source, approachable web app testing tool that supports both manual and automated workflows.",
+        "You want to learn how web requests, responses, cookies, and headers relate to common vulnerabilities.",
+        "You are building a repeatable DAST check in CI and want a plan driven approach."
+      ],
+      "notes": [
+        "Run active scans only on targets you are authorized to test, and start on staging environments.",
+        "Coverage matters more than button clicking. Crawl and explore first, scan second.",
+        "If the app is authenticated, spend time on Context, users, and session management. It pays off immediately."
+      ],
+      "quickPanel": {
+        "notes": [
+          "Think in phases: scope, explore, crawl, scan, validate.",
+          "Passive scan is low risk, active scan is intrusive and can break things."
+        ],
+        "proTips": [
+          "Combine Spider and AJAX Spider for modern apps. One crawler rarely covers everything.",
+          "Treat Context configuration like code: keep it stable and reuse it through automation plans."
+        ],
+        "commonMistakes": [
+          "Scanning without a defined scope and getting overwhelmed by third party noise.",
+          "Running active scan before you have coverage, which leads to false confidence.",
+          "Ignoring authentication setup and accidentally testing only the login page."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "The mental model: proxy first, scanner second",
+            "paragraphs": [
+              "ZAP is easiest to understand if you treat it as two systems that work together. The first is the proxy, which captures and organizes traffic as you use the application. The second is a set of analysis and scanning engines that operate on that captured traffic or on URLs discovered during crawling.",
+              "If you skip the proxy mindset and jump straight to scanning, you lose context. You will not know whether a finding is actually reachable, whether it depends on a specific session state, or whether it is being triggered by a third party page you do not own. The proxy view is what turns raw alerts into evidence that developers can reproduce.",
+              "A practical habit is to keep asking: “Do I understand the request that caused this?” If the answer is no, go back to History, inspect the request and response, and only then decide whether the alert is a real issue or just noise."
+            ]
+          },
+          {
+            "title": "Passive scanning versus active scanning",
+            "paragraphs": [
+              "Passive scanning inspects the traffic you generate while browsing or replaying requests. It does not attack the application. This makes it a safe way to learn and a low risk way to run checks continuously during development.",
+              "Active scanning is the opposite: ZAP actively sends payloads and variations to try to trigger vulnerabilities. It can cause side effects, load, or unexpected behavior. The point is not to “scan everything”, but to scan what you have verified is in scope, reachable, and stable enough to test.",
+              "A good workflow is to use passive results as a compass. If passive scan flags missing security headers, insecure cookies, or suspicious parameters, you can prioritize where deeper manual testing and controlled active scanning will produce the best signal."
+            ]
+          },
+          {
+            "title": "Coverage is everything: Spider and AJAX Spider",
+            "paragraphs": [
+              "Most disappointing scan results are coverage problems, not scanner problems. If ZAP never sees a page, a parameter, or a workflow, it cannot analyze it. That is why crawling is a first class skill in web app testing.",
+              "ZAP’s classic Spider is great for traditional link based sites. Modern applications often build routes and content dynamically in JavaScript, which is why ZAP also has an AJAX Spider add on that drives a browser based crawler. Combining the two often gives the best results: the Spider gets the obvious content fast, while the AJAX Spider explores dynamic states.",
+              "Treat crawling outputs as data. Look at what endpoints were discovered, which were not, and what should be excluded. Only after you trust your discovered attack surface should you spend time on active scanning and alert triage."
+            ]
+          },
+          {
+            "title": "Contexts, authentication, and session handling",
+            "paragraphs": [
+              "Authenticated scanning is where tools either become valuable or become frustrating. ZAP uses Contexts to define scope, users, authentication method, and session management. The goal is to make “being logged in” a repeatable configuration rather than a manual ritual.",
+              "Session management determines how ZAP tracks whether it is still authenticated, typically via cookies or HTTP auth, and it can be extended with scripts when applications use custom mechanisms. Once configured, you should validate it by browsing and crawling for a while and verifying that the requests remain in an authenticated state.",
+              "This is also where you control safety. By excluding logout links, destructive actions, and admin only flows from a Context, you reduce the chance that crawling or scanning triggers accidental changes while still allowing meaningful coverage."
+            ]
+          },
+          {
+            "title": "Automation Framework: repeatable scans as a plan",
+            "paragraphs": [
+              "For non trivial testing, repeatability matters. ZAP’s Automation Framework lets you define a sequence of jobs such as spidering and active scanning in a single plan file. The plan captures what is in scope, how authentication works, and what scanning steps to run so results are comparable between runs.",
+              "A strong pattern is “desktop to automate”. Configure and validate the Context and authentication in the GUI first, then export that setup into an automation plan and run it in CI. That way, automation inherits a configuration you already proved works.",
+              "If you treat the plan as part of your security pipeline, you can start small with passive checks and crawling, then add active scan jobs for specific contexts once the environment and exclusions are mature."
+            ]
+          }
+        ]
+      },
+      "category": "GUI"
+    }
+  ],
+  "detectionTool": {
+    "id": "suricata",
+    "name": "Suricata",
+    "desc": "Inspect network traffic for threats using an IDS engine with rules, logs, and EVE JSON telemetry.",
+    "quickSetup": [
+      "Set HOME_NET and your capture method in /etc/suricata/suricata.yaml so the engine understands what is internal and which interface(s) to monitor.",
+      "Fetch the default rule set with sudo suricata-update, then confirm rules are installed under /var/lib/suricata/rules.",
+      "Restart the service (sudo systemctl restart suricata) and verify Suricata starts cleanly by checking /var/log/suricata/suricata.log.",
+      "Confirm packets are being processed by tailing /var/log/suricata/stats.log and looking for growing counters (processed packets, decoded protocols, drops).",
+      "Validate your configuration and rules before deep tuning: sudo suricata -T -c /etc/suricata/suricata.yaml.",
+      "Trigger a known test alert, then watch fast.log and EVE JSON to confirm you get both human readable alerts and structured events."
+    ],
+    "actions": [
+      "Show build details and enabled capture features: sudo suricata --build-info",
+      "Test configuration and rule loading: sudo suricata -T -c /etc/suricata/suricata.yaml",
+      "Run on an interface in IDS mode: sudo suricata -c /etc/suricata/suricata.yaml -i eth0",
+      "Daemonize when running from a terminal: sudo suricata -D -c /etc/suricata/suricata.yaml -i eth0",
+      "Replay a capture for offline triage: sudo suricata -r traffic.pcap -c /etc/suricata/suricata.yaml",
+      "Keep processing a directory of PCAPs as files arrive: sudo suricata -r /pcaps --pcap-file-continuous -c /etc/suricata/suricata.yaml",
+      "Filter alert events from EVE JSON: sudo tail -f /var/log/suricata/eve.json | jq 'select(.event_type==\"alert\")'",
+      "Reload rules without restarting (socket): sudo suricatasc -c reload-rules",
+      "Reload rules without restarting (signal): sudo kill -USR2 $(pidof suricata)",
+      "Override a simple setting at runtime: sudo suricata --set default-log-dir=/var/tmp -c /etc/suricata/suricata.yaml -i eth0"
+    ],
+    "category": "Detection",
+    "description": "IDS/IPS engine for inspecting network traffic with rules and rich JSON logging.",
+    "overview": {
+      "what": "Suricata is an open source intrusion detection and prevention engine that inspects network traffic in real time. It raises alerts using signature rules and can also produce rich network telemetry as structured events.",
+      "how": "Packets are captured from an interface or replayed from PCAP, decoded into protocol and flow records, then evaluated against rule sets. Output is written to alert logs and to EVE JSON so events can be filtered, shipped to a SIEM, and correlated with other data sources.",
+      "useCases": [
+        "Detect known exploits, malware command and control patterns, and suspicious scanning using signatures.",
+        "Generate DNS, HTTP, TLS, file, and flow telemetry for threat hunting and incident response.",
+        "Run retrospective analysis on packet captures to confirm or triage an incident quickly."
+      ]
+    },
+    "features": [
+      "Signature based detection with rule sets that can be updated and managed.",
+      "Rich telemetry via EVE JSON for alerts, DNS, HTTP, TLS, files, and statistics.",
+      "Multiple output formats including fast.log and structured JSON for automation.",
+      "Configurable capture and performance settings for low to high throughput environments."
+    ],
+    "workflow": [
+      "Capture packets from an interface or pcap input and decode protocols and flows.",
+      "Match traffic against signature rules and track state across sessions.",
+      "Write alerts and metadata to log outputs that you can feed into SIEM or analysis tooling.",
+      "Tune rules and configuration to reduce noise and improve signal for your environment."
+    ],
+    "when": [
+      "You want IDS visibility and structured logs from network traffic",
+      "You are learning detection engineering or blue team triage",
+      "You need to confirm whether a pattern is visible in network telemetry"
+    ],
+    "notes": [
+      "The best results come from tuning HOME_NET and rule selection. Default rule sets are useful, but every network needs tuning to reduce false positives.",
+      "Treat Suricata output as telemetry. Alerts are one output, but protocol metadata is often the real hunting gold.",
+      "Start simple, then scale. Verify capture and logging first, then add performance tuning and integrations."
+    ],
+    "tagline": "Network threat detection with signatures and rich structured event output.",
+    "quickPanel": {
+      "notes": [
+        "Begin with visibility. Confirm packets are being processed and logs are moving before chasing alerts.",
+        "Use EVE JSON for workflows that need automation, correlation, and long term analytics.",
+        "Rule tuning is ongoing. Plan time for triage, suppression, and adding environment specific detection."
+      ],
+      "proTips": [
+        "Use suricata-update regularly so rules stay current, and track changes in a controlled way.",
+        "Tail stats.log when tuning performance. Dropped packets or decode failures show up there early.",
+        "Send EVE JSON into a central log platform so you can correlate Suricata with host logs and identity data."
+      ],
+      "commonMistakes": [
+        "Leaving HOME_NET too broad or too narrow, which creates noise or missed detection.",
+        "Relying only on fast.log. You lose a lot of useful context compared to EVE JSON.",
+        "Enabling every rule without tuning, leading to alert fatigue and poor signal to noise."
+      ],
+      "funFact": "Suricata can output both high level alerts and low level protocol metadata, which makes it useful for both detection and network visibility."
+    },
+    "deepDive": {
+      "sections": [
+        {
+          "title": "From packets to events",
+          "paragraphs": [
+            "Suricata starts with packet capture. It ingests traffic from a live interface or from recorded pcaps, then decodes protocols and tracks flows so it can reason about sessions instead of isolated packets.",
+            "Detection rules operate on this decoded context. Rules can match on payload content, protocol fields, flow direction, and other attributes, which allows meaningful alerts like a specific exploit attempt or suspicious command and control pattern.",
+            "In parallel, Suricata can emit protocol metadata. Even when no signature triggers, those events give you visibility into what happened on the wire, which is essential for threat hunting and incident timelines."
+          ]
+        },
+        {
+          "title": "Rules, updates, and tuning",
+          "paragraphs": [
+            "Rule sets are the detection brain. The default experience often starts with ET Open rules, then evolves into a curated selection based on your environment and your threat model.",
+            "suricata-update helps fetch and manage rule sources and keeps the deployed rules consistent with your configuration. Updates should be treated like software changes: test, deploy, and monitor for new noise.",
+            "Tuning is where value is created. Suppress known benign patterns, disable irrelevant categories, and add custom rules for your assets. This turns generic IDS into environment specific detection."
+          ]
+        },
+        {
+          "title": "Understanding outputs: fast.log versus EVE JSON",
+          "paragraphs": [
+            "fast.log is a human friendly alert log. It is great for quick verification and hands on testing, but it is not ideal for automation because it is not strongly structured.",
+            "EVE JSON is structured event output. It can include alerts, protocol records, file events, and statistics. Because it is JSON, you can filter and transform it with tools like jq and ship it to SIEM platforms with minimal friction.",
+            "A practical approach is to use fast.log for immediate debugging and EVE JSON for everything you want to retain, correlate, and analyze at scale."
+          ]
+        },
+        {
+          "title": "Deployment patterns and performance basics",
+          "paragraphs": [
+            "Most teams start in IDS mode on a single interface with default logging, then expand into multiple sensors, dedicated capture hardware, or inline IPS patterns depending on needs and risk tolerance.",
+            "Performance is about capture reliability. Monitor packet drops, thread behavior, and decode stats. If you miss packets, you miss detection. stats.log and Suricata logs are your early warning signals.",
+            "Keep configurations explicit. Document HOME_NET, rule sources, and output settings, and treat changes as part of your normal change management so detection stays stable and explainable."
+          ]
+        }
+      ]
+    }
+  },
+  "detectionTools": [
+    {
+      "id": "zeek",
+      "name": "Zeek",
+      "desc": "Protocol aware network analysis engine that generates structured telemetry (logs) and supports custom detections through an event driven scripting language.",
+      "category": "Detection",
+      "description": "Network security monitor that analyzes traffic and produces rich, protocol aware logs plus an event driven scripting layer for custom detections.",
+      "overview": {
+        "what": "Zeek observes network traffic and extracts protocol metadata into structured logs such as connections, DNS, HTTP, TLS, and files. Instead of focusing on signatures, it builds high quality telemetry that helps you answer “who talked to whom, when, and how” across many protocols.",
+        "how": "Zeek parses traffic with protocol analyzers. As it recognizes protocol elements, it raises events into its scripting layer and writes logs via its logging framework. You can extend behavior with scripts and packages: add fields, create new logs, raise notices, enrich with threat intel feeds, and tune what Zeek considers interesting.",
+        "useCases": [
+          "Incident response and threat hunting by pivoting through conn, dns, http, ssl, files, and notice logs.",
+          "Building detections that rely on protocol behavior rather than brittle payload signatures.",
+          "Creating long term network baselines and anomaly investigations using consistent, query friendly logs."
+        ]
+      },
+      "quickSetup": [
+        "Place Zeek on a sensor that can see the traffic you care about (SPAN, TAP, or host based capture).",
+        "Start with default scripts and confirm core logs (conn, dns, http, ssl, notice) are being generated.",
+        "Choose an output format and log rotation strategy that fits your pipeline (text or JSON, rotation intervals).",
+        "Integrate with your SIEM or data lake, then add packages or custom scripts for your environment."
+      ],
+      "actions": [
+        "Start with conn.log to map connections, then pivot into protocol specific logs like dns.log and http.log.",
+        "Raise notices for suspicious behaviors and route them to your alerting pipeline.",
+        "Feed threat intelligence indicators into the Intel framework for matching against traffic.",
+        "Enable file analysis to extract metadata and hashes from transferred files.",
+        "Tune logging by filtering logs, adding fields that matter, and adjusting rotation and retention."
+      ],
+      "features": [
+        "Protocol aware logs for many common network protocols, designed for hunting and incident response.",
+        "Event driven scripting language to customize detections and extend Zeek’s outputs.",
+        "Logging framework with flexible rotation, filtering, and optional post processing.",
+        "Notice framework to turn script logic into actionable, structured alerts.",
+        "Intelligence framework for indicator ingestion and matching.",
+        "File analysis framework for metadata extraction across supported protocols.",
+        "Package manager (zkg) to install and manage third party scripts and plugins."
+      ],
+      "workflow": [
+        "Collect traffic on the sensor and validate that timestamps, interfaces, and capture visibility are correct.",
+        "Establish a baseline: review conn.log plus a small set of protocol logs (dns, http, ssl) to learn normal behavior.",
+        "Add hunting pivots: use notice, files, and software logs to increase context around suspicious hosts.",
+        "Implement detections with scripts: subscribe to protocol events, create derived fields, and raise notices for patterns you care about.",
+        "Operationalize: ship logs to your platform, tune filters, and iterate based on false positives and gaps."
+      ],
+      "when": [
+        "You need high quality network telemetry for investigations, not just alerts.",
+        "You want to write detections based on protocol behavior and metadata at scale.",
+        "You are building a SOC pipeline and want consistent logs that work well with search and analytics."
+      ],
+      "notes": [
+        "Zeek is only as good as its visibility. SPAN misconfigurations, asymmetric routing, or missing VLANs can silently break analysis.",
+        "Start small. A handful of well understood logs beats turning on everything and drowning in noise.",
+        "Custom scripting is powerful, but performance and data volume matter. Treat scripts like production code and test changes."
+      ],
+      "quickPanel": {
+        "notes": [
+          "Zeek generates logs by design. Detections come from how you query, enrich, and script that telemetry."
+        ],
+        "proTips": [
+          "Learn conn.log deeply. It is the pivot point for most investigations and joins naturally to other logs.",
+          "Use the Notice framework to standardize alerts and keep your detection logic auditable."
+        ],
+        "commonMistakes": [
+          "Assuming missing detections are a scripting problem when the real issue is sensor visibility or capture loss.",
+          "Turning on too many logs and frameworks on day one, then failing to build a usable baseline.",
+          "Not planning for rotation and ingestion, which leads to data loss or pipeline bottlenecks."
+        ]
+      },
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Why Zeek feels different: telemetry, not signatures",
+            "paragraphs": [
+              "Many tools try to answer “is this bad?” immediately. Zeek’s superpower is answering “what happened?” with high fidelity. It records structured facts about connections and protocols, which lets you search, correlate, and build detections that survive small attacker changes.",
+              "For example, conn.log captures who communicated, when, how long, and over which transport. Protocol logs then add meaning: dns.log shows name resolution behavior, http.log shows methods and URIs, and TLS logs show certificate and handshake metadata. This layered view is the foundation for both hunting and detection engineering."
+            ]
+          },
+          {
+            "title": "Logs as a language: how Zeek writes evidence",
+            "paragraphs": [
+              "Zeek’s logging framework controls what gets written, how it is rotated, and how it can be post processed. Rotation is not just housekeeping. It shapes how your pipeline tails files, how you batch ingest data, and how you keep time aligned during investigations.",
+              "Core logs are intentionally stable. You can rely on them to build dashboards and saved searches. When you need more context, you extend logs by adding fields in scripts or by enabling additional analyzers and packages."
+            ]
+          },
+          {
+            "title": "Event driven scripting: turning protocol parsing into detections",
+            "paragraphs": [
+              "Zeek’s scripting language is event driven. Protocol analyzers raise events as they parse traffic, and your scripts can react in near real time. This is how you build custom detections without writing a full parser yourself.",
+              "A useful mindset is “subscribe, enrich, decide”. Subscribe to an event that represents something meaningful, enrich it with local context or intelligence, then decide whether to log it, tag it, or raise a notice. Keeping those responsibilities separate makes scripts easier to tune and safer to operate."
+            ]
+          },
+          {
+            "title": "Frameworks: Notice, Intel, and File Analysis",
+            "paragraphs": [
+              "Frameworks are reusable building blocks exposed to scripts. The Notice framework gives you a consistent way to emit alerts with the right fields and context. The Intel framework ingests indicators and matches them against observed traffic so enrichment is systematic rather than ad hoc.",
+              "The File Analysis framework is where Zeek becomes particularly useful for investigations. It can identify files transferred over supported protocols, compute hashes, extract metadata, and let you route high value artifacts into deeper analysis workflows."
+            ]
+          },
+          {
+            "title": "Operational reality: visibility, performance, and integration",
+            "paragraphs": [
+              "Zeek can be deployed in many ways, but the operational constraints are always the same: you need reliable traffic visibility, predictable performance, and a log pipeline that will not drop data under load. If packets are missing, analyzers become less confident, and your logs can contain gaps or ambiguous results.",
+              "Treat Zeek as part of a system. Capture, parsing, rotation, shipping, and storage all have to work together. When you get that right, Zeek becomes a long term source of truth for network behavior that scales from day to day monitoring to incident response."
+            ]
+          }
+        ]
+      },
+      "tagline": "Network security monitor that turns packets into high fidelity, structured logs and events."
+    }
+  ],
+  "_meta": {
+    "file": "data/tools.json",
+    "version": 3,
+    "based_on": 2,
+    "updated_ymd": "2026-02-11",
+    "scope": "Task 2 content rewrite: OWASP ZAP, Zeek; Deep Dive only: Wireshark, Burp Suite"
+  }
+}

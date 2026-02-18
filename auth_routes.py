@@ -1,5 +1,6 @@
 import os
 import json
+import re
 from datetime import datetime, timezone
 from functools import wraps
 from user_profile import (
@@ -11,7 +12,7 @@ from user_profile import (
     get_user_rank,
 )
 
-from flask import Blueprint, jsonify, redirect, render_template, request, g, current_app, make_response
+from flask import Blueprint, jsonify, redirect, render_template, request, g, current_app
 from flask_babel import gettext as _
 
 from firebase_admin_init import (
@@ -26,6 +27,23 @@ auth_bp = Blueprint("auth_bp", __name__)
 
 SESSION_COOKIE_NAME = "cb_session"
 SESSION_EXPIRES_DAYS = 14
+
+
+def _is_safe_internal_next(next_path: str) -> bool:
+    candidate = (next_path or "").strip()
+    if not candidate:
+        return False
+    if not candidate.startswith("/"):
+        return False
+    if candidate.startswith("//"):
+        return False
+    if "\\" in candidate:
+        return False
+    if "://" in candidate:
+        return False
+    if re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", candidate.lstrip("/")):
+        return False
+    return True
 
 
 def _is_https_request() -> bool:
@@ -138,7 +156,13 @@ def login_page():
     }
     # Only pass non-empty values; client falls back to inline defaults when missing
     cfg = {k: v for k, v in cfg.items() if v}
-    return render_template("auth/login.html", firebase_config_json=json.dumps(cfg))
+    next_path = (request.args.get("next") or "").strip()
+    safe_next = next_path if _is_safe_internal_next(next_path) else "/dashboard"
+    return render_template(
+        "auth/login.html",
+        firebase_config_json=json.dumps(cfg),
+        login_next=safe_next,
+    )
 
 
 @auth_bp.post("/sessionLogin")

@@ -17,7 +17,7 @@ import os
 import re
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from collections import defaultdict, deque
 from flask import has_request_context
 from flask_babel import get_locale

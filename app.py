@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 from typing import Any, Optional
 from auth_routes import auth_bp, set_current_user_from_session_cookie, api_login_required
 
-from flask import Flask, render_template, request, redirect, url_for, jsonify, abort, g, has_request_context
+from flask import Flask, render_template, request, redirect, url_for, jsonify, abort, g, has_request_context, session
 from flask_babel import Babel, get_locale, gettext as _
 
 _BASE_DIR = os.path.dirname(__file__)
@@ -44,6 +44,7 @@ app.json.ensure_ascii = False
 
 _SUPPORTED_LOCALES = ("en", "sv")
 _LANG_COOKIE_NAME = "cb_lang"
+_LANG_SESSION_KEY = "cb_lang"
 _PORT_DETAILS_SV_CACHE: Optional[dict[int, dict[str, Any]]] = None
 
 
@@ -57,12 +58,15 @@ def _normalize_locale_code(raw: str) -> str:
 
 
 def _select_locale() -> str:
-    saved = _normalize_locale_code(request.cookies.get(_LANG_COOKIE_NAME) or "")
-    if saved:
-        return saved
+    saved_cookie = _normalize_locale_code(request.cookies.get(_LANG_COOKIE_NAME) or "")
+    if saved_cookie:
+        return saved_cookie
 
-    matched = _normalize_locale_code(request.accept_languages.best_match(_SUPPORTED_LOCALES) or "")
-    return matched or "en"
+    saved_session = _normalize_locale_code(session.get(_LANG_SESSION_KEY) or "")
+    if saved_session:
+        return saved_session
+
+    return "en"
 
 
 app.config["BABEL_DEFAULT_LOCALE"] = "en"
@@ -116,6 +120,10 @@ def _inject_profile():
 def _ensure_utf8_html(response):
     if response.mimetype == "text/html":
         response.mimetype_params["charset"] = "utf-8"
+    # Baseline browser hardening headers that do not alter app behavior.
+    response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     return response
 
 
@@ -136,6 +144,9 @@ def set_language(lang_code: str):
     next_path = (request.args.get("next") or "").strip()
     if (not next_path.startswith("/")) or next_path.startswith("//"):
         next_path = "/"
+
+    if app.secret_key:
+        session[_LANG_SESSION_KEY] = chosen
 
     resp = redirect(next_path)
     resp.set_cookie(
@@ -1283,6 +1294,21 @@ def api_ai():
     - chat: page_url, message_text, optional context
     """
 
+    authz = (request.headers.get("Authorization") or "").strip()
+    id_token = ""
+    if authz.lower().startswith("bearer "):
+        id_token = authz[7:].strip()
+    auth_required_message = _("Please log in to use the AI assistant.")
+    if not id_token:
+        return jsonify({"ok": False, "error": {"code": "AUTH_REQUIRED", "message": auth_required_message}}), 401
+    try:
+        decoded = verify_id_token(id_token)
+        user_id = (decoded or {}).get("uid")
+        if not user_id:
+            return jsonify({"ok": False, "error": {"code": "AUTH_REQUIRED", "message": auth_required_message}}), 401
+    except Exception:
+        return jsonify({"ok": False, "error": {"code": "AUTH_REQUIRED", "message": auth_required_message}}), 401
+
     payload = request.get_json(silent=True) or {}
     mode = (payload.get("mode") or "").strip()
     page_url = (payload.get("page_url") or "").strip()
@@ -1330,12 +1356,16 @@ def api_ai():
         resp.status_code = status
 
     except AiAssistantError as e:
-        resp = jsonify({"ok": False, "error": {"code": e.code, "message": e.message}})
-        resp.status_code = e.http_status
+        logger.exception("AI endpoint handled error code=%s status=%s", e.code, e.http_status)
+        if e.code == "bad_mode":
+            resp = jsonify({"ok": False, "error": {"code": "bad_mode", "message": _("Invalid AI mode.")}})
+            resp.status_code = e.http_status
+        else:
+            resp = jsonify({"ok": False, "error": {"code": "server_error", "message": _("AI request failed.")}})
+            resp.status_code = e.http_status
 
-    except Exception as e:  # pragma: no cover
-        if debug:
-            logger.exception("AI endpoint error: %s", str(e))
+    except Exception:  # pragma: no cover
+        logger.exception("AI endpoint error")
         resp = jsonify({"ok": False, "error": {"code": "server_error", "message": _("AI request failed.")}})
         resp.status_code = 500
 
@@ -1437,10 +1467,10 @@ def api_ai_chat():
             debug=debug,
         )
     except AiAssistantError as e:
-        return jsonify({"error": e.message}), e.http_status
+        logger.exception("/api/ai/chat handled error code=%s status=%s", e.code, e.http_status)
+        return jsonify({"error": _("AI request failed.")}), e.http_status
     except Exception:
-        if debug:
-            logger.exception("/api/ai/chat failure")
+        logger.exception("/api/ai/chat failure")
         return jsonify({"error": _("AI request failed.")}), 502
 
     finished = time.time()
@@ -1660,8 +1690,9 @@ def concept_detail(cat: str, cid: str):
             is_ports=False,
         )
 
-    except Exception as e:
-        return render_template("error.html", error=str(e)), 500
+    except Exception:
+        logger.exception("Concept detail failed cat=%s cid=%s", cat, cid)
+        return render_template("error.html", error=_("Something went wrong.")), 500
 
 
 @app.route("/defend")

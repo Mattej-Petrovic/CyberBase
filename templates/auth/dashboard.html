@@ -15,7 +15,7 @@
       <div class="cb-card p-4">
         <h2 class="text-lg font-semibold mb-3">{{ _('Your profile') }}</h2>
         <div class="flex items-center gap-4 mb-3">
-          <img src="/static/avatars/{{ profile.avatar_key }}.png" data-current-avatar="true" alt="{{ _('Avatar') }}" class="w-16 h-16 rounded-full object-cover"/>
+          <img src="/static/images/avatars/{{ profile.avatar_key }}.png" data-current-avatar="true" alt="{{ _('Avatar') }}" class="w-16 h-16 rounded-full object-cover"/>
           <div class="min-w-0">
             {% from '_macros.html' import user_name %}
             <div class="text-base font-semibold truncate" id="currentDisplayName">{{ user_name((profile.display_name or user.email or user.uid), (g.user and g.user.get('admin'))) }}</div>
@@ -47,7 +47,7 @@
           <div id="avatarGrid" class="grid grid-cols-8 gap-2">
             {% for i in range(1,9) %}
               {% set key = 'avatar_%02d' % i %}
-              <img data-key="{{ key }}" src="/static/avatars/{{ key }}.png" alt="{{ key }}" class="h-12 w-12 rounded-full object-cover border {{ 'border-cyan-400 ring-2 ring-cyan-400' if key == profile.avatar_key else 'border-slate-600 hover:border-slate-400' }} cursor-pointer transition" />
+              <img data-key="{{ key }}" src="/static/images/avatars/{{ key }}.png" alt="{{ key }}" class="h-12 w-12 rounded-full object-cover border {{ 'border-cyan-400 ring-2 ring-cyan-400' if key == profile.avatar_key else 'border-slate-600 hover:border-slate-400' }} cursor-pointer transition" />
             {% endfor %}
           </div>
           <button id="saveAvatar" class="mt-3 cb-btn cb-btn-secondary">{{ _('Save Avatar') }}</button>
@@ -63,7 +63,7 @@
               <span class="w-8 text-center text-gray-200">
                 {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}#{{ loop.index }}{% endif %}
               </span>
-              <img src="/static/avatars/{{ u.avatar_key }}.png" class="lb-avatar" alt="{{ _('Avatar') }}"/>
+              <img src="/static/images/avatars/{{ u.avatar_key }}.png" class="lb-avatar" alt="{{ _('Avatar') }}"/>
               {% from '_macros.html' import user_name %}
               <span class="truncate">{{ user_name(u.display_name, u.is_admin) }}{% if u.uid == user.uid %} <span class="lb-chip">{{ _('You') }}</span>{% endif %}</span>
               <span class="ml-auto text-gray-300">{{ _('Best') }} 🔥 {{ u.best_streak }}</span>
@@ -82,7 +82,7 @@
           <div class="mt-4 border-t border-slate-700 pt-3 text-sm text-gray-300">
             <div class="lb-row cb-row-hover">
               <span class="w-8 text-center text-gray-400">#{{ user_rank.rank }}</span>
-              <img src="/static/avatars/{{ user_rank.avatar_key }}.png" class="lb-avatar" alt="{{ _('Avatar') }}"/>
+              <img src="/static/images/avatars/{{ user_rank.avatar_key }}.png" class="lb-avatar" alt="{{ _('Avatar') }}"/>
               {% from '_macros.html' import user_name %}
               <span class="truncate">{{ user_name(user_rank.display_name, user_rank.is_admin) }}</span>
               <span class="ml-auto text-gray-300">{{ _('Best') }} 🔥 {{ user_rank.best_streak }}</span>
@@ -138,7 +138,7 @@
       el.classList.add('cb-alert','cb-alert-success');
       el.textContent = DASH_SAVED;
       const imgs = document.querySelectorAll('img[data-current-avatar="true"]');
-      imgs.forEach(img => img.src = `/static/avatars/${selectedAvatar}.png`);
+      imgs.forEach(img => img.src = `/static/images/avatars/${selectedAvatar}.png`);
     } else {
       el.classList.add('cb-alert','cb-alert-error');
       el.textContent = d.error || DASH_FAILED;

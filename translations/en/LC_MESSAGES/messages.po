@@ -1750,7 +1750,7 @@ msgstr ""
 
 #: templates/auth/login.html:41
 msgid "Create account"
-msgstr "Account"
+msgstr "Create account"
 
 #: templates/auth/login.html:45
 msgid "Forgot password?"

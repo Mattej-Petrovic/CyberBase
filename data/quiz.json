@@ -1,0 +1,4764 @@
+{
+  "_version": 2,
+  "_version_note": "v2 expands each topic to a 30-question bank and supports 10 questions per run randomization.",
+  "quizzes": [
+    {
+      "id": "network-basics",
+      "title": "Network Basics",
+      "questions": [
+        {
+          "q": "Which protocol provides reliable, ordered delivery?",
+          "choices": [
+            "UDP",
+            "TCP",
+            "ICMP",
+            "ARP"
+          ],
+          "answer": 1,
+          "explain": "TCP establishes a connection and ensures ordered delivery.",
+          "type": "mcq"
+        },
+        {
+          "q": "A server exposed on TCP 3389 is most likely offering which service?",
+          "choices": [
+            "SSH",
+            "RDP",
+            "VNC",
+            "Telnet"
+          ],
+          "answer": 1,
+          "explain": "3389/TCP is Remote Desktop Protocol (RDP).",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Users report intermittent name resolution failures. Which logs help most?",
+          "choices": [
+            "Firewall allow logs",
+            "DNS query logs",
+            "Web server access logs",
+            "Endpoint EDR alerts"
+          ],
+          "answer": 1,
+          "explain": "DNS query/response logs show failures, timeouts, and upstream behavior.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which layer does IP operate at in the OSI model?",
+          "choices": [
+            "Transport",
+            "Network",
+            "Data Link",
+            "Application"
+          ],
+          "answer": 1,
+          "explain": "IP is a Layer 3 (Network) protocol.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which protocol is commonly used for time synchronization?",
+          "choices": [
+            "NTP",
+            "SMTP",
+            "SNMP",
+            "DHCP"
+          ],
+          "answer": 0,
+          "explain": "NTP synchronizes time across systems.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which tool shows the route packets take to a host?",
+          "choices": [
+            "ping",
+            "traceroute",
+            "curl",
+            "dig"
+          ],
+          "answer": 1,
+          "explain": "traceroute maps the path hop by hop.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which address class is 10.0.0.0/8?",
+          "choices": [
+            "Private IPv4",
+            "Public IPv4",
+            "Multicast",
+            "Loopback"
+          ],
+          "answer": 0,
+          "explain": "10.0.0.0/8 is private IPv4 address space.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which statement about UDP is true?",
+          "choices": [
+            "It guarantees delivery",
+            "It is connectionless",
+            "It reorders packets",
+            "It performs congestion control"
+          ],
+          "answer": 1,
+          "explain": "UDP is connectionless and does not guarantee delivery.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Latency spikes without packet loss. What do you check first?",
+          "choices": [
+            "DNS servers",
+            "Bandwidth graphs",
+            "Routing loops",
+            "Disk temperature"
+          ],
+          "answer": 1,
+          "explain": "Bandwidth or QoS issues commonly cause latency without loss.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which record type maps names to IPv6 addresses?",
+          "choices": [
+            "A",
+            "AAAA",
+            "CNAME",
+            "MX"
+          ],
+          "answer": 1,
+          "explain": "AAAA records map hostnames to IPv6 addresses.",
+          "type": "mcq"
+        },
+        {
+          "q": "What does a subnet mask (/24) primarily define?",
+          "choices": [
+            "DNS servers",
+            "How many IPs are in a network",
+            "A device MAC address",
+            "Which ports are open"
+          ],
+          "answer": 1,
+          "explain": "CIDR prefix length defines the network size and which IPs are considered local.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which message is used by ARP to ask 'Who has this IP?'",
+          "choices": [
+            "ARP Reply",
+            "ARP Request",
+            "ICMP Echo Reply",
+            "DHCP Offer"
+          ],
+          "answer": 1,
+          "explain": "An ARP Request is broadcast to discover the MAC address for an IP on the local network.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which ICMP type is used by ping to test reachability?",
+          "choices": [
+            "Echo Request",
+            "Time Exceeded",
+            "Destination Unreachable",
+            "Redirect"
+          ],
+          "answer": 0,
+          "explain": "Ping typically uses ICMP Echo Request and Echo Reply.",
+          "type": "mcq"
+        },
+        {
+          "q": "In TCP, which flag is commonly used to start a connection?",
+          "choices": [
+            "RST",
+            "SYN",
+            "FIN",
+            "PSH"
+          ],
+          "answer": 1,
+          "explain": "The TCP three way handshake begins with a SYN.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is the main purpose of NAT in many networks?",
+          "choices": [
+            "Encrypt traffic",
+            "Translate private to public addresses",
+            "Detect malware",
+            "Synchronize time"
+          ],
+          "answer": 1,
+          "explain": "NAT maps internal private addresses to external public addresses (or other address spaces).",
+          "type": "mcq"
+        },
+        {
+          "q": "Which protocol is commonly used for automatic IP address assignment?",
+          "choices": [
+            "DHCP",
+            "SNMP",
+            "SFTP",
+            "BGP"
+          ],
+          "answer": 0,
+          "explain": "DHCP automates addressing and related configuration like DNS and default gateway.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which DNS component typically performs recursion on behalf of clients?",
+          "choices": [
+            "Authoritative name server",
+            "Recursive resolver",
+            "Root zone file",
+            "DHCP relay"
+          ],
+          "answer": 1,
+          "explain": "A recursive resolver queries other servers to resolve a name for the client.",
+          "type": "mcq"
+        },
+        {
+          "q": "What does MTU describe?",
+          "choices": [
+            "Maximum DNS TTL",
+            "Maximum packet size on a link",
+            "Maximum CPU usage",
+            "Maximum port number"
+          ],
+          "answer": 1,
+          "explain": "MTU is the maximum transmission unit, the largest packet size a link can carry without fragmentation.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which mechanism helps avoid IP conflicts on a LAN?",
+          "choices": [
+            "DHCP leases",
+            "TLS certificates",
+            "MAC randomization",
+            "Port knocking"
+          ],
+          "answer": 0,
+          "explain": "DHCP tracks leased addresses and can reduce conflicts compared to manual static assignment.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Users can reach an IP address but not the hostname. What is the best next check?",
+          "choices": [
+            "Verify DNS resolution for the hostname",
+            "Reinstall the operating system",
+            "Disable the firewall permanently",
+            "Replace the network cable on the server"
+          ],
+          "answer": 0,
+          "explain": "If IP works but hostname fails, check DNS resolution (A/AAAA records, resolver, cache).",
+          "type": "scenario"
+        },
+        {
+          "q": "Which OSI layer is responsible for switching frames by MAC address?",
+          "choices": [
+            "Network",
+            "Data Link",
+            "Transport",
+            "Session"
+          ],
+          "answer": 1,
+          "explain": "Switching is a Layer 2 (Data Link) function.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which protocol is typically used to manage routers and switches securely today?",
+          "choices": [
+            "Telnet",
+            "SNMPv1",
+            "SSH",
+            "FTP"
+          ],
+          "answer": 2,
+          "explain": "SSH provides encrypted management access; Telnet and legacy SNMP are often insecure.",
+          "type": "mcq"
+        },
+        {
+          "q": "What does 'default gateway' represent for a host?",
+          "choices": [
+            "The local DNS cache",
+            "The router used to reach other networks",
+            "The MAC address of the host",
+            "The ARP table"
+          ],
+          "answer": 1,
+          "explain": "The default gateway is the next hop router for traffic leaving the local subnet.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which DNS record type is used for mail routing?",
+          "choices": [
+            "TXT",
+            "MX",
+            "PTR",
+            "SRV"
+          ],
+          "answer": 1,
+          "explain": "MX records specify mail exchangers for a domain.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which address range is loopback in IPv4?",
+          "choices": [
+            "169.254.0.0/16",
+            "127.0.0.0/8",
+            "224.0.0.0/4",
+            "192.0.2.0/24"
+          ],
+          "answer": 1,
+          "explain": "127.0.0.0/8 is the loopback range; 127.0.0.1 is commonly used.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is the primary security value of TLS over plain TCP?",
+          "choices": [
+            "Better routing",
+            "Confidentiality and integrity for application data",
+            "Lower latency",
+            "Automatic IP assignment"
+          ],
+          "answer": 1,
+          "explain": "TLS adds encryption and integrity to protect data in transit.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A workstation shows 'limited connectivity' and has an IP in 169.254.0.0/16. Most likely cause?",
+          "choices": [
+            "DNS misconfiguration",
+            "DHCP failure and APIPA fallback",
+            "Correct static configuration",
+            "Firewall blocking outbound HTTPS"
+          ],
+          "answer": 1,
+          "explain": "APIPA addresses often appear when DHCP fails and the host self assigns a link local address.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which routing protocol is commonly used between large networks on the internet?",
+          "choices": [
+            "BGP",
+            "STP",
+            "LLDP",
+            "ARP"
+          ],
+          "answer": 0,
+          "explain": "BGP is the dominant interdomain routing protocol.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is a common benefit of VLANs?",
+          "choices": [
+            "They encrypt traffic by default",
+            "They reduce broadcast domains and segment networks",
+            "They replace firewalls",
+            "They automatically patch systems"
+          ],
+          "answer": 1,
+          "explain": "VLANs segment Layer 2 networks and reduce broadcast scope.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A traceroute shows a sudden jump in latency at one hop, but later hops are normal. Most likely explanation?",
+          "choices": [
+            "That hop deprioritizes ICMP replies",
+            "The path is definitely congested end to end",
+            "DNS is down",
+            "The destination is unreachable"
+          ],
+          "answer": 0,
+          "explain": "Some routers rate limit or deprioritize ICMP, making a hop appear slow even if forwarding is fine.",
+          "type": "scenario"
+        }
+      ]
+    },
+    {
+      "id": "ports",
+      "title": "Ports",
+      "questions": [
+        {
+          "q": "SSH typically listens on which TCP port?",
+          "choices": [
+            "21",
+            "22",
+            "80",
+            "443"
+          ],
+          "answer": 1,
+          "explain": "SSH defaults to TCP 22.",
+          "type": "mcq"
+        },
+        {
+          "q": "HTTPS typically uses which port?",
+          "choices": [
+            "80",
+            "389",
+            "443",
+            "25"
+          ],
+          "answer": 2,
+          "explain": "HTTPS defaults to TCP 443.",
+          "type": "mcq"
+        },
+        {
+          "q": "SMTP submission from clients commonly uses:",
+          "choices": [
+            "25",
+            "110",
+            "123",
+            "587"
+          ],
+          "answer": 3,
+          "explain": "Port 587 is for authenticated SMTP submission.",
+          "type": "mcq"
+        },
+        {
+          "q": "RDP is most often found on:",
+          "choices": [
+            "22",
+            "3389",
+            "5900",
+            "3306"
+          ],
+          "answer": 1,
+          "explain": "RDP uses TCP 3389.",
+          "type": "mcq"
+        },
+        {
+          "q": "MySQL default port is:",
+          "choices": [
+            "1521",
+            "1433",
+            "3306",
+            "5432"
+          ],
+          "answer": 2,
+          "explain": "MySQL/MariaDB default to 3306.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which protocol commonly uses UDP 53?",
+          "choices": [
+            "DNS",
+            "DHCP",
+            "SNMP",
+            "NTP"
+          ],
+          "answer": 0,
+          "explain": "DNS queries commonly use UDP 53.",
+          "type": "mcq"
+        },
+        {
+          "q": "IMAPS uses which port?",
+          "choices": [
+            "110",
+            "143",
+            "993",
+            "995"
+          ],
+          "answer": 2,
+          "explain": "IMAP over TLS is 993.",
+          "type": "mcq"
+        },
+        {
+          "q": "PostgreSQL default port is:",
+          "choices": [
+            "3306",
+            "5432",
+            "1521",
+            "1433"
+          ],
+          "answer": 1,
+          "explain": "PostgreSQL defaults to 5432.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a legacy VPN protocol often avoided today?",
+          "choices": [
+            "PPTP",
+            "IKEv2",
+            "WireGuard",
+            "OpenVPN"
+          ],
+          "answer": 0,
+          "explain": "PPTP is legacy and generally discouraged.",
+          "type": "mcq"
+        },
+        {
+          "q": "Syslog traditionally uses which UDP port?",
+          "choices": [
+            "514",
+            "25",
+            "123",
+            "993"
+          ],
+          "answer": 0,
+          "explain": "Syslog over UDP uses 514 by convention.",
+          "type": "mcq"
+        },
+        {
+          "q": "DNS over TLS (DoT) commonly uses which port?",
+          "choices": [
+            "53",
+            "853",
+            "443",
+            "5353"
+          ],
+          "answer": 1,
+          "explain": "DNS over TLS commonly uses TCP 853.",
+          "type": "mcq"
+        },
+        {
+          "q": "SMB over TCP is typically on which port?",
+          "choices": [
+            "139",
+            "445",
+            "25",
+            "161"
+          ],
+          "answer": 1,
+          "explain": "Modern SMB typically uses TCP 445.",
+          "type": "mcq"
+        },
+        {
+          "q": "Kerberos authentication commonly uses which port?",
+          "choices": [
+            "88",
+            "53",
+            "110",
+            "2049"
+          ],
+          "answer": 0,
+          "explain": "Kerberos typically uses TCP and UDP 88.",
+          "type": "mcq"
+        },
+        {
+          "q": "LDAP typically uses which port (unencrypted)?",
+          "choices": [
+            "389",
+            "636",
+            "143",
+            "3128"
+          ],
+          "answer": 0,
+          "explain": "LDAP is commonly TCP 389; LDAPS is 636.",
+          "type": "mcq"
+        },
+        {
+          "q": "RADIUS authentication commonly uses which UDP port?",
+          "choices": [
+            "1812",
+            "1813",
+            "162",
+            "500"
+          ],
+          "answer": 0,
+          "explain": "RADIUS auth commonly uses UDP 1812; accounting often uses 1813.",
+          "type": "mcq"
+        },
+        {
+          "q": "NFS commonly uses which port?",
+          "choices": [
+            "2049",
+            "3306",
+            "1521",
+            "5900"
+          ],
+          "answer": 0,
+          "explain": "NFS commonly uses TCP 2049 (plus related RPC services in some setups).",
+          "type": "mcq"
+        },
+        {
+          "q": "SNMP polling is typically on which UDP port?",
+          "choices": [
+            "514",
+            "161",
+            "162",
+            "69"
+          ],
+          "answer": 1,
+          "explain": "SNMP polling uses UDP 161; traps are often UDP 162.",
+          "type": "mcq"
+        },
+        {
+          "q": "Syslog over TCP is commonly on:",
+          "choices": [
+            "514",
+            "6514",
+            "443",
+            "587"
+          ],
+          "answer": 1,
+          "explain": "Syslog over TLS often uses TCP 6514 in practice.",
+          "type": "mcq"
+        },
+        {
+          "q": "IPsec IKE (phase 1) commonly uses which UDP port?",
+          "choices": [
+            "500",
+            "4500",
+            "1701",
+            "1194"
+          ],
+          "answer": 0,
+          "explain": "IKE commonly uses UDP 500; NAT T often uses 4500.",
+          "type": "mcq"
+        },
+        {
+          "q": "SIP signaling for VoIP commonly uses:",
+          "choices": [
+            "5060",
+            "5061",
+            "3389",
+            "27017"
+          ],
+          "answer": 0,
+          "explain": "SIP commonly uses 5060; TLS secured SIP often uses 5061.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You see inbound connections to TCP 445 from the internet edge. Best interpretation?",
+          "choices": [
+            "Normal web traffic",
+            "Likely unsafe exposure of SMB",
+            "NTP sync activity",
+            "SMTP submission"
+          ],
+          "answer": 1,
+          "explain": "SMB should generally not be exposed to untrusted networks.",
+          "type": "scenario"
+        },
+        {
+          "q": "IMAP (unencrypted) commonly uses:",
+          "choices": [
+            "143",
+            "993",
+            "995",
+            "110"
+          ],
+          "answer": 0,
+          "explain": "IMAP is 143; IMAPS is 993.",
+          "type": "mcq"
+        },
+        {
+          "q": "POP3S (implicit TLS) commonly uses:",
+          "choices": [
+            "110",
+            "995",
+            "993",
+            "25"
+          ],
+          "answer": 1,
+          "explain": "POP3S uses TCP 995.",
+          "type": "mcq"
+        },
+        {
+          "q": "Remote VNC services are often on:",
+          "choices": [
+            "5900",
+            "3389",
+            "22",
+            "8080"
+          ],
+          "answer": 0,
+          "explain": "VNC commonly uses TCP 5900 (and incremental ports for multiple displays).",
+          "type": "mcq"
+        },
+        {
+          "q": "Microsoft SQL Server commonly uses:",
+          "choices": [
+            "1433",
+            "1521",
+            "3306",
+            "27017"
+          ],
+          "answer": 0,
+          "explain": "MSSQL commonly uses TCP 1433.",
+          "type": "mcq"
+        },
+        {
+          "q": "Oracle Database commonly uses:",
+          "choices": [
+            "1521",
+            "1433",
+            "6379",
+            "9200"
+          ],
+          "answer": 0,
+          "explain": "Oracle commonly uses TCP 1521.",
+          "type": "mcq"
+        },
+        {
+          "q": "Redis commonly uses which port?",
+          "choices": [
+            "27017",
+            "6379",
+            "9200",
+            "5985"
+          ],
+          "answer": 1,
+          "explain": "Redis commonly uses TCP 6379.",
+          "type": "mcq"
+        },
+        {
+          "q": "MongoDB commonly uses which port?",
+          "choices": [
+            "27017",
+            "5432",
+            "8080",
+            "2049"
+          ],
+          "answer": 0,
+          "explain": "MongoDB commonly uses TCP 27017.",
+          "type": "mcq"
+        },
+        {
+          "q": "WinRM commonly uses which ports?",
+          "choices": [
+            "5985 and 5986",
+            "445 and 139",
+            "80 and 443",
+            "500 and 4500"
+          ],
+          "answer": 0,
+          "explain": "WinRM commonly uses 5985 (HTTP) and 5986 (HTTPS).",
+          "type": "mcq"
+        },
+        {
+          "q": "OpenVPN commonly uses which port by default?",
+          "choices": [
+            "1194",
+            "1701",
+            "500",
+            "1812"
+          ],
+          "answer": 0,
+          "explain": "OpenVPN commonly uses UDP 1194 by default.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "frameworks-standards",
+      "title": "Frameworks and Standards",
+      "questions": [
+        {
+          "q": "Which framework has core functions Identify, Protect, Detect, Respond, Recover?",
+          "choices": [
+            "CIS Controls",
+            "NIST CSF",
+            "ISO 27001",
+            "OWASP Top 10"
+          ],
+          "answer": 1,
+          "explain": "NIST CSF defines these five core functions.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which standard defines requirements for an ISMS?",
+          "choices": [
+            "ISO/IEC 27001",
+            "PCI DSS",
+            "SOC 2",
+            "DORA"
+          ],
+          "answer": 0,
+          "explain": "ISO/IEC 27001 defines ISMS requirements.",
+          "type": "mcq"
+        },
+        {
+          "q": "OWASP Top 10 primarily addresses which domain?",
+          "choices": [
+            "Network hardening",
+            "Web application risks",
+            "Identity governance",
+            "Incident response"
+          ],
+          "answer": 1,
+          "explain": "OWASP Top 10 focuses on web app risks.",
+          "type": "mcq"
+        },
+        {
+          "q": "CIS Controls are best described as:",
+          "choices": [
+            "Regulatory law",
+            "Auditing standard",
+            "Prioritized safeguards",
+            "Encryption suite"
+          ],
+          "answer": 2,
+          "explain": "CIS Controls are prioritized defensive safeguards.",
+          "type": "mcq"
+        },
+        {
+          "q": "MITRE ATT&CK organizes:",
+          "choices": [
+            "Encryption algorithms",
+            "Adversary tactics and techniques",
+            "Compliance controls",
+            "Vulnerability scoring"
+          ],
+          "answer": 1,
+          "explain": "ATT&CK catalogs tactics/techniques based on real-world behavior.",
+          "type": "mcq"
+        },
+        {
+          "q": "DORA focuses on:",
+          "choices": [
+            "EU operational resilience for financial entities",
+            "US healthcare privacy",
+            "Payment card data security",
+            "Software licensing"
+          ],
+          "answer": 0,
+          "explain": "DORA is EU legislation on ICT resilience in finance.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a certification standard rather than a control catalog?",
+          "choices": [
+            "NIST CSF",
+            "CIS Controls",
+            "MITRE ATT&CK",
+            "ISO 27001"
+          ],
+          "answer": 3,
+          "explain": "Organizations can certify to ISO/IEC 27001.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which best complements OWASP Top 10 for detailed requirements?",
+          "choices": [
+            "ASVS",
+            "NIST 800-53",
+            "COBIT",
+            "SOX"
+          ],
+          "answer": 0,
+          "explain": "OWASP ASVS provides deeper app security requirements.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which framework provides implementation tiers describing maturity?",
+          "choices": [
+            "CIS Controls",
+            "NIST CSF",
+            "ISO 27001",
+            "OWASP Top 10"
+          ],
+          "answer": 1,
+          "explain": "NIST CSF includes implementation tiers.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which item is a knowledge base rather than a control framework?",
+          "choices": [
+            "CIS Controls",
+            "ISO 27001",
+            "MITRE ATT&CK",
+            "NIST CSF"
+          ],
+          "answer": 2,
+          "explain": "ATT&CK is a knowledge base of adversary behavior.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which framework is a catalog of security and privacy controls for US federal information systems?",
+          "choices": [
+            "NIST SP 800-53",
+            "OWASP Top 10",
+            "MITRE ATT&CK",
+            "ASVS"
+          ],
+          "answer": 0,
+          "explain": "NIST SP 800-53 is a control catalog for security and privacy controls.",
+          "type": "mcq"
+        },
+        {
+          "q": "PCI DSS is primarily concerned with:",
+          "choices": [
+            "Payment cardholder data security",
+            "Email encryption standards",
+            "Router configuration syntax",
+            "Incident response staffing"
+          ],
+          "answer": 0,
+          "explain": "PCI DSS focuses on protecting cardholder data environments.",
+          "type": "mcq"
+        },
+        {
+          "q": "SOC 2 reports are based on:",
+          "choices": [
+            "AICPA Trust Services Criteria",
+            "ISO 27002 clauses",
+            "MITRE ATT&CK tactics",
+            "CIS Benchmarks only"
+          ],
+          "answer": 0,
+          "explain": "SOC 2 uses the AICPA Trust Services Criteria as the basis for evaluation.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which document is best described as a prioritized set of practical safeguards rather than a certification standard?",
+          "choices": [
+            "CIS Controls",
+            "ISO/IEC 27001",
+            "GDPR",
+            "SOX"
+          ],
+          "answer": 0,
+          "explain": "CIS Controls provide prioritized safeguards; ISO 27001 is a certifiable management system standard.",
+          "type": "mcq"
+        },
+        {
+          "q": "MITRE ATT&CK is most useful for:",
+          "choices": [
+            "Mapping detections to adversary behavior",
+            "Selecting encryption key sizes",
+            "Defining payroll rules",
+            "Configuring DHCP scopes"
+          ],
+          "answer": 0,
+          "explain": "ATT&CK provides a common language to describe adversary techniques and map detections and coverage.",
+          "type": "mcq"
+        },
+        {
+          "q": "NIST CSF 'Profiles' are used to:",
+          "choices": [
+            "Define target and current states for cybersecurity outcomes",
+            "Encrypt traffic end to end",
+            "Replace vulnerability scanning",
+            "Generate passwords"
+          ],
+          "answer": 0,
+          "explain": "Profiles describe current and target outcomes for a given context.",
+          "type": "mcq"
+        },
+        {
+          "q": "ISO/IEC 27002 is best described as:",
+          "choices": [
+            "A guidance catalog of information security controls",
+            "A certification audit report",
+            "A vulnerability database",
+            "A malware analysis framework"
+          ],
+          "answer": 0,
+          "explain": "ISO 27002 provides guidance for selecting and implementing controls.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a common reason organizations adopt CIS Benchmarks?",
+          "choices": [
+            "Hardening configuration guidance for specific technologies",
+            "Automatic incident response",
+            "Real-time packet capture",
+            "Phishing simulation only"
+          ],
+          "answer": 0,
+          "explain": "CIS Benchmarks provide configuration hardening guidance for specific systems and products.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A customer asks for evidence of security controls without requiring ISO certification. A common deliverable is:",
+          "choices": [
+            "SOC 2 Type II report",
+            "An ARP table export",
+            "A port scan screenshot only",
+            "A single password policy statement"
+          ],
+          "answer": 0,
+          "explain": "SOC 2 Type II is commonly used to provide assurance evidence over a period of time.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which statement about compliance vs security is most accurate?",
+          "choices": [
+            "Compliance guarantees strong security",
+            "Compliance can help structure work but does not guarantee security",
+            "Security is only about passing audits",
+            "Security means disabling all access"
+          ],
+          "answer": 1,
+          "explain": "Compliance frameworks can guide efforts, but security outcomes depend on effective implementation and risk management.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which framework focuses on web application risk awareness rather than governance?",
+          "choices": [
+            "OWASP Top 10",
+            "ISO 27001",
+            "NIST CSF",
+            "DORA"
+          ],
+          "answer": 0,
+          "explain": "OWASP Top 10 is an awareness list for web app risks.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which framework is best described as outcome-based rather than control prescriptive?",
+          "choices": [
+            "NIST CSF",
+            "CIS Controls",
+            "PCI DSS",
+            "ISO 27001 Annex A"
+          ],
+          "answer": 0,
+          "explain": "NIST CSF focuses on outcomes and functions; it is less prescriptive than control catalogs.",
+          "type": "mcq"
+        },
+        {
+          "q": "A 'policy' in an ISMS context is typically:",
+          "choices": [
+            "A high-level statement of intent and requirements",
+            "A firewall rule list",
+            "A packet capture",
+            "A vulnerability signature"
+          ],
+          "answer": 0,
+          "explain": "Policies set direction and requirements; procedures and configs implement them.",
+          "type": "mcq"
+        },
+        {
+          "q": "Risk assessments in ISO 27001 primarily drive:",
+          "choices": [
+            "Which controls to select and prioritize",
+            "Which ports to open on every host",
+            "Which cipher suite to hardcode",
+            "How to format log files"
+          ],
+          "answer": 0,
+          "explain": "Risk assessment results drive selection and prioritization of controls.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a typical difference between SOC 2 Type I and Type II?",
+          "choices": [
+            "Type I covers design at a point in time; Type II covers operating effectiveness over a period",
+            "Type I is for networks; Type II is for apps",
+            "Type II has no controls",
+            "They are identical"
+          ],
+          "answer": 0,
+          "explain": "Type I is a snapshot; Type II tests over a period.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Your team wants a lightweight starting point for basic cyber hygiene. A common baseline is:",
+          "choices": [
+            "CIS Implementation Group 1 style controls",
+            "A custom cryptography algorithm",
+            "Disabling all logs",
+            "Only a yearly penetration test"
+          ],
+          "answer": 0,
+          "explain": "CIS IG1 is commonly used as a practical baseline for basic hygiene.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which concept best matches 'security outcomes mapped to business context'?",
+          "choices": [
+            "NIST CSF Profiles",
+            "Port mapping",
+            "ARP poisoning",
+            "Key stretching"
+          ],
+          "answer": 0,
+          "explain": "CSF Profiles align cybersecurity outcomes to a given business context.",
+          "type": "mcq"
+        },
+        {
+          "q": "A 'control objective' is best described as:",
+          "choices": [
+            "The purpose the control should achieve",
+            "A specific command line flag",
+            "A list of CVEs",
+            "A firewall port number"
+          ],
+          "answer": 0,
+          "explain": "Control objectives describe intended outcomes, while implementations can vary.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which item is most directly aimed at improving operational resilience in certain financial entities within the EU?",
+          "choices": [
+            "DORA",
+            "OWASP ASVS",
+            "MITRE ATT&CK",
+            "CIS Benchmarks"
+          ],
+          "answer": 0,
+          "explain": "DORA addresses ICT risk management and operational resilience for the financial sector.",
+          "type": "mcq"
+        },
+        {
+          "q": "ASVS is best described as:",
+          "choices": [
+            "A set of detailed web app security requirements by assurance level",
+            "A malware family taxonomy",
+            "A network routing standard",
+            "A password cracking tool"
+          ],
+          "answer": 0,
+          "explain": "OWASP ASVS provides detailed web application security requirements.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "principles-identity",
+      "title": "Principles and Identity",
+      "questions": [
+        {
+          "q": "Zero Trust emphasizes:",
+          "choices": [
+            "Perimeter trust",
+            "Implicit trust",
+            "Always verify",
+            "No logging"
+          ],
+          "answer": 2,
+          "explain": "Zero Trust: never trust, always verify.",
+          "type": "mcq"
+        },
+        {
+          "q": "Least privilege means:",
+          "choices": [
+            "Deny admin logins",
+            "Grant only necessary access",
+            "Use public Wi‑Fi",
+            "Disable TLS"
+          ],
+          "answer": 1,
+          "explain": "Only the minimum necessary permissions should be granted.",
+          "type": "mcq"
+        },
+        {
+          "q": "AAA stands for:",
+          "choices": [
+            "Authentication, Authorization, Accounting",
+            "Assess, Act, Audit",
+            "Apply, Approve, Archive",
+            "Admin, Access, Audit"
+          ],
+          "answer": 0,
+          "explain": "AAA is Authentication, Authorization, Accounting.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a phishing‑resistant MFA method?",
+          "choices": [
+            "SMS",
+            "Email link",
+            "WebAuthn/passkeys",
+            "TOTP in email"
+          ],
+          "answer": 2,
+          "explain": "WebAuthn/passkeys provide strong phishing resistance.",
+          "type": "mcq"
+        },
+        {
+          "q": "IAM typically manages:",
+          "choices": [
+            "Code deployments",
+            "Digital identities and access",
+            "Datacenter cooling",
+            "TLS handshakes"
+          ],
+          "answer": 1,
+          "explain": "IAM is for identity lifecycle and access control.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A vendor needs temporary access to one resource. Best approach?",
+          "choices": [
+            "Permanent admin role",
+            "Shared credentials",
+            "Just‑in‑time least privilege",
+            "Disable logging"
+          ],
+          "answer": 2,
+          "explain": "Grant scoped, time‑bound access aligned with least privilege.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which factor category is a fingerprint?",
+          "choices": [
+            "Knowledge",
+            "Possession",
+            "Inherence",
+            "Location"
+          ],
+          "answer": 2,
+          "explain": "Biometrics fall under inherence factors.",
+          "type": "mcq"
+        },
+        {
+          "q": "Service accounts should:",
+          "choices": [
+            "Use shared passwords",
+            "Have broad admin by default",
+            "Use scoped permissions",
+            "Rotate yearly at most"
+          ],
+          "answer": 2,
+          "explain": "Use scoped permissions and avoid shared creds.",
+          "type": "mcq"
+        },
+        {
+          "q": "Centralized SSO reduces:",
+          "choices": [
+            "Password reuse risk",
+            "Network latency",
+            "TLS handshake time",
+            "Disk I/O"
+          ],
+          "answer": 0,
+          "explain": "SSO and federation can reduce password sprawl.",
+          "type": "mcq"
+        },
+        {
+          "q": "Access reviews help:",
+          "choices": [
+            "Fix kernel bugs",
+            "Validate entitlements",
+            "Reduce packet loss",
+            "Encrypt disks"
+          ],
+          "answer": 1,
+          "explain": "Periodic reviews validate that access is appropriate.",
+          "type": "mcq"
+        },
+        {
+          "q": "RBAC stands for:",
+          "choices": [
+            "Risk Based Access Control",
+            "Role Based Access Control",
+            "Resource Based Access Control",
+            "Rule Based Account Control"
+          ],
+          "answer": 1,
+          "explain": "RBAC assigns permissions to roles and roles to users.",
+          "type": "mcq"
+        },
+        {
+          "q": "ABAC is best described as:",
+          "choices": [
+            "Access based on attributes and policy evaluation",
+            "Access based only on group membership",
+            "A password hashing algorithm",
+            "A network segmentation protocol"
+          ],
+          "answer": 0,
+          "explain": "ABAC uses attributes (user, resource, context) evaluated against policy.",
+          "type": "mcq"
+        },
+        {
+          "q": "A common benefit of using passkeys/WebAuthn is:",
+          "choices": [
+            "They are easier to phish",
+            "They reduce phishing and password reuse risks",
+            "They require shared passwords",
+            "They disable MFA"
+          ],
+          "answer": 1,
+          "explain": "Passkeys are phishing resistant and reduce reliance on shared secrets.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which token type is commonly used with OAuth 2.0 / OIDC?",
+          "choices": [
+            "JWT",
+            "PCAP",
+            "SYSLOG",
+            "CSV"
+          ],
+          "answer": 0,
+          "explain": "JWT is a common token format for access and ID tokens.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: An engineer needs admin rights for 30 minutes to apply a change. Best approach?",
+          "choices": [
+            "Add them to Domain Admins permanently",
+            "Use just in time elevation with approval and logging",
+            "Share the admin password in chat",
+            "Disable MFA for speed"
+          ],
+          "answer": 1,
+          "explain": "Time bound elevation with approvals and auditing reduces standing privilege.",
+          "type": "scenario"
+        },
+        {
+          "q": "A key reason to avoid shared accounts is:",
+          "choices": [
+            "They improve accountability",
+            "They reduce audit logging",
+            "They remove individual attribution",
+            "They enable better MFA"
+          ],
+          "answer": 2,
+          "explain": "Shared accounts break attribution and make investigations and revocation harder.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is an example of 'something you have' MFA?",
+          "choices": [
+            "A password",
+            "A hardware token",
+            "A fingerprint",
+            "A PIN"
+          ],
+          "answer": 1,
+          "explain": "A token or device is a possession factor.",
+          "type": "mcq"
+        },
+        {
+          "q": "Federation (SSO) typically relies on protocols like:",
+          "choices": [
+            "SAML or OIDC",
+            "ARP or ICMP",
+            "FTP or Telnet",
+            "BGP or OSPF"
+          ],
+          "answer": 0,
+          "explain": "SAML and OIDC are common federation protocols.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is a practical way to reduce session hijacking risk for web apps?",
+          "choices": [
+            "Use long lived cookies without flags",
+            "Use secure, httpOnly cookies with short lifetimes and rotation",
+            "Disable TLS",
+            "Use shared admin accounts"
+          ],
+          "answer": 1,
+          "explain": "Secure cookie flags and shorter lifetimes reduce exposure, and rotation limits impact.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a common goal of Privileged Access Management (PAM)?",
+          "choices": [
+            "Give all users admin rights",
+            "Control and monitor privileged sessions and credentials",
+            "Disable logging",
+            "Increase DNS TTL"
+          ],
+          "answer": 1,
+          "explain": "PAM limits, monitors, and secures privileged access.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A user reports MFA prompts they did not initiate. Best next step?",
+          "choices": [
+            "Ignore it",
+            "Treat as possible credential compromise and reset sessions and credentials",
+            "Disable MFA for the user",
+            "Whitelist the source IP permanently"
+          ],
+          "answer": 1,
+          "explain": "Unexpected MFA prompts can indicate stolen credentials and push fatigue attempts.",
+          "type": "scenario"
+        },
+        {
+          "q": "What does 'account lifecycle' include in IAM?",
+          "choices": [
+            "Create, modify, disable, and delete identities and access",
+            "Only password resets",
+            "Only firewall rules",
+            "Only incident tickets"
+          ],
+          "answer": 0,
+          "explain": "Lifecycle includes joiner mover leaver processes and access changes.",
+          "type": "mcq"
+        },
+        {
+          "q": "A common control to reduce lateral movement is:",
+          "choices": [
+            "Reuse local admin passwords everywhere",
+            "Use unique local admin credentials or LAPS style management",
+            "Disable audit logs",
+            "Use plaintext LDAP"
+          ],
+          "answer": 1,
+          "explain": "Unique local admin secrets reduce pass-the-hash and lateral movement.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is the main security risk of long lived API keys?",
+          "choices": [
+            "They expire too quickly",
+            "They can be stolen and used silently for long periods",
+            "They prevent automation",
+            "They force MFA every request"
+          ],
+          "answer": 1,
+          "explain": "Long lived keys increase the window for undetected misuse.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which approach best supports 'deny by default' in access design?",
+          "choices": [
+            "Grant broad roles and remove later",
+            "Start with minimal permissions and add as needed",
+            "Share a privileged account",
+            "Disable auditing"
+          ],
+          "answer": 1,
+          "explain": "Start minimal and expand based on verified need.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A contractor leaves the company today. Best practice is to:",
+          "choices": [
+            "Wait for the next quarterly review",
+            "Disable the account and revoke active sessions promptly",
+            "Keep access for convenience",
+            "Only change the email password"
+          ],
+          "answer": 1,
+          "explain": "Prompt deprovisioning and session revocation reduce risk.",
+          "type": "scenario"
+        },
+        {
+          "q": "Conditional access policies commonly evaluate signals like:",
+          "choices": [
+            "Disk health only",
+            "Device posture, location, risk, and MFA",
+            "CPU cache size",
+            "Printer queue length"
+          ],
+          "answer": 1,
+          "explain": "Modern conditional access often uses device and risk signals.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is the benefit of centralized audit logs for identity systems?",
+          "choices": [
+            "They reduce the need for encryption",
+            "They enable investigations across services with consistent identity context",
+            "They make passwords unnecessary",
+            "They stop all phishing"
+          ],
+          "answer": 1,
+          "explain": "Central logs improve detection and response by correlating identity events.",
+          "type": "mcq"
+        },
+        {
+          "q": "A 'break glass' account should typically be:",
+          "choices": [
+            "Used daily by admins",
+            "Highly protected, monitored, and used only for emergencies",
+            "Shared widely",
+            "Without MFA"
+          ],
+          "answer": 1,
+          "explain": "Break glass accounts are emergency use only and should be tightly controlled.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a good practice for service account authentication?",
+          "choices": [
+            "Use interactive logins",
+            "Prefer workload identity or certificates over static passwords",
+            "Disable key rotation",
+            "Reuse human credentials"
+          ],
+          "answer": 1,
+          "explain": "Workload identities and certificates reduce exposure compared to static shared passwords.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "command-basics",
+      "title": "Command Reference Basics",
+      "questions": [
+        {
+          "q": "In examples, angle brackets like <path> indicate:",
+          "choices": [
+            "Optional flag",
+            "Literal text",
+            "Replaceable value",
+            "Comment"
+          ],
+          "answer": 2,
+          "explain": "Angle brackets denote placeholders to replace.",
+          "type": "mcq"
+        },
+        {
+          "q": "Square brackets like [options] generally indicate:",
+          "choices": [
+            "Mandatory value",
+            "Optional parts",
+            "Comments",
+            "Deprecated flags"
+          ],
+          "answer": 1,
+          "explain": "Square brackets commonly show optional segments.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which tool resolves DNS names?",
+          "choices": [
+            "curl",
+            "dig",
+            "ssh",
+            "lsof"
+          ],
+          "answer": 1,
+          "explain": "dig performs DNS lookups.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which flag pattern usually maps ports with docker run?",
+          "choices": [
+            "-v host:container",
+            "-p host:container",
+            "-e key=value",
+            "-u user"
+          ],
+          "answer": 1,
+          "explain": "-p HOST:CONTAINER maps ports.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command follows HTTP redirects?",
+          "choices": [
+            "curl -L",
+            "curl -I",
+            "curl -X",
+            "curl -d"
+          ],
+          "answer": 0,
+          "explain": "-L follows redirects.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which flag shows service versions in nmap?",
+          "choices": [
+            "-sV",
+            "-A",
+            "-p",
+            "-O"
+          ],
+          "answer": 0,
+          "explain": "-sV probes for service/version.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which shows listening sockets with processes?",
+          "choices": [
+            "ss -tulpn",
+            "ping -n",
+            "traceroute -n",
+            "lsof +D"
+          ],
+          "answer": 0,
+          "explain": "ss -tulpn shows TCP/UDP listening with PIDs.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command prints headers only?",
+          "choices": [
+            "curl -I",
+            "curl -L",
+            "curl -d",
+            "curl -X"
+          ],
+          "answer": 0,
+          "explain": "-I fetches headers only.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You need container logs with timestamps.",
+          "choices": [
+            "docker logs -t <container>",
+            "docker ps",
+            "docker images",
+            "docker build"
+          ],
+          "answer": 0,
+          "explain": "-t adds timestamps in docker logs.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which command lists all containers including stopped?",
+          "choices": [
+            "docker ps",
+            "docker ps -a",
+            "docker logs",
+            "docker start"
+          ],
+          "answer": 1,
+          "explain": "-a shows all containers.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command is commonly used to view the end of a log file in real time?",
+          "choices": [
+            "tail -f /var/log/syslog",
+            "cat /var/log/syslog",
+            "ls -la /var/log",
+            "mkdir /var/log/syslog"
+          ],
+          "answer": 0,
+          "explain": "tail -f follows new lines appended to a file.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command searches text for a pattern?",
+          "choices": [
+            "grep 'error' file.log",
+            "cp file.log backup.log",
+            "mv file.log /tmp",
+            "chmod 600 file.log"
+          ],
+          "answer": 0,
+          "explain": "grep is used for pattern searching.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command shows running processes?",
+          "choices": [
+            "ps aux",
+            "pwd",
+            "mkdir",
+            "whoami"
+          ],
+          "answer": 0,
+          "explain": "ps aux lists processes and their details.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command changes file permissions?",
+          "choices": [
+            "chmod",
+            "chown",
+            "tar",
+            "df"
+          ],
+          "answer": 0,
+          "explain": "chmod sets permissions on files and directories.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command shows disk usage by filesystem?",
+          "choices": [
+            "df -h",
+            "du -s",
+            "free -m",
+            "uname -a"
+          ],
+          "answer": 0,
+          "explain": "df reports filesystem usage; -h makes it human readable.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command shows current user identity and groups?",
+          "choices": [
+            "id",
+            "uptime",
+            "date",
+            "echo"
+          ],
+          "answer": 0,
+          "explain": "id prints UID, GID, and group memberships.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command displays recent systemd journal entries for a service?",
+          "choices": [
+            "journalctl -u ssh",
+            "systemctl edit ssh",
+            "cat /etc/systemd/system/ssh.service",
+            "killall ssh"
+          ],
+          "answer": 0,
+          "explain": "journalctl -u shows logs for a specific unit.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command tests TCP connectivity to a host and port (common utility)?",
+          "choices": [
+            "nc -vz host 443",
+            "dig host",
+            "ps host",
+            "chmod host"
+          ],
+          "answer": 0,
+          "explain": "netcat can test ports with -vz in many builds.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You need to find which process is bound to TCP 8080. Best command?",
+          "choices": [
+            "ss -ltnp | grep :8080",
+            "cat /etc/passwd",
+            "df -h",
+            "ping -c 1 8080"
+          ],
+          "answer": 0,
+          "explain": "ss can show listening TCP sockets with the owning process (PID/program).",
+          "type": "scenario"
+        },
+        {
+          "q": "Which tool captures network packets on an interface?",
+          "choices": [
+            "tcpdump",
+            "nano",
+            "find",
+            "chmod"
+          ],
+          "answer": 0,
+          "explain": "tcpdump captures packets for troubleshooting and analysis.",
+          "type": "mcq"
+        },
+        {
+          "q": "In command docs, '| grep' is commonly used to:",
+          "choices": [
+            "Encrypt output",
+            "Pipe output into a filter",
+            "Delete files",
+            "Reboot the system"
+          ],
+          "answer": 1,
+          "explain": "A pipe passes stdout from one command to another for filtering or processing.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command displays IP addresses on Linux (modern iproute2)?",
+          "choices": [
+            "ip addr",
+            "ifconfig",
+            "net view",
+            "route print"
+          ],
+          "answer": 0,
+          "explain": "ip addr shows interface addresses; ifconfig may be absent on minimal systems.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command shows listening and established sockets on Linux?",
+          "choices": [
+            "ss -tunap",
+            "cd -tunap",
+            "ls -tunap",
+            "rm -tunap"
+          ],
+          "answer": 0,
+          "explain": "ss shows sockets; flags select TCP/UDP and show processes.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A command returns 'permission denied' reading a log. Best next step?",
+          "choices": [
+            "Run it with appropriate privileges (sudo) and verify access is justified",
+            "Delete the log file",
+            "Disable auditing",
+            "Change the system clock"
+          ],
+          "answer": 0,
+          "explain": "Use least privilege: elevate only if needed and appropriate.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which command searches for files by name under a directory?",
+          "choices": [
+            "find /var/log -name '*.log'",
+            "grep /var/log -name '*.log'",
+            "ls /var/log -name '*.log'",
+            "cat /var/log -name '*.log'"
+          ],
+          "answer": 0,
+          "explain": "find searches directories for files by criteria like name.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command prints the current working directory?",
+          "choices": [
+            "pwd",
+            "ps",
+            "who",
+            "wc"
+          ],
+          "answer": 0,
+          "explain": "pwd prints the current directory path.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command shows system uptime and load averages?",
+          "choices": [
+            "uptime",
+            "uname",
+            "umask",
+            "usermod"
+          ],
+          "answer": 0,
+          "explain": "uptime prints time up and load averages.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is a common safe way to test a command before applying it widely?",
+          "choices": [
+            "Run it on production for all hosts immediately",
+            "Test on a non production system and document expected output",
+            "Disable logging first",
+            "Hardcode secrets in the command"
+          ],
+          "answer": 1,
+          "explain": "Validate on a safe environment first and document expected results.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command shows the last logged in users (on many Linux systems)?",
+          "choices": [
+            "last",
+            "ls",
+            "less",
+            "ln"
+          ],
+          "answer": 0,
+          "explain": "last reads wtmp to show login history.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which command can show active users and their terminals?",
+          "choices": [
+            "who",
+            "touch",
+            "tar",
+            "tee"
+          ],
+          "answer": 0,
+          "explain": "who shows currently logged in users.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "detection-logging",
+      "title": "Detection and Logging",
+      "questions": [
+        {
+          "q": "Which logs best detect password spraying?",
+          "choices": [
+            "DNS logs",
+            "Auth logs",
+            "Web server access logs",
+            "Package manager logs"
+          ],
+          "answer": 1,
+          "explain": "Auth logs show repeated failures across many users.",
+          "type": "mcq"
+        },
+        {
+          "q": "A SIEM is mainly used to:",
+          "choices": [
+            "Compile code",
+            "Ingest, normalize, and correlate events",
+            "Manage TLS certificates",
+            "Allocate IPs"
+          ],
+          "answer": 1,
+          "explain": "A SIEM ingests and correlates security events.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which can indicate brute-force?",
+          "choices": [
+            "Many failures from one IP",
+            "Single success login",
+            "Short DHCP leases",
+            "High CPU"
+          ],
+          "answer": 0,
+          "explain": "Burst of failures from one source suggests brute-force.",
+          "type": "mcq"
+        },
+        {
+          "q": "DNS logs can help detect:",
+          "choices": [
+            "Privilege escalation",
+            "Tunneling/exfiltration patterns",
+            "Disk failures",
+            "Kernel panics"
+          ],
+          "answer": 1,
+          "explain": "Odd domains/frequencies can indicate tunneling/exfil.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You see WAF SQLi alerts and auth failures from same IP.",
+          "choices": [
+            "Ignore; different sources",
+            "Likely benign crawler",
+            "Increase alert threshold",
+            "Investigate as correlated activity"
+          ],
+          "answer": 3,
+          "explain": "Correlation raises confidence of malicious activity.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which improves log reliability vs UDP syslog?",
+          "choices": [
+            "TCP or TLS syslog",
+            "Shorter messages",
+            "Randomized ports",
+            "Less logging"
+          ],
+          "answer": 0,
+          "explain": "TCP/TLS improves delivery guarantees.",
+          "type": "mcq"
+        },
+        {
+          "q": "A practical allowlist often includes:",
+          "choices": [
+            "Health endpoints",
+            "All admin IPs",
+            "All local users",
+            "All ports"
+          ],
+          "answer": 0,
+          "explain": "Health checks and internal ranges can be allowlisted.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which metric helps detect scanning?",
+          "choices": [
+            "Unique destination ports per source",
+            "Disk write latency",
+            "CPU context switches",
+            "Open file handles"
+          ],
+          "answer": 0,
+          "explain": "Many dest ports from one source suggests scanning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Correlating events over time windows helps:",
+          "choices": [
+            "Reduce false positives",
+            "Speed up disks",
+            "Encrypt logs",
+            "Patch kernels"
+          ],
+          "answer": 0,
+          "explain": "Time correlation increases fidelity of detections.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: After 10 failures, a success from same IP.",
+          "choices": [
+            "Likely normal user",
+            "Potential compromise",
+            "DNS issue",
+            "Disk quota"
+          ],
+          "answer": 1,
+          "explain": "Fail→success from same IP is suspicious.",
+          "type": "scenario"
+        },
+        {
+          "q": "What is the most important prerequisite for reliable timelines across log sources?",
+          "choices": [
+            "High CPU",
+            "Time synchronization (NTP) across systems",
+            "More RAM",
+            "Shorter hostnames"
+          ],
+          "answer": 1,
+          "explain": "Consistent time (NTP) is critical for correlating events.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which field is most helpful for correlating user activity across services?",
+          "choices": [
+            "Wallpaper name",
+            "User or principal identifier",
+            "CPU model",
+            "Monitor resolution"
+          ],
+          "answer": 1,
+          "explain": "User or principal identifiers link actions across systems.",
+          "type": "mcq"
+        },
+        {
+          "q": "A log 'normalization' step primarily aims to:",
+          "choices": [
+            "Remove encryption",
+            "Convert differing formats into consistent fields",
+            "Disable retention",
+            "Increase latency"
+          ],
+          "answer": 1,
+          "explain": "Normalization makes cross-source searches and detections easier and more consistent.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is a common failure mode when logging is enabled but not monitored?",
+          "choices": [
+            "Higher accuracy",
+            "Alert fatigue or blind spots due to no review",
+            "Fewer events",
+            "Automatic incident containment"
+          ],
+          "answer": 1,
+          "explain": "Logs without review and alerts often create blind spots.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Your SIEM shows a spike in auth failures after a password policy change. Best first action?",
+          "choices": [
+            "Assume an attack and isolate all users",
+            "Validate if the change caused legitimate failures and adjust detections accordingly",
+            "Disable auth logging",
+            "Turn off MFA"
+          ],
+          "answer": 1,
+          "explain": "Policy changes can create benign spikes; validate context before escalating.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which detection approach is best for finding rare but high impact events?",
+          "choices": [
+            "Only static thresholds",
+            "Baselining and anomaly detection with context",
+            "Disabling noisy sources",
+            "Ignoring outliers"
+          ],
+          "answer": 1,
+          "explain": "Baselines help identify abnormal behavior when contextualized.",
+          "type": "mcq"
+        },
+        {
+          "q": "A 'key' label on events is useful because it:",
+          "choices": [
+            "Encrypts the event",
+            "Groups related events for searching and reporting",
+            "Stops log shipping",
+            "Hides the hostname"
+          ],
+          "answer": 1,
+          "explain": "Keys and tags support fast filtering and reporting.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is a strong reason to log both 'allowed' and 'blocked' firewall events?",
+          "choices": [
+            "It doubles storage without benefit",
+            "Allowed logs show successful connections for investigations and detection",
+            "Blocked logs are always enough",
+            "It makes encryption unnecessary"
+          ],
+          "answer": 1,
+          "explain": "Allowed connections often matter most when tracing successful access and lateral movement.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You find many DNS queries for random looking subdomains to one domain. Best next step?",
+          "choices": [
+            "Ignore because DNS is always noisy",
+            "Check for tunneling patterns and correlate with endpoint and proxy logs",
+            "Disable DNS logging",
+            "Block all DNS"
+          ],
+          "answer": 1,
+          "explain": "Random high volume subdomains can indicate DGA or tunneling; correlation improves confidence.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which data source most directly answers 'what process started this network connection' on endpoints?",
+          "choices": [
+            "EDR telemetry or endpoint audit logs",
+            "Router syslog only",
+            "DNS cache only",
+            "A VLAN map"
+          ],
+          "answer": 0,
+          "explain": "Endpoint telemetry links network connections to processes and users.",
+          "type": "mcq"
+        },
+        {
+          "q": "A well designed detection rule should include:",
+          "choices": [
+            "Only a single indicator",
+            "Clear intent, scope, and expected false positives",
+            "No documentation",
+            "No tuning"
+          ],
+          "answer": 1,
+          "explain": "Good detections are documented and tuned with known false positives.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which concept best describes 'collecting just enough logs to support investigations without drowning'?",
+          "choices": [
+            "Least privilege",
+            "Signal to noise optimization",
+            "Key stretching",
+            "Overfitting"
+          ],
+          "answer": 1,
+          "explain": "Aim for high value signals and manageable noise levels.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Your logging pipeline drops events during peak hours. What is a practical mitigation?",
+          "choices": [
+            "Reduce buffering and retry",
+            "Add buffering and backpressure, and monitor ingestion health",
+            "Disable logs",
+            "Change all timestamps"
+          ],
+          "answer": 1,
+          "explain": "Buffering, backpressure, and monitoring ingestion health improves resilience.",
+          "type": "scenario"
+        },
+        {
+          "q": "Why is log integrity important?",
+          "choices": [
+            "It reduces CPU usage",
+            "It helps prove logs were not tampered with",
+            "It makes DNS faster",
+            "It increases Wi-Fi range"
+          ],
+          "answer": 1,
+          "explain": "Integrity controls and access restriction reduce tampering risk.",
+          "type": "mcq"
+        },
+        {
+          "q": "A typical 'good' authentication event includes fields like:",
+          "choices": [
+            "Username, result, source IP, device, timestamp",
+            "Only username",
+            "Only timestamp",
+            "Only process ID"
+          ],
+          "answer": 0,
+          "explain": "Useful auth events include who, result, where, and when.",
+          "type": "mcq"
+        },
+        {
+          "q": "Correlation is stronger when you can tie events together using:",
+          "choices": [
+            "Random strings",
+            "Stable identifiers like host ID, user ID, and session ID",
+            "Wallpaper",
+            "Screen brightness"
+          ],
+          "answer": 1,
+          "explain": "Stable identifiers enable reliable linking.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a common way to reduce false positives for geolocation based login alerts?",
+          "choices": [
+            "Disable the rule",
+            "Add user travel context and known VPN ranges, and require multiple signals",
+            "Alert on every login",
+            "Ignore MFA results"
+          ],
+          "answer": 1,
+          "explain": "Combine signals and context to improve fidelity.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You see a successful admin login outside business hours from a managed device and a known VPN range. Best interpretation?",
+          "choices": [
+            "Always malicious",
+            "Potentially expected, but verify change ticket or on-call context",
+            "Definitely benign; ignore forever",
+            "Unrelated to logging"
+          ],
+          "answer": 1,
+          "explain": "Context matters; verify with operational context and tickets.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which metric helps validate that logging coverage is improving over time?",
+          "choices": [
+            "Number of fonts installed",
+            "Percent of critical assets sending logs successfully",
+            "Number of wallpapers",
+            "Average desk height"
+          ],
+          "answer": 1,
+          "explain": "Coverage metrics for critical assets indicate progress.",
+          "type": "mcq"
+        },
+        {
+          "q": "A retention policy should consider:",
+          "choices": [
+            "Only disk size",
+            "Investigation needs, legal requirements, and cost",
+            "Only CPU speed",
+            "Only UI color"
+          ],
+          "answer": 1,
+          "explain": "Retention is a tradeoff between investigative value, requirements, and cost.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "hardening",
+      "title": "Hardening",
+      "questions": [
+        {
+          "q": "On Linux SSH, which reduces risk most?",
+          "choices": [
+            "Enable root login",
+            "Use keys and disable password auth",
+            "Use telnet",
+            "Disable logs"
+          ],
+          "answer": 1,
+          "explain": "Keys and disabling password auth reduce brute-force risk.",
+          "type": "mcq"
+        },
+        {
+          "q": "Windows RDP hardening includes:",
+          "choices": [
+            "MFA and NLA",
+            "Disable updates",
+            "Shared local admin",
+            "Open to internet"
+          ],
+          "answer": 0,
+          "explain": "Use MFA and Network Level Authentication.",
+          "type": "mcq"
+        },
+        {
+          "q": "macOS baseline typically includes:",
+          "choices": [
+            "Disable Gatekeeper",
+            "Enable FileVault",
+            "Allow any kernel extension",
+            "Disable updates"
+          ],
+          "answer": 1,
+          "explain": "Full‑disk encryption protects data at rest.",
+          "type": "mcq"
+        },
+        {
+          "q": "Host firewall default inbound should be:",
+          "choices": [
+            "Allow all",
+            "Deny all then allow needed",
+            "Allow ICMP only",
+            "Mirror outbound"
+          ],
+          "answer": 1,
+          "explain": "Default‑deny inbound and allow services as needed.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Public database exposed without TLS.",
+          "choices": [
+            "Accept risk",
+            "Close exposure, require auth/TLS, restrict networks",
+            "Ignore alerts",
+            "Add RAM"
+          ],
+          "answer": 1,
+          "explain": "Restrict access, require auth and TLS.",
+          "type": "scenario"
+        },
+        {
+          "q": "Package updates help with:",
+          "choices": [
+            "New UI themes",
+            "Security patches",
+            "Disk defrag",
+            "CPU overclock"
+          ],
+          "answer": 1,
+          "explain": "Regular updates remediate vulnerabilities.",
+          "type": "mcq"
+        },
+        {
+          "q": "SSH root login should be:",
+          "choices": [
+            "Enabled",
+            "Disabled",
+            "Only via telnet",
+            "Only on weekends"
+          ],
+          "answer": 1,
+          "explain": "Prefer sudo, disable direct root login.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which reduces standing privileges?",
+          "choices": [
+            "Persistent admin tokens",
+            "Just‑in‑time elevation",
+            "Shared accounts",
+            "Local admin everywhere"
+          ],
+          "answer": 1,
+          "explain": "JIT elevation minimizes exposure time.",
+          "type": "mcq"
+        },
+        {
+          "q": "Disk encryption protects:",
+          "choices": [
+            "Against network scans",
+            "Data at rest",
+            "Against DDoS",
+            "CPU temperature"
+          ],
+          "answer": 1,
+          "explain": "Encryption protects resting data if device is lost.",
+          "type": "mcq"
+        },
+        {
+          "q": "Backups should be:",
+          "choices": [
+            "Unauthenticated shares",
+            "Regularly tested",
+            "Stored only on prod",
+            "Unlabeled"
+          ],
+          "answer": 1,
+          "explain": "Test backups to ensure recovery.",
+          "type": "mcq"
+        },
+        {
+          "q": "What does 'secure by default' typically mean in hardening?",
+          "choices": [
+            "Everything is exposed to the internet",
+            "Default settings minimize attack surface and require intentional enablement",
+            "No patches are needed",
+            "Users share passwords"
+          ],
+          "answer": 1,
+          "explain": "Secure by default reduces exposure unless explicitly enabled.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which practice best reduces configuration drift across many systems?",
+          "choices": [
+            "Manual one off changes",
+            "Configuration management and baselines",
+            "Disabling audits",
+            "Sharing local admin passwords"
+          ],
+          "answer": 1,
+          "explain": "Config management enforces consistent baselines and detects drift.",
+          "type": "mcq"
+        },
+        {
+          "q": "Application allowlisting primarily aims to:",
+          "choices": [
+            "Run more software",
+            "Restrict which binaries can execute",
+            "Disable TLS",
+            "Open firewall ports"
+          ],
+          "answer": 1,
+          "explain": "Allowlisting limits executable content to approved software.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why is 'least functionality' important?",
+          "choices": [
+            "It increases user convenience",
+            "Fewer enabled services reduce attack surface",
+            "It speeds up DNS",
+            "It improves Wi-Fi range"
+          ],
+          "answer": 1,
+          "explain": "Disabling unnecessary services reduces reachable and exploitable components.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which control most directly protects data at rest on a stolen laptop?",
+          "choices": [
+            "Rate limiting",
+            "Full disk encryption",
+            "DNS filtering",
+            "Port scanning"
+          ],
+          "answer": 1,
+          "explain": "Full disk encryption protects data if the device is lost.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A server must run an old app that requires a legacy protocol. Best hardening approach?",
+          "choices": [
+            "Expose it broadly and accept risk",
+            "Isolate the service, restrict access, add monitoring, and document an exception",
+            "Disable all logs",
+            "Disable backups"
+          ],
+          "answer": 1,
+          "explain": "Use compensating controls: isolate, restrict, monitor, and document exceptions.",
+          "type": "scenario"
+        },
+        {
+          "q": "What is a realistic downside of aggressive hardening without testing?",
+          "choices": [
+            "It always improves usability",
+            "It can break legitimate workflows and create unsafe workarounds",
+            "It eliminates all vulnerabilities",
+            "It makes phishing impossible"
+          ],
+          "answer": 1,
+          "explain": "Hardening can break apps; unsafe workarounds are a common failure mode.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a good practice for admin access on servers?",
+          "choices": [
+            "Direct internet exposure with passwords",
+            "Use MFA and restrict access to trusted networks or jump hosts",
+            "Disable logging",
+            "Use shared accounts"
+          ],
+          "answer": 1,
+          "explain": "Restricting admin surfaces and using MFA reduces compromise risk.",
+          "type": "mcq"
+        },
+        {
+          "q": "A 'golden image' is useful because it:",
+          "choices": [
+            "Forces users to share passwords",
+            "Provides a known good baseline for new systems",
+            "Disables patching",
+            "Stops all malware"
+          ],
+          "answer": 1,
+          "explain": "Golden images help standardize secure configurations.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is a common reason to enable Secure Boot?",
+          "choices": [
+            "To speed up networking",
+            "To help prevent bootkit style tampering of boot components",
+            "To disable encryption",
+            "To allow unsigned drivers"
+          ],
+          "answer": 1,
+          "explain": "Secure Boot helps ensure trusted boot chain components.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which setting is often part of a stricter workstation baseline?",
+          "choices": [
+            "Disable screen lock",
+            "Require screen lock and short idle timeout",
+            "Disable updates",
+            "Allow unsigned macros"
+          ],
+          "answer": 1,
+          "explain": "Lock screens reduce risk from unattended access.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why is log auditing part of hardening?",
+          "choices": [
+            "It replaces patching",
+            "It provides accountability and detects misuse of privileges",
+            "It disables services",
+            "It increases CPU speed"
+          ],
+          "answer": 1,
+          "explain": "Auditing supports investigations and detection of abuse.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You need to allow remote admin, but want lower risk. Best option?",
+          "choices": [
+            "Open RDP/SSH to the internet",
+            "Use a VPN or a bastion with MFA and strict ACLs",
+            "Disable MFA for admins",
+            "Use telnet"
+          ],
+          "answer": 1,
+          "explain": "Centralized access via VPN or bastion reduces exposure.",
+          "type": "scenario"
+        },
+        {
+          "q": "A common hardening control for browsers is:",
+          "choices": [
+            "Disable sandboxing",
+            "Disable or limit risky plugins and enforce auto updates",
+            "Allow any extension",
+            "Disable TLS"
+          ],
+          "answer": 1,
+          "explain": "Browser hardening reduces drive-by and extension risks.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why are backups part of hardening and resilience?",
+          "choices": [
+            "They reduce packet loss",
+            "They enable recovery from ransomware and accidents",
+            "They prevent phishing",
+            "They stop port scans"
+          ],
+          "answer": 1,
+          "explain": "Backups enable recovery when prevention fails.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a common best practice for local admin credentials on Windows endpoints?",
+          "choices": [
+            "Same password everywhere",
+            "Use LAPS or similar to manage unique local admin passwords",
+            "Store passwords in plain text",
+            "Disable UAC"
+          ],
+          "answer": 1,
+          "explain": "Unique managed local admin passwords reduce lateral movement.",
+          "type": "mcq"
+        },
+        {
+          "q": "A firewall 'default deny inbound' stance means:",
+          "choices": [
+            "Block all traffic forever",
+            "Block unsolicited inbound and allow only required services",
+            "Allow inbound by default",
+            "Disable outbound"
+          ],
+          "answer": 1,
+          "explain": "Default deny inbound reduces exposure and forces intentional allow rules.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A security baseline blocks a developer tool that is needed. What is the safest response?",
+          "choices": [
+            "Tell them to disable security controls",
+            "Create a documented exception with scope, duration, and compensating controls",
+            "Ignore and do nothing",
+            "Share an admin account"
+          ],
+          "answer": 1,
+          "explain": "Exceptions should be scoped, documented, and monitored.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which is a strong indicator that hardening is working operationally?",
+          "choices": [
+            "Fewer logs",
+            "Reduced number of exposed services and fewer high severity findings in scans",
+            "More open ports",
+            "No patching needed"
+          ],
+          "answer": 1,
+          "explain": "Reduced attack surface and fewer critical findings indicate progress.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why should hardening be paired with monitoring?",
+          "choices": [
+            "Monitoring is optional",
+            "Hardening reduces risk but does not eliminate it; monitoring catches what slips through",
+            "Monitoring prevents all incidents",
+            "Monitoring replaces encryption"
+          ],
+          "answer": 1,
+          "explain": "Defense in depth: monitoring detects residual risk and misconfigurations.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "web-app-security",
+      "title": "Web App Security",
+      "questions": [
+        {
+          "q": "Which OWASP category covers failures where users can access data they should not?",
+          "choices": [
+            "Injection",
+            "Broken Access Control",
+            "Security Misconfiguration",
+            "SSRF"
+          ],
+          "answer": 1,
+          "explain": "Broken access control covers missing or flawed authorization checks.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which header helps mitigate clickjacking by restricting framing?",
+          "choices": [
+            "X-Frame-Options",
+            "Server",
+            "ETag",
+            "Accept"
+          ],
+          "answer": 0,
+          "explain": "X-Frame-Options (or CSP frame-ancestors) helps mitigate clickjacking.",
+          "type": "mcq"
+        },
+        {
+          "q": "A parameterized query primarily mitigates:",
+          "choices": [
+            "XSS",
+            "SQL injection",
+            "CSRF",
+            "Open redirect"
+          ],
+          "answer": 1,
+          "explain": "Prepared statements separate code from data to reduce injection risk.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is the primary goal of CSRF protection?",
+          "choices": [
+            "Preventing users from logging in",
+            "Preventing unwanted state-changing requests from a victim's browser",
+            "Encrypting data at rest",
+            "Blocking DNS queries"
+          ],
+          "answer": 1,
+          "explain": "CSRF defenses ensure state changes require a valid user intent and token.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is the most effective default for storing session identifiers in browsers?",
+          "choices": [
+            "LocalStorage without expiration",
+            "Cookies marked Secure and HttpOnly",
+            "URL parameters",
+            "A shared static token"
+          ],
+          "answer": 1,
+          "explain": "Secure and HttpOnly cookies reduce exposure to script access and require HTTPS.",
+          "type": "mcq"
+        },
+        {
+          "q": "A Content Security Policy (CSP) is mainly used to:",
+          "choices": [
+            "Speed up page loads",
+            "Reduce XSS impact by restricting script sources",
+            "Rotate passwords",
+            "Configure DNS"
+          ],
+          "answer": 1,
+          "explain": "CSP limits where scripts and other content can load from.",
+          "type": "mcq"
+        },
+        {
+          "q": "Server-side request forgery (SSRF) often targets:",
+          "choices": [
+            "Public CDNs only",
+            "Internal metadata services and internal networks",
+            "User browser caches",
+            "Email MX records"
+          ],
+          "answer": 1,
+          "explain": "SSRF can reach internal services not exposed externally, including cloud metadata endpoints.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which input validation approach is generally safer?",
+          "choices": [
+            "Allowlist expected formats",
+            "Blocklist bad strings only",
+            "No validation and trust clients",
+            "Only validate in the UI"
+          ],
+          "answer": 0,
+          "explain": "Allowlisting expected formats is more robust than blocking known bad strings.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A login endpoint returns different errors for 'user not found' vs 'wrong password'. Best fix?",
+          "choices": [
+            "Keep it; it helps users",
+            "Use a generic error message and consistent timing",
+            "Disable login",
+            "Log passwords for debugging"
+          ],
+          "answer": 1,
+          "explain": "Generic messages and consistent behavior reduce account enumeration.",
+          "type": "scenario"
+        },
+        {
+          "q": "What is the best practice for password storage in a web app?",
+          "choices": [
+            "Plaintext",
+            "Fast hash like SHA-1",
+            "Adaptive password hash like bcrypt/Argon2",
+            "Encrypt with a hardcoded key"
+          ],
+          "answer": 2,
+          "explain": "Use a slow adaptive password hashing function with proper parameters and salts.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which control most directly reduces brute-force login risk?",
+          "choices": [
+            "Longer URLs",
+            "Rate limiting and account lockout with safe thresholds",
+            "More DNS servers",
+            "Disable TLS"
+          ],
+          "answer": 1,
+          "explain": "Rate limiting and safe lockout policies reduce brute force and credential stuffing.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a secure approach for file uploads?",
+          "choices": [
+            "Accept any file type and execute it",
+            "Validate type, store outside web root, and scan",
+            "Trust the filename extension",
+            "Disable logging"
+          ],
+          "answer": 1,
+          "explain": "Validate uploads, store safely, and scan to reduce upload abuse.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why is output encoding important?",
+          "choices": [
+            "It improves CPU usage",
+            "It prevents untrusted data from being interpreted as code in the browser",
+            "It replaces authentication",
+            "It increases retention"
+          ],
+          "answer": 1,
+          "explain": "Proper output encoding is a core XSS defense.",
+          "type": "mcq"
+        },
+        {
+          "q": "An IDOR issue is best described as:",
+          "choices": [
+            "A missing DNS record",
+            "Direct object access without authorization checks",
+            "A slow database query",
+            "A TLS cipher mismatch"
+          ],
+          "answer": 1,
+          "explain": "Insecure direct object references are authorization failures over object identifiers.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a strong defense against session fixation?",
+          "choices": [
+            "Accept any session ID from the URL",
+            "Regenerate session IDs on login and privilege change",
+            "Use long lived sessions",
+            "Disable cookies"
+          ],
+          "answer": 1,
+          "explain": "Rotating session identifiers on auth events reduces fixation risk.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A developer proposes putting JWTs in localStorage for convenience. Main concern?",
+          "choices": [
+            "It makes tokens too short",
+            "XSS can read localStorage and steal tokens",
+            "It breaks DNS",
+            "It disables MFA"
+          ],
+          "answer": 1,
+          "explain": "XSS can exfiltrate tokens from localStorage; cookies with HttpOnly can help reduce this exposure.",
+          "type": "scenario"
+        },
+        {
+          "q": "What is the main purpose of server-side authorization checks?",
+          "choices": [
+            "Improve UI styling",
+            "Enforce access regardless of client behavior",
+            "Reduce disk usage",
+            "Enable CORS"
+          ],
+          "answer": 1,
+          "explain": "Clients can be modified; authorization must be enforced on the server.",
+          "type": "mcq"
+        },
+        {
+          "q": "CORS primarily controls:",
+          "choices": [
+            "Which ports are open",
+            "Which origins can read responses in browsers",
+            "How passwords are hashed",
+            "How DNS caches work"
+          ],
+          "answer": 1,
+          "explain": "CORS controls cross-origin reads from browsers, not server-side access control.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which approach is safest for secrets in a web app?",
+          "choices": [
+            "Hardcode in code",
+            "Use a secrets manager or environment variables with access controls",
+            "Put in client-side JavaScript",
+            "Email them to developers"
+          ],
+          "answer": 1,
+          "explain": "Use managed secrets and least-privileged access.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is 'insecure deserialization' risk typically about?",
+          "choices": [
+            "Images not loading",
+            "Attacker controlled data triggering dangerous object behavior",
+            "DNS failures",
+            "Slow TLS handshakes"
+          ],
+          "answer": 1,
+          "explain": "Unsafe deserialization can lead to code execution or privilege changes.",
+          "type": "mcq"
+        },
+        {
+          "q": "A secure default for 'debug mode' in production is:",
+          "choices": [
+            "Enabled",
+            "Disabled",
+            "Enabled only on weekends",
+            "Enabled for all users"
+          ],
+          "answer": 1,
+          "explain": "Debug outputs can leak secrets and internals; disable in production.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You detect reflected XSS on a search parameter. Best immediate mitigation?",
+          "choices": [
+            "Remove the search feature",
+            "Implement proper output encoding and add CSP, then fix root cause",
+            "Block all JavaScript",
+            "Change the domain name"
+          ],
+          "answer": 1,
+          "explain": "Output encoding fixes reflection, CSP reduces impact, and you still patch the root cause.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which is a good practice for API error responses?",
+          "choices": [
+            "Return stack traces to clients",
+            "Return minimal errors to clients and log detailed errors server-side",
+            "Hide logs entirely",
+            "Disable exceptions"
+          ],
+          "answer": 1,
+          "explain": "Clients need stable minimal errors; logs should contain details for debugging.",
+          "type": "mcq"
+        },
+        {
+          "q": "What does 'security misconfiguration' commonly include?",
+          "choices": [
+            "Strong MFA",
+            "Default credentials, verbose errors, missing headers, and open admin interfaces",
+            "Encrypted backups",
+            "Least privilege roles"
+          ],
+          "answer": 1,
+          "explain": "Misconfigurations often include insecure defaults and excessive exposure.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is the best place to enforce input validation?",
+          "choices": [
+            "Only in the client",
+            "Only in the server",
+            "Both client and server, with server authoritative",
+            "Nowhere"
+          ],
+          "answer": 2,
+          "explain": "Client validation improves UX; server validation is required for security.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A webhook endpoint accepts requests without verifying origin. Best fix?",
+          "choices": [
+            "Trust source IP always",
+            "Verify signatures or shared secret and replay protections",
+            "Disable TLS",
+            "Log less"
+          ],
+          "answer": 1,
+          "explain": "Signed webhooks with replay protection verify authenticity.",
+          "type": "scenario"
+        },
+        {
+          "q": "Why is 'least privilege' relevant to web app database accounts?",
+          "choices": [
+            "It increases query speed",
+            "It limits damage if the app is compromised or a query is abused",
+            "It disables backups",
+            "It removes logging"
+          ],
+          "answer": 1,
+          "explain": "Least privilege reduces blast radius from injection or compromise.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which control best reduces risk from vulnerable dependencies?",
+          "choices": [
+            "Never update",
+            "Use dependency scanning and timely patching with testing",
+            "Hide the version banner only",
+            "Disable HTTPS"
+          ],
+          "answer": 1,
+          "explain": "Scanning and patching dependencies reduces known-risk exposure.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You need a quick check for authentication bypass risk. Which test is most relevant?",
+          "choices": [
+            "Try accessing protected endpoints without a valid session",
+            "Ping the server",
+            "Increase DNS TTL",
+            "Disable HSTS"
+          ],
+          "answer": 0,
+          "explain": "Attempting access without auth tests whether server side auth checks exist.",
+          "type": "scenario"
+        },
+        {
+          "q": "SameSite cookies primarily help mitigate:",
+          "choices": [
+            "SQL injection",
+            "CSRF in many cases",
+            "Ransomware",
+            "BGP hijacking"
+          ],
+          "answer": 1,
+          "explain": "SameSite reduces cross-site sending of cookies, which can reduce CSRF risk in many flows.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "cloud-security",
+      "title": "Cloud Security Fundamentals",
+      "questions": [
+        {
+          "q": "The cloud 'shared responsibility model' means:",
+          "choices": [
+            "The provider secures everything end to end",
+            "Security is split between provider and customer depending on service",
+            "Customers only manage billing",
+            "Security is optional"
+          ],
+          "answer": 1,
+          "explain": "In cloud, providers secure the underlying services; customers secure their configs, identities, and data.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which control most directly reduces risk from leaked cloud access keys?",
+          "choices": [
+            "Longer hostnames",
+            "Use short-lived credentials and rotate keys",
+            "Disable logging",
+            "Increase TTL"
+          ],
+          "answer": 1,
+          "explain": "Short lived credentials and rotation reduce the window of misuse.",
+          "type": "mcq"
+        },
+        {
+          "q": "A common cause of cloud breaches is:",
+          "choices": [
+            "Too many DNS servers",
+            "Misconfigured identity and access policies",
+            "Too much RAM",
+            "TLS 1.3"
+          ],
+          "answer": 1,
+          "explain": "Over permissive IAM policies are a common root cause of cloud incidents.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which log source is most useful for 'who did what' API actions in many clouds?",
+          "choices": [
+            "Flow logs only",
+            "Cloud audit logs (control plane)",
+            "Kernel ring buffer",
+            "Browser history"
+          ],
+          "answer": 1,
+          "explain": "Control plane audit logs record API calls and identity context.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is a security group or network security group best compared to?",
+          "choices": [
+            "A router",
+            "A stateful virtual firewall rule set",
+            "A password manager",
+            "A DNS zone"
+          ],
+          "answer": 1,
+          "explain": "Security groups are stateful allow rules attached to workloads.",
+          "type": "mcq"
+        },
+        {
+          "q": "A best practice for object storage buckets is:",
+          "choices": [
+            "Public read by default",
+            "Default private and explicitly grant least access",
+            "Store secrets in object names",
+            "Disable versioning always"
+          ],
+          "answer": 1,
+          "explain": "Start private and grant least privilege; avoid public access unless intentionally required.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why is encryption with customer-managed keys useful in some environments?",
+          "choices": [
+            "It makes systems unpatchable",
+            "It can support separation of duties and key revocation",
+            "It removes the need for IAM",
+            "It disables backups"
+          ],
+          "answer": 1,
+          "explain": "Key control and separation of duties can be important for compliance and risk management.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a strong control for cloud admin accounts?",
+          "choices": [
+            "No MFA",
+            "Phishing-resistant MFA and conditional access",
+            "Shared root credentials",
+            "Disable logging"
+          ],
+          "answer": 1,
+          "explain": "Strong MFA and conditional access reduce takeover risk.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A developer needs temporary production access to diagnose an issue. Best approach?",
+          "choices": [
+            "Grant broad admin rights permanently",
+            "Use time-bound access with approvals and audit logging",
+            "Share credentials in chat",
+            "Turn off MFA"
+          ],
+          "answer": 1,
+          "explain": "Just-in-time, audited elevation is safer than standing privilege.",
+          "type": "scenario"
+        },
+        {
+          "q": "What is a common risk of 'instance metadata' services?",
+          "choices": [
+            "They slow down DNS",
+            "SSRF can access metadata to steal credentials if not protected",
+            "They disable TLS",
+            "They prevent logging"
+          ],
+          "answer": 1,
+          "explain": "Metadata endpoints can be abused via SSRF if not restricted.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which practice helps detect and prevent unintended public exposure?",
+          "choices": [
+            "Disable inventory",
+            "Continuous configuration monitoring and alerts for public access",
+            "Remove all tags",
+            "Stop patching"
+          ],
+          "answer": 1,
+          "explain": "Continuous config monitoring catches drift and accidental exposure.",
+          "type": "mcq"
+        },
+        {
+          "q": "A common reason to separate dev and prod accounts/projects is:",
+          "choices": [
+            "To make DNS slower",
+            "To reduce blast radius and enforce different policies",
+            "To reuse credentials everywhere",
+            "To avoid monitoring"
+          ],
+          "answer": 1,
+          "explain": "Segmentation reduces blast radius and enables stricter prod controls.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is the best description of 'least privilege' IAM?",
+          "choices": [
+            "Grant permissions broadly for speed",
+            "Grant only the permissions needed for a task, scoped to resources and time",
+            "Use shared accounts",
+            "Disable audit logs"
+          ],
+          "answer": 1,
+          "explain": "Least privilege scopes permissions to need, resources, and time.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why are resource tags useful for security operations?",
+          "choices": [
+            "They increase packet loss",
+            "They support ownership, cost attribution, and policy scoping",
+            "They disable encryption",
+            "They prevent backups"
+          ],
+          "answer": 1,
+          "explain": "Tags help governance, ownership, and policy scope for enforcement.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which concept best supports preventing lateral movement in cloud networks?",
+          "choices": [
+            "Flat networks",
+            "Network segmentation and tightly scoped security groups",
+            "Open inbound rules",
+            "Disabling flow logs"
+          ],
+          "answer": 1,
+          "explain": "Segmentation and scoped rules reduce reachability and lateral movement.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You discover an access key used from a new country within minutes of creation. Best next step?",
+          "choices": [
+            "Do nothing",
+            "Disable the key, investigate the principal, and review recent changes",
+            "Increase bucket public access",
+            "Rotate DNS servers"
+          ],
+          "answer": 1,
+          "explain": "Fast unusual use suggests compromise; disable and investigate promptly.",
+          "type": "scenario"
+        },
+        {
+          "q": "What is a practical baseline for cloud logging?",
+          "choices": [
+            "Only collect CPU metrics",
+            "Enable control-plane audit logs plus network flow logs and key service logs",
+            "Disable all logs to save costs",
+            "Only log on incidents"
+          ],
+          "answer": 1,
+          "explain": "Audit and flow logs provide accountability and network context.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why is 'infrastructure as code' helpful for security?",
+          "choices": [
+            "It prevents all incidents",
+            "It enables reviewable, repeatable changes and policy enforcement",
+            "It disables backups",
+            "It replaces IAM"
+          ],
+          "answer": 1,
+          "explain": "IaC makes changes reviewable and consistent, enabling policy checks.",
+          "type": "mcq"
+        },
+        {
+          "q": "A 'service principal' or 'role' for workloads should typically use:",
+          "choices": [
+            "User passwords",
+            "Workload identity or role-based credentials",
+            "Shared root account",
+            "Plaintext API keys in code"
+          ],
+          "answer": 1,
+          "explain": "Workload identity reduces secrets sprawl and supports rotation.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which control helps ensure only approved images run in production?",
+          "choices": [
+            "Disable registries",
+            "Image signing and allow policies, plus vulnerability scanning",
+            "Public buckets",
+            "Shared admin accounts"
+          ],
+          "answer": 1,
+          "explain": "Trusted images, signing, and scanning reduce supply chain and vulnerable image risk.",
+          "type": "mcq"
+        },
+        {
+          "q": "Cloud network flow logs primarily show:",
+          "choices": [
+            "Application errors",
+            "Accepted/denied network connections metadata",
+            "Database schemas",
+            "Password hashes"
+          ],
+          "answer": 1,
+          "explain": "Flow logs capture connection metadata like src/dst and allow/deny decisions.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A storage bucket must be public for a marketing website. Safest approach?",
+          "choices": [
+            "Make the whole bucket writable",
+            "Allow only read to specific objects and separate upload paths, and monitor",
+            "Disable logging",
+            "Store secrets alongside assets"
+          ],
+          "answer": 1,
+          "explain": "Scope public access to read only and separate any write paths with strict controls.",
+          "type": "scenario"
+        },
+        {
+          "q": "A common cloud hardening step for management planes is:",
+          "choices": [
+            "Expose admin consoles publicly without controls",
+            "Restrict admin access via conditional access and strong MFA",
+            "Disable audit logs",
+            "Use shared accounts"
+          ],
+          "answer": 1,
+          "explain": "Restricting admin access and using strong auth reduces takeover.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is the security value of private endpoints/private links?",
+          "choices": [
+            "They increase bandwidth",
+            "They keep service traffic on private networks rather than the public internet",
+            "They disable encryption",
+            "They remove the need for DNS"
+          ],
+          "answer": 1,
+          "explain": "Private endpoints reduce exposure to the public internet.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a reliable way to manage secrets for applications?",
+          "choices": [
+            "Commit to git",
+            "Use a managed secrets store with access policies and rotation",
+            "Store in container images",
+            "Email them"
+          ],
+          "answer": 1,
+          "explain": "Managed secret stores support policy and rotation.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You are asked to grant a CI pipeline permission to deploy. Best practice is to:",
+          "choices": [
+            "Give it global admin",
+            "Grant a dedicated role scoped to required resources and environments",
+            "Reuse a human admin account",
+            "Disable review"
+          ],
+          "answer": 1,
+          "explain": "Pipelines should have dedicated scoped identities and minimal permissions.",
+          "type": "scenario"
+        },
+        {
+          "q": "A 'break-glass' cloud admin account should typically be:",
+          "choices": [
+            "Used daily",
+            "Highly protected, monitored, and excluded from normal workflows",
+            "Publicly shared",
+            "Without MFA"
+          ],
+          "answer": 1,
+          "explain": "Break-glass accounts are emergency-only and should be tightly controlled.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which of these is a safer default for inbound rules to workloads?",
+          "choices": [
+            "0.0.0.0/0 to all ports",
+            "Allow only required ports from known sources",
+            "Disable all outbound",
+            "Allow any protocol"
+          ],
+          "answer": 1,
+          "explain": "Restrict inbound to required ports and known sources.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is a common 'good' outcome for IAM reviews?",
+          "choices": [
+            "Permissions only ever grow",
+            "Permissions are removed when unused and roles are simplified",
+            "Shared accounts are added",
+            "Logging is disabled"
+          ],
+          "answer": 1,
+          "explain": "Reviews reduce unused access and simplify roles.",
+          "type": "mcq"
+        },
+        {
+          "q": "Configuration drift in cloud most often refers to:",
+          "choices": [
+            "Changes in CPU temperature",
+            "Manual changes outside of code that diverge from the intended baseline",
+            "DNS TTL values increasing",
+            "VPN bandwidth fluctuations"
+          ],
+          "answer": 1,
+          "explain": "Drift occurs when real configurations differ from the declared baseline, often due to manual changes.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "incident-response-scenarios",
+      "title": "Incident Response Scenarios",
+      "questions": [
+        {
+          "q": "Scenario: A user reports a suspicious email with an unexpected attachment. What is the best first step?",
+          "choices": [
+            "Open the attachment in production to confirm",
+            "Preserve the email and headers, and report through the defined IR channel",
+            "Delete the email and move on",
+            "Forward it to everyone as a warning"
+          ],
+          "answer": 1,
+          "explain": "Start with preservation and proper reporting so analysis can occur safely and consistently.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Your EDR flags a possible ransomware process on one workstation. Best next step?",
+          "choices": [
+            "Wait to see if it spreads",
+            "Isolate the endpoint from the network and begin evidence collection",
+            "Reimage immediately without collecting data",
+            "Disable backups"
+          ],
+          "answer": 1,
+          "explain": "Containment via isolation reduces spread; collect evidence before wiping when possible.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You detect a new admin account created overnight. What do you do next?",
+          "choices": [
+            "Ignore until the next audit",
+            "Validate whether it is authorized, and if not, disable it and review associated events",
+            "Reset all employee passwords immediately",
+            "Disable logging to reduce noise"
+          ],
+          "answer": 1,
+          "explain": "Confirm legitimacy, contain unauthorized access, and pivot on related audit events.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A server shows repeated failed logins followed by one success from the same IP. Best next step?",
+          "choices": [
+            "Block the IP and close the ticket",
+            "Check what the account did after the successful login and whether MFA was used",
+            "Assume it is harmless",
+            "Delete the auth logs"
+          ],
+          "answer": 1,
+          "explain": "Post-success activity determines impact and required containment.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You suspect data exfiltration from a database server. What is most important to preserve early?",
+          "choices": [
+            "Only screenshots",
+            "Network and access logs, and disk images if feasible",
+            "Just the user list",
+            "The desktop wallpaper"
+          ],
+          "answer": 1,
+          "explain": "Preserve evidence that supports timeline and impact analysis.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A critical system is compromised but supports a safety function. Best action?",
+          "choices": [
+            "Power it off immediately",
+            "Coordinate containment with stakeholders and use a risk-based approach to avoid safety impact",
+            "Ignore the compromise",
+            "Publish details publicly"
+          ],
+          "answer": 1,
+          "explain": "Containment must consider operational safety and business impact while limiting attacker control.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You identify malware on a host. When is eradication appropriate?",
+          "choices": [
+            "Before containment",
+            "After containment and evidence capture, with a plan to verify removal",
+            "Never",
+            "Only after the annual audit"
+          ],
+          "answer": 1,
+          "explain": "Contain first, then remove the threat with verification and recovery planning.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You have indicators of compromise (IOCs). Best way to use them?",
+          "choices": [
+            "Block everything that matches forever",
+            "Hunt across logs and endpoints to find scope and related activity",
+            "Share publicly immediately",
+            "Ignore them once found"
+          ],
+          "answer": 1,
+          "explain": "IOCs help scope and find related activity; blocking requires context and validation.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A workstation is suspected compromised, but the user is traveling. Best next step?",
+          "choices": [
+            "Ask user to keep using it normally",
+            "Disable or revoke sessions and credentials, and coordinate remote containment",
+            "Wait until they return",
+            "Tell them to install random tools"
+          ],
+          "answer": 1,
+          "explain": "Session revocation reduces attacker access; coordinate containment with minimal user disruption.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You need to collect volatile evidence. What is a key reason to do it early?",
+          "choices": [
+            "It is cheaper",
+            "Volatile data (processes, network connections) changes quickly",
+            "It improves patching",
+            "It removes malware automatically"
+          ],
+          "answer": 1,
+          "explain": "Memory and runtime state can be lost on reboot or over time.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: An alert indicates suspicious PowerShell usage on a server. Best next step?",
+          "choices": [
+            "Disable PowerShell everywhere immediately",
+            "Validate the alert with process lineage, command line, and user context",
+            "Ignore PowerShell alerts as noise",
+            "Delete the server"
+          ],
+          "answer": 1,
+          "explain": "Triage requires context to distinguish admin activity from abuse.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You confirm credential theft. What is the safest order of actions?",
+          "choices": [
+            "Reset passwords first, then contain systems later",
+            "Contain attacker access (disable accounts, revoke sessions), then rotate credentials and investigate",
+            "Only notify leadership",
+            "Only block one IP"
+          ],
+          "answer": 1,
+          "explain": "Stop active access, then rotate and investigate to prevent re-compromise.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You are asked 'is this incident reportable?' Best next step?",
+          "choices": [
+            "Guess",
+            "Check the org's reporting criteria and consult legal/compliance if needed",
+            "Ignore reporting",
+            "Report everything to the media"
+          ],
+          "answer": 1,
+          "explain": "Use defined criteria and involve the right stakeholders for reporting decisions.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A phishing campaign uses lookalike domains. Best containment step?",
+          "choices": [
+            "Do nothing",
+            "Block the domains, search for clicks, and reset affected sessions",
+            "Disable email for everyone",
+            "Change the company name"
+          ],
+          "answer": 1,
+          "explain": "Block infrastructure, identify victims, and revoke sessions to reduce impact.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: During IR, a team member proposes wiping all logs to hide attacker traces. Best response?",
+          "choices": [
+            "Agree",
+            "Reject; preserve logs and restrict access to them",
+            "Only wipe firewall logs",
+            "Email logs to attackers"
+          ],
+          "answer": 1,
+          "explain": "Preservation of evidence is fundamental to IR and lessons learned.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You suspect an attacker still has access. What is a strong indicator you can look for?",
+          "choices": [
+            "A new desktop icon",
+            "New persistence mechanisms or recurring unauthorized authentications",
+            "More RAM usage only",
+            "A changed hostname only"
+          ],
+          "answer": 1,
+          "explain": "Persistence often shows as new services, tasks, accounts, or recurring auth activity.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You have limited visibility on an endpoint. What is a practical immediate step?",
+          "choices": [
+            "Assume it is fine",
+            "Increase logging/telemetry for that asset class and prioritize coverage gaps",
+            "Disable the network",
+            "Remove encryption"
+          ],
+          "answer": 1,
+          "explain": "Improve visibility to support scope and verification.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: After containment, business asks to restore service quickly. Best approach?",
+          "choices": [
+            "Restore from backups without verifying compromise",
+            "Restore with verification: patch, rotate creds, validate clean state, then monitor closely",
+            "Turn off security tools",
+            "Reuse old passwords"
+          ],
+          "answer": 1,
+          "explain": "Recovery must include verification and hardening to prevent reinfection.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You need to communicate during an incident. Best practice is to:",
+          "choices": [
+            "Use any public channel",
+            "Use predefined comms channels and limit details to need-to-know",
+            "Share IOCs on social media",
+            "Avoid documenting anything"
+          ],
+          "answer": 1,
+          "explain": "Controlled communications reduce leaks and confusion; documentation is important.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Multiple alerts suggest the same root cause. Best next step?",
+          "choices": [
+            "Treat each alert as unrelated",
+            "Build a timeline and hypothesis, then test it with additional evidence",
+            "Close them all",
+            "Disable alerts"
+          ],
+          "answer": 1,
+          "explain": "Hypothesis-driven analysis helps connect events and find the true scope.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A compromised account belongs to an IT admin. What is a safe immediate action?",
+          "choices": [
+            "Wait for the admin to respond",
+            "Disable the account, revoke sessions, and use break-glass access if needed",
+            "Disable MFA org-wide",
+            "Only block one source IP"
+          ],
+          "answer": 1,
+          "explain": "Admin accounts have high blast radius; immediate containment is often warranted.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You detect suspicious outbound traffic from a server to a rare destination. Best triage action?",
+          "choices": [
+            "Ignore outbound traffic",
+            "Check process-to-connection mapping, DNS history, and recent changes on the server",
+            "Immediately format the disk",
+            "Tell users to reboot"
+          ],
+          "answer": 1,
+          "explain": "Link network activity to processes and recent changes to confirm maliciousness.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You are unsure whether a detection is a false positive. What should you do?",
+          "choices": [
+            "Disable the detection permanently",
+            "Document assumptions and validate with additional data sources",
+            "Ignore it",
+            "Block all internet"
+          ],
+          "answer": 1,
+          "explain": "Use more evidence, document reasoning, and tune rules safely.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You found a malicious file hash. What is the best use of the hash?",
+          "choices": [
+            "Use it as the only indicator",
+            "Search across endpoints for occurrences and related parent processes",
+            "Assume the file is everywhere",
+            "Delete all files with similar names"
+          ],
+          "answer": 1,
+          "explain": "Hashes support scoping and hunting, but should be combined with behavior and context.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A business unit demands to know exactly who did it immediately. Best response?",
+          "choices": [
+            "Give a name without evidence",
+            "Explain that attribution takes time; prioritize containment and evidence-driven analysis",
+            "Refuse to communicate",
+            "Publish guesses"
+          ],
+          "answer": 1,
+          "explain": "Containment and evidence first; attribution requires careful analysis.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You have an incident that appears contained. What post-incident activity is most valuable?",
+          "choices": [
+            "Delete all notes",
+            "Run a lessons learned review and update controls, playbooks, and detections",
+            "Assume it will never happen again",
+            "Disable monitoring"
+          ],
+          "answer": 1,
+          "explain": "Post-incident improvements reduce recurrence and improve response.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You are investigating possible lateral movement. What log source is most directly useful?",
+          "choices": [
+            "Screen brightness logs",
+            "Authentication and remote access logs across hosts",
+            "DNS zone serials only",
+            "Printer logs only"
+          ],
+          "answer": 1,
+          "explain": "Lateral movement often shows as new auth events and remote execution patterns.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You plan to rotate credentials after an incident. What common failure mode should you avoid?",
+          "choices": [
+            "Rotating too quickly",
+            "Rotating only user passwords while leaving service accounts and API keys unchanged",
+            "Using MFA",
+            "Documenting changes"
+          ],
+          "answer": 1,
+          "explain": "Service accounts and keys are often missed and can preserve attacker access.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Evidence suggests a compromised laptop is still online. You cannot reach the user. Best next step?",
+          "choices": [
+            "Do nothing",
+            "Disable the device's access (network, VPN, identity sessions) and alert stakeholders",
+            "Send the user a survey",
+            "Wait a week"
+          ],
+          "answer": 1,
+          "explain": "Contain access quickly via centralized controls when the device cannot be reached.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A third party notifies you about stolen credentials. Best next step?",
+          "choices": [
+            "Assume it is a scam",
+            "Validate the report, rotate affected credentials, and check for suspicious logins",
+            "Publish all details",
+            "Disable all accounts"
+          ],
+          "answer": 1,
+          "explain": "Validate and take targeted containment actions while scoping impact.",
+          "type": "scenario"
+        }
+      ]
+    },
+    {
+      "id": "soc-triage-scenarios",
+      "title": "SOC Analyst Triage",
+      "questions": [
+        {
+          "q": "Scenario: An alert shows 'multiple failed logins' for a user, but it matches a scheduled password sync window. Best next step?",
+          "choices": [
+            "Escalate as critical immediately",
+            "Check change calendar and compare historical patterns before escalating",
+            "Disable all logins",
+            "Delete the alert"
+          ],
+          "answer": 1,
+          "explain": "Context and baselines help distinguish expected bursts from attacks.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You receive an EDR alert for 'suspicious script execution' on an IT admin laptop. Best next step?",
+          "choices": [
+            "Close it; admins run scripts",
+            "Review the command line, parent process, and whether it aligns with an approved task",
+            "Reimage the laptop immediately",
+            "Turn off EDR for admins"
+          ],
+          "answer": 1,
+          "explain": "Admin activity can be benign or abused; lineage and task context matter.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A SIEM rule fires for a single outbound connection to a rare country. Best triage action?",
+          "choices": [
+            "Ignore geolocation",
+            "Check user role, device posture, VPN usage, and related auth events",
+            "Block the whole country permanently",
+            "Disable DNS logging"
+          ],
+          "answer": 1,
+          "explain": "Combine signals before escalating; geolocation alone is often noisy.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A user reports a browser popup asking to 're-authenticate'. What do you do next?",
+          "choices": [
+            "Tell them to enter credentials",
+            "Treat as potential phishing; collect the URL/screenshot and reset sessions if they clicked",
+            "Ignore user reports",
+            "Disable the user's account forever"
+          ],
+          "answer": 1,
+          "explain": "User reports are valuable; treat as potential phishing and take targeted action.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: An IDS alert indicates a possible port scan from an internal host. Best first step?",
+          "choices": [
+            "Assume it is an attacker",
+            "Identify the source host owner and check if it is a vulnerability scanner or monitoring system",
+            "Block all internal traffic",
+            "Rebuild the firewall"
+          ],
+          "answer": 1,
+          "explain": "Many scans are legitimate; validate source and purpose first.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A malware alert shows a file was quarantined successfully. What is the best next step?",
+          "choices": [
+            "Close immediately",
+            "Check if the host shows additional indicators (persistence, network beacons) and whether other hosts have the same file",
+            "Disable quarantine",
+            "Notify the media"
+          ],
+          "answer": 1,
+          "explain": "Quarantine is good, but you must scope and ensure no other activity exists.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You see repeated DNS queries for algorithmic domains from one endpoint. Best triage?",
+          "choices": [
+            "Ignore DNS",
+            "Correlate with proxy/EDR telemetry and check for suspicious processes",
+            "Block all DNS to the endpoint",
+            "Reboot the DNS server"
+          ],
+          "answer": 1,
+          "explain": "DGA-like DNS needs correlation to confirm malware behavior.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: An alert indicates 'new local admin user created' on a workstation. Best action?",
+          "choices": [
+            "Wait for the next business day",
+            "Validate legitimacy; if unexpected, disable the account and collect host context",
+            "Disable all user accounts",
+            "Only change the wallpaper"
+          ],
+          "answer": 1,
+          "explain": "New admin accounts are high value and require rapid validation and containment.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A login succeeds after many MFA push prompts. Most likely cause?",
+          "choices": [
+            "User used a passkey",
+            "MFA fatigue/push bombing leading to accidental approval",
+            "DNS caching",
+            "Patch Tuesday"
+          ],
+          "answer": 1,
+          "explain": "Repeated prompts can pressure a user into approving, enabling account takeover.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A SIEM alert fires for 'suspicious PowerShell download cradle' on a server. Best triage step?",
+          "choices": [
+            "Block PowerShell everywhere",
+            "Confirm by inspecting process tree, command line, and network destination",
+            "Ignore; PowerShell is normal",
+            "Disable logging"
+          ],
+          "answer": 1,
+          "explain": "Validate with evidence (lineage and destination) before taking broad action.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You have 50 low severity alerts and one medium alert. What is a good triage strategy?",
+          "choices": [
+            "Work oldest first always",
+            "Prioritize by potential impact, asset criticality, and confidence",
+            "Ignore medium alerts",
+            "Randomly choose"
+          ],
+          "answer": 1,
+          "explain": "Risk-based prioritization reduces missed high impact events.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: An alert indicates possible credential stuffing on a web login. Best next step?",
+          "choices": [
+            "Disable the website",
+            "Check rate limits, source IP patterns, and whether accounts were successfully accessed",
+            "Ignore because it is common",
+            "Disable MFA"
+          ],
+          "answer": 1,
+          "explain": "Confirm success vs attempts and apply targeted mitigations like rate limiting and session resets.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You find a suspicious scheduled task on a workstation. What is the best next step?",
+          "choices": [
+            "Delete it immediately without notes",
+            "Record details (name, command, user), check creation time, and look for similar tasks elsewhere",
+            "Ignore it",
+            "Disable Windows Task Scheduler everywhere"
+          ],
+          "answer": 1,
+          "explain": "Preserve evidence and scope across environment before removal.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A new process is making periodic outbound connections every 5 minutes. Best triage?",
+          "choices": [
+            "Assume it is normal",
+            "Identify the process, its signer/path, and whether the destination is known and allowed",
+            "Only check DNS",
+            "Disable the network for all users"
+          ],
+          "answer": 1,
+          "explain": "Beacons require mapping process to destination and legitimacy.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You are unsure whether to escalate to IR. Best criterion is:",
+          "choices": [
+            "Your mood",
+            "Potential impact and evidence of compromise (successful access, persistence, data access)",
+            "Number of alerts only",
+            "Time of day"
+          ],
+          "answer": 1,
+          "explain": "Escalation should consider impact and strong indicators of compromise.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A user clicked a phishing link but claims they did not enter credentials. Best next step?",
+          "choices": [
+            "Do nothing",
+            "Check for session tokens, OAuth consent grants, and suspicious logins; consider password reset if risk",
+            "Disable email forever",
+            "Rebuild the laptop immediately"
+          ],
+          "answer": 1,
+          "explain": "Phishing can steal tokens or trigger consent flows even without password entry.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A cloud audit log shows an API key created and used to list storage buckets. Best triage?",
+          "choices": [
+            "Ignore cloud logs",
+            "Identify the principal, validate purpose, and check for anomalous access patterns",
+            "Delete the audit logs",
+            "Disable all buckets"
+          ],
+          "answer": 1,
+          "explain": "Audit context and anomaly checks help determine misuse.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Your detection fired on a known admin tool (PsExec/remote exec). Best approach?",
+          "choices": [
+            "Always close as false positive",
+            "Check if usage aligns with approved admin activity and investigate source host and target list",
+            "Block all admin tools forever",
+            "Disable Windows networking"
+          ],
+          "answer": 1,
+          "explain": "Dual-use tools require context: who used it, from where, and why.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A user reports 'my files look encrypted' but EDR is quiet. Best next step?",
+          "choices": [
+            "Dismiss it",
+            "Collect details and check file system activity, recent processes, and backup health",
+            "Disable the file server",
+            "Change the DNS server"
+          ],
+          "answer": 1,
+          "explain": "User reports can be early signals; investigate host and storage activity.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Your SIEM has ingestion delays. Best operational response for triage?",
+          "choices": [
+            "Assume everything is fine",
+            "Use local sources (EDR, endpoint logs) for time-critical investigations and track ingestion health",
+            "Disable all alerts",
+            "Reboot the SIEM"
+          ],
+          "answer": 1,
+          "explain": "When central logs lag, use alternative telemetry while fixing ingestion.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A detection is noisy in one business unit due to a new app rollout. Best action?",
+          "choices": [
+            "Turn it off permanently",
+            "Tune with exclusions or thresholds based on verified benign patterns, and document changes",
+            "Ignore all alerts",
+            "Delete the app"
+          ],
+          "answer": 1,
+          "explain": "Tune based on verified benign behavior and document to prevent blind spots.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You need to enrich an IP address quickly during triage. What is most helpful?",
+          "choices": [
+            "Only the IP's last octet",
+            "Asset context (internal/external), DNS, and related connections and users",
+            "Screen size",
+            "Printer name"
+          ],
+          "answer": 1,
+          "explain": "Enrichment ties the IP to assets, identities, and activity.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You see repeated authentication failures for many accounts from one IP. Best next step?",
+          "choices": [
+            "Block all accounts",
+            "Block or rate-limit the source and search for any successful logins among targets",
+            "Ignore it",
+            "Disable password policy"
+          ],
+          "answer": 1,
+          "explain": "Focus on success and containment while reducing further attempts.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: An endpoint shows a new unsigned binary in a user temp directory. Best triage?",
+          "choices": [
+            "Assume it is safe",
+            "Check execution events, signer/path, parent process, and whether other hosts have it",
+            "Only check disk space",
+            "Disable antivirus"
+          ],
+          "answer": 1,
+          "explain": "Unsigned binaries in temp paths are suspicious and require context and scoping.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: An alert indicates a domain controller is making outbound connections to a new destination. Best response?",
+          "choices": [
+            "Treat as low priority",
+            "Prioritize quickly due to asset criticality and validate process and destination",
+            "Ignore; DCs talk to everything",
+            "Reimage immediately"
+          ],
+          "answer": 1,
+          "explain": "High criticality assets justify faster triage and containment.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A user account shows login from a new device but from a known corporate VPN range. Best next step?",
+          "choices": [
+            "Mark as safe forever",
+            "Check whether the device is enrolled/managed and whether MFA and device posture were satisfied",
+            "Disable the VPN",
+            "Ignore all future alerts"
+          ],
+          "answer": 1,
+          "explain": "VPN ranges reduce risk, but device and MFA context still matter.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You find an alert that clearly indicates compromise. What is the best next step?",
+          "choices": [
+            "Keep investigating quietly for days",
+            "Escalate to the incident response process and initiate containment actions",
+            "Close it to avoid panic",
+            "Disable logging"
+          ],
+          "answer": 1,
+          "explain": "Clear compromise should trigger IR escalation and containment per process.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You need to decide if an alert is worth paging after hours. Best factor is:",
+          "choices": [
+            "How annoying it is",
+            "Asset criticality and evidence of active attacker behavior",
+            "Number of tags in the alert",
+            "Whether it is cloudy outside"
+          ],
+          "answer": 1,
+          "explain": "Page based on potential impact and active compromise indicators.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: A single workstation shows repeated connections to many internal hosts on TCP 445. Most likely cause?",
+          "choices": [
+            "A DNS server issue",
+            "Possible worm-like lateral movement or scanning for SMB shares",
+            "Normal web browsing",
+            "NTP sync"
+          ],
+          "answer": 1,
+          "explain": "Many SMB connections can indicate scanning or propagation behavior.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: You are building a case note during triage. What should you capture?",
+          "choices": [
+            "Only conclusions",
+            "Evidence, timestamps, hypotheses, actions taken, and next steps",
+            "Only screenshots",
+            "Only the alert title"
+          ],
+          "answer": 1,
+          "explain": "Good case notes support handoffs, audits, and later learning.",
+          "type": "scenario"
+        }
+      ]
+    },
+    {
+      "id": "malware-endpoint-defense",
+      "title": "Malware and Endpoint Defense",
+      "questions": [
+        {
+          "q": "A file hash is best used for:",
+          "choices": [
+            "Determining author identity",
+            "Exact match identification of a specific file",
+            "Blocking all similar files",
+            "Decrypting malware"
+          ],
+          "answer": 1,
+          "explain": "Hashes identify a specific file version; variants often change hashes.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a common persistence mechanism on Windows?",
+          "choices": [
+            "Changing the wallpaper",
+            "Scheduled tasks or Run keys",
+            "Increasing DNS TTL",
+            "ARP cache flush"
+          ],
+          "answer": 1,
+          "explain": "Scheduled tasks and Run keys are common persistence locations.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which behavior most strongly suggests ransomware activity?",
+          "choices": [
+            "High CPU during compilation",
+            "Rapid file modifications with new extensions and deletion of shadow copies",
+            "Many DNS queries to CDNs",
+            "A single ping"
+          ],
+          "answer": 1,
+          "explain": "Mass encryption patterns and shadow copy deletion are common ransomware behaviors.",
+          "type": "mcq"
+        },
+        {
+          "q": "The main advantage of endpoint isolation during an incident is:",
+          "choices": [
+            "It deletes malware automatically",
+            "It prevents lateral movement and exfiltration while investigation continues",
+            "It updates software faster",
+            "It reduces log volume"
+          ],
+          "answer": 1,
+          "explain": "Isolation contains the threat and reduces spread.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is the primary purpose of an EDR tool compared to traditional antivirus?",
+          "choices": [
+            "Only signature scanning",
+            "Behavioral telemetry and investigation with response actions",
+            "Replacing backups",
+            "Replacing firewalls"
+          ],
+          "answer": 1,
+          "explain": "EDR provides telemetry, correlation, and response capabilities beyond signatures.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why is running unknown binaries from user temp directories risky?",
+          "choices": [
+            "Temp directories are slower",
+            "They are common locations for malware dropper execution",
+            "They cannot execute",
+            "They are encrypted"
+          ],
+          "answer": 1,
+          "explain": "Temp and user writeable paths are common malware staging areas.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which email attachment type is commonly abused for initial access?",
+          "choices": [
+            "Plain text",
+            "Office documents with macros",
+            "PNG images only",
+            "MP3 files"
+          ],
+          "answer": 1,
+          "explain": "Macro-enabled documents are commonly abused, though controls vary by environment.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is a 'living off the land' technique?",
+          "choices": [
+            "Using only malware binaries",
+            "Abusing built-in tools (PowerShell, WMI) to reduce detection",
+            "Using only hardware tokens",
+            "Using only DNS"
+          ],
+          "answer": 1,
+          "explain": "Attackers often abuse native tools to blend in.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You find a suspicious executable with a valid signature from an unknown publisher. Best next step?",
+          "choices": [
+            "Assume it is safe due to signature",
+            "Validate the signer reputation, file path, and behavior, and check parent process",
+            "Delete all signed files",
+            "Disable signature checks"
+          ],
+          "answer": 1,
+          "explain": "Signatures help, but trust should be verified with context and behavior.",
+          "type": "scenario"
+        },
+        {
+          "q": "A sandbox is most useful for:",
+          "choices": [
+            "Generating passwords",
+            "Observing malware behavior in an isolated environment",
+            "Reducing latency",
+            "Encrypting disks"
+          ],
+          "answer": 1,
+          "explain": "Sandboxes provide safe dynamic analysis of suspicious files.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which artifact best supports scoping a malware infection across endpoints?",
+          "choices": [
+            "A single screenshot",
+            "Unique IOCs: file path, hash, process names, registry keys, C2 domains",
+            "Only the hostname",
+            "Only the username"
+          ],
+          "answer": 1,
+          "explain": "Multiple IOCs help find related hosts and activity.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is the main risk of disabling antivirus due to performance concerns?",
+          "choices": [
+            "Less disk space",
+            "Increased exposure to commodity malware and delayed detection",
+            "Faster DNS",
+            "Better compliance"
+          ],
+          "answer": 1,
+          "explain": "Disabling AV reduces baseline protection and often increases risk.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A user reports their browser installed a new extension without consent. Best next step?",
+          "choices": [
+            "Ignore it",
+            "Remove the extension, check browser policy controls, and investigate installed software and auth events",
+            "Reinstall the browser only",
+            "Disable all extensions permanently"
+          ],
+          "answer": 1,
+          "explain": "Unexpected extensions can indicate adware or compromise; investigate root cause and enforce policy.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which is a common sign of credential dumping on endpoints?",
+          "choices": [
+            "High disk usage",
+            "Access to LSASS memory or suspicious credential tool execution",
+            "Many print jobs",
+            "A new wallpaper"
+          ],
+          "answer": 1,
+          "explain": "Credential dumping often targets LSASS and uses known tool patterns.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why is application allowlisting effective against some malware?",
+          "choices": [
+            "It increases user freedom",
+            "It prevents unapproved executables and scripts from running",
+            "It disables logging",
+            "It speeds up Wi-Fi"
+          ],
+          "answer": 1,
+          "explain": "Allowlisting restricts execution to known approved software.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You suspect malware spread via SMB shares. Best containment step?",
+          "choices": [
+            "Open SMB to the internet",
+            "Limit SMB access, isolate infected hosts, and check for shared credential reuse",
+            "Disable all file sharing permanently",
+            "Ignore it"
+          ],
+          "answer": 1,
+          "explain": "Contain spread and address credential and share access patterns.",
+          "type": "scenario"
+        },
+        {
+          "q": "What is a practical way to reduce macro malware risk?",
+          "choices": [
+            "Enable all macros",
+            "Block macros from the internet and use trusted locations and signed macros",
+            "Disable email",
+            "Disable TLS"
+          ],
+          "answer": 1,
+          "explain": "Macro policies can prevent untrusted macro execution.",
+          "type": "mcq"
+        },
+        {
+          "q": "A 'beacon' in malware context usually means:",
+          "choices": [
+            "A daily backup",
+            "Periodic outbound communications to a command and control server",
+            "A DNS server",
+            "A firewall rule"
+          ],
+          "answer": 1,
+          "explain": "Beacons are periodic check-ins to C2 infrastructure.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why should you rotate credentials after confirmed compromise?",
+          "choices": [
+            "It makes logs smaller",
+            "Attackers may have stolen creds, and rotation reduces ongoing access",
+            "It disables patching",
+            "It improves CPU"
+          ],
+          "answer": 1,
+          "explain": "Credential theft is common; rotate and revoke sessions to cut access.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Your team wants to wipe an infected host immediately. What is a key tradeoff?",
+          "choices": [
+            "Wiping increases risk",
+            "Wiping removes evidence that could reveal root cause and scope",
+            "Wiping is always the best",
+            "Wiping encrypts disks"
+          ],
+          "answer": 1,
+          "explain": "Eradication without evidence can hinder understanding and prevent recurrence.",
+          "type": "scenario"
+        },
+        {
+          "q": "A strong control to limit credential theft on endpoints is:",
+          "choices": [
+            "Reuse passwords",
+            "Use privileged access separation and reduce local admin rights",
+            "Disable MFA",
+            "Disable patching"
+          ],
+          "answer": 1,
+          "explain": "Reducing privileges and separating admin accounts reduces theft impact.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is the security value of tamper protection for endpoint tools?",
+          "choices": [
+            "It makes malware faster",
+            "It makes it harder for attackers to disable defenses",
+            "It disables updates",
+            "It increases phishing"
+          ],
+          "answer": 1,
+          "explain": "Tamper protection prevents attackers from turning off security controls.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A host shows signs of malware, but it is a critical server. Best approach?",
+          "choices": [
+            "Power it off immediately",
+            "Coordinate a containment plan with stakeholders, isolate where possible, and collect evidence",
+            "Ignore it due to criticality",
+            "Disable logging"
+          ],
+          "answer": 1,
+          "explain": "Containment must consider service impact and evidence collection.",
+          "type": "scenario"
+        },
+        {
+          "q": "What is the main purpose of quarantine actions in endpoint tools?",
+          "choices": [
+            "Encrypt files",
+            "Prevent a suspicious file from executing and spreading while preserving it for analysis",
+            "Disable backups",
+            "Change firewall zones"
+          ],
+          "answer": 1,
+          "explain": "Quarantine reduces risk while keeping the artifact available for analysis.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why is 'known-good baseline' important for endpoint monitoring?",
+          "choices": [
+            "It removes need for alerts",
+            "It helps detect unusual processes and configurations",
+            "It disables updates",
+            "It prevents DNS"
+          ],
+          "answer": 1,
+          "explain": "Baselines help identify abnormal behavior.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You find a malicious domain in proxy logs. Best next step?",
+          "choices": [
+            "Block the domain and stop",
+            "Block and also search for endpoints that connected, then inspect the initiating process",
+            "Delete proxy logs",
+            "Disable proxy"
+          ],
+          "answer": 1,
+          "explain": "Blocking reduces future hits, but scoping and host investigation are needed.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which is most likely to prevent malware from exploiting known vulnerabilities?",
+          "choices": [
+            "Changing hostnames",
+            "Timely patching and vulnerability management",
+            "Disabling logs",
+            "Using weak passwords"
+          ],
+          "answer": 1,
+          "explain": "Patching reduces exposure to known exploit paths.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is a common 'good' endpoint recovery step after eradication?",
+          "choices": [
+            "Rejoin without checks",
+            "Reimage or restore from known-good sources and verify controls and logs are healthy",
+            "Disable AV",
+            "Stop monitoring"
+          ],
+          "answer": 1,
+          "explain": "Recovery should return the system to a clean, monitored state.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: You see a suspicious process spawned by 'winword.exe'. Most likely initial vector?",
+          "choices": [
+            "Disk failure",
+            "Malicious document macro or exploit",
+            "DNS poisoning",
+            "NTP drift"
+          ],
+          "answer": 1,
+          "explain": "Office process spawning scripts or executables often indicates malicious documents.",
+          "type": "scenario"
+        },
+        {
+          "q": "Why are offline or immutable backups valuable against ransomware?",
+          "choices": [
+            "They reduce CPU usage",
+            "They limit the attacker's ability to encrypt or delete backups",
+            "They speed up browsing",
+            "They stop phishing"
+          ],
+          "answer": 1,
+          "explain": "Isolation and immutability protect backups from attacker access.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "vulnerability-management",
+      "title": "Vulnerability Management",
+      "questions": [
+        {
+          "q": "Asset inventory is critical for vulnerability management because:",
+          "choices": [
+            "It slows patching",
+            "You cannot fix what you do not know you have",
+            "It replaces scanning",
+            "It disables logging"
+          ],
+          "answer": 1,
+          "explain": "Knowing assets and owners is required to scope scanning and remediation.",
+          "type": "mcq"
+        },
+        {
+          "q": "CVSS scores primarily represent:",
+          "choices": [
+            "Guaranteed exploitation",
+            "A standardized severity estimate, not business impact",
+            "Patch availability",
+            "Network speed"
+          ],
+          "answer": 1,
+          "explain": "CVSS is a severity metric; prioritization also needs context and exposure.",
+          "type": "mcq"
+        },
+        {
+          "q": "A key reason to run authenticated scans where possible is:",
+          "choices": [
+            "They are always slower",
+            "They provide deeper visibility into installed packages and patch levels",
+            "They remove the need for agents",
+            "They encrypt traffic"
+          ],
+          "answer": 1,
+          "explain": "Authenticated scans can validate versions and missing patches more accurately.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is a common cause of false positives in vulnerability scanning?",
+          "choices": [
+            "Too much disk space",
+            "Service banners and incomplete fingerprinting",
+            "Too many users",
+            "Too few ports"
+          ],
+          "answer": 1,
+          "explain": "Banner-based detection can misidentify versions or patched backports.",
+          "type": "mcq"
+        },
+        {
+          "q": "Patch management is best described as:",
+          "choices": [
+            "A yearly event",
+            "A repeatable process to deploy updates with testing and rollback",
+            "Disabling updates",
+            "Only changing passwords"
+          ],
+          "answer": 1,
+          "explain": "Effective patching needs process, testing, and rollback planning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A critical vulnerability is announced, but no exploit is observed and the affected service is not exposed externally. Best next step?",
+          "choices": [
+            "Ignore it",
+            "Assess exposure, compensating controls, and patch within a defined SLA",
+            "Panic and rebuild everything",
+            "Disable logging"
+          ],
+          "answer": 1,
+          "explain": "Risk-based prioritization considers exposure and impact while still patching in time.",
+          "type": "scenario"
+        },
+        {
+          "q": "A compensating control is:",
+          "choices": [
+            "A replacement for all patching",
+            "A mitigating measure when immediate remediation is not possible",
+            "A type of malware",
+            "A DNS setting"
+          ],
+          "answer": 1,
+          "explain": "Compensating controls reduce risk until the real fix is applied.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is the best outcome of a remediation ticket?",
+          "choices": [
+            "No evidence",
+            "A change applied, validated, and documented with owner and date",
+            "A screenshot only",
+            "A promise to patch later"
+          ],
+          "answer": 1,
+          "explain": "Remediation should be verified and documented.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why is 'exposure' important in prioritization?",
+          "choices": [
+            "It increases storage",
+            "An internally isolated service has different risk than an internet-facing one",
+            "It changes CVSS",
+            "It disables encryption"
+          ],
+          "answer": 1,
+          "explain": "Exposure and reachability change real-world risk.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vulnerability management should include which validation step after patching?",
+          "choices": [
+            "Assume it worked",
+            "Rescan or otherwise verify the vulnerability is resolved",
+            "Disable scanners",
+            "Delete logs"
+          ],
+          "answer": 1,
+          "explain": "Verification confirms remediation and prevents drift.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A scan reports an old OpenSSL version, but the OS vendor backported fixes without changing the version string. Best next step?",
+          "choices": [
+            "Close as false positive without checking",
+            "Validate using vendor advisories or package changelogs and consider authenticated scanning",
+            "Reinstall the OS immediately",
+            "Disable TLS"
+          ],
+          "answer": 1,
+          "explain": "Backports can confuse scanners; validate with authoritative package sources.",
+          "type": "scenario"
+        },
+        {
+          "q": "A good metric for vuln program health is:",
+          "choices": [
+            "Number of wallpapers",
+            "Time to remediate high risk findings on critical assets",
+            "Number of emails",
+            "CPU model"
+          ],
+          "answer": 1,
+          "explain": "Time-to-remediate for critical findings on critical assets indicates program effectiveness.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why is vulnerability triage important?",
+          "choices": [
+            "It delays work",
+            "It reduces noise by focusing remediation on true, relevant issues",
+            "It disables scanning",
+            "It increases risk"
+          ],
+          "answer": 1,
+          "explain": "Triage focuses effort on what matters and avoids wasted work.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which is a typical priority order when two vulns have equal severity?",
+          "choices": [
+            "Fix the one with higher exposure and higher asset criticality first",
+            "Fix randomly",
+            "Fix the one with the longest description",
+            "Fix the one on the newest server"
+          ],
+          "answer": 0,
+          "explain": "Exposure and asset criticality are strong tie-breakers.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is a common security risk of end-of-life software?",
+          "choices": [
+            "It is too fast",
+            "It stops receiving security patches",
+            "It has too many logs",
+            "It is always encrypted"
+          ],
+          "answer": 1,
+          "explain": "EOL software remains vulnerable because fixes are no longer provided.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A team cannot patch a legacy system for 90 days. Best practice is to:",
+          "choices": [
+            "Do nothing",
+            "Apply compensating controls, increase monitoring, and document an exception with owner and expiry",
+            "Disable firewalls",
+            "Expose it publicly"
+          ],
+          "answer": 1,
+          "explain": "Exceptions should be risk managed, time bound, and monitored.",
+          "type": "scenario"
+        },
+        {
+          "q": "Which control helps ensure vulnerabilities are not reintroduced after remediation?",
+          "choices": [
+            "Ad hoc changes",
+            "Configuration management and hardened images",
+            "Disabling audits",
+            "Sharing passwords"
+          ],
+          "answer": 1,
+          "explain": "Baselines and images prevent regressions and drift.",
+          "type": "mcq"
+        },
+        {
+          "q": "In vulnerability management, 'attack surface' refers to:",
+          "choices": [
+            "UI colors",
+            "Exposed services, reachable paths, and exploitable configurations",
+            "CPU temperature",
+            "Printer queues"
+          ],
+          "answer": 1,
+          "explain": "Attack surface includes reachable and exploitable components.",
+          "type": "mcq"
+        },
+        {
+          "q": "Why should you track software dependencies in apps as part of vuln management?",
+          "choices": [
+            "It is irrelevant",
+            "Dependencies often contain known vulnerabilities",
+            "It prevents backups",
+            "It disables encryption"
+          ],
+          "answer": 1,
+          "explain": "Supply chain vulnerabilities frequently come from dependencies.",
+          "type": "mcq"
+        },
+        {
+          "q": "A Software Bill of Materials (SBOM) is:",
+          "choices": [
+            "A list of ports",
+            "An inventory of components and dependencies used in software",
+            "A DNS record",
+            "A firewall rule set"
+          ],
+          "answer": 1,
+          "explain": "SBOMs help track components for vulnerability response.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A new critical vuln affects a widely used library. Best initial action?",
+          "choices": [
+            "Wait for the next scan cycle",
+            "Identify where the library is used, prioritize internet-facing services, and apply patches or mitigations",
+            "Disable all services permanently",
+            "Delete source code"
+          ],
+          "answer": 1,
+          "explain": "Scope usage first, then prioritize and mitigate.",
+          "type": "scenario"
+        },
+        {
+          "q": "Why is patching alone sometimes insufficient?",
+          "choices": [
+            "Patches do nothing",
+            "Misconfigurations and insecure defaults can still be exploitable",
+            "Patching disables encryption",
+            "Patching replaces MFA"
+          ],
+          "answer": 1,
+          "explain": "Risk also comes from configuration and identity weaknesses.",
+          "type": "mcq"
+        },
+        {
+          "q": "Which approach reduces production risk when deploying patches?",
+          "choices": [
+            "Deploy everywhere at once",
+            "Use staged rollout, testing, and rollback plans",
+            "Never patch",
+            "Disable monitoring"
+          ],
+          "answer": 1,
+          "explain": "Staged rollout reduces blast radius of bad updates.",
+          "type": "mcq"
+        },
+        {
+          "q": "What is a reasonable practice for vulnerability exception handling?",
+          "choices": [
+            "Allow exceptions forever",
+            "Require justification, compensating controls, review cadence, and expiry",
+            "No documentation needed",
+            "Only verbal approvals"
+          ],
+          "answer": 1,
+          "explain": "Exceptions should be controlled, documented, and time bound.",
+          "type": "mcq"
+        },
+        {
+          "q": "Threat intelligence is most useful in vuln prioritization when it tells you:",
+          "choices": [
+            "What UI theme is popular",
+            "Whether a vulnerability is actively exploited in the wild",
+            "How many users you have",
+            "Your disk speed"
+          ],
+          "answer": 1,
+          "explain": "Active exploitation signals can elevate priority.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A scan finds a critical vuln on a non-critical lab host. Best response?",
+          "choices": [
+            "Treat the same as a production payment system",
+            "Fix when feasible, but prioritize production and critical assets first",
+            "Ignore forever",
+            "Disable scanning"
+          ],
+          "answer": 1,
+          "explain": "Risk-based prioritization considers asset criticality and environment.",
+          "type": "scenario"
+        },
+        {
+          "q": "Why should you integrate vuln management with change management?",
+          "choices": [
+            "To slow things down",
+            "To ensure fixes are tracked, approved when needed, and auditable",
+            "To avoid documentation",
+            "To disable patching"
+          ],
+          "answer": 1,
+          "explain": "Change management supports control and auditability.",
+          "type": "mcq"
+        },
+        {
+          "q": "A good remediation verification 'looks like':",
+          "choices": [
+            "A note saying done",
+            "Scan results or system evidence showing the vulnerable version is no longer present",
+            "A new firewall rule only",
+            "A screenshot of an email"
+          ],
+          "answer": 1,
+          "explain": "Verification requires evidence, not just claims.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: A scanner reports hundreds of medium findings on one host. Best next step?",
+          "choices": [
+            "Fix all immediately without triage",
+            "Group by root cause (missing patch bundle, weak config), fix the highest impact causes first",
+            "Delete the scan report",
+            "Turn off the scanner"
+          ],
+          "answer": 1,
+          "explain": "Root cause grouping makes remediation efficient and reduces noise.",
+          "type": "scenario"
+        },
+        {
+          "q": "What is the main goal of vulnerability management?",
+          "choices": [
+            "To get a perfect score",
+            "To reduce risk by finding, prioritizing, and remediating weaknesses over time",
+            "To collect logs only",
+            "To block all traffic"
+          ],
+          "answer": 1,
+          "explain": "The goal is sustained risk reduction through an ongoing process.",
+          "type": "mcq"
+        }
+      ]
+    }
+  ]
+}

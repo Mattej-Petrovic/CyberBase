@@ -1,0 +1,4764 @@
+{
+  "_version": 2,
+  "_version_note": "v2 utökar varje ämne till en frågebank med 30 frågor och stödjer slumpmässigt urval av 10 frågor per omgång.",
+  "quizzes": [
+    {
+      "id": "network-basics",
+      "title": "Nätverksgrunder",
+      "questions": [
+        {
+          "q": "Vilket protokoll ger tillförlitlig, beställd leverans?",
+          "choices": [
+            "UDP",
+            "TCP",
+            "ICMP",
+            "ARP"
+          ],
+          "answer": 1,
+          "explain": "TCP upprättar en anslutning och säkerställer beställd leverans.",
+          "type": "mcq"
+        },
+        {
+          "q": "En server som exponeras på TCP 3389 erbjuder troligen vilken tjänst?",
+          "choices": [
+            "SSH",
+            "RDP",
+            "VNC",
+            "Telnet"
+          ],
+          "answer": 1,
+          "explain": "3389/TCP är Remote Desktop Protocol (RDP).",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Användare rapporterar intermittenta misslyckanden vid namnupplösning. Vilka loggar hjälper mest?",
+          "choices": [
+            "Brandvägg tillåter loggar",
+            "DNS frågeloggar",
+            "Loggar för åtkomst till webbservern",
+            "EDR-varningar p? endpoints"
+          ],
+          "answer": 1,
+          "explain": "DNS fråge-/svarsloggar visar fel, tidsgränser och uppströms beteende.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilket lager arbetar IP i modellen OSI?",
+          "choices": [
+            "Transport",
+            "Nätverk",
+            "Datalänk",
+            "Applikation"
+          ],
+          "answer": 1,
+          "explain": "IP är ett lager 3-protokoll (nätverk).",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket protokoll används vanligtvis för tidssynkronisering?",
+          "choices": [
+            "NTP",
+            "SMTP",
+            "SNMP",
+            "DHCP"
+          ],
+          "answer": 0,
+          "explain": "NTP synkroniserar tid över system.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket verktyg visar ruttpaketen till en värd?",
+          "choices": [
+            "ping",
+            "traceroute",
+            "curl",
+            "dig"
+          ],
+          "answer": 1,
+          "explain": "traceroute kartlägger vägen hop för hop.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken adressklass är 10.0.0.0/8?",
+          "choices": [
+            "Privat IPv4",
+            "Offentlig IPv4",
+            "Multicast",
+            "Loopback"
+          ],
+          "answer": 0,
+          "explain": "10.0.0.0/8 är privat IPv4 adressutrymme.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket påstående om UDP är sant?",
+          "choices": [
+            "Det garanterar leverans",
+            "Det är anslutningslöst",
+            "Den ordnar om paket",
+            "Den utför trängselkontroll"
+          ],
+          "answer": 1,
+          "explain": "UDP är anslutningsfri och garanterar inte leverans.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Latenspik utan paketförlust. Vad kollar du först?",
+          "choices": [
+            "DNS servrar",
+            "Bandbreddsgrafer",
+            "Routing loopar",
+            "Diskens temperatur"
+          ],
+          "answer": 1,
+          "explain": "Bandbredds- eller QoS-problem orsakar vanligtvis latens utan förlust.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilken posttyp mappar namn till IPv6-adresser?",
+          "choices": [
+            "A",
+            "AAAA",
+            "CNAME",
+            "MX"
+          ],
+          "answer": 1,
+          "explain": "AAAA poster mappar värdnamn till IPv6 adresser.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad definierar en nätmask (/24) främst?",
+          "choices": [
+            "DNS servrar",
+            "Hur många IP-adresser finns i ett nätverk",
+            "En enhets MAC adress",
+            "Vilka portar är öppna"
+          ],
+          "answer": 1,
+          "explain": "CIDR prefixlängd definierar nätverksstorleken och vilka IP-adresser som anses vara lokala.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket meddelande används av ARP för att fråga \"Vem har denna IP?\"",
+          "choices": [
+            "ARP Svara",
+            "ARP Begäran",
+            "ICMP Ekosvar",
+            "DHCP Erbjudande"
+          ],
+          "answer": 1,
+          "explain": "En ARP-förfrågan sänds för att upptäcka adressen MAC för en IP på det lokala nätverket.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken ICMP-typ används av ping för att testa nåbarhet?",
+          "choices": [
+            "Eko-förfrågan",
+            "Tiden har överskridits",
+            "Destinationen går inte att nå",
+            "Dirigera om"
+          ],
+          "answer": 0,
+          "explain": "Ping använder vanligtvis ICMP Echo Request och Echo Reply.",
+          "type": "mcq"
+        },
+        {
+          "q": "I TCP, vilken flagga används vanligtvis för att starta en anslutning?",
+          "choices": [
+            "RST",
+            "SYN",
+            "FIN",
+            "PSH"
+          ],
+          "answer": 1,
+          "explain": "TCP trevägshandskakning börjar med en SYN.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är huvudsyftet med NAT i många nätverk?",
+          "choices": [
+            "Kryptera trafik",
+            "Översätt privat till offentliga adresser",
+            "Upptäck skadlig programvara",
+            "Synkronisera tid"
+          ],
+          "answer": 1,
+          "explain": "NAT mappar interna privata adresser till externa offentliga adresser (eller andra adressutrymmen).",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket protokoll används vanligtvis för automatisk IP adresstilldelning?",
+          "choices": [
+            "DHCP",
+            "SNMP",
+            "SFTP",
+            "BGP"
+          ],
+          "answer": 0,
+          "explain": "DHCP automatiserar adressering och relaterad konfiguration som DNS och standardgateway.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken DNS-komponent utför vanligtvis rekursion på uppdrag av klienter?",
+          "choices": [
+            "Auktoritativ DNS-server",
+            "Rekursiv resolver",
+            "Rotzonsfil",
+            "DHCP relä"
+          ],
+          "answer": 1,
+          "explain": "En rekursiv resolver frågar andra servrar för att lösa ett namn för klienten.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad beskriver MTU?",
+          "choices": [
+            "Maximalt DNS TTL",
+            "Maximal paketstorlek på en länk",
+            "Maximal CPU användning",
+            "Maximalt portnummer"
+          ],
+          "answer": 1,
+          "explain": "MTU är den maximala överföringsenheten, den största paketstorlek en länk kan bära utan fragmentering.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken mekanism hjälper till att undvika IP-konflikter på en LAN?",
+          "choices": [
+            "DHCP hyresavtal",
+            "TLS certifikat",
+            "MAC randomisering",
+            "Hamnknackning"
+          ],
+          "answer": 0,
+          "explain": "DHCP spårar hyrda adresser och kan minska konflikter jämfört med manuell statisk tilldelning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Användare kan nå en IP-adress men inte värdnamnet. Vilken är den bästa nästa kontrollen?",
+          "choices": [
+            "Verifiera DNS upplösning för värdnamnet",
+            "Installera om operativsystemet",
+            "Inaktivera brandväggen permanent",
+            "Byt ut nätverkskabeln på servern"
+          ],
+          "answer": 0,
+          "explain": "Om IP fungerar men värdnamn misslyckas, kontrollera DNS upplösning (A/AAAA poster, resolver, cache).",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilket OSI lager är ansvarigt för att byta ramar efter MAC adress?",
+          "choices": [
+            "Nätverk",
+            "Datalänk",
+            "Transport",
+            "Session"
+          ],
+          "answer": 1,
+          "explain": "Switching är en Layer 2 (Datalänk) funktion.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket protokoll används vanligtvis för att hantera routrar och switchar säkert idag?",
+          "choices": [
+            "Telnet",
+            "SNMPv1",
+            "SSH",
+            "FTP"
+          ],
+          "answer": 2,
+          "explain": "SSH ger krypterad hanteringsåtkomst; Telnet och äldre SNMP är ofta osäkra.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad representerar \"default gateway\" för en värd?",
+          "choices": [
+            "Den lokala DNS cachen",
+            "Routern använde för att nå andra nätverk",
+            "Värdens MAC adress",
+            "Tabellen ARP"
+          ],
+          "answer": 1,
+          "explain": "Standardgatewayen är nästa hop-router för trafik som lämnar det lokala subnätet.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken posttyp DNS används för e-postdirigering?",
+          "choices": [
+            "TXT",
+            "MX",
+            "PTR",
+            "SRV"
+          ],
+          "answer": 1,
+          "explain": "MX poster anger e-postväxlare för en domän.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket adressintervall är loopback i IPv4?",
+          "choices": [
+            "169.254.0.0/16",
+            "127.0.0.0/8",
+            "224.0.0.0/4",
+            "192.0.2.0/24"
+          ],
+          "answer": 1,
+          "explain": "127.0.0.0/8 är loopback-intervallet; 127.0.0.1 används ofta.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är det primära säkerhetsvärdet för TLS över vanligt TCP?",
+          "choices": [
+            "Bättre rutt",
+            "Konfidentialitet och integritet för applikationsdata",
+            "Lägre latens",
+            "Automatisk IP tilldelning"
+          ],
+          "answer": 1,
+          "explain": "TLS lägger till kryptering och integritet för att skydda data under överföring.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En arbetsstation visar \"begränsad anslutning\" och har en IP i 169.254.0.0/16. Mest trolig orsak?",
+          "choices": [
+            "DNS felkonfiguration",
+            "DHCP misslyckande och APIPA reserv",
+            "Korrekt statisk konfiguration",
+            "Brandvägg blockerar utgående HTTPS"
+          ],
+          "answer": 1,
+          "explain": "APIPA-adresser visas ofta när DHCP misslyckas och värden själv tilldelar en lokal länkadress.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilket routingprotokoll används vanligtvis mellan stora nätverk på internet?",
+          "choices": [
+            "BGP",
+            "STP",
+            "LLDP",
+            "ARP"
+          ],
+          "answer": 0,
+          "explain": "BGP är det dominerande routingprotokollet mellan domäner.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är en vanlig fördel med VLAN?",
+          "choices": [
+            "De krypterar trafik som standard",
+            "De minskar sändningsdomäner och segmenterar nätverk",
+            "De ersätter brandväggar",
+            "De patchar automatiskt system"
+          ],
+          "answer": 1,
+          "explain": "VLAN segmenterar Layer 2-nätverk och minskar sändningsomfånget.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En traceroute visar ett plötsligt hopp i latens vid ett hopp, men senare hopp är normala. Mest trolig förklaring?",
+          "choices": [
+            "Det hoppet nedprioriterar ICMP svar",
+            "Vägen är definitivt överbelastad från början",
+            "DNS är nere",
+            "Destinationen går inte att nå"
+          ],
+          "answer": 0,
+          "explain": "Vissa routrar hastighetsbegränsar eller nedprioriterar ICMP, vilket gör att ett hopp verkar långsamt även om vidarebefordran går bra.",
+          "type": "scenario"
+        }
+      ]
+    },
+    {
+      "id": "ports",
+      "title": "Portar",
+      "questions": [
+        {
+          "q": "SSH lyssnar vanligtvis på vilken TCP-port?",
+          "choices": [
+            "21",
+            "22",
+            "80",
+            "443"
+          ],
+          "answer": 1,
+          "explain": "SSH har som standard TCP 22.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken port använder HTTPS vanligtvis?",
+          "choices": [
+            "80",
+            "389",
+            "443",
+            "25"
+          ],
+          "answer": 2,
+          "explain": "HTTPS har som standard TCP 443.",
+          "type": "mcq"
+        },
+        {
+          "q": "SMTP inlämning från kunder använder vanligtvis:",
+          "choices": [
+            "25",
+            "110",
+            "123",
+            "587"
+          ],
+          "answer": 3,
+          "explain": "Port 587 är för autentiserad SMTP-inlämning.",
+          "type": "mcq"
+        },
+        {
+          "q": "RDP finns oftast på:",
+          "choices": [
+            "22",
+            "3389",
+            "5900",
+            "3306"
+          ],
+          "answer": 1,
+          "explain": "RDP använder TCP 3389.",
+          "type": "mcq"
+        },
+        {
+          "q": "MySQL standardport är:",
+          "choices": [
+            "1521",
+            "1433",
+            "3306",
+            "5432"
+          ],
+          "answer": 2,
+          "explain": "MySQL/MariaDB är som standard 3306.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket protokoll använder vanligtvis UDP 53?",
+          "choices": [
+            "DNS",
+            "DHCP",
+            "SNMP",
+            "NTP"
+          ],
+          "answer": 0,
+          "explain": "DNS frågor använder vanligtvis UDP 53.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken port använder IMAPS?",
+          "choices": [
+            "110",
+            "143",
+            "993",
+            "995"
+          ],
+          "answer": 2,
+          "explain": "IMAP över TLS är 993.",
+          "type": "mcq"
+        },
+        {
+          "q": "PostgreSQL standardport är:",
+          "choices": [
+            "3306",
+            "5432",
+            "1521",
+            "1433"
+          ],
+          "answer": 1,
+          "explain": "PostgreSQL har som standard 5432.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är ett äldre VPN-protokoll som ofta undviks idag?",
+          "choices": [
+            "PPTP",
+            "IKEv2",
+            "WireGuard",
+            "OpenVPN"
+          ],
+          "answer": 0,
+          "explain": "PPTP är arv och allmänt avskräckt.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken UDP-port använder syslog traditionellt?",
+          "choices": [
+            "514",
+            "25",
+            "123",
+            "993"
+          ],
+          "answer": 0,
+          "explain": "Syslog över UDP använder 514 enligt konvention.",
+          "type": "mcq"
+        },
+        {
+          "q": "DNS över TLS (DoT) använder vanligtvis vilken port?",
+          "choices": [
+            "53",
+            "853",
+            "443",
+            "5353"
+          ],
+          "answer": 1,
+          "explain": "DNS över TLS använder vanligtvis TCP 853.",
+          "type": "mcq"
+        },
+        {
+          "q": "SMB över TCP är vanligtvis på vilken port?",
+          "choices": [
+            "139",
+            "445",
+            "25",
+            "161"
+          ],
+          "answer": 1,
+          "explain": "Modern SMB använder vanligtvis TCP 445.",
+          "type": "mcq"
+        },
+        {
+          "q": "Kerberos autentisering använder vanligtvis vilken port?",
+          "choices": [
+            "88",
+            "53",
+            "110",
+            "2049"
+          ],
+          "answer": 0,
+          "explain": "Kerberos använder vanligtvis TCP och UDP 88.",
+          "type": "mcq"
+        },
+        {
+          "q": "LDAP använder vanligtvis vilken port (okrypterad)?",
+          "choices": [
+            "389",
+            "636",
+            "143",
+            "3128"
+          ],
+          "answer": 0,
+          "explain": "LDAP är vanligtvis TCP 389; LDAPS är 636.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken UDP-port används vanligtvis för RADIUS-autentisering?",
+          "choices": [
+            "1812",
+            "1813",
+            "162",
+            "500"
+          ],
+          "answer": 0,
+          "explain": "RADIUS auth använder vanligtvis UDP 1812; redovisning använder ofta 1813.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken port använder NFS vanligtvis?",
+          "choices": [
+            "2049",
+            "3306",
+            "1521",
+            "5900"
+          ],
+          "answer": 0,
+          "explain": "NFS använder vanligtvis TCP 2049 (plus relaterade RPC tjänster i vissa inställningar).",
+          "type": "mcq"
+        },
+        {
+          "q": "SNMP avfrågning sker vanligtvis på vilken UDP-port?",
+          "choices": [
+            "514",
+            "161",
+            "162",
+            "69"
+          ],
+          "answer": 1,
+          "explain": "SNMP polling använder UDP 161; fällor är ofta UDP 162.",
+          "type": "mcq"
+        },
+        {
+          "q": "Syslog över TCP är vanligtvis på:",
+          "choices": [
+            "514",
+            "6514",
+            "443",
+            "587"
+          ],
+          "answer": 1,
+          "explain": "Syslog över TLS använder ofta TCP 6514 i praktiken.",
+          "type": "mcq"
+        },
+        {
+          "q": "IPsec IKE (fas 1) använder vanligtvis vilken UDP-port?",
+          "choices": [
+            "500",
+            "4500",
+            "1701",
+            "1194"
+          ],
+          "answer": 0,
+          "explain": "IKE använder vanligtvis UDP 500; NAT T använder ofta 4500.",
+          "type": "mcq"
+        },
+        {
+          "q": "SIP-signalering för VoIP använder vanligtvis:",
+          "choices": [
+            "5060",
+            "5061",
+            "3389",
+            "27017"
+          ],
+          "answer": 0,
+          "explain": "SIP använder vanligtvis 5060; TLS säker SIP använder ofta 5061.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du ser inkommande anslutningar till TCP 445 från internetkanten. Bästa tolkningen?",
+          "choices": [
+            "Normal webbtrafik",
+            "Troligtvis osäker exponering av SMB",
+            "NTP synkroniseringsaktivitet",
+            "SMTP inlämning"
+          ],
+          "answer": 1,
+          "explain": "SMB bör i allmänhet inte exponeras för opålitliga nätverk.",
+          "type": "scenario"
+        },
+        {
+          "q": "IMAP (okrypterad) använder vanligtvis:",
+          "choices": [
+            "143",
+            "993",
+            "995",
+            "110"
+          ],
+          "answer": 0,
+          "explain": "IMAP är 143; IMAPS är 993.",
+          "type": "mcq"
+        },
+        {
+          "q": "POP3S (implicit TLS) använder vanligtvis:",
+          "choices": [
+            "110",
+            "995",
+            "993",
+            "25"
+          ],
+          "answer": 1,
+          "explain": "POP3S använder TCP 995.",
+          "type": "mcq"
+        },
+        {
+          "q": "Fjärrtjänster VNC är ofta på:",
+          "choices": [
+            "5900",
+            "3389",
+            "22",
+            "8080"
+          ],
+          "answer": 0,
+          "explain": "VNC använder vanligtvis TCP 5900 (och inkrementella portar för flera skärmar).",
+          "type": "mcq"
+        },
+        {
+          "q": "Microsoft SQL Server använder vanligtvis:",
+          "choices": [
+            "1433",
+            "1521",
+            "3306",
+            "27017"
+          ],
+          "answer": 0,
+          "explain": "MSSQL använder vanligtvis TCP 1433.",
+          "type": "mcq"
+        },
+        {
+          "q": "Oracle Database använder vanligtvis:",
+          "choices": [
+            "1521",
+            "1433",
+            "6379",
+            "9200"
+          ],
+          "answer": 0,
+          "explain": "Oracle använder vanligtvis TCP 1521.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken port använder Redis vanligtvis?",
+          "choices": [
+            "27017",
+            "6379",
+            "9200",
+            "5985"
+          ],
+          "answer": 1,
+          "explain": "Redis använder vanligtvis TCP 6379.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken port använder MongoDB vanligtvis?",
+          "choices": [
+            "27017",
+            "5432",
+            "8080",
+            "2049"
+          ],
+          "answer": 0,
+          "explain": "MongoDB använder vanligtvis TCP 27017.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilka portar använder WinRM vanligtvis?",
+          "choices": [
+            "5985 och 5986",
+            "445 och 139",
+            "80 och 443",
+            "500 och 4500"
+          ],
+          "answer": 0,
+          "explain": "WinRM använder vanligtvis 5985 (HTTP) och 5986 (HTTPS).",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken port använder OpenVPN vanligtvis som standard?",
+          "choices": [
+            "1194",
+            "1701",
+            "500",
+            "1812"
+          ],
+          "answer": 0,
+          "explain": "OpenVPN använder vanligtvis UDP 1194 som standard.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "frameworks-standards",
+      "title": "Ramverk och standarder",
+      "questions": [
+        {
+          "q": "Vilket ramverk har kärnfunktioner Identifiera, skydda, upptäcka, svara, återställa?",
+          "choices": [
+            "CIS Controls",
+            "NIST CSF",
+            "ISO 27001",
+            "OWASP Topp 10"
+          ],
+          "answer": 1,
+          "explain": "NIST CSF definierar dessa fem kärnfunktioner.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken standard definierar kraven för en ISMS?",
+          "choices": [
+            "ISO/IEC 27001",
+            "PCI DSS",
+            "SOC 2",
+            "DORA"
+          ],
+          "answer": 0,
+          "explain": "ISO/IEC 27001 definierar ISMS krav.",
+          "type": "mcq"
+        },
+        {
+          "q": "OWASP Topp 10 adresserar främst vilken domän?",
+          "choices": [
+            "Nätverkshärdning",
+            "Webbapplikationsrisker",
+            "Identitetsstyrning",
+            "Incident respons"
+          ],
+          "answer": 1,
+          "explain": "OWASP Topp 10 fokuserar på risker med webbappar.",
+          "type": "mcq"
+        },
+        {
+          "q": "CIS Controls beskrivs bäst som:",
+          "choices": [
+            "Regleringsrätt",
+            "Revisionsstandard",
+            "Prioriterade skyddsåtgärder",
+            "Krypteringssvit"
+          ],
+          "answer": 2,
+          "explain": "CIS Controls är prioriterade defensiva skyddsåtgärder.",
+          "type": "mcq"
+        },
+        {
+          "q": "MITRE ATT&CK organiserar:",
+          "choices": [
+            "Krypteringsalgoritmer",
+            "Motståndarens taktik och teknik",
+            "Efterlevnadskontroller",
+            "Sårbarhetspoäng"
+          ],
+          "answer": 1,
+          "explain": "ATT&CK katalogiserar taktik/tekniker baserade på verkliga beteenden.",
+          "type": "mcq"
+        },
+        {
+          "q": "DORA fokuserar på:",
+          "choices": [
+            "EU operativ motståndskraft för finansiella enheter",
+            "US sjukvårdsintegritet",
+            "Betalkorts datasäkerhet",
+            "Programvarulicenser"
+          ],
+          "answer": 0,
+          "explain": "DORA är EU lagstiftning om ICT motståndskraft inom finans.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken är en certifieringsstandard snarare än en kontrollkatalog?",
+          "choices": [
+            "NIST CSF",
+            "CIS Controls",
+            "MITRE ATT&CK",
+            "ISO 27001"
+          ],
+          "answer": 3,
+          "explain": "Organisationer kan certifiera till ISO/IEC 27001.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kompletterar bäst OWASP Topp 10 för detaljerade krav?",
+          "choices": [
+            "ASVS",
+            "NIST 800-53",
+            "COBIT",
+            "SOX"
+          ],
+          "answer": 0,
+          "explain": "OWASP ASVS ger djupare krav på appsäkerhet.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket ramverk tillhandahåller implementeringsnivåer som beskriver mognad?",
+          "choices": [
+            "CIS Controls",
+            "NIST CSF",
+            "ISO 27001",
+            "OWASP Topp 10"
+          ],
+          "answer": 1,
+          "explain": "NIST CSF inkluderar implementeringsnivåer.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken post är en kunskapsbas snarare än en kontrollram?",
+          "choices": [
+            "CIS Controls",
+            "ISO 27001",
+            "MITRE ATT&CK",
+            "NIST CSF"
+          ],
+          "answer": 2,
+          "explain": "ATT&CK är en kunskapsbas om motståndares beteende.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket ramverk är en katalog över säkerhets- och integritetskontroller för US federala informationssystem?",
+          "choices": [
+            "NIST SP 800-53",
+            "OWASP Topp 10",
+            "MITRE ATT&CK",
+            "ASVS"
+          ],
+          "answer": 0,
+          "explain": "NIST SP 800-53 är en kontrollkatalog för säkerhets- och integritetskontroller.",
+          "type": "mcq"
+        },
+        {
+          "q": "PCI DSS handlar främst om:",
+          "choices": [
+            "Betalkortsinnehavarens datasäkerhet",
+            "E-postkrypteringsstandarder",
+            "Syntax för routerkonfiguration",
+            "Incident respons bemanning"
+          ],
+          "answer": 0,
+          "explain": "PCI DSS fokuserar på att skydda kortinnehavarens datamiljöer.",
+          "type": "mcq"
+        },
+        {
+          "q": "SOC 2 rapporter är baserade på:",
+          "choices": [
+            "AICPA Kriterier för förtroendetjänster",
+            "ISO 27002 klausuler",
+            "MITRE ATT&CK taktik",
+            "CIS Endast benchmarks"
+          ],
+          "answer": 0,
+          "explain": "SOC 2 använder AICPA Trust Services Criteria som grund för utvärdering.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket dokument beskrivs bäst som en prioriterad uppsättning praktiska skyddsåtgärder snarare än en certifieringsstandard?",
+          "choices": [
+            "CIS Controls",
+            "ISO/IEC 27001",
+            "GDPR",
+            "SOX"
+          ],
+          "answer": 0,
+          "explain": "CIS Controls tillhandahålla prioriterade skyddsåtgärder; ISO 27001 är en certifierbar ledningssystemstandard.",
+          "type": "mcq"
+        },
+        {
+          "q": "MITRE ATT&CK är mest användbar för:",
+          "choices": [
+            "Kartlägga upptäckter till motståndares beteende",
+            "Välj storlek på krypteringsnyckel",
+            "Definiera löneregler",
+            "Konfigurerar DHCP omfattningar"
+          ],
+          "answer": 0,
+          "explain": "ATT&CK tillhandahåller ett gemensamt språk för att beskriva motståndartekniker och kartdetektering och täckning.",
+          "type": "mcq"
+        },
+        {
+          "q": "NIST CSF 'Profiler' används för att:",
+          "choices": [
+            "Definiera mål och aktuella tillstånd för cybersäkerhetsresultat",
+            "Kryptera trafik från början till slut",
+            "Ersätt sårbarhetsskanning",
+            "Skapa lösenord"
+          ],
+          "answer": 0,
+          "explain": "Profiler beskriver aktuella resultat och målresultat för ett givet sammanhang.",
+          "type": "mcq"
+        },
+        {
+          "q": "ISO/IEC 27002 beskrivs bäst som:",
+          "choices": [
+            "En vägledningskatalog över kontroller av informationssäkerhet",
+            "En certifieringsrevisionsrapport",
+            "En sårbarhetsdatabas",
+            "Ett ramverk för analys av skadlig programvara"
+          ],
+          "answer": 0,
+          "explain": "ISO 27002 ger vägledning för att välja och implementera kontroller.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är en vanlig anledning till att organisationer använder CIS benchmarks?",
+          "choices": [
+            "Härdande konfigurationsvägledning för specifika tekniker",
+            "Automatisk incidentrespons",
+            "Paketfångst i realtid",
+            "Endast nätfiske-simulering"
+          ],
+          "answer": 0,
+          "explain": "CIS Benchmarks ger vägledning för konfigurationshärdning för specifika system och produkter.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En kund ber om bevis på säkerhetskontroller utan att kräva ISO-certifiering. En vanlig leverans är:",
+          "choices": [
+            "SOC 2 Skriv II rapport",
+            "En ARP tabellexport",
+            "Endast en skärmdump av portskanning",
+            "En enda lösenordspolicy"
+          ],
+          "answer": 0,
+          "explain": "SOC 2 Typ II används vanligtvis för att tillhandahålla försäkransbevis över en tidsperiod.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilket uttalande om efterlevnad kontra säkerhet är mest korrekt?",
+          "choices": [
+            "Efterlevnad garanterar stark säkerhet",
+            "Efterlevnad kan hjälpa till att strukturera arbetet men garanterar inte säkerheten",
+            "Säkerhet handlar bara om att klara revisioner",
+            "Säkerhet innebär att inaktivera all åtkomst"
+          ],
+          "answer": 1,
+          "explain": "Ramverk för efterlevnad kan vägleda insatser, men säkerhetsresultat beror på effektiv implementering och riskhantering.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket ramverk fokuserar på riskmedvetenhet för webbapplikationer snarare än styrning?",
+          "choices": [
+            "OWASP Topp 10",
+            "ISO 27001",
+            "NIST CSF",
+            "DORA"
+          ],
+          "answer": 0,
+          "explain": "OWASP Topp 10 är en medvetenhetslista för risker med webbappar.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket ramverk beskrivs bäst som resultatbaserat snarare än kontrollpreskriptivt?",
+          "choices": [
+            "NIST CSF",
+            "CIS Controls",
+            "PCI DSS",
+            "ISO 27001 Bilaga A"
+          ],
+          "answer": 0,
+          "explain": "NIST CSF fokuserar på resultat och funktioner; det är mindre föreskrivande än kontrollkataloger.",
+          "type": "mcq"
+        },
+        {
+          "q": "En \"policy\" i ett ISMS sammanhang är vanligtvis:",
+          "choices": [
+            "En avsiktsförklaring och krav på hög nivå",
+            "En brandväggsregellista",
+            "En paketfångst",
+            "En sårbarhetssignatur"
+          ],
+          "answer": 0,
+          "explain": "Policyer anger riktning och krav; procedurer och konfigurationer implementerar dem.",
+          "type": "mcq"
+        },
+        {
+          "q": "Riskbedömningar i ISO 27001 driver främst:",
+          "choices": [
+            "Vilka kontroller som ska väljas och prioriteras",
+            "Vilka portar som ska öppnas på varje värd",
+            "Vilken chiffersvit till hårdkod",
+            "Hur man formaterar loggfiler"
+          ],
+          "answer": 0,
+          "explain": "Riskbedömningsresultat driver urval och prioritering av kontroller.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken är en typisk skillnad mellan SOC 2 typ I och typ II?",
+          "choices": [
+            "Typ I täcker design vid en tidpunkt; Typ II täcker driftseffektivitet under en period",
+            "Typ I är för nätverk; Typ II är för appar",
+            "Typ II har inga kontroller",
+            "De är identiska"
+          ],
+          "answer": 0,
+          "explain": "Typ I är en ögonblicksbild; Typ II tester under en period.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Ditt team vill ha en lätt utgångspunkt för grundläggande cyberhygien. En vanlig baslinje är:",
+          "choices": [
+            "CIS Stilkontroller för implementeringsgrupp 1",
+            "En anpassad kryptografialgoritm",
+            "Inaktiverar alla loggar",
+            "Endast ett årligt penetrationstest"
+          ],
+          "answer": 0,
+          "explain": "CIS IG1 används ofta som en praktisk baslinje för grundläggande hygien.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilket koncept stämmer bäst överens med \"säkerhetsresultat kartlade till affärssammanhang\"?",
+          "choices": [
+            "NIST CSF Profiler",
+            "Portkartering",
+            "ARP förgiftning",
+            "Nyckelsträckning"
+          ],
+          "answer": 0,
+          "explain": "CSF Profiler anpassar cybersäkerhetsresultat till en given affärskontext.",
+          "type": "mcq"
+        },
+        {
+          "q": "Ett \"kontrollmål\" beskrivs bäst som:",
+          "choices": [
+            "Det syfte kontrollen ska uppnå",
+            "En specifik kommandoradsflagga",
+            "En lista över CVE",
+            "Ett brandväggsportnummer"
+          ],
+          "answer": 0,
+          "explain": "Kontrollmål beskriver avsedda resultat, medan implementeringar kan variera.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken post är mest direkt inriktad på att förbättra operativ motståndskraft i vissa finansiella enheter inom EU?",
+          "choices": [
+            "DORA",
+            "OWASP ASVS",
+            "MITRE ATT&CK",
+            "CIS Benchmarks"
+          ],
+          "answer": 0,
+          "explain": "DORA tar upp ICT riskhantering och operativ motståndskraft för finanssektorn.",
+          "type": "mcq"
+        },
+        {
+          "q": "ASVS beskrivs bäst som:",
+          "choices": [
+            "En uppsättning detaljerade säkerhetskrav för webbappar efter garantinivå",
+            "En familjeklassificering för skadlig programvara",
+            "En nätverksroutingstandard",
+            "Ett verktyg för att knäcka lösenord"
+          ],
+          "answer": 0,
+          "explain": "OWASP ASVS ger detaljerade säkerhetskrav för webbapplikationer.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "principles-identity",
+      "title": "Principer och identitet",
+      "questions": [
+        {
+          "q": "Zero Trust betonar:",
+          "choices": [
+            "Perimeterförtroende",
+            "Implicit förtroende",
+            "Verifiera alltid",
+            "Ingen loggning"
+          ],
+          "answer": 2,
+          "explain": "Noll förtroende: lita aldrig på, verifiera alltid.",
+          "type": "mcq"
+        },
+        {
+          "q": "Minsta privilegium betyder:",
+          "choices": [
+            "Neka administratörsinloggningar",
+            "Ge endast nödvändig åtkomst",
+            "Använd offentligt Wi-Fi",
+            "Inaktivera TLS"
+          ],
+          "answer": 1,
+          "explain": "Endast de minsta nödvändiga tillstånden bör beviljas.",
+          "type": "mcq"
+        },
+        {
+          "q": "AAA står för:",
+          "choices": [
+            "Autentisering, auktorisering, redovisning",
+            "Bedöma, agera, granska",
+            "Ansök, godkänn, arkivera",
+            "Admin, åtkomst, revision"
+          ],
+          "answer": 0,
+          "explain": "AAA är autentisering, auktorisering, redovisning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken är en phishing-resistent MFA-metod?",
+          "choices": [
+            "SMS",
+            "E-postlänk",
+            "WebAuthn/lösenord",
+            "TOTP i e-post"
+          ],
+          "answer": 2,
+          "explain": "WebAuthn/lösenord ger starkt motstånd mot nätfiske.",
+          "type": "mcq"
+        },
+        {
+          "q": "IAM hanterar vanligtvis:",
+          "choices": [
+            "Kodinstallationer",
+            "Digitala identiteter och tillgång",
+            "Datacenterkylning",
+            "TLS handslag"
+          ],
+          "answer": 1,
+          "explain": "IAM är för identitetslivscykel och åtkomstkontroll.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En leverantör behöver tillfällig tillgång till en resurs. Bästa tillvägagångssättet?",
+          "choices": [
+            "Permanent administratörsroll",
+            "Delade autentiseringsuppgifter",
+            "Just-in-time minsta privilegiet",
+            "Inaktivera loggning"
+          ],
+          "answer": 2,
+          "explain": "Ge omfattning, tidsbunden åtkomst anpassad med minsta privilegium.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilken faktorkategori är ett fingeravtryck?",
+          "choices": [
+            "Kunskap",
+            "Besittning",
+            "Inherens",
+            "Plats"
+          ],
+          "answer": 2,
+          "explain": "Biometri faller under inneboende faktorer.",
+          "type": "mcq"
+        },
+        {
+          "q": "Tjänstekonton bör:",
+          "choices": [
+            "Använd delade lösenord",
+            "Har bred admin som standard",
+            "Använd behörigheter med omfattning",
+            "Rotera högst årligen"
+          ],
+          "answer": 2,
+          "explain": "Använd avgränsade behörigheter och undvik delade creds.",
+          "type": "mcq"
+        },
+        {
+          "q": "Centraliserad SSO minskar:",
+          "choices": [
+            "Risk för återanvändning av lösenord",
+            "Nätverkslatens",
+            "TLS handskakningstid",
+            "Disk I/O"
+          ],
+          "answer": 0,
+          "explain": "SSO och federation kan minska lösenordsspridningen.",
+          "type": "mcq"
+        },
+        {
+          "q": "Åtkomst till hjälp för recensioner:",
+          "choices": [
+            "Fixa kärnbuggar",
+            "Validera rättigheter",
+            "Minska paketförlusten",
+            "Kryptera diskar"
+          ],
+          "answer": 1,
+          "explain": "Regelbundna granskningar bekräftar att åtkomsten är lämplig.",
+          "type": "mcq"
+        },
+        {
+          "q": "RBAC står för:",
+          "choices": [
+            "Riskbaserad åtkomstkontroll",
+            "Rollbaserad åtkomstkontroll",
+            "Resursbaserad åtkomstkontroll",
+            "Regelbaserad kontokontroll"
+          ],
+          "answer": 1,
+          "explain": "RBAC tilldelar behörigheter till roller och roller till användare.",
+          "type": "mcq"
+        },
+        {
+          "q": "ABAC beskrivs bäst som:",
+          "choices": [
+            "Åtkomst baserad på attribut och policyutvärdering",
+            "Åtkomst baseras endast på gruppmedlemskap",
+            "En hashningsalgoritm för lösenord",
+            "Ett nätverkssegmenteringsprotokoll"
+          ],
+          "answer": 0,
+          "explain": "ABAC använder attribut (användare, resurs, sammanhang) utvärderade mot policy.",
+          "type": "mcq"
+        },
+        {
+          "q": "En vanlig fördel med att använda lösenord/WebAuthn är:",
+          "choices": [
+            "De är lättare att nätfiska",
+            "De minskar riskerna för nätfiske och återanvändning av lösenord",
+            "De kräver delade lösenord",
+            "De inaktiverar MFA"
+          ],
+          "answer": 1,
+          "explain": "Nyckeln är nätfiskeresistent och minskar beroendet av delade hemligheter.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken tokentyp används vanligtvis med OAuth 2.0 / OIDC?",
+          "choices": [
+            "JWT",
+            "PCAP",
+            "SYSLOG",
+            "CSV"
+          ],
+          "answer": 0,
+          "explain": "JWT är ett vanligt tokenformat för åtkomst och ID tokens.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En ingenjör behöver administratörsrättigheter i 30 minuter för att tillämpa en ändring. Bästa tillvägagångssättet?",
+          "choices": [
+            "Lägg till dem till domänadministratörer permanent",
+            "Använd just in time elevation med godkännande och loggning",
+            "Dela administratörslösenordet i chatten",
+            "Inaktivera MFA för hastighet"
+          ],
+          "answer": 1,
+          "explain": "Tidsbunden höjd med godkännanden och revision minskar stående privilegium.",
+          "type": "scenario"
+        },
+        {
+          "q": "Ett viktigt skäl till att undvika delade konton är:",
+          "choices": [
+            "De förbättrar ansvarsskyldigheten",
+            "De minskar revisionsloggningen",
+            "De tar bort individuell attribution",
+            "De möjliggör bättre MFA"
+          ],
+          "answer": 2,
+          "explain": "Delade konton bryter tillskrivningen och gör utredningar och återkallelse svårare.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är ett exempel på \"något du har\" MFA?",
+          "choices": [
+            "Ett lösenord",
+            "En hårdvarutoken",
+            "Ett fingeravtryck",
+            "A PIN"
+          ],
+          "answer": 1,
+          "explain": "En token eller enhet är en innehavsfaktor.",
+          "type": "mcq"
+        },
+        {
+          "q": "Federation (SSO) förlitar sig vanligtvis på protokoll som:",
+          "choices": [
+            "SAML eller OIDC",
+            "ARP eller ICMP",
+            "FTP eller Telnet",
+            "BGP eller OSPF"
+          ],
+          "answer": 0,
+          "explain": "SAML och OIDC är vanliga federationsprotokoll.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är ett praktiskt sätt att minska risken för kapning av sessioner för webbappar?",
+          "choices": [
+            "Använd långlivade kakor utan flaggor",
+            "Använd säkra, httpEndast cookies med kort livslängd och rotation",
+            "Inaktivera TLS",
+            "Använd delade administratörskonton"
+          ],
+          "answer": 1,
+          "explain": "Säkra cookie-flaggor och kortare livslängder minskar exponeringen och rotation begränsar påverkan.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är ett vanligt mål för Privileged Access Management (PAM)?",
+          "choices": [
+            "Ge alla användare administratörsrättigheter",
+            "Kontrollera och övervaka privilegierade sessioner och referenser",
+            "Inaktivera loggning",
+            "Öka DNS TTL"
+          ],
+          "answer": 1,
+          "explain": "PAM begränsar, övervakar och säkrar privilegierad åtkomst.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En användare rapporterar MFA uppmaningar som de inte initierade. Bästa nästa steg?",
+          "choices": [
+            "Ignorera det",
+            "Behandla som möjliga kompromisser och återställ sessioner och autentiseringsuppgifter",
+            "Inaktivera MFA för användaren",
+            "Vitlista källan IP permanent"
+          ],
+          "answer": 1,
+          "explain": "Oväntade MFA-meddelanden kan indikera stulna autentiseringsuppgifter och push-utmattningsförsök.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vad inkluderar \"kontolivscykel\" i IAM?",
+          "choices": [
+            "Skapa, ändra, inaktivera och ta bort identiteter och åtkomst",
+            "Endast lösenordsåterställningar",
+            "Endast brandväggsregler",
+            "Endast incidentbiljetter"
+          ],
+          "answer": 0,
+          "explain": "Livscykeln inkluderar processer för snickarflyttare och åtkomständringar.",
+          "type": "mcq"
+        },
+        {
+          "q": "En vanlig kontroll för att minska sidorörelser är:",
+          "choices": [
+            "Återanvänd lokala administratörslösenord överallt",
+            "Använd unika lokala administratörsuppgifter eller LAPS stilhantering",
+            "Inaktivera granskningsloggar",
+            "Använd klartext LDAP"
+          ],
+          "answer": 1,
+          "explain": "Unika lokala administratörshemligheter minskar pass-the-hash och sidorörelser.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken är den största säkerhetsrisken med långlivade API-nycklar?",
+          "choices": [
+            "De går ut för snabbt",
+            "De kan stjälas och användas tyst under långa perioder",
+            "De förhindrar automatisering",
+            "De tvingar fram MFA varje begäran"
+          ],
+          "answer": 1,
+          "explain": "Långlivade nycklar ökar fönstret för oupptäckt missbruk.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket tillvägagångssätt stöder bäst \"neka som standard\" i åtkomstdesign?",
+          "choices": [
+            "Ge breda roller och ta bort senare",
+            "Börja med minimala behörigheter och lägg till efter behov",
+            "Dela ett privilegierat konto",
+            "Inaktivera revision"
+          ],
+          "answer": 1,
+          "explain": "Börja minimalt och expandera baserat på verifierat behov.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En entreprenör lämnar företaget idag. Bästa praxis är att:",
+          "choices": [
+            "Vänta på nästa kvartalsöversyn",
+            "Inaktivera kontot och återkalla aktiva sessioner omedelbart",
+            "Behåll åtkomst för bekvämlighet",
+            "Ändra bara e-postlösenordet"
+          ],
+          "answer": 1,
+          "explain": "Snabb avprovisionering och återkallelse av session minskar risken.",
+          "type": "scenario"
+        },
+        {
+          "q": "Policyer för villkorad åtkomst utvärderar vanligtvis signaler som:",
+          "choices": [
+            "Endast diskhälsa",
+            "Enhetens hållning, plats, risk och MFA",
+            "CPU cachestorlek",
+            "Längd på skrivarkö"
+          ],
+          "answer": 1,
+          "explain": "Modern villkorad tillgång använder ofta enhets- och risksignaler.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är fördelen med centraliserade revisionsloggar för identitetssystem?",
+          "choices": [
+            "De minskar behovet av kryptering",
+            "De möjliggör undersökningar över tjänster med konsekvent identitetskontext",
+            "De gör lösenord onödiga",
+            "De stoppar allt nätfiske"
+          ],
+          "answer": 1,
+          "explain": "Centrala loggar förbättrar upptäckt och svar genom att korrelera identitetshändelser.",
+          "type": "mcq"
+        },
+        {
+          "q": "Ett \"krossglas\"-konto bör vanligtvis vara:",
+          "choices": [
+            "Används dagligen av administratörer",
+            "Mycket skyddad, övervakad och används endast i nödsituationer",
+            "Delas brett",
+            "Utan MFA"
+          ],
+          "answer": 1,
+          "explain": "Krossglaskonton är endast för nödsituationer och bör kontrolleras noggrant.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är en bra praxis för tjänstkontoautentisering?",
+          "choices": [
+            "Använd interaktiva inloggningar",
+            "Föredrar arbetsbelastningsidentitet eller certifikat framför statiska lösenord",
+            "Inaktivera nyckelrotation",
+            "Återanvänd mänskliga referenser"
+          ],
+          "answer": 1,
+          "explain": "Arbetsbelastningsidentiteter och certifikat minskar exponeringen jämfört med statiska delade lösenord.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "command-basics",
+      "title": "Grunder i kommandoreferens",
+      "questions": [
+        {
+          "q": "I exempel indikerar vinkelparenteser som <sökväg>:",
+          "choices": [
+            "Valfri flagga",
+            "Bokstavlig text",
+            "Utbytbart värde",
+            "Kommentar"
+          ],
+          "answer": 2,
+          "explain": "Vinkelparenteser anger platshållare som ska bytas ut.",
+          "type": "mcq"
+        },
+        {
+          "q": "Hakparenteser som [alternativ] indikerar vanligtvis:",
+          "choices": [
+            "Obligatoriskt värde",
+            "Valfria delar",
+            "Kommentarer",
+            "Föråldrade flaggor"
+          ],
+          "answer": 1,
+          "explain": "Hakparenteser visar vanligtvis valfria segment.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket verktyg löser DNS namn?",
+          "choices": [
+            "curl",
+            "dig",
+            "ssh",
+            "lsof"
+          ],
+          "answer": 1,
+          "explain": "dig utför DNS uppslagningar.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket flaggmönster kartlägger vanligtvis hamnar med docker run?",
+          "choices": [
+            "-v värd:behållare",
+            "-p värd:behållare",
+            "-e nyckel=värde",
+            "-u användare"
+          ],
+          "answer": 1,
+          "explain": "-p HOST:CONTAINER mappar portar.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando följer HTTP omdirigeringar?",
+          "choices": [
+            "curl -L",
+            "curl -I",
+            "curl -X",
+            "curl -d"
+          ],
+          "answer": 0,
+          "explain": "-L följer omdirigeringar.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken flagga visar tjänsteversioner i nmap?",
+          "choices": [
+            "-sV",
+            "-A",
+            "-p",
+            "-O"
+          ],
+          "answer": 0,
+          "explain": "-sV sonder för tjänst/version.",
+          "type": "mcq"
+        },
+        {
+          "q": "Som visar lyssningsuttag med processer?",
+          "choices": [
+            "ss -tulpn",
+            "ping -n",
+            "traceroute -n",
+            "lsof +D"
+          ],
+          "answer": 0,
+          "explain": "ss -tulpn visar att TCP/UDP lyssnar med PID.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando skriver bara ut rubriker?",
+          "choices": [
+            "curl -I",
+            "curl -L",
+            "curl -d",
+            "curl -X"
+          ],
+          "answer": 0,
+          "explain": "-I hämtar endast rubriker.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du behöver behållarloggar med tidsstämplar.",
+          "choices": [
+            "docker loggar -t <container>",
+            "hamnare ps",
+            "docker-bilder",
+            "hamnarbyggare"
+          ],
+          "answer": 0,
+          "explain": "-t lägger till tidsstämplar i docker-loggar.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilket kommando listar alla behållare inklusive stoppade?",
+          "choices": [
+            "hamnare ps",
+            "docker ps -a",
+            "hamnarloggar",
+            "hamnarbetare start"
+          ],
+          "answer": 1,
+          "explain": "-a visar alla behållare.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando används vanligtvis för att se slutet av en loggfil i realtid?",
+          "choices": [
+            "svans -f /var/log/syslog",
+            "cat /var/log/syslog",
+            "ls -la /var/log",
+            "mkdir /var/log/syslog"
+          ],
+          "answer": 0,
+          "explain": "tail -f följer nya rader som läggs till en fil.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando söker efter ett mönster i text?",
+          "choices": [
+            "grep 'error' file.log",
+            "cp file.log backup.log",
+            "mv file.log /tmp",
+            "chmod 600 file.log"
+          ],
+          "answer": 0,
+          "explain": "grep används för mönstersökning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando visar pågående processer?",
+          "choices": [
+            "ps aux",
+            "pwd",
+            "mkdir",
+            "whoami"
+          ],
+          "answer": 0,
+          "explain": "ps aux listar processer och deras detaljer.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando ändrar filbehörigheter?",
+          "choices": [
+            "chmod",
+            "chown",
+            "tjära",
+            "df"
+          ],
+          "answer": 0,
+          "explain": "chmod ställer in behörigheter för filer och kataloger.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando visar diskanvändning per filsystem?",
+          "choices": [
+            "df -h",
+            "du -s",
+            "gratis -m",
+            "uname -a"
+          ],
+          "answer": 0,
+          "explain": "df rapporterar filsystemanvändning; -h gör den läsbar för människor.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando visar aktuell användaridentitet och grupper?",
+          "choices": [
+            "id",
+            "upptid",
+            "datum",
+            "eko"
+          ],
+          "answer": 0,
+          "explain": "id-utskrifter UID, GID och gruppmedlemskap.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando visar senaste systemd-journalposter för en tjänst?",
+          "choices": [
+            "journalctl -u ssh",
+            "systemctl redigera ssh",
+            "cat /etc/systemd/system/ssh.service",
+            "killall ssh"
+          ],
+          "answer": 0,
+          "explain": "journalctl -u visar loggar för en specifik enhet.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando testar TCP anslutning till en värd och port (gemensamt verktyg)?",
+          "choices": [
+            "nc -vz värd 443",
+            "dig värd",
+            "ps värd",
+            "chmod värd"
+          ],
+          "answer": 0,
+          "explain": "netcat kan testa portar med -vz i många builds.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du måste hitta vilken process som är bunden till TCP 8080. Bästa kommando?",
+          "choices": [
+            "ss -ltnp | grep:8080",
+            "cat /etc/passwd",
+            "df -h",
+            "ping -c 1 8080"
+          ],
+          "answer": 0,
+          "explain": "ss kan visa lyssnande TCP-uttag med ägandeprocessen (PID/program).",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilket verktyg fångar nätverkspaket på ett gränssnitt?",
+          "choices": [
+            "tcpdump",
+            "nano",
+            "hitta",
+            "chmod"
+          ],
+          "answer": 0,
+          "explain": "tcpdump fångar paket för felsökning och analys.",
+          "type": "mcq"
+        },
+        {
+          "q": "I kommandodokument, '| grep' används vanligtvis för att:",
+          "choices": [
+            "Kryptera utdata",
+            "Led utgången till ett filter",
+            "Ta bort filer",
+            "Starta om systemet"
+          ],
+          "answer": 1,
+          "explain": "Ett rör skickar stdout från ett kommando till ett annat för filtrering eller bearbetning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando visar IP-adresser på Linux (modern iproute2)?",
+          "choices": [
+            "ip-adress",
+            "ifconfig",
+            "nätvy",
+            "ruttutskrift"
+          ],
+          "answer": 0,
+          "explain": "ip-adress visar gränssnittsadresser; ifconfig kan saknas på minimala system.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando visar lyssnande och etablerade sockets på Linux?",
+          "choices": [
+            "ss -tunap",
+            "cd -tunap",
+            "ls -tunap",
+            "rm -tunap"
+          ],
+          "answer": 0,
+          "explain": "ss visar uttag; flaggor väljer TCP/UDP och visar processer.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Ett kommando returnerar \"behörighet nekad\" när du läser en logg. Bästa nästa steg?",
+          "choices": [
+            "Kör den med lämpliga privilegier (sudo) och kontrollera att åtkomsten är motiverad",
+            "Ta bort loggfilen",
+            "Inaktivera revision",
+            "Ändra systemklockan"
+          ],
+          "answer": 0,
+          "explain": "Använd minsta privilegium: höj endast om det behövs och är lämpligt.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilket kommando söker efter filer efter namn under en katalog?",
+          "choices": [
+            "hitta /var/log -name '*.log'",
+            "grep /var/log -name '*.log'",
+            "ls /var/log -name '*.log'",
+            "cat /var/log -name '*.log'"
+          ],
+          "answer": 0,
+          "explain": "hitta söker kataloger efter filer efter kriterier som namn.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando skriver ut den aktuella arbetskatalogen?",
+          "choices": [
+            "pwd",
+            "ps",
+            "WHO",
+            "wc"
+          ],
+          "answer": 0,
+          "explain": "pwd skriver ut den aktuella katalogsökvägen.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando visar systemupptid och belastningsmedelvärden?",
+          "choices": [
+            "upptid",
+            "unname",
+            "umask",
+            "usermod"
+          ],
+          "answer": 0,
+          "explain": "upptid skriver ut tid och laddningsmedelvärden.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är ett vanligt säkert sätt att testa ett kommando innan det tillämpas brett?",
+          "choices": [
+            "Kör den i produktion för alla värdar omedelbart",
+            "Testa på ett icke-produktionssystem och dokumentera förväntad produktion",
+            "Inaktivera loggning först",
+            "Hårdkodshemligheter i kommandot"
+          ],
+          "answer": 1,
+          "explain": "Validera först en säker miljö och dokumentera förväntade resultat.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando visar de senast inloggade användarna (på många Linux-system)?",
+          "choices": [
+            "sista",
+            "ls",
+            "mindre",
+            "ln"
+          ],
+          "answer": 0,
+          "explain": "läser senast wtmp för att visa inloggningshistorik.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kommando kan visa aktiva användare och deras terminaler?",
+          "choices": [
+            "WHO",
+            "röra",
+            "tjära",
+            "tee"
+          ],
+          "answer": 0,
+          "explain": "som visar för närvarande inloggade användare.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "detection-logging",
+      "title": "Detektering och loggning",
+      "questions": [
+        {
+          "q": "Vilka loggar upptäcker bäst lösenordssprutning?",
+          "choices": [
+            "DNS loggar",
+            "Auth logs",
+            "Loggar för åtkomst till webbservern",
+            "Pakethanterarens loggar"
+          ],
+          "answer": 1,
+          "explain": "Auth-loggar visar upprepade fel hos många användare.",
+          "type": "mcq"
+        },
+        {
+          "q": "En SIEM används huvudsakligen för att:",
+          "choices": [
+            "Kompilera kod",
+            "Inta, normalisera och korrelera händelser",
+            "Hantera TLS certifikat",
+            "Tilldela IP:er"
+          ],
+          "answer": 1,
+          "explain": "En SIEM tar in och korrelerar säkerhetshändelser.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket kan indikera brute-force?",
+          "choices": [
+            "Många misslyckanden från en IP",
+            "Enkel framgångsinloggning",
+            "Korta DHCP hyresavtal",
+            "Hög CPU"
+          ],
+          "answer": 0,
+          "explain": "En skur av misslyckanden från en källa tyder på brute-force.",
+          "type": "mcq"
+        },
+        {
+          "q": "DNS loggar kan hjälpa till att upptäcka:",
+          "choices": [
+            "Privilegiumupptrappning",
+            "Tunnel-/exfiltrationsmönster",
+            "Diskfel",
+            "Kärnpanik"
+          ],
+          "answer": 1,
+          "explain": "Udda domäner/frekvenser kan indikera tunnling/exfil.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du ser WAF SQLi-varningar och autentiseringsfel från samma IP.",
+          "choices": [
+            "Ignorera; olika källor",
+            "Troligtvis godartad crawler",
+            "Öka varningströskeln",
+            "Undersök som korrelerad aktivitet"
+          ],
+          "answer": 3,
+          "explain": "Korrelation ökar förtroendet för skadlig aktivitet.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilket förbättrar loggtillförlitligheten jämfört med UDP syslog?",
+          "choices": [
+            "TCP eller TLS syslog",
+            "Kortare meddelanden",
+            "Randomiserade portar",
+            "Mindre loggning"
+          ],
+          "answer": 0,
+          "explain": "TCP/TLS förbättrar leveransgarantierna.",
+          "type": "mcq"
+        },
+        {
+          "q": "En praktisk godkännandelista inkluderar ofta:",
+          "choices": [
+            "Hälsoendpointer",
+            "Alla administratörs-IP:er",
+            "Alla lokala användare",
+            "Alla hamnar"
+          ],
+          "answer": 0,
+          "explain": "Hälsokontroller och interna intervall kan godkännas.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket mått hjälper till att upptäcka skanning?",
+          "choices": [
+            "Unika destinationsportar per källa",
+            "Diskskrivfördröjning",
+            "CPU kontextväxlar",
+            "Öppna filhandtagen"
+          ],
+          "answer": 0,
+          "explain": "Många destinationsportar från en källa föreslår skanning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Att korrelera händelser över tidsfönster hjälper:",
+          "choices": [
+            "Minska falska positiva",
+            "Snabba upp diskarna",
+            "Kryptera loggar",
+            "Patch kärnor"
+          ],
+          "answer": 0,
+          "explain": "Tidskorrelation ökar detektionernas trohet.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Efter 10 misslyckanden, en framgång från samma IP.",
+          "choices": [
+            "Förmodligen normal användare",
+            "Potentiell kompromiss",
+            "DNS problem",
+            "Diskkvot"
+          ],
+          "answer": 1,
+          "explain": "Misslyckande→framgång från samma IP är misstänkt.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilken är den viktigaste förutsättningen för tillförlitliga tidslinjer över loggkällor?",
+          "choices": [
+            "Hög CPU",
+            "Tidssynkronisering (NTP) över system",
+            "mer RAM",
+            "Kortare värdnamn"
+          ],
+          "answer": 1,
+          "explain": "Konsekvent tid (NTP) är avgörande för att korrelera händelser.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket fält är mest användbart för att korrelera användaraktivitet mellan tjänster?",
+          "choices": [
+            "Tapetnamn",
+            "Användar- eller huvudidentifierare",
+            "CPU modell",
+            "Övervakningsupplösning"
+          ],
+          "answer": 1,
+          "explain": "Användar- eller huvudidentifierare länkar åtgärder över system.",
+          "type": "mcq"
+        },
+        {
+          "q": "Ett loggnormaliseringssteg syftar främst till att:",
+          "choices": [
+            "Ta bort kryptering",
+            "Konvertera olika format till konsekventa fält",
+            "Inaktivera lagring",
+            "Öka latensen"
+          ],
+          "answer": 1,
+          "explain": "Normalisering gör sökningar och upptäckter över källor enklare och mer konsekvent.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är ett vanligt felläge när loggning är aktiverad men inte övervakas?",
+          "choices": [
+            "Högre noggrannhet",
+            "Varnar trötthet eller blinda fläckar på grund av ingen recension",
+            "Färre evenemang",
+            "Automatisk incidentinneslutning"
+          ],
+          "answer": 1,
+          "explain": "Loggar utan granskning och varningar skapar ofta blinda fläckar.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Din SIEM visar en ökning av autentiseringsfel efter en ändring av lösenordspolicyn. Bästa första åtgärden?",
+          "choices": [
+            "Anta en attack och isolera alla användare",
+            "Verifiera om ändringen orsakade legitima fel och justera upptäckterna därefter",
+            "Inaktivera autentiseringsloggning",
+            "Stäng av MFA"
+          ],
+          "answer": 1,
+          "explain": "Policyändringar kan skapa godartade toppar; validera sammanhang innan du eskalerar.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilken detekteringsmetod är bäst för att hitta sällsynta händelser med stor påverkan?",
+          "choices": [
+            "Endast statiska trösklar",
+            "Baselining och anomalidetektering med sammanhang",
+            "Inaktivera bullriga källor",
+            "Ignorera extremvärden"
+          ],
+          "answer": 1,
+          "explain": "Baslinjer hjälper till att identifiera onormalt beteende när det kontextualiseras.",
+          "type": "mcq"
+        },
+        {
+          "q": "En \"nyckel\"-etikett på händelser är användbar eftersom den:",
+          "choices": [
+            "Krypterar händelsen",
+            "Grupperar relaterade händelser för sökning och rapportering",
+            "Stoppar loggsändning",
+            "Döljer värdnamnet"
+          ],
+          "answer": 1,
+          "explain": "Nycklar och taggar stöder snabb filtrering och rapportering.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är ett starkt skäl att logga både \"tillåtna\" och \"blockerade\" brandväggshändelser?",
+          "choices": [
+            "Det fördubblar lagringen utan fördel",
+            "Tillåtna loggar visar framgångsrika anslutningar för undersökningar och upptäckt",
+            "Blockerade loggar räcker alltid",
+            "Det gör kryptering onödig"
+          ],
+          "answer": 1,
+          "explain": "Tillåtna anslutningar betyder ofta mest när man spårar framgångsrik åtkomst och sidorörelse.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du hittar många DNS-frågor för slumpmässiga underdomäner till en domän. Bästa nästa steg?",
+          "choices": [
+            "Ignorera eftersom DNS alltid är bullriga",
+            "Kontrollera om det finns tunnelmönster och korrelera med ändpunkts- och proxyloggar",
+            "Inaktivera DNS-loggning",
+            "Blockera alla DNS"
+          ],
+          "answer": 1,
+          "explain": "Slumpmässiga underdomäner med hög volym kan indikera DGA eller tunnling; korrelation förbättrar förtroendet.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilken datakälla svarar mest direkt \"vilken process startade denna nätverksanslutning\" på endpointer?",
+          "choices": [
+            "EDR telemetri- eller endpointsgranskningsloggar",
+            "Endast routerns syslog",
+            "DNS cache endast",
+            "En VLAN karta"
+          ],
+          "answer": 0,
+          "explain": "Endpoint-telemetri länkar nätverksanslutningar till processer och användare.",
+          "type": "mcq"
+        },
+        {
+          "q": "En väl utformad detektionsregel bör innehålla:",
+          "choices": [
+            "Endast en enda indikator",
+            "Tydlig avsikt, omfattning och förväntade falska positiva resultat",
+            "Ingen dokumentation",
+            "Ingen stämning"
+          ],
+          "answer": 1,
+          "explain": "Bra detektioner dokumenteras och avstämda med kända falska positiva resultat.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket koncept beskriver bäst \"att samla in precis tillräckligt med loggar för att stödja utredningar utan att drunkna\"?",
+          "choices": [
+            "Minsta privilegium",
+            "Signal till brus optimering",
+            "Nyckelsträckning",
+            "Övermontering"
+          ],
+          "answer": 1,
+          "explain": "Sikta på högvärdiga signaler och hanterbara brusnivåer.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Din loggningspipeline släpper händelser under rusningstid. Vad är en praktisk begränsning?",
+          "choices": [
+            "Minska buffringen och försök igen",
+            "Lägg till buffring och mottryck och övervaka intagshälsan",
+            "Inaktivera loggar",
+            "Ändra alla tidsstämplar"
+          ],
+          "answer": 1,
+          "explain": "Buffring, mottryck och övervakning av intagshälsan förbättrar motståndskraften.",
+          "type": "scenario"
+        },
+        {
+          "q": "Varför är loggintegritet viktig?",
+          "choices": [
+            "Det minskar användningen av CPU",
+            "Det hjälper till att bevisa att loggar inte har manipulerats",
+            "Det gör DNS snabbare",
+            "Det ökar Wi-Fi-räckvidden"
+          ],
+          "answer": 1,
+          "explain": "Integritetskontroller och åtkomstbegränsningar minskar risken för manipulering.",
+          "type": "mcq"
+        },
+        {
+          "q": "En typisk \"bra\" autentiseringshändelse inkluderar fält som:",
+          "choices": [
+            "Användarnamn, resultat, källa IP, enhet, tidsstämpel",
+            "Endast användarnamn",
+            "Endast tidsstämpel",
+            "Bearbeta endast ID"
+          ],
+          "answer": 0,
+          "explain": "Användbara autentiseringshändelser inkluderar vem, resultat, var och när.",
+          "type": "mcq"
+        },
+        {
+          "q": "Korrelationen är starkare när du kan knyta samman händelser med hjälp av:",
+          "choices": [
+            "Slumpmässiga strängar",
+            "Stabila identifierare som värd ID, användare ID och session ID",
+            "Tapet",
+            "Skärmens ljusstyrka"
+          ],
+          "answer": 1,
+          "explain": "Stabila identifierare möjliggör tillförlitlig länkning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är ett vanligt sätt att minska falska positiva resultat för geolokaliseringsbaserade inloggningsvarningar?",
+          "choices": [
+            "Inaktivera regeln",
+            "Lägg till användarresekontext och kända VPN-intervall och kräver flera signaler",
+            "Varning vid varje inloggning",
+            "Ignorera MFA resultat"
+          ],
+          "answer": 1,
+          "explain": "Kombinera signaler och sammanhang för att förbättra troheten.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du ser en framgångsrik administratörsinloggning utanför kontorstid från en hanterad enhet och ett känt VPN-intervall. Bästa tolkningen?",
+          "choices": [
+            "Alltid illvillig",
+            "Potentiellt förväntat, men verifiera ändra biljett eller joursammanhang",
+            "Definitivt godartad; ignorera för alltid",
+            "Inte relaterat till loggning"
+          ],
+          "answer": 1,
+          "explain": "Sammanhang spelar roll; verifiera med operativt sammanhang och biljetter.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilket mätvärde hjälper till att validera att loggtäckningen förbättras över tiden?",
+          "choices": [
+            "Antal installerade teckensnitt",
+            "Procent av kritiska tillgångar som skickar loggar",
+            "Antal tapeter",
+            "Genomsnittlig skrivbordshöjd"
+          ],
+          "answer": 1,
+          "explain": "Täckningsmått för kritiska tillgångar indikerar framsteg.",
+          "type": "mcq"
+        },
+        {
+          "q": "En lagringspolicy bör ta hänsyn till:",
+          "choices": [
+            "Endast diskstorlek",
+            "Utredningsbehov, lagkrav och kostnader",
+            "Endast CPU hastighet",
+            "Endast UI färg"
+          ],
+          "answer": 1,
+          "explain": "Retention är en avvägning mellan undersökningsvärde, krav och kostnad.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "hardening",
+      "title": "Härdning",
+      "questions": [
+        {
+          "q": "På Linux SSH, vilket minskar risken mest?",
+          "choices": [
+            "Aktivera rotinloggning",
+            "Använd nycklar och inaktivera lösenordsautentisering",
+            "Använd telnet",
+            "Inaktivera loggar"
+          ],
+          "answer": 1,
+          "explain": "Nycklar och inaktivering av lösenordsautentisering minskar risken för bruteforce.",
+          "type": "mcq"
+        },
+        {
+          "q": "Windows RDP härdning inkluderar:",
+          "choices": [
+            "MFA och NLA",
+            "Inaktivera uppdateringar",
+            "Delad lokal administratör",
+            "Öppen för internet"
+          ],
+          "answer": 0,
+          "explain": "Använd MFA och nätverksnivåautentisering.",
+          "type": "mcq"
+        },
+        {
+          "q": "macOS baslinje inkluderar vanligtvis:",
+          "choices": [
+            "Inaktivera Gatekeeper",
+            "Aktivera FileVault",
+            "Tillåt alla kärntillägg",
+            "Inaktivera uppdateringar"
+          ],
+          "answer": 1,
+          "explain": "Heldiskkryptering skyddar data i vila.",
+          "type": "mcq"
+        },
+        {
+          "q": "Värdbrandväggens standardinkommande inkommande bör vara:",
+          "choices": [
+            "Tillåt alla",
+            "Neka alla sedan tillåta behövs",
+            "Tillåt endast ICMP",
+            "Spegel utgående"
+          ],
+          "answer": 1,
+          "explain": "Standard-neka inkommande och tillåt tjänster vid behov.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Offentlig databas exponerad utan TLS.",
+          "choices": [
+            "Acceptera risk",
+            "När exponering, kräver auth/TLS, begränsa nätverk",
+            "Ignorera varningar",
+            "Lägg till RAM"
+          ],
+          "answer": 1,
+          "explain": "Begränsa åtkomst, kräver autentisering och TLS.",
+          "type": "scenario"
+        },
+        {
+          "q": "Paketuppdateringar hjälper till med:",
+          "choices": [
+            "Nya UI teman",
+            "Säkerhetskorrigeringar",
+            "Diskdefragmentera",
+            "CPU överklocka"
+          ],
+          "answer": 1,
+          "explain": "Regelbundna uppdateringar åtgärdar sårbarheter.",
+          "type": "mcq"
+        },
+        {
+          "q": "SSH rotinloggning bör vara:",
+          "choices": [
+            "Aktiverad",
+            "Inaktiverad",
+            "Endast via telnet",
+            "Endast på helger"
+          ],
+          "answer": 1,
+          "explain": "Föredrar sudo, inaktivera direkt rotinloggning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket minskar stående privilegier?",
+          "choices": [
+            "Beständiga administratörstokens",
+            "Just-in-time höjd",
+            "Delade konton",
+            "Lokal administratör överallt"
+          ],
+          "answer": 1,
+          "explain": "JIT höjd minimerar exponeringstiden.",
+          "type": "mcq"
+        },
+        {
+          "q": "Diskkryptering skyddar:",
+          "choices": [
+            "Mot nätverksskanningar",
+            "Data i vila",
+            "Mot DDoS",
+            "CPU temperatur"
+          ],
+          "answer": 1,
+          "explain": "Kryptering skyddar vilodata om enheten tappas bort.",
+          "type": "mcq"
+        },
+        {
+          "q": "Säkerhetskopieringar bör vara:",
+          "choices": [
+            "Oautentiserade andelar",
+            "Testas regelbundet",
+            "Lagras endast på prod",
+            "Omärkt"
+          ],
+          "answer": 1,
+          "explain": "Testa säkerhetskopior för att säkerställa återställning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad betyder \"säker som standard\" vanligtvis vid härdning?",
+          "choices": [
+            "Allt är utsatt för internet",
+            "Standardinställningarna minimerar attackytan och kräver avsiktlig aktivering",
+            "Inga plåster behövs",
+            "Användare delar lösenord"
+          ],
+          "answer": 1,
+          "explain": "Säker som standard minskar exponeringen om det inte uttryckligen är aktiverat.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken praxis minskar bäst konfigurationsdrift över många system?",
+          "choices": [
+            "Manuella engångsändringar",
+            "Konfigurationshantering och baslinjer",
+            "Inaktivera revisioner",
+            "Dela lokala administratörslösenord"
+          ],
+          "answer": 1,
+          "explain": "Konfigurationshantering upprätthåller konsekventa baslinjer och upptäcker drift.",
+          "type": "mcq"
+        },
+        {
+          "q": "Tillståndslistning för ansökningar syftar främst till att:",
+          "choices": [
+            "Kör mer programvara",
+            "Begränsa vilka binärer som kan köras",
+            "Inaktivera TLS",
+            "Öppna brandväggsportar"
+          ],
+          "answer": 1,
+          "explain": "Tillståndslista begränsar körbart innehåll till godkänd programvara.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför är \"minst funktionalitet\" viktigt?",
+          "choices": [
+            "Det ökar användarvänligheten",
+            "Färre aktiverade tjänster minskar attackytan",
+            "Det snabbar upp DNS",
+            "Det förbättrar Wi-Fi-räckvidden"
+          ],
+          "answer": 1,
+          "explain": "Att inaktivera onödiga tjänster minskar de komponenter som kan nås och utnyttjas.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken kontroll skyddar mest direkt data i vila på en stulen bärbar dator?",
+          "choices": [
+            "Prisbegränsande",
+            "Full diskkryptering",
+            "DNS filtrering",
+            "Portskanning"
+          ],
+          "answer": 1,
+          "explain": "Full diskkryptering skyddar data om enheten tappas bort.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En server måste köra en gammal app som kräver ett äldre protokoll. Bästa härdningsmetod?",
+          "choices": [
+            "Exponera det brett och acceptera risker",
+            "Isolera tjänsten, begränsa åtkomst, lägg till övervakning och dokumentera ett undantag",
+            "Inaktivera alla loggar",
+            "Inaktivera säkerhetskopior"
+          ],
+          "answer": 1,
+          "explain": "Använd kompenserande kontroller: isolera, begränsa, övervaka och dokumentera undantag.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vad är en realistisk nackdel med aggressiv härdning utan testning?",
+          "choices": [
+            "Det förbättrar alltid användbarheten",
+            "Det kan bryta legitima arbetsflöden och skapa osäkra lösningar",
+            "Det eliminerar alla sårbarheter",
+            "Det gör nätfiske omöjligt"
+          ],
+          "answer": 1,
+          "explain": "Härdning kan bryta appar; osäkra lösningar är ett vanligt felläge.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är en bra praxis för administratörsåtkomst på servrar?",
+          "choices": [
+            "Direkt internetexponering med lösenord",
+            "Använd MFA och begränsa åtkomsten till betrodda nätverk eller hoppa värdar",
+            "Inaktivera loggning",
+            "Använd delade konton"
+          ],
+          "answer": 1,
+          "explain": "Att begränsa administratörsytor och använda MFA minskar risken för kompromisser.",
+          "type": "mcq"
+        },
+        {
+          "q": "En \"gyllene bild\" är användbar eftersom den:",
+          "choices": [
+            "Tvingar användare att dela lösenord",
+            "Ger en känd bra baslinje för nya system",
+            "Inaktiverar patchning",
+            "Stoppar all skadlig programvara"
+          ],
+          "answer": 1,
+          "explain": "Gyllene bilder hjälper till att standardisera säkra konfigurationer.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är ett vanligt skäl till att aktivera säker start?",
+          "choices": [
+            "För att påskynda nätverkandet",
+            "För att förhindra manipulering av bootkitskomponenter",
+            "För att inaktivera kryptering",
+            "För att tillåta osignerade drivrutiner"
+          ],
+          "answer": 1,
+          "explain": "Säker start hjälper till att säkerställa pålitliga komponenter i startkedjan.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken inställning är ofta en del av en striktare arbetsstationsbaslinje?",
+          "choices": [
+            "Inaktivera skärmlås",
+            "Kräv skärmlås och kort inaktiv timeout",
+            "Inaktivera uppdateringar",
+            "Tillåt osignerade makron"
+          ],
+          "answer": 1,
+          "explain": "Låsskärmar minskar risken från obevakad åtkomst.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför är logrevision en del av härdning?",
+          "choices": [
+            "Det ersätter lappning",
+            "Det ger ansvar och upptäcker missbruk av privilegier",
+            "Det inaktiverar tjänster",
+            "Det ökar hastigheten CPU"
+          ],
+          "answer": 1,
+          "explain": "Revision stöder utredningar och upptäckt av missbruk.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du måste tillåta fjärradmin, men vill ha lägre risk. Bästa alternativet?",
+          "choices": [
+            "Öppna RDP/SSH till internet",
+            "Använd en VPN eller en bastion med MFA och strikta ACL",
+            "Inaktivera MFA för administratörer",
+            "Använd telnet"
+          ],
+          "answer": 1,
+          "explain": "Centraliserad åtkomst via VPN eller bastion minskar exponeringen.",
+          "type": "scenario"
+        },
+        {
+          "q": "En vanlig härdningskontroll för webbläsare är:",
+          "choices": [
+            "Inaktivera sandboxing",
+            "Inaktivera eller begränsa riskfyllda plugins och framtvinga automatiska uppdateringar",
+            "Tillåt vilken förlängning som helst",
+            "Inaktivera TLS"
+          ],
+          "answer": 1,
+          "explain": "Webbläsarhärdning minskar riskerna för körning och förlängning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför är säkerhetskopiering en del av härdning och motståndskraft?",
+          "choices": [
+            "De minskar paketförlusten",
+            "De möjliggör återhämtning från ransomware och olyckor",
+            "De förhindrar nätfiske",
+            "De stoppar portskanningar"
+          ],
+          "answer": 1,
+          "explain": "Säkerhetskopieringar möjliggör återställning när förebyggandet misslyckas.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken är en vanlig bästa praxis för lokala administratörsuppgifter på Windows-endpointer?",
+          "choices": [
+            "Samma lösenord överallt",
+            "Använd LAPS eller liknande för att hantera unika lokala administratörslösenord",
+            "Lagra lösenord i vanlig text",
+            "Inaktivera UAC"
+          ],
+          "answer": 1,
+          "explain": "Unika hanterade lokala administratörslösenord minskar rörelser i sidled.",
+          "type": "mcq"
+        },
+        {
+          "q": "En brandväggs \"default deny inbound\"-hållning betyder:",
+          "choices": [
+            "Blockera all trafik för alltid",
+            "Blockera oönskad inkommande och tillåt endast nödvändiga tjänster",
+            "Tillåt inkommande som standard",
+            "Inaktivera utgående"
+          ],
+          "answer": 1,
+          "explain": "Standard för neka inkommande minskar exponeringen och tvingar fram regler för avsiktligt tillåtelse.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En säkerhetsbaslinje blockerar ett utvecklarverktyg som behövs. Vad är det säkraste svaret?",
+          "choices": [
+            "Be dem att inaktivera säkerhetskontroller",
+            "Skapa ett dokumenterat undantag med omfattning, varaktighet och kompenserande kontroller",
+            "Ignorera och gör ingenting",
+            "Dela ett administratörskonto"
+          ],
+          "answer": 1,
+          "explain": "Undantag bör avgränsas, dokumenteras och övervakas.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilket är en stark indikator på att härdning fungerar operativt?",
+          "choices": [
+            "Färre loggar",
+            "Minskat antal exponerade tjänster och färre fynd med hög allvarlighetsgrad vid skanningar",
+            "Fler öppna hamnar",
+            "Ingen lappning behövs"
+          ],
+          "answer": 1,
+          "explain": "Minskad attackyta och färre kritiska fynd tyder på framsteg.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför ska härdning paras med övervakning?",
+          "choices": [
+            "Övervakning är valfritt",
+            "Härdning minskar risken men eliminerar den inte; övervakning fångar upp det som slinker igenom",
+            "Övervakning förhindrar alla incidenter",
+            "Övervakning ersätter kryptering"
+          ],
+          "answer": 1,
+          "explain": "Försvar på djupet: övervakning upptäcker kvarvarande risk och felkonfigurationer.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "web-app-security",
+      "title": "Webbapplikationssäkerhet",
+      "questions": [
+        {
+          "q": "Vilken OWASP kategori täcker fel där användare kan komma åt data som de inte borde?",
+          "choices": [
+            "Injektion",
+            "Trasig åtkomstkontroll",
+            "Säkerhetsfelkonfiguration",
+            "SSRF"
+          ],
+          "answer": 1,
+          "explain": "Trasig åtkomstkontroll täcker saknade eller felaktiga behörighetskontroller.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken rubrik hjälper till att minska clickjacking genom att begränsa inramningen?",
+          "choices": [
+            "X-Frame-alternativ",
+            "Server",
+            "ETag",
+            "Acceptera"
+          ],
+          "answer": 0,
+          "explain": "X-Frame-Options (eller CSP frame-förfäder) hjälper till att lindra clickjacking.",
+          "type": "mcq"
+        },
+        {
+          "q": "En parameteriserad fråga mildrar främst:",
+          "choices": [
+            "XSS",
+            "SQL injektion",
+            "CSRF",
+            "Öppna omdirigering"
+          ],
+          "answer": 1,
+          "explain": "Förberedda uttalanden separerar kod från data för att minska risken för injektion.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är det primära målet med CSRF-skyddet?",
+          "choices": [
+            "Förhindrar användare från att logga in",
+            "Förhindra oönskade förfrågningar som ändrar tillstånd från ett offers webbläsare",
+            "Kryptera data i vila",
+            "Blockerar DNS frågor"
+          ],
+          "answer": 1,
+          "explain": "CSRF försvar säkerställer att tillståndsändringar kräver en giltig användaravsikt och token.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken är den mest effektiva standarden för att lagra sessionsidentifierare i webbläsare?",
+          "choices": [
+            "LocalStorage utan utgångsdatum",
+            "Cookies märkta Secure och HttpOnly",
+            "URL parametrar",
+            "En delad statisk token"
+          ],
+          "answer": 1,
+          "explain": "Säkra och HttpOnly cookies minskar exponeringen för skriptåtkomst och kräver HTTPS.",
+          "type": "mcq"
+        },
+        {
+          "q": "En innehållssäkerhetspolicy (CSP) används huvudsakligen för att:",
+          "choices": [
+            "Snabba upp sidladdningar",
+            "Minska XSS påverkan genom att begränsa skriptkällor",
+            "Rotera lösenord",
+            "Konfigurera DNS"
+          ],
+          "answer": 1,
+          "explain": "CSP gränser varifrån skript och annat innehåll kan laddas.",
+          "type": "mcq"
+        },
+        {
+          "q": "Förfalskning av förfrågningar på serversidan (SSRF) riktar sig ofta mot:",
+          "choices": [
+            "Endast offentliga CDN",
+            "Interna metadatatjänster och interna nätverk",
+            "Användarwebbläsare cachar",
+            "E-posta MX poster"
+          ],
+          "answer": 1,
+          "explain": "SSRF kan nå interna tjänster som inte exponeras externt, inklusive endpointer för molnmetadata.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken metod för indatavalidering är generellt sett säkrare?",
+          "choices": [
+            "Tillåtslista förväntade format",
+            "Blocklista endast dåliga strängar",
+            "Inga validerings- och förtroendeklienter",
+            "Validera endast i UI"
+          ],
+          "answer": 0,
+          "explain": "Att tillåta förväntade format är mer robust än att blockera kända dåliga strängar.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En endpoint för inloggning returnerar olika fel för \"användare hittades inte\" kontra \"fel lösenord\". Bästa fixen?",
+          "choices": [
+            "Behåll det; det hjälper användarna",
+            "Använd ett allmänt felmeddelande och konsekvent timing",
+            "Inaktivera inloggning",
+            "Logga lösenord för felsökning"
+          ],
+          "answer": 1,
+          "explain": "Generiska meddelanden och konsekvent beteende minskar kontouppräkningen.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vad är bästa praxis för lösenordslagring i en webbapp?",
+          "choices": [
+            "Klartext",
+            "Snabb hash som SHA-1",
+            "Adaptiv lösenordshash som bcrypt/Argon2",
+            "Kryptera med en hårdkodad nyckel"
+          ],
+          "answer": 2,
+          "explain": "Använd en långsam adaptiv lösenordshashningsfunktion med korrekta parametrar och salter.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken kontroll minskar mest direkt inloggningsrisken för brute-force?",
+          "choices": [
+            "Längre webbadresser",
+            "Takstbegränsning och kontolåsning med säkra trösklar",
+            "Fler DNS-servrar",
+            "Inaktivera TLS"
+          ],
+          "answer": 1,
+          "explain": "Prisbegränsande och säkra lockout-policyer minskar brute force och referensfyllning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är ett säkert tillvägagångssätt för filuppladdning?",
+          "choices": [
+            "Acceptera vilken filtyp som helst och kör den",
+            "Validera typ, lagra utanför webbroten och skanna",
+            "Lita på filnamnstillägget",
+            "Inaktivera loggning"
+          ],
+          "answer": 1,
+          "explain": "Validera uppladdningar, lagra säkert och skanna för att minska uppladdningsmissbruk.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför är utdatakodning viktig?",
+          "choices": [
+            "Det förbättrar användningen av CPU",
+            "Det förhindrar att opålitlig data tolkas som kod i webbläsaren",
+            "Det ersätter autentisering",
+            "Det ökar retentionen"
+          ],
+          "answer": 1,
+          "explain": "Korrekt utdatakodning är ett kärnförsvar för XSS.",
+          "type": "mcq"
+        },
+        {
+          "q": "Ett problem med IDOR beskrivs bäst som:",
+          "choices": [
+            "En DNS-post som saknas",
+            "Direkt objektåtkomst utan behörighetskontroller",
+            "En långsam databasfråga",
+            "En TLS chiffer inte matchar"
+          ],
+          "answer": 1,
+          "explain": "Osäkra direkta objektreferenser är auktoriseringsfel över objektidentifierare.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är ett starkt försvar mot sessionsfixering?",
+          "choices": [
+            "Acceptera valfri session ID från URL",
+            "Återskapa sessions-ID:n vid inloggning och privilegieändring",
+            "Använd långlivade sessioner",
+            "Inaktivera cookies"
+          ],
+          "answer": 1,
+          "explain": "Roterande sessionsidentifierare på autentiseringshändelser minskar fixeringsrisken.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En utvecklare föreslår att JWT:er ska placeras i localStorage för enkelhetens skull. Huvudsaklig oro?",
+          "choices": [
+            "Det gör tokens för korta",
+            "XSS kan läsa localStorage och stjäla tokens",
+            "Den bryter DNS",
+            "Det inaktiverar MFA"
+          ],
+          "answer": 1,
+          "explain": "XSS kan exfiltrera tokens från localStorage; cookies med HttpOnly kan hjälpa till att minska denna exponering.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vad är huvudsyftet med auktoriseringskontroller på serversidan?",
+          "choices": [
+            "Förbättra UI styling",
+            "Framtvinga åtkomst oavsett klientbeteende",
+            "Minska diskanvändningen",
+            "Aktivera CORS"
+          ],
+          "answer": 1,
+          "explain": "Klienter kan modifieras; auktorisering måste verkställas på servern.",
+          "type": "mcq"
+        },
+        {
+          "q": "CORS styr främst:",
+          "choices": [
+            "Vilka portar är öppna",
+            "Vilka ursprung kan läsa svar i webbläsare",
+            "Hur lösenord hashas",
+            "Hur DNS cachar fungerar"
+          ],
+          "answer": 1,
+          "explain": "CORS kontrollerar korsoriginläsningar från webbläsare, inte åtkomstkontroll på serversidan.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket tillvägagångssätt är säkrast för hemligheter i en webbapp?",
+          "choices": [
+            "Hårdkod i koden",
+            "Använd en hemlighetshanterare eller miljövariabler med åtkomstkontroller",
+            "Sätt in JavaScript på klientsidan",
+            "Maila dem till utvecklare"
+          ],
+          "answer": 1,
+          "explain": "Använd hanterade hemligheter och minst privilegierad åtkomst.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad handlar risken för \"osäker deserialisering\" vanligtvis om?",
+          "choices": [
+            "Bilder laddas inte",
+            "Angriparkontrollerad data som utlöser farligt objektbeteende",
+            "DNS misslyckanden",
+            "Långsamma TLS handslag"
+          ],
+          "answer": 1,
+          "explain": "Osäker deserialisering kan leda till kodexekvering eller privilegieändringar.",
+          "type": "mcq"
+        },
+        {
+          "q": "En säker standard för \"felsökningsläge\" i produktionen är:",
+          "choices": [
+            "Aktiverad",
+            "Inaktiverad",
+            "Aktiverad endast på helger",
+            "Aktiverad för alla användare"
+          ],
+          "answer": 1,
+          "explain": "Felsökningsutgångar kan läcka hemligheter och interna delar; inaktivera i produktionen.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du upptäcker reflekterad XSS på en sökparameter. Bästa omedelbara begränsningen?",
+          "choices": [
+            "Ta bort sökfunktionen",
+            "Implementera korrekt utdatakodning och lägg till CSP, fixa sedan rotorsaken",
+            "Blockera all JavaScript",
+            "Ändra domännamnet"
+          ],
+          "answer": 1,
+          "explain": "Utdatakodning fixar reflektion, CSP minskar effekten och du korrigerar fortfarande grundorsaken.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilket är en bra praxis för API felsvar?",
+          "choices": [
+            "Returnera stackspår till kunder",
+            "Returnera minimala fel till klienter och logga detaljerade fel på serversidan",
+            "Dölj loggar helt",
+            "Inaktivera undantag"
+          ],
+          "answer": 1,
+          "explain": "Klienter behöver stabila minimala fel; loggar bör innehålla detaljer för felsökning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad inkluderar \"säkerhetsfelkonfiguration\" vanligtvis?",
+          "choices": [
+            "Stark MFA",
+            "Standardinloggningsuppgifter, utförliga fel, saknade rubriker och öppna administratörsgränssnitt",
+            "Krypterade säkerhetskopior",
+            "Minst privilegierade roller"
+          ],
+          "answer": 1,
+          "explain": "Felkonfigurationer inkluderar ofta osäkra standardinställningar och överdriven exponering.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är det bästa stället att genomdriva indatavalidering?",
+          "choices": [
+            "Endast i klienten",
+            "Endast i servern",
+            "Både klient och server, med servern auktoritativ",
+            "Ingenstans"
+          ],
+          "answer": 2,
+          "explain": "Klientvalidering förbättrar UX; servervalidering krävs för säkerheten.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En webhook-endpoint accepterar förfrågningar utan att verifiera ursprunget. Bästa fixen?",
+          "choices": [
+            "Lita alltid på källan IP",
+            "Verifiera signaturer eller delad hemlighet och återuppspelningsskydd",
+            "Inaktivera TLS",
+            "Logga mindre"
+          ],
+          "answer": 1,
+          "explain": "Signerade webhooks med replay-skydd verifierar äktheten.",
+          "type": "scenario"
+        },
+        {
+          "q": "Varför är \"minst privilegium\" relevant för webbappsdatabaskonton?",
+          "choices": [
+            "Det ökar frågehastigheten",
+            "Det begränsar skador om appen äventyras eller en fråga missbrukas",
+            "Det inaktiverar säkerhetskopiering",
+            "Det tar bort loggning"
+          ],
+          "answer": 1,
+          "explain": "Minsta privilegium minskar sprängradien från insprutning eller kompromiss.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken kontroll minskar bäst risken från sårbara beroenden?",
+          "choices": [
+            "Uppdatera aldrig",
+            "Använd beroendeskanning och snabb patchning med testning",
+            "Dölj endast versionsbannern",
+            "Inaktivera HTTPS"
+          ],
+          "answer": 1,
+          "explain": "Skanning och korrigering av beroenden minskar exponeringen för kända risker.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du behöver en snabb kontroll för risk för förbikoppling av autentisering. Vilket test är mest relevant?",
+          "choices": [
+            "Försök att komma åt skyddade endpointer utan en giltig session",
+            "Pinga servern",
+            "Öka DNS TTL",
+            "Inaktivera HSTS"
+          ],
+          "answer": 0,
+          "explain": "Om du försöker komma åt utan autentisering testar du om autentiseringskontroller på serversidan finns.",
+          "type": "scenario"
+        },
+        {
+          "q": "SameSite-cookies hjälper främst till att lindra:",
+          "choices": [
+            "SQL injektion",
+            "CSRF i många fall",
+            "Ransomware",
+            "BGP kapning"
+          ],
+          "answer": 1,
+          "explain": "SameSite minskar sändning av cookies mellan webbplatser, vilket kan minska risken CSRF i många flöden.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "cloud-security",
+      "title": "Grunder i molnsäkerhet",
+      "questions": [
+        {
+          "q": "Molnets modell för delat ansvar betyder:",
+          "choices": [
+            "Leverantören säkrar allt från början",
+            "Säkerheten är uppdelad mellan leverantör och kund beroende på tjänst",
+            "Kunder hanterar bara fakturering",
+            "Säkerhet är valfritt"
+          ],
+          "answer": 1,
+          "explain": "I molnet säkrar leverantörer de underliggande tjänsterna; kunder säkrar sina konfigurationer, identiteter och data.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken kontroll minskar mest direkt risken från läckta molnåtkomstnycklar?",
+          "choices": [
+            "Längre värdnamn",
+            "Använd kortlivade autentiseringsuppgifter och rotera nycklar",
+            "Inaktivera loggning",
+            "Öka TTL"
+          ],
+          "answer": 1,
+          "explain": "Kortlivade referenser och rotation minskar risken för missbruk.",
+          "type": "mcq"
+        },
+        {
+          "q": "En vanlig orsak till molnintrång är:",
+          "choices": [
+            "För många DNS-servrar",
+            "Felkonfigurerade identitets- och åtkomstpolicyer",
+            "För mycket RAM",
+            "TLS 1.3"
+          ],
+          "answer": 1,
+          "explain": "Övertillåtande IAM-policyer är en vanlig grundorsak till molnincidenter.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken loggkälla är mest användbar för \"vem gjorde vad\" API-åtgärder i många moln?",
+          "choices": [
+            "Endast flödesloggar",
+            "Cloud revisionsloggar (kontrollplan)",
+            "Kärnring buffert",
+            "Webbläsarhistorik"
+          ],
+          "answer": 1,
+          "explain": "Kontrollplanets granskningsloggar registrerar API samtal och identitetskontext.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är en säkerhetsgrupp eller nätverkssäkerhetsgrupp bäst att jämföra med?",
+          "choices": [
+            "En router",
+            "En tillståndsfull virtuell brandväggsregeluppsättning",
+            "En lösenordshanterare",
+            "En DNS zon"
+          ],
+          "answer": 1,
+          "explain": "Säkerhetsgrupper är statliga tillåter regler kopplade till arbetsbelastningar.",
+          "type": "mcq"
+        },
+        {
+          "q": "En bästa praxis för objektförvaringshinkar är:",
+          "choices": [
+            "Offentlig läsning som standard",
+            "Standard privat och ge uttryckligen minsta åtkomst",
+            "Lagra hemligheter i objektnamn",
+            "Inaktivera alltid versionshantering"
+          ],
+          "answer": 1,
+          "explain": "Starta privat och ge minsta privilegium; undvika allmänhetens tillgång om det inte avsiktligt krävs.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför är kryptering med kundhanterade nycklar användbart i vissa miljöer?",
+          "choices": [
+            "Det gör system opatchbara",
+            "Det kan stödja arbetsuppdelning och återkallelse av nyckel",
+            "Det tar bort behovet av IAM",
+            "Det inaktiverar säkerhetskopiering"
+          ],
+          "answer": 1,
+          "explain": "Nyckelkontroll och åtskillnad av arbetsuppgifter kan vara viktigt för efterlevnad och riskhantering.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är en stark kontroll för molnadministratörskonton?",
+          "choices": [
+            "Nej MFA",
+            "Phishing-resistent MFA och villkorad åtkomst",
+            "Delade root-uppgifter",
+            "Inaktivera loggning"
+          ],
+          "answer": 1,
+          "explain": "Stark MFA och villkorad tillgång minskar risken för uppköp.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En utvecklare behöver tillfällig produktionsåtkomst för att diagnostisera ett problem. Bästa tillvägagångssättet?",
+          "choices": [
+            "Ge breda administratörsrättigheter permanent",
+            "Använd tidsbunden åtkomst med godkännanden och revisionsloggning",
+            "Dela autentiseringsuppgifter i chatten",
+            "Stäng av MFA"
+          ],
+          "answer": 1,
+          "explain": "Just-in-time, granskad höjd är säkrare än stående privilegium.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vad är en vanlig risk med \"instansmetadata\"-tjänster?",
+          "choices": [
+            "De saktar ner DNS",
+            "SSRF kan komma åt metadata för att stjäla referenser om den inte är skyddad",
+            "De inaktiverar TLS",
+            "De förhindrar loggning"
+          ],
+          "answer": 1,
+          "explain": "Metadataendpointer kan missbrukas via SSRF om de inte begränsas.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken praxis hjälper till att upptäcka och förhindra oavsiktlig offentlig exponering?",
+          "choices": [
+            "Inaktivera inventering",
+            "Kontinuerlig konfigurationsövervakning och varningar för allmänhetens tillgång",
+            "Ta bort alla taggar",
+            "Sluta lappa"
+          ],
+          "answer": 1,
+          "explain": "Kontinuerlig konfigurationsövervakning fångar drift och oavsiktlig exponering.",
+          "type": "mcq"
+        },
+        {
+          "q": "Ett vanligt skäl till att separera dev- och prodkonton/projekt är:",
+          "choices": [
+            "För att göra DNS långsammare",
+            "För att minska sprängradien och genomdriva olika policyer",
+            "Att återanvända referenser överallt",
+            "För att undvika övervakning"
+          ],
+          "answer": 1,
+          "explain": "Segmentering minskar sprängradien och möjliggör strängare produktkontroller.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken är den bästa beskrivningen av 'minsta privilegiet' IAM?",
+          "choices": [
+            "Ge tillstånd i stort sett för hastighet",
+            "Ge bara de behörigheter som behövs för en uppgift, omfattning av resurser och tid",
+            "Använd delade konton",
+            "Inaktivera granskningsloggar"
+          ],
+          "answer": 1,
+          "explain": "Minsta behörighet omfattar behörigheter till behov, resurser och tid.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför är resurstaggar användbara för säkerhetsoperationer?",
+          "choices": [
+            "De ökar paketförlusten",
+            "De stöder ägande, kostnadstilldelning och policyomfattning",
+            "De inaktiverar kryptering",
+            "De förhindrar säkerhetskopiering"
+          ],
+          "answer": 1,
+          "explain": "Taggar hjälper styrning, ägarskap och policyomfattning för tillämpning.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket koncept stöder bäst förhindrande av sidorörelse i molnnätverk?",
+          "choices": [
+            "Platta nätverk",
+            "Nätverkssegmentering och snäva säkerhetsgrupper",
+            "Öppna inkommande regler",
+            "Inaktiverar flödesloggar"
+          ],
+          "answer": 1,
+          "explain": "Segmentering och räckviddsregler minskar nåbarheten och rörelse i sidled.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du upptäcker en åtkomstnyckel som används från ett nytt land inom några minuter efter att du skapat den. Bästa nästa steg?",
+          "choices": [
+            "Gör ingenting",
+            "Inaktivera nyckeln, undersök huvudmannen och granska de senaste ändringarna",
+            "Öka tillgången för allmänheten",
+            "Rotera DNS servrar"
+          ],
+          "answer": 1,
+          "explain": "Snabb ovanlig användning tyder på kompromisser; inaktivera och undersök omedelbart.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vad är en praktisk baslinje för molnloggning?",
+          "choices": [
+            "Samla bara in CPU mätvärden",
+            "Aktivera kontrollplanets granskningsloggar plus nätverksflödesloggar och nyckeltjänstloggar",
+            "Inaktivera alla loggar för att spara kostnader",
+            "Logga bara på incidenter"
+          ],
+          "answer": 1,
+          "explain": "Revisions- och flödesloggar ger ansvarighet och nätverkskontext.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför är \"infrastruktur som kod\" till hjälp för säkerheten?",
+          "choices": [
+            "Det förhindrar alla incidenter",
+            "Det möjliggör granskningsbara, repeterbara ändringar och policytillämpning",
+            "Det inaktiverar säkerhetskopiering",
+            "Den ersätter IAM"
+          ],
+          "answer": 1,
+          "explain": "IaC gör ändringarna granskningsbara och konsekventa, vilket möjliggör policykontroller.",
+          "type": "mcq"
+        },
+        {
+          "q": "En \"tjänsthuvudman\" eller \"roll\" för arbetsbelastningar bör vanligtvis använda:",
+          "choices": [
+            "Användarlösenord",
+            "Arbetsbelastningsidentitet eller rollbaserade referenser",
+            "Delat root-konto",
+            "Klartext API anger kod"
+          ],
+          "answer": 1,
+          "explain": "Arbetsbelastningsidentitet minskar hemligheternas spridning och stöder rotation.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken kontroll hjälper till att säkerställa att endast godkända bilder körs i produktionen?",
+          "choices": [
+            "Inaktivera register",
+            "Bildsignering och tillåt policy, plus sårbarhetsskanning",
+            "Offentliga hinkar",
+            "Delade administratörskonton"
+          ],
+          "answer": 1,
+          "explain": "Pålitliga bilder, signering och skanning minskar risken för leverantörskedjan och sårbara bilder.",
+          "type": "mcq"
+        },
+        {
+          "q": "Molnnätverksflödesloggar visar främst:",
+          "choices": [
+            "Applikationsfel",
+            "Accepterade/nekade metadata för nätverksanslutningar",
+            "Databasscheman",
+            "Lösenordshaschar"
+          ],
+          "answer": 1,
+          "explain": "Flödesloggar fångar upp anslutningsmetadata som src/dst och tillåter/nekar beslut.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En lagringshink måste vara offentlig för en marknadsföringswebbplats. Säkraste tillvägagångssätt?",
+          "choices": [
+            "Gör hela hinken skrivbar",
+            "Tillåt endast läsning till specifika objekt och separata uppladdningsvägar och övervaka",
+            "Inaktivera loggning",
+            "Lagra hemligheter tillsammans med tillgångar"
+          ],
+          "answer": 1,
+          "explain": "Omfattning offentlig åtkomst för att endast läsa och separera alla skrivvägar med strikta kontroller.",
+          "type": "scenario"
+        },
+        {
+          "q": "Ett vanligt molnhärdande steg för förvaltningsplan är:",
+          "choices": [
+            "Visa administratörskonsoler offentligt utan kontroller",
+            "Begränsa administratörsåtkomst via villkorad åtkomst och stark MFA",
+            "Inaktivera granskningsloggar",
+            "Använd delade konton"
+          ],
+          "answer": 1,
+          "explain": "Att begränsa administratörsåtkomst och använda stark autentisering minskar övertagandet.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är säkerhetsvärdet för privata endpointer/privata länkar?",
+          "choices": [
+            "De ökar bandbredden",
+            "De håller tjänstetrafiken på privata nätverk snarare än det offentliga internet",
+            "De inaktiverar kryptering",
+            "De tar bort behovet av DNS"
+          ],
+          "answer": 1,
+          "explain": "Privata endpointer minskar exponeringen för det offentliga internet.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är ett tillförlitligt sätt att hantera hemligheter för applikationer?",
+          "choices": [
+            "Förplikta dig till git",
+            "Använd en hanterad hemlighetsbutik med åtkomstpolicyer och rotation",
+            "Förvara bilder i behållare",
+            "Maila dem"
+          ],
+          "answer": 1,
+          "explain": "Hanterade hemliga butiker stödjer policy och rotation.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du ombeds att ge en CI pipeline behörighet att distribuera. Bästa praxis är att:",
+          "choices": [
+            "Ge det global admin",
+            "Tilldela en dedikerad roll anpassad till erforderliga resurser och miljöer",
+            "Återanvänd ett mänskligt administratörskonto",
+            "Inaktivera granskning"
+          ],
+          "answer": 1,
+          "explain": "Pipelines bör ha dedikerade scoped identiteter och minimala behörigheter.",
+          "type": "scenario"
+        },
+        {
+          "q": "Ett \"break-glass\" molnadministratörskonto bör vanligtvis vara:",
+          "choices": [
+            "Används dagligen",
+            "Mycket skyddad, övervakad och utesluten från normala arbetsflöden",
+            "Delas offentligt",
+            "Utan MFA"
+          ],
+          "answer": 1,
+          "explain": "Break-glass-konton är endast för nödsituationer och bör kontrolleras noggrant.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket av dessa är en säkrare standard för inkommande regler till arbetsbelastningar?",
+          "choices": [
+            "0.0.0.0/0 till alla portar",
+            "Tillåt endast nödvändiga portar från kända källor",
+            "Inaktivera alla utgående",
+            "Tillåt alla protokoll"
+          ],
+          "answer": 1,
+          "explain": "Begränsa inkommande till obligatoriska portar och kända källor.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är ett vanligt \"bra\" resultat för IAM recensioner?",
+          "choices": [
+            "Behörigheterna växer alltid",
+            "Behörigheter tas bort när de inte används och roller förenklas",
+            "Delade konton läggs till",
+            "Loggning är inaktiverad"
+          ],
+          "answer": 1,
+          "explain": "Recensioner minskar oanvänd åtkomst och förenklar roller.",
+          "type": "mcq"
+        },
+        {
+          "q": "Konfigurationsdrift i molnet syftar oftast på:",
+          "choices": [
+            "Ändringar i CPU temperatur",
+            "Manuella ändringar utanför koden som avviker från den avsedda baslinjen",
+            "DNS TTL värden ökar",
+            "VPN bandbreddsfluktuationer"
+          ],
+          "answer": 1,
+          "explain": "Drift uppstår när verkliga konfigurationer skiljer sig från den deklarerade baslinjen, ofta på grund av manuella ändringar.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "incident-response-scenarios",
+      "title": "Scenarier för incidenthantering",
+      "questions": [
+        {
+          "q": "Scenario: En användare rapporterar ett misstänkt e-postmeddelande med en oväntad bilaga. Vilket är det bästa första steget?",
+          "choices": [
+            "Öppna bilagan i produktion för att bekräfta",
+            "Bevara e-post och rubriker och rapportera via den definierade IR-kanalen",
+            "Radera mejlet och gå vidare",
+            "Vidarebefordra det till alla som en varning"
+          ],
+          "answer": 1,
+          "explain": "Börja med bevarande och korrekt rapportering så att analys kan ske säkert och konsekvent.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Din EDR flaggar en möjlig ransomware-process på en arbetsstation. Bästa nästa steg?",
+          "choices": [
+            "Vänta och se om det sprider sig",
+            "Isolera endpointen från nätverket och påbörja bevisinsamling",
+            "Ombilda omedelbart utan att samla in data",
+            "Inaktivera säkerhetskopior"
+          ],
+          "answer": 1,
+          "explain": "Inneslutning via isolering minskar spridningen; samla bevis innan du torkar när det är möjligt.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du upptäcker att ett nytt administratörskonto skapats över natten. Vad gör du härnäst?",
+          "choices": [
+            "Ignorera tills nästa revision",
+            "Verifiera om det är auktoriserat, och om inte, inaktivera det och granska associerade händelser",
+            "Återställ alla anställdas lösenord omedelbart",
+            "Inaktivera loggning för att minska brus"
+          ],
+          "answer": 1,
+          "explain": "Bekräfta legitimitet, innehålla obehörig åtkomst och pivotera på relaterade revisionshändelser.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En server visar upprepade misslyckade inloggningar följt av en framgång från samma IP. Bästa nästa steg?",
+          "choices": [
+            "Blockera IP och stäng biljetten",
+            "Kontrollera vad kontot gjorde efter lyckad inloggning och om MFA användes",
+            "Anta att det är ofarligt",
+            "Ta bort autentiseringsloggarna"
+          ],
+          "answer": 1,
+          "explain": "Aktivitet efter framgång avgör effekten och nödvändig inneslutning.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du misstänker dataexfiltrering från en databasserver. Vad är viktigast att bevara tidigt?",
+          "choices": [
+            "Endast skärmdumpar",
+            "Nätverks- och åtkomstloggar och diskavbildningar om möjligt",
+            "Bara användarlistan",
+            "Skrivbordsbakgrunden"
+          ],
+          "answer": 1,
+          "explain": "Bevara bevis som stöder tidslinje och konsekvensanalys.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Ett kritiskt system har äventyrats men stöder en säkerhetsfunktion. Bästa åtgärden?",
+          "choices": [
+            "Stäng av den omedelbart",
+            "Samordna inneslutning med intressenter och använd ett riskbaserat tillvägagångssätt för att undvika säkerhetspåverkan",
+            "Ignorera kompromissen",
+            "Publicera information offentligt"
+          ],
+          "answer": 1,
+          "explain": "Inneslutning måste ta hänsyn till driftsäkerhet och affärspåverkan samtidigt som angriparens kontroll begränsas.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du identifierar skadlig programvara på en värd. När är utrotning lämplig?",
+          "choices": [
+            "Innan inneslutning",
+            "Efter inneslutning och bevisfångst, med en plan för att verifiera borttagning",
+            "Aldrig",
+            "Först efter den årliga revisionen"
+          ],
+          "answer": 1,
+          "explain": "Innehåll först och ta sedan bort hotet med verifiering och återställningsplanering.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du har kompromissindikatorer (IOCs). Bästa sättet att använda dem?",
+          "choices": [
+            "Blockera allt som matchar för alltid",
+            "Jaga över loggar och endpointer för att hitta omfattning och relaterad aktivitet",
+            "Dela offentligt omedelbart",
+            "Ignorera dem när de hittats"
+          ],
+          "answer": 1,
+          "explain": "IOC hjälper till att avgränsa och hitta relaterad aktivitet; blockering kräver sammanhang och validering.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En arbetsstation misstänks vara intrång, men användaren är på resande fot. Bästa nästa steg?",
+          "choices": [
+            "Be användaren att fortsätta använda det normalt",
+            "Inaktivera eller återkalla sessioner och autentiseringsuppgifter och samordna fjärrinneslutning",
+            "Vänta tills de kommer tillbaka",
+            "Säg åt dem att installera slumpmässiga verktyg"
+          ],
+          "answer": 1,
+          "explain": "Återkallande av session minskar angriparens åtkomst; samordna inneslutningen med minimala användarstörningar.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du måste samla in flyktiga bevis. Vad är en viktig anledning till att göra det tidigt?",
+          "choices": [
+            "Det är billigare",
+            "Flyktiga data (processer, nätverksanslutningar) ändras snabbt",
+            "Det förbättrar lappningen",
+            "Den tar bort skadlig programvara automatiskt"
+          ],
+          "answer": 1,
+          "explain": "Minne och körtidstillstånd kan gå förlorade vid omstart eller med tiden.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En varning indikerar misstänkt PowerShell användning på en server. Bästa nästa steg?",
+          "choices": [
+            "Inaktivera PowerShell överallt omedelbart",
+            "Validera varningen med processlinje, kommandorad och användarkontext",
+            "Ignorera PowerShell varningar som brus",
+            "Ta bort servern"
+          ],
+          "answer": 1,
+          "explain": "Triage kräver sammanhang för att skilja adminaktivitet från missbruk.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du bekräftar identitetsstöld. Vilken är den säkraste handlingsordningen?",
+          "choices": [
+            "Återställ lösenord först och innehåll sedan system senare",
+            "Innehåll angriparåtkomst (inaktivera konton, återkalla sessioner), rotera sedan autentiseringsuppgifter och undersök",
+            "Meddela endast ledningen",
+            "Blockera bara en IP"
+          ],
+          "answer": 1,
+          "explain": "Stoppa aktiv åtkomst, rotera sedan och undersök för att förhindra återkompromiss.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du får frågan \"är denna incident rapporterbar?\" Bästa nästa steg?",
+          "choices": [
+            "Gissning",
+            "Kontrollera organisationens rapporteringskriterier och konsultera juridik/efterlevnad om det behövs",
+            "Ignorera rapportering",
+            "Rapportera allt till media"
+          ],
+          "answer": 1,
+          "explain": "Använd definierade kriterier och involvera rätt intressenter för att rapportera beslut.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En nätfiskekampanj använder lookalike-domäner. Bästa inneslutningssteget?",
+          "choices": [
+            "Gör ingenting",
+            "Blockera domänerna, sök efter klick och återställ berörda sessioner",
+            "Inaktivera e-post för alla",
+            "Ändra företagets namn"
+          ],
+          "answer": 1,
+          "explain": "Blockera infrastruktur, identifiera offer och återkalla sessioner för att minska påverkan.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Under IR föreslår en teammedlem att torka alla loggar för att dölja angriparens spår. Bästa svaret?",
+          "choices": [
+            "Komma överens",
+            "Avvisa; bevara loggar och begränsa åtkomsten till dem",
+            "Rensa bara brandväggsloggar",
+            "E-postloggar till angripare"
+          ],
+          "answer": 1,
+          "explain": "Bevarande av bevis är grundläggande för IR och lärdomar.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du misstänker att en angripare fortfarande har åtkomst. Vad är en stark indikator du kan leta efter?",
+          "choices": [
+            "En ny skrivbordsikon",
+            "Nya beständighetsmekanismer eller återkommande obehöriga autentiseringar",
+            "Endast mer RAM användning",
+            "Endast ett ändrat värdnamn"
+          ],
+          "answer": 1,
+          "explain": "Persistens visas ofta som nya tjänster, uppgifter, konton eller återkommande autentiseringsaktivitet.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du har begränsad sikt på en endpoint. Vad är ett praktiskt omedelbart steg?",
+          "choices": [
+            "Antar att det är bra",
+            "Öka loggning/telemetri för den tillgångsklassen och prioritera täckningsluckor",
+            "Inaktivera nätverket",
+            "Ta bort kryptering"
+          ],
+          "answer": 1,
+          "explain": "Förbättra synligheten för att stödja omfattning och verifiering.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Efter inneslutning ber företaget att snabbt återställa tjänsten. Bästa tillvägagångssättet?",
+          "choices": [
+            "Återställ från säkerhetskopior utan att verifiera kompromisser",
+            "Återställ med verifiering: patcha, rotera creds, validera rent tillstånd, övervaka sedan noga",
+            "Stäng av säkerhetsverktyg",
+            "Återanvänd gamla lösenord"
+          ],
+          "answer": 1,
+          "explain": "Återhämtningen måste innefatta verifiering och härdning för att förhindra återinfektion.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du måste kommunicera under en incident. Bästa praxis är att:",
+          "choices": [
+            "Använd valfri offentlig kanal",
+            "Använd fördefinierade kommunikationskanaler och begränsa detaljer till att behöva veta",
+            "Dela IOC på sociala medier",
+            "Undvik att dokumentera någonting"
+          ],
+          "answer": 1,
+          "explain": "Kontrollerad kommunikation minskar läckor och förvirring; dokumentation är viktig.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Flera varningar tyder på samma grundorsak. Bästa nästa steg?",
+          "choices": [
+            "Behandla varje varning som orelaterade",
+            "Bygg en tidslinje och hypotes och testa den sedan med ytterligare bevis",
+            "Stäng dem alla",
+            "Inaktivera varningar"
+          ],
+          "answer": 1,
+          "explain": "Hypotesdriven analys hjälper till att koppla samman händelser och hitta den verkliga omfattningen.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Ett inträngt konto tillhör en IT-administratör. Vad är en säker omedelbar åtgärd?",
+          "choices": [
+            "Vänta på att administratören svarar",
+            "Inaktivera kontot, återkalla sessioner och använd glasögonåtkomst om det behövs",
+            "Inaktivera MFA hela organisationen",
+            "Blockera bara en källa IP"
+          ],
+          "answer": 1,
+          "explain": "Administratörskonton har hög sprängradie; omedelbar inneslutning är ofta motiverad.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du upptäcker misstänkt utgående trafik från en server till en sällsynt destination. Bästa triage-action?",
+          "choices": [
+            "Ignorera utgående trafik",
+            "Kontrollera process-till-anslutning mappning, DNS historik och senaste ändringar på servern",
+            "Formatera omedelbart disken",
+            "Be användarna att starta om"
+          ],
+          "answer": 1,
+          "explain": "Länka nätverksaktivitet till processer och senaste ändringar för att bekräfta skadlighet.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du är osäker på om en upptäckt är en falsk positiv. Vad ska du göra?",
+          "choices": [
+            "Inaktivera detekteringen permanent",
+            "Dokumentera antaganden och validera med ytterligare datakällor",
+            "Ignorera det",
+            "Blockera allt internet"
+          ],
+          "answer": 1,
+          "explain": "Använd mer bevis, dokumentera resonemang och justera regler på ett säkert sätt.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du hittade en skadlig filhash. Vilken är den bästa användningen av hash?",
+          "choices": [
+            "Använd den som enda indikator",
+            "Sök över endpointer efter händelser och relaterade överordnade processer",
+            "Anta att filen finns överallt",
+            "Ta bort alla filer med liknande namn"
+          ],
+          "answer": 1,
+          "explain": "Hashes stödjer scoping och jakt, men bör kombineras med beteende och sammanhang.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En affärsenhet kräver att få veta exakt vem som gjorde det omedelbart. Bästa svaret?",
+          "choices": [
+            "Ge ett namn utan bevis",
+            "Förklara att tillskrivning tar tid; prioritera inneslutning och evidensdriven analys",
+            "Vägra att kommunicera",
+            "Publicera gissningar"
+          ],
+          "answer": 1,
+          "explain": "Inneslutning och bevis först; attribution kräver noggrann analys.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du har en incident som verkar innesluten. Vilken aktivitet efter incidenten är mest värdefull?",
+          "choices": [
+            "Ta bort alla anteckningar",
+            "Kör en lärdomsgranskning och uppdatera kontroller, spelböcker och upptäckter",
+            "Anta att det aldrig kommer att hända igen",
+            "Inaktivera övervakning"
+          ],
+          "answer": 1,
+          "explain": "Förbättringar efter incidenten minskar återkommande och förbättrar responsen.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du undersöker möjliga sidorörelser. Vilken loggkälla är mest direkt användbar?",
+          "choices": [
+            "Loggar för skärmens ljusstyrka",
+            "Loggar för autentisering och fjärråtkomst över värdar",
+            "Endast DNS zonserier",
+            "Endast skrivarloggar"
+          ],
+          "answer": 1,
+          "explain": "Sidorörelser visas ofta som nya autentiseringshändelser och fjärrexekveringsmönster.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du planerar att rotera autentiseringsuppgifter efter en incident. Vilket vanligt felläge bör du undvika?",
+          "choices": [
+            "Roterar för snabbt",
+            "Roterar endast användarlösenord samtidigt som servicekonton och API-nycklar lämnas oförändrade",
+            "Använder MFA",
+            "Dokumentera förändringar"
+          ],
+          "answer": 1,
+          "explain": "Tjänstkonton och nycklar missas ofta och kan bevara angriparens åtkomst.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Bevis tyder på att en komprometterad bärbar dator fortfarande är online. Du kan inte nå användaren. Bästa nästa steg?",
+          "choices": [
+            "Gör ingenting",
+            "Inaktivera enhetens åtkomst (nätverk, VPN, identitetssessioner) och varna intressenter",
+            "Skicka en enkät till användaren",
+            "Vänta en vecka"
+          ],
+          "answer": 1,
+          "explain": "Innehåll åtkomst snabbt via centraliserade kontroller när enheten inte kan nås.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En tredje part meddelar dig om stulna autentiseringsuppgifter. Bästa nästa steg?",
+          "choices": [
+            "Anta att det är en bluff",
+            "Validera rapporten, rotera berörda autentiseringsuppgifter och kontrollera om det finns misstänkta inloggningar",
+            "Publicera alla detaljer",
+            "Inaktivera alla konton"
+          ],
+          "answer": 1,
+          "explain": "Validera och vidta riktade inneslutningsåtgärder samtidigt som effekten avgränsas.",
+          "type": "scenario"
+        }
+      ]
+    },
+    {
+      "id": "soc-triage-scenarios",
+      "title": "SOC-analytikertriage",
+      "questions": [
+        {
+          "q": "Scenario: En varning visar \"flera misslyckade inloggningar\" för en användare, men den matchar ett schemalagt lösenordssynkroniseringsfönster. Bästa nästa steg?",
+          "choices": [
+            "Eskalera som kritisk omedelbart",
+            "Kontrollera ändra kalender och jämför historiska mönster innan du eskalerar",
+            "Inaktivera alla inloggningar",
+            "Ta bort varningen"
+          ],
+          "answer": 1,
+          "explain": "Kontext och baslinjer hjälper till att skilja förväntade utbrott från attacker.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du får en EDR-varning för \"misstänkt skriptkörning\" på en IT administratörsbärbar dator. Bästa nästa steg?",
+          "choices": [
+            "Stäng den; administratörer kör skript",
+            "Granska kommandoraden, överordnad process och om den överensstämmer med en godkänd uppgift",
+            "Gör om den bärbara datorn omedelbart",
+            "Stäng av EDR för administratörer"
+          ],
+          "answer": 1,
+          "explain": "Administratörsaktivitet kan vara godartad eller missbrukad; härstamning och uppgiftssammanhang spelar roll.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En SIEM-regel aktiveras för en enda utgående anslutning till ett sällsynt land. Bästa triage-action?",
+          "choices": [
+            "Ignorera geolokalisering",
+            "Kontrollera användarroll, enhetsställning, VPN användning och relaterade autentiseringshändelser",
+            "Blockera hela landet permanent",
+            "Inaktivera DNS-loggning"
+          ],
+          "answer": 1,
+          "explain": "Kombinera signaler innan du eskalerar; Enbart geolokalisering är ofta bullrig.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En användare rapporterar en webbläsarpopup som ber om att \"återautenticera\". Vad gör du härnäst?",
+          "choices": [
+            "Be dem att ange autentiseringsuppgifter",
+            "Behandla som potentiellt nätfiske; samla in URL/skärmdumpen och återställ sessionerna om de klickade",
+            "Ignorera användarrapporter",
+            "Inaktivera användarens konto för alltid"
+          ],
+          "answer": 1,
+          "explain": "Användarrapporter är värdefulla; behandla som potentiellt nätfiske och vidta riktade åtgärder.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En IDS-varning indikerar en möjlig portskanning från en intern värd. Bästa första steget?",
+          "choices": [
+            "Antag att det är en angripare",
+            "Identifiera källvärdens ägare och kontrollera om det är en sårbarhetsskanner eller övervakningssystem",
+            "Blockera all intern trafik",
+            "Bygg om brandväggen"
+          ],
+          "answer": 1,
+          "explain": "Många skanningar är legitima; validera källa och syfte först.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En varning om skadlig programvara visar att en fil sattes i karantän. Vilket är det bästa nästa steget?",
+          "choices": [
+            "Stäng omedelbart",
+            "Kontrollera om värden visar ytterligare indikatorer (persistens, nätverkssignaler) och om andra värdar har samma fil",
+            "Inaktivera karantän",
+            "Meddela media"
+          ],
+          "answer": 1,
+          "explain": "Karantän är bra, men du måste omfånga och se till att ingen annan aktivitet existerar.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du ser upprepade DNS-frågor för algoritmiska domäner från en endpoint. Bästa triage?",
+          "choices": [
+            "Ignorera DNS",
+            "Korrelera med proxy/EDR telemetri och kontrollera om det finns misstänkta processer",
+            "Blockera alla DNS till endpointen",
+            "Starta om servern DNS"
+          ],
+          "answer": 1,
+          "explain": "DGA-liknande DNS behöver korrelation för att bekräfta skadlig programvara.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En varning indikerar \"ny lokal administratörsanvändare skapad\" på en arbetsstation. Bästa åtgärden?",
+          "choices": [
+            "Vänta till nästa arbetsdag",
+            "Validera legitimitet; om det inte förväntas, inaktivera kontot och samla in värdkontext",
+            "Inaktivera alla användarkonton",
+            "Byt bara tapeten"
+          ],
+          "answer": 1,
+          "explain": "Nya administratörskonton är värdefulla och kräver snabb validering och inneslutning.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En inloggning lyckas efter många MFA push-uppmaningar. Mest trolig orsak?",
+          "choices": [
+            "Användaren använde en lösenordsnyckel",
+            "MFA trötthets-/pushbombning som leder till oavsiktligt godkännande",
+            "DNS cachning",
+            "Patch tisdag"
+          ],
+          "answer": 1,
+          "explain": "Upprepade uppmaningar kan pressa en användare att godkänna, vilket möjliggör kontoövertagande.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En SIEM-varning utlöses för \"misstänkt PowerShell-nedladdningsvagga\" på en server. Bästa triagesteg?",
+          "choices": [
+            "Blockera PowerShell överallt",
+            "Bekräfta genom att inspektera processträdet, kommandoraden och nätverksdestinationen",
+            "Ignorera; PowerShell är normalt",
+            "Inaktivera loggning"
+          ],
+          "answer": 1,
+          "explain": "Validera med bevis (härstamning och destination) innan du vidtar breda åtgärder.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du har 50 varningar med låg allvarlighetsgrad och en medelstor varning. Vad är en bra triagestrategi?",
+          "choices": [
+            "Jobba äldst först alltid",
+            "Prioritera efter potentiell påverkan, tillgångens kriticitet och förtroende",
+            "Ignorera medelstora varningar",
+            "Välj slumpmässigt"
+          ],
+          "answer": 1,
+          "explain": "Riskbaserad prioritering minskar missade händelser med hög effekt.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En varning indikerar möjlig fyllning av autentiseringsuppgifter på en webbinloggning. Bästa nästa steg?",
+          "choices": [
+            "Inaktivera webbplatsen",
+            "Kontrollera hastighetsgränser, källmönster IP och om konton har nåtts",
+            "Ignorera eftersom det är vanligt",
+            "Inaktivera MFA"
+          ],
+          "answer": 1,
+          "explain": "Bekräfta framgång kontra försök och tillämpa riktade begränsningar som hastighetsbegränsning och sessionsåterställning.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du hittar en misstänkt schemalagd uppgift på en arbetsstation. Vilket är det bästa nästa steget?",
+          "choices": [
+            "Ta bort den omedelbart utan anteckningar",
+            "Spela in detaljer (namn, kommando, användare), kontrollera skapelsetiden och leta efter liknande uppgifter någon annanstans",
+            "Ignorera det",
+            "Inaktivera Windows Task Scheduler överallt"
+          ],
+          "answer": 1,
+          "explain": "Bevara bevis och omfattning över hela miljön innan borttagning.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En ny process gör periodiska utgående anslutningar var 5:e minut. Bästa triage?",
+          "choices": [
+            "Antar att det är normalt",
+            "Identifiera processen, dess undertecknare/sökväg och om destinationen är känd och tillåten",
+            "Kontrollera endast DNS",
+            "Inaktivera nätverket för alla användare"
+          ],
+          "answer": 1,
+          "explain": "Beacons kräver kartläggningsprocess till destination och legitimitet.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du är osäker på om du ska eskalera till IR. Bästa kriteriet är:",
+          "choices": [
+            "Ditt humör",
+            "Potentiell påverkan och bevis på kompromiss (framgångsrik åtkomst, persistens, dataåtkomst)",
+            "Endast antal varningar",
+            "Tid på dagen"
+          ],
+          "answer": 1,
+          "explain": "Eskalering bör beakta effekter och starka indikatorer på kompromiss.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En användare klickade på en nätfiske-länk men hävdar att de inte angav autentiseringsuppgifter. Bästa nästa steg?",
+          "choices": [
+            "Gör ingenting",
+            "Kontrollera efter sessionstokens, OAuth samtyckesbeviljande och misstänkta inloggningar; överväg att återställa lösenordet om det finns risk",
+            "Inaktivera e-post för alltid",
+            "Bygg om den bärbara datorn omedelbart"
+          ],
+          "answer": 1,
+          "explain": "Nätfiske kan stjäla tokens eller utlösa samtyckesflöden även utan lösenordsinmatning.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En granskningslogg för molnet visar en API-nyckel som skapats och används för att lista lagringshinkar. Bästa triage?",
+          "choices": [
+            "Ignorera molnloggar",
+            "Identifiera det huvudsakliga, validera syftet och kontrollera efter onormala åtkomstmönster",
+            "Ta bort granskningsloggarna",
+            "Inaktivera alla hinkar"
+          ],
+          "answer": 1,
+          "explain": "Granskningskontext och avvikelsekontroller hjälper till att fastställa missbruk.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Din upptäckt avfyrades på ett känt adminverktyg (PsExec/remote exec). Bästa tillvägagångssättet?",
+          "choices": [
+            "Stäng alltid som falskt positivt",
+            "Kontrollera om användningen överensstämmer med godkänd administratörsaktivitet och undersök källvärd och mållista",
+            "Blockera alla administratörsverktyg för alltid",
+            "Inaktivera Windows-nätverk"
+          ],
+          "answer": 1,
+          "explain": "Verktyg med dubbla användningsområden kräver sammanhang: vem använde det, varifrån och varför.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En användare rapporterar \"mina filer ser krypterade ut\" men EDR är tyst. Bästa nästa steg?",
+          "choices": [
+            "Avvisa det",
+            "Samla in detaljer och kontrollera filsystemaktivitet, senaste processer och säkerhetskopieringsstatus",
+            "Inaktivera filservern",
+            "Ändra DNS-servern"
+          ],
+          "answer": 1,
+          "explain": "Användarrapporter kan vara tidiga signaler; undersöka värd- och lagringsaktivitet.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Din SIEM har intagsfördröjningar. Bästa operativa svar för triage?",
+          "choices": [
+            "Anta att allt är bra",
+            "Använd lokala källor (EDR, endpointsloggar) för tidskritiska undersökningar och spåra intagshälsa",
+            "Inaktivera alla varningar",
+            "Starta om SIEM"
+          ],
+          "answer": 1,
+          "explain": "När centrala loggar fördröjer, använd alternativ telemetri medan du fixar intag.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En upptäckt är bullrig i en affärsenhet på grund av att en ny app lanseras. Bästa åtgärden?",
+          "choices": [
+            "Stäng av den permanent",
+            "Ställ in med undantag eller trösklar baserat på verifierade godartade mönster och dokumentändringar",
+            "Ignorera alla varningar",
+            "Ta bort appen"
+          ],
+          "answer": 1,
+          "explain": "Ställ in baserat på verifierat godartat beteende och dokumentera för att förhindra blinda fläckar.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du måste berika en IP-adress snabbt under triage. Vad är mest användbart?",
+          "choices": [
+            "Endast IPs sista oktett",
+            "Tillgångskontext (intern/extern), DNS och relaterade anslutningar och användare",
+            "Skärmstorlek",
+            "Skrivarens namn"
+          ],
+          "answer": 1,
+          "explain": "Anrikning knyter IP till tillgångar, identiteter och aktivitet.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du ser upprepade autentiseringsfel för många konton från en IP. Bästa nästa steg?",
+          "choices": [
+            "Blockera alla konton",
+            "Blockera eller hastighetsbegränsa källan och sök efter framgångsrika inloggningar bland mål",
+            "Ignorera det",
+            "Inaktivera lösenordspolicy"
+          ],
+          "answer": 1,
+          "explain": "Fokusera på framgång och inneslutning samtidigt som du minskar ytterligare försök.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En endpoint visar en ny osignerad binär i en tillfällig användarkatalog. Bästa triage?",
+          "choices": [
+            "Anta att det är säkert",
+            "Kontrollera exekveringshändelser, signerare/sökväg, överordnad process och om andra värdar har det",
+            "Kontrollera endast diskutrymme",
+            "Inaktivera antivirus"
+          ],
+          "answer": 1,
+          "explain": "Osignerade binärer i temporära sökvägar är misstänkta och kräver sammanhang och omfattning.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En varning indikerar att en domänkontrollant gör utgående anslutningar till en ny destination. Bästa svaret?",
+          "choices": [
+            "Behandla som låg prioritet",
+            "Prioritera snabbt på grund av tillgångens kriticitet och validera process och destination",
+            "Ignorera; DCs pratar med allt",
+            "Ombilda omedelbart"
+          ],
+          "answer": 1,
+          "explain": "Tillgångar med hög kritik motiverar snabbare triage och inneslutning.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Ett användarkonto visar inloggning från en ny enhet men från ett känt företagsintervall VPN. Bästa nästa steg?",
+          "choices": [
+            "Markera som säker för alltid",
+            "Kontrollera om enheten är registrerad/hanterad och om MFA och enhetens hållning var uppfyllda",
+            "Inaktivera VPN",
+            "Ignorera alla framtida varningar"
+          ],
+          "answer": 1,
+          "explain": "VPN intervall minskar risken, men enheten och MFA sammanhang spelar fortfarande roll.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du hittar en varning som tydligt indikerar kompromiss. Vilket är det bästa nästa steget?",
+          "choices": [
+            "Fortsätt undersöka tyst i dagar",
+            "Eskalera till incidentresponsprocessen och initiera inneslutningsåtgärder",
+            "Stäng den för att undvika panik",
+            "Inaktivera loggning"
+          ],
+          "answer": 1,
+          "explain": "Tydlig kompromiss bör utlösa IR eskalering och inneslutning per process.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du måste bestämma om en varning är värd att söka efter timmar. Bästa faktorn är:",
+          "choices": [
+            "Vad irriterande det är",
+            "Tillgångskritikitet och bevis på aktivt angriparbeteende",
+            "Antal taggar i varningen",
+            "Om det är mulet ute"
+          ],
+          "answer": 1,
+          "explain": "Sida baserad på potentiell påverkan och aktiva kompromissindikatorer.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: En enskild arbetsstation visar upprepade anslutningar till många interna värdar på TCP 445. Mest trolig orsak?",
+          "choices": [
+            "Ett DNS serverproblem",
+            "Möjlig maskliknande rörelse i sidled eller skanning efter SMB andelar",
+            "Normal webbsurfning",
+            "NTP synk"
+          ],
+          "answer": 1,
+          "explain": "Många SMB-anslutningar kan indikera skannings- eller spridningsbeteende.",
+          "type": "scenario"
+        },
+        {
+          "q": "Scenario: Du bygger en ärendeanteckning under triage. Vad ska du fånga?",
+          "choices": [
+            "Bara slutsatser",
+            "Bevis, tidsstämplar, hypoteser, vidtagna åtgärder och nästa steg",
+            "Endast skärmdumpar",
+            "Endast varningstiteln"
+          ],
+          "answer": 1,
+          "explain": "Bra fallanteckningar stöder handoffs, revisioner och senare lärande.",
+          "type": "scenario"
+        }
+      ]
+    },
+    {
+      "id": "malware-endpoint-defense",
+      "title": "Skadlig kod och endpointförsvar",
+      "questions": [
+        {
+          "q": "En filhash används bäst för:",
+          "choices": [
+            "Fastställande av författarens identitet",
+            "Identifiering av exakt matchning av en specifik fil",
+            "Blockerar alla liknande filer",
+            "Dekrypterar skadlig programvara"
+          ],
+          "answer": 1,
+          "explain": "Hashes identifierar en specifik filversion; varianter byter ofta hash.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken är en vanlig beständighetsmekanism på Windows?",
+          "choices": [
+            "Byt tapet",
+            "Schemalagda uppgifter eller Run-nycklar",
+            "Ökar DNS TTL",
+            "ARP cacheminne"
+          ],
+          "answer": 1,
+          "explain": "Schemalagda uppgifter och Run-nycklar är vanliga beständighetsplatser.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket beteende tyder starkast på ransomware-aktivitet?",
+          "choices": [
+            "Hög CPU under kompilering",
+            "Snabba filändringar med nya tillägg och radering av skuggkopior",
+            "Många DNS frågor till CDN",
+            "En enda ping"
+          ],
+          "answer": 1,
+          "explain": "Masskrypteringsmönster och radering av skuggkopior är vanliga beteenden för ransomware.",
+          "type": "mcq"
+        },
+        {
+          "q": "Den största fördelen med endpoint-isolering under en incident är:",
+          "choices": [
+            "Den tar bort skadlig programvara automatiskt",
+            "Det förhindrar laterala rörelser och exfiltration medan undersökningen fortsätter",
+            "Den uppdaterar mjukvaran snabbare",
+            "Det minskar loggvolymen"
+          ],
+          "answer": 1,
+          "explain": "Isolering begränsar hotet och minskar spridningen.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är det primära syftet med ett EDR-verktyg jämfört med traditionellt antivirusprogram?",
+          "choices": [
+            "Endast signaturskanning",
+            "Beteendetelemetri och utredning med svarsåtgärder",
+            "Ersätter säkerhetskopior",
+            "Byte av brandväggar"
+          ],
+          "answer": 1,
+          "explain": "EDR tillhandahåller telemetri-, korrelations- och svarsmöjligheter utöver signaturer.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför är det riskabelt att köra okända binärfiler från tillfälliga användarkataloger?",
+          "choices": [
+            "Temp-kataloger är långsammare",
+            "De är vanliga platser för exekvering av skadlig programvara",
+            "De kan inte avrätta",
+            "De är krypterade"
+          ],
+          "answer": 1,
+          "explain": "Temp- och skrivbara sökvägar för användare är vanliga områden för skadlig kod.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken typ av e-postbilagor missbrukas vanligtvis för första åtkomst?",
+          "choices": [
+            "Vanlig text",
+            "Office-dokument med makron",
+            "Endast PNG bilder",
+            "MP3-filer"
+          ],
+          "answer": 1,
+          "explain": "Makroaktiverade dokument missbrukas ofta, även om kontrollerna varierar beroende på miljö.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är en \"living off the land\"-teknik?",
+          "choices": [
+            "Använder endast binärprogram för skadlig programvara",
+            "Missbrukar inbyggda verktyg (PowerShell, WMI) för att minska upptäckten",
+            "Använder endast hårdvarutokens",
+            "Använder endast DNS"
+          ],
+          "answer": 1,
+          "explain": "Angripare missbrukar ofta inbyggda verktyg för att smälta in.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du hittar en misstänkt körbar fil med en giltig signatur från en okänd utgivare. Bästa nästa steg?",
+          "choices": [
+            "Anta att det är säkert på grund av signaturen",
+            "Validera undertecknarens rykte, filsökväg och beteende och kontrollera den överordnade processen",
+            "Ta bort alla signerade filer",
+            "Inaktivera signaturkontroller"
+          ],
+          "answer": 1,
+          "explain": "Signaturer hjälper, men förtroende bör verifieras med sammanhang och beteende.",
+          "type": "scenario"
+        },
+        {
+          "q": "En sandlåda är mest användbar för:",
+          "choices": [
+            "Generera lösenord",
+            "Att observera skadlig programvara i en isolerad miljö",
+            "Minska latens",
+            "Kryptera diskar"
+          ],
+          "answer": 1,
+          "explain": "Sandlådor ger säker dynamisk analys av misstänkta filer.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken artefakt stöder bäst scoping av en skadlig kodinfektion över endpoints?",
+          "choices": [
+            "En enda skärmdump",
+            "Unika IOC:er: filsökväg, hash, processnamn, registernycklar, C2-domäner",
+            "Endast värdnamnet",
+            "Endast användarnamnet"
+          ],
+          "answer": 1,
+          "explain": "Flera IOC hjälper till att hitta relaterade värdar och aktiviteter.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken är den största risken med att inaktivera antivirus på grund av prestandaproblem?",
+          "choices": [
+            "Mindre diskutrymme",
+            "Ökad exponering för skadlig programvara och fördröjd upptäckt",
+            "Snabbare DNS",
+            "Bättre efterlevnad"
+          ],
+          "answer": 1,
+          "explain": "Att inaktivera AV minskar grundlinjeskyddet och ökar ofta risken.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En användare rapporterar att deras webbläsare har installerat ett nytt tillägg utan samtycke. Bästa nästa steg?",
+          "choices": [
+            "Ignorera det",
+            "Ta bort tillägget, kontrollera webbläsarens policykontroller och undersök installerad programvara och autentiseringshändelser",
+            "Installera bara om webbläsaren",
+            "Inaktivera alla tillägg permanent"
+          ],
+          "answer": 1,
+          "explain": "Oväntade tillägg kan indikera adware eller kompromiss; undersöka grundorsaken och upprätthålla policy.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilket är ett vanligt tecken på referensdumpning på endpoints?",
+          "choices": [
+            "Hög diskanvändning",
+            "Tillgång till LSASS-minne eller misstänkt exekvering av autentiseringsverktyg",
+            "Många utskriftsjobb",
+            "En ny tapet"
+          ],
+          "answer": 1,
+          "explain": "Autentiseringsdumpning riktar sig ofta mot LSASS och använder kända verktygsmönster.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför är godkännandelistning effektiv mot viss skadlig programvara?",
+          "choices": [
+            "Det ökar användarfriheten",
+            "Det förhindrar ej godkända körbara filer och skript från att köras",
+            "Det inaktiverar loggning",
+            "Det snabbar upp Wi-Fi"
+          ],
+          "answer": 1,
+          "explain": "Allowlisting begränsar exekvering till känd godkänd programvara.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du misstänker att skadlig programvara sprids via SMB delningar. Bästa inneslutningssteget?",
+          "choices": [
+            "Öppna SMB till internet",
+            "Begränsa åtkomsten SMB, isolera infekterade värdar och kontrollera efter återanvändning av delade autentiseringsuppgifter",
+            "Inaktivera all fildelning permanent",
+            "Ignorera det"
+          ],
+          "answer": 1,
+          "explain": "Innehåll spridnings- och adressuppgifter och dela åtkomstmönster.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vad är ett praktiskt sätt att minska risken för makroskadlig programvara?",
+          "choices": [
+            "Aktivera alla makron",
+            "Blockera makron från internet och använd betrodda platser och signerade makron",
+            "Inaktivera e-post",
+            "Inaktivera TLS"
+          ],
+          "answer": 1,
+          "explain": "Makropolicyer kan förhindra opålitlig makroexekvering.",
+          "type": "mcq"
+        },
+        {
+          "q": "En \"beacon\" i skadlig programvara betyder vanligtvis:",
+          "choices": [
+            "En daglig backup",
+            "Periodisk utgående kommunikation till en kommando- och kontrollserver",
+            "En DNS-server",
+            "En brandväggsregel"
+          ],
+          "answer": 1,
+          "explain": "Beacons är periodiska incheckningar till C2-infrastruktur.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför ska du rotera autentiseringsuppgifter efter bekräftad kompromiss?",
+          "choices": [
+            "Det gör loggar mindre",
+            "Angripare kan ha stulna creds och rotation minskar pågående åtkomst",
+            "Det inaktiverar patchning",
+            "Det förbättrar CPU"
+          ],
+          "answer": 1,
+          "explain": "Autentiseringsstöld är vanligt; rotera och återkalla sessioner för att minska åtkomsten.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Ditt team vill rensa en infekterad värd omedelbart. Vad är en viktig kompromiss?",
+          "choices": [
+            "Torkning ökar risken",
+            "Torkning tar bort bevis som kan avslöja grundorsaken och omfattningen",
+            "Att torka är alltid bäst",
+            "Att torka krypterar diskar"
+          ],
+          "answer": 1,
+          "explain": "Utrotning utan bevis kan hindra förståelse och förhindra upprepning.",
+          "type": "scenario"
+        },
+        {
+          "q": "En stark kontroll för att begränsa identitetsstöld på endpointer är:",
+          "choices": [
+            "Återanvänd lösenord",
+            "Använd privilegierad åtkomstseparation och minska lokala administratörsrättigheter",
+            "Inaktivera MFA",
+            "Inaktivera patchning"
+          ],
+          "answer": 1,
+          "explain": "Att minska privilegier och separera administratörskonton minskar stöldpåverkan.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är säkerhetsvärdet av manipuleringsskydd för endpoint-verktyg?",
+          "choices": [
+            "Det gör skadlig programvara snabbare",
+            "Det gör det svårare för angripare att inaktivera försvar",
+            "Det inaktiverar uppdateringar",
+            "Det ökar nätfiske"
+          ],
+          "answer": 1,
+          "explain": "Sabotageskydd förhindrar angripare från att stänga av säkerhetskontroller.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En värd visar tecken på skadlig programvara, men det är en kritisk server. Bästa tillvägagångssättet?",
+          "choices": [
+            "Stäng av den omedelbart",
+            "Samordna en inneslutningsplan med intressenter, isolera där det är möjligt och samla bevis",
+            "Ignorera det på grund av kritik",
+            "Inaktivera loggning"
+          ],
+          "answer": 1,
+          "explain": "Inneslutning måste ta hänsyn till tjänstens inverkan och bevisinsamling.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vad är huvudsyftet med karantänåtgärder i endpoint-verktyg?",
+          "choices": [
+            "Kryptera filer",
+            "Förhindra att en misstänkt fil körs och sprids samtidigt som den bevaras för analys",
+            "Inaktivera säkerhetskopior",
+            "Ändra brandväggszoner"
+          ],
+          "answer": 1,
+          "explain": "Karantän minskar risken samtidigt som artefakten hålls tillgänglig för analys.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför är \"känd-bra baslinje\" viktig för endpoint-övervakning?",
+          "choices": [
+            "Det tar bort behovet av varningar",
+            "Det hjälper till att upptäcka ovanliga processer och konfigurationer",
+            "Det inaktiverar uppdateringar",
+            "Det förhindrar DNS"
+          ],
+          "answer": 1,
+          "explain": "Baslinjer hjälper till att identifiera onormalt beteende.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du hittar en skadlig domän i proxyloggar. Bästa nästa steg?",
+          "choices": [
+            "Blockera domänen och sluta",
+            "Blockera och sök även efter endpointer som anslutit, inspektera sedan initieringsprocessen",
+            "Ta bort proxyloggar",
+            "Inaktivera proxy"
+          ],
+          "answer": 1,
+          "explain": "Blockering minskar framtida träffar, men omfattning och värdundersökning behövs.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilken är mest sannolikt att förhindra skadlig programvara från att utnyttja kända sårbarheter?",
+          "choices": [
+            "Ändra värdnamn",
+            "Lappning i rätt tid och sårbarhetshantering",
+            "Inaktiverar loggar",
+            "Använder svaga lösenord"
+          ],
+          "answer": 1,
+          "explain": "Patchning minskar exponeringen för kända exploateringsvägar.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är ett vanligt \"bra\" endpointsåterställningssteg efter utrotning?",
+          "choices": [
+            "Gå med igen utan kontroller",
+            "Gör om eller återställ från kända bra källor och verifiera att kontroller och loggar är sunda",
+            "Inaktivera AV",
+            "Sluta bevaka"
+          ],
+          "answer": 1,
+          "explain": "Återställning bör återställa systemet till ett rent, övervakat tillstånd.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Du ser en misstänkt process som skapats av 'winword.exe'. Mest troligt initial vektor?",
+          "choices": [
+            "Diskfel",
+            "Skadligt dokumentmakro eller utnyttjande",
+            "DNS förgiftning",
+            "NTP drift"
+          ],
+          "answer": 1,
+          "explain": "Skript eller körbara skript för kontorsprocesser indikerar ofta skadliga dokument.",
+          "type": "scenario"
+        },
+        {
+          "q": "Varför är offline- eller oföränderliga säkerhetskopior värdefulla mot ransomware?",
+          "choices": [
+            "De minskar användningen av CPU",
+            "De begränsar angriparens förmåga att kryptera eller ta bort säkerhetskopior",
+            "De snabbar upp surfandet",
+            "De slutar nätfiske"
+          ],
+          "answer": 1,
+          "explain": "Isolering och oföränderlighet skyddar säkerhetskopior från angripare.",
+          "type": "mcq"
+        }
+      ]
+    },
+    {
+      "id": "vulnerability-management",
+      "title": "Sårbarhetshantering",
+      "questions": [
+        {
+          "q": "Tillgångsinventering är avgörande för sårbarhetshantering eftersom:",
+          "choices": [
+            "Det saktar ner lappningen",
+            "Du kan inte fixa det du inte vet att du har",
+            "Den ersätter skanning",
+            "Det inaktiverar loggning"
+          ],
+          "answer": 1,
+          "explain": "Att känna till tillgångar och ägare krävs för att omfånga skanning och sanering.",
+          "type": "mcq"
+        },
+        {
+          "q": "CVSS poäng representerar främst:",
+          "choices": [
+            "Garanterat utnyttjande",
+            "En standardiserad uppskattning av allvarlighetsgrad, inte affärseffekt",
+            "Tillgänglighet av patch",
+            "Nätverkshastighet"
+          ],
+          "answer": 1,
+          "explain": "CVSS är ett allvarlighetsmått; prioritering kräver också sammanhang och exponering.",
+          "type": "mcq"
+        },
+        {
+          "q": "Ett viktigt skäl till att köra autentiserade skanningar där det är möjligt är:",
+          "choices": [
+            "De är alltid långsammare",
+            "De ger djupare insyn i installerade paket och patchnivåer",
+            "De tar bort behovet av agenter",
+            "De krypterar trafik"
+          ],
+          "answer": 1,
+          "explain": "Autentiserade skanningar kan validera versioner och saknade patchar mer exakt.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är en vanlig orsak till falska positiva resultat vid sårbarhetsskanning?",
+          "choices": [
+            "För mycket diskutrymme",
+            "Servicebanner och ofullständig fingeravtryck",
+            "För många användare",
+            "För få portar"
+          ],
+          "answer": 1,
+          "explain": "Bannerbaserad upptäckt kan felidentifiera versioner eller korrigerade bakportar.",
+          "type": "mcq"
+        },
+        {
+          "q": "Patchhantering beskrivs bäst som:",
+          "choices": [
+            "Ett årligt evenemang",
+            "En repeterbar process för att distribuera uppdateringar med testning och återställning",
+            "Inaktiverar uppdateringar",
+            "Byter bara lösenord"
+          ],
+          "answer": 1,
+          "explain": "Effektiv korrigeringsprocess, testning och återställningsplanering.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En kritisk sårbarhet meddelas, men ingen exploatering observeras och den berörda tjänsten exponeras inte externt. Bästa nästa steg?",
+          "choices": [
+            "Ignorera det",
+            "Bedöm exponering, kompenserande kontroller och patch inom en definierad SLA",
+            "Få panik och bygg om allt",
+            "Inaktivera loggning"
+          ],
+          "answer": 1,
+          "explain": "Riskbaserad prioritering tar hänsyn till exponering och påverkan samtidigt som den lappar i tid.",
+          "type": "scenario"
+        },
+        {
+          "q": "En kompenserande kontroll är:",
+          "choices": [
+            "En ersättning för all lappning",
+            "En förmildrande åtgärd när omedelbar sanering inte är möjlig",
+            "En typ av skadlig programvara",
+            "En DNS-inställning"
+          ],
+          "answer": 1,
+          "explain": "Kompenserande kontroller minskar risken tills den verkliga fixen tillämpas.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket är det bästa resultatet av en saneringsbiljett?",
+          "choices": [
+            "Inga bevis",
+            "En förändring tillämpad, validerad och dokumenterad med ägare och datum",
+            "Endast en skärmdump",
+            "Ett löfte att lappa senare"
+          ],
+          "answer": 1,
+          "explain": "Sanering bör verifieras och dokumenteras.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför är \"exponering\" viktig vid prioritering?",
+          "choices": [
+            "Det ökar lagringen",
+            "En internt isolerad tjänst har en annan risk än en internetvändande",
+            "Det ändras CVSS",
+            "Det inaktiverar kryptering"
+          ],
+          "answer": 1,
+          "explain": "Exponering och nåbarhet förändrar den verkliga risken.",
+          "type": "mcq"
+        },
+        {
+          "q": "Sårbarhetshantering bör inkludera vilket valideringssteg efter patchning?",
+          "choices": [
+            "Antar att det fungerade",
+            "Skanna om eller på annat sätt verifiera att sårbarheten är löst",
+            "Inaktivera skannrar",
+            "Ta bort loggar"
+          ],
+          "answer": 1,
+          "explain": "Verifiering bekräftar sanering och förhindrar drift.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En skanning rapporterar en gammal OpenSSL-version, men OS-leverantören backporterade korrigeringar utan att ändra versionssträngen. Bästa nästa steg?",
+          "choices": [
+            "Stäng som falskt positivt utan att kontrollera",
+            "Validera med hjälp av leverantörsmeddelanden eller paketändringsloggar och överväg autentiserad skanning",
+            "Installera om OS omedelbart",
+            "Inaktivera TLS"
+          ],
+          "answer": 1,
+          "explain": "Backports kan förvirra skannrar; validera med auktoritativa paketkällor.",
+          "type": "scenario"
+        },
+        {
+          "q": "Ett bra mått på hälsan hos sårbara program är:",
+          "choices": [
+            "Antal tapeter",
+            "Dags att åtgärda högriskfynd på kritiska tillgångar",
+            "Antal e-postmeddelanden",
+            "CPU modell"
+          ],
+          "answer": 1,
+          "explain": "Tid för att åtgärda kritiska fynd om kritiska tillgångar indikerar programmets effektivitet.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför är sårbarhetstriage viktigt?",
+          "choices": [
+            "Det försenar arbetet",
+            "Det minskar buller genom att fokusera saneringen på verkliga, relevanta frågor",
+            "Det inaktiverar skanning",
+            "Det ökar risken"
+          ],
+          "answer": 1,
+          "explain": "Triage fokuserar på det som är viktigt och undviker slöseri med arbete.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilken är en typisk prioritetsordning när två vulner har samma svårighetsgrad?",
+          "choices": [
+            "Fixa den med högre exponering och högre tillgångskritikitet först",
+            "Fixa slumpmässigt",
+            "Fixa den med den längsta beskrivningen",
+            "Fixa den på den senaste servern"
+          ],
+          "answer": 0,
+          "explain": "Exponering och tillgångskritikitet är starka tie-breakers.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är en vanlig säkerhetsrisk med uttjänt programvara?",
+          "choices": [
+            "Det är för snabbt",
+            "Den slutar ta emot säkerhetskorrigeringar",
+            "Den har för många loggar",
+            "Den är alltid krypterad"
+          ],
+          "answer": 1,
+          "explain": "EOL programvara förblir sårbar eftersom korrigeringar inte längre tillhandahålls.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: Ett team kan inte patcha ett äldre system under 90 dagar. Bästa praxis är att:",
+          "choices": [
+            "Gör ingenting",
+            "Tillämpa kompenserande kontroller, öka övervakningen och dokumentera ett undantag med ägare och utgång",
+            "Inaktivera brandväggar",
+            "Avslöja det offentligt"
+          ],
+          "answer": 1,
+          "explain": "Undantag bör vara riskhanterade, tidsbundna och övervakade.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vilken kontroll hjälper till att säkerställa att sårbarheter inte återinförs efter åtgärdande?",
+          "choices": [
+            "Ad hoc förändringar",
+            "Konfigurationshantering och härdade bilder",
+            "Inaktivera revisioner",
+            "Dela lösenord"
+          ],
+          "answer": 1,
+          "explain": "Baslinjer och bilder förhindrar regression och drift.",
+          "type": "mcq"
+        },
+        {
+          "q": "I sårbarhetshantering syftar \"attackyta\" på:",
+          "choices": [
+            "UI färger",
+            "Exponerade tjänster, nåbara vägar och exploaterbara konfigurationer",
+            "CPU temperatur",
+            "Skrivarköer"
+          ],
+          "answer": 1,
+          "explain": "Attackytan inkluderar nåbara och exploaterbara komponenter.",
+          "type": "mcq"
+        },
+        {
+          "q": "Varför ska du spåra mjukvaruberoenden i appar som en del av vuln management?",
+          "choices": [
+            "Det är irrelevant",
+            "Beroenden innehåller ofta kända sårbarheter",
+            "Det förhindrar säkerhetskopiering",
+            "Det inaktiverar kryptering"
+          ],
+          "answer": 1,
+          "explain": "Sårbarheter i försörjningskedjan kommer ofta från beroenden.",
+          "type": "mcq"
+        },
+        {
+          "q": "En mjukvarulista (SBOM) är:",
+          "choices": [
+            "En lista över hamnar",
+            "En inventering av komponenter och beroenden som används i programvara",
+            "En DNS post",
+            "En brandväggsregeluppsättning"
+          ],
+          "answer": 1,
+          "explain": "SBOM hjälper till att spåra komponenter för sårbarhetsrespons.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En ny kritisk vuln påverkar ett allmänt använt bibliotek. Bästa initiala åtgärden?",
+          "choices": [
+            "Vänta på nästa skanningscykel",
+            "Identifiera var biblioteket används, prioritera tjänster som vänder sig till internet och tillämpa patchar eller begränsningar",
+            "Inaktivera alla tjänster permanent",
+            "Ta bort källkoden"
+          ],
+          "answer": 1,
+          "explain": "Omfång användningen först, prioritera och minska sedan.",
+          "type": "scenario"
+        },
+        {
+          "q": "Varför är det ibland otillräckligt med lappning ensam?",
+          "choices": [
+            "Plåster gör ingenting",
+            "Felkonfigurationer och osäkra standardinställningar kan fortfarande utnyttjas",
+            "Patchning inaktiverar kryptering",
+            "Patching ersätter MFA"
+          ],
+          "answer": 1,
+          "explain": "Risk kommer också från svagheter i konfiguration och identitet.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vilket tillvägagångssätt minskar produktionsrisken vid installation av patchar?",
+          "choices": [
+            "Distribuera överallt på en gång",
+            "Använd stegvis lansering, testning och återställningsplaner",
+            "Plåster aldrig",
+            "Inaktivera övervakning"
+          ],
+          "answer": 1,
+          "explain": "Etappvis utrullning minskar sprängradien för dåliga uppdateringar.",
+          "type": "mcq"
+        },
+        {
+          "q": "Vad är en rimlig praxis för hantering av sårbarhetsundantag?",
+          "choices": [
+            "Tillåt undantag för alltid",
+            "Kräv motivering, kompenserande kontroller, granska kadens och utgång",
+            "Ingen dokumentation behövs",
+            "Endast muntliga godkännanden"
+          ],
+          "answer": 1,
+          "explain": "Undantag bör vara kontrollerade, dokumenterade och tidsbundna.",
+          "type": "mcq"
+        },
+        {
+          "q": "Hotintelligens är mest användbar vid prioritering av sårbara personer när den säger till dig:",
+          "choices": [
+            "Vilket UI-tema är populärt",
+            "Huruvida en sårbarhet utnyttjas aktivt i naturen",
+            "Hur många användare du har",
+            "Din diskhastighet"
+          ],
+          "answer": 1,
+          "explain": "Aktiva exploateringssignaler kan höja prioritet.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En skanning hittar en kritisk vuln på en icke-kritisk labbvärd. Bästa svaret?",
+          "choices": [
+            "Behandla detsamma som ett produktionsbetalningssystem",
+            "Fixa när det är möjligt, men prioritera produktion och kritiska tillgångar först",
+            "Ignorera för alltid",
+            "Inaktivera skanning"
+          ],
+          "answer": 1,
+          "explain": "Riskbaserad prioritering tar hänsyn till tillgångens kriticitet och miljö.",
+          "type": "scenario"
+        },
+        {
+          "q": "Varför ska man integrera vuln management med förändringshantering?",
+          "choices": [
+            "Att sakta ner saker",
+            "För att säkerställa att korrigeringar spåras, godkänns vid behov och kan granskas",
+            "För att undvika dokumentation",
+            "För att inaktivera patchning"
+          ],
+          "answer": 1,
+          "explain": "Förändringshantering stöder kontroll och revisionsbarhet.",
+          "type": "mcq"
+        },
+        {
+          "q": "En bra åtgärdsverifiering \"ser ut\":",
+          "choices": [
+            "En lapp som säger gjort",
+            "Skanningsresultat eller systembevis som visar att den sårbara versionen inte längre finns",
+            "Endast en ny brandväggsregel",
+            "En skärmdump av ett mejl"
+          ],
+          "answer": 1,
+          "explain": "Verifiering kräver bevis, inte bara påståenden.",
+          "type": "mcq"
+        },
+        {
+          "q": "Scenario: En skanner rapporterar hundratals medelstora fynd på en värd. Bästa nästa steg?",
+          "choices": [
+            "Fixa allt omedelbart utan triage",
+            "Gruppera efter rotorsak (saknat patch-bunt, svag konfiguration), åtgärda de största effekterna först",
+            "Ta bort skanningsrapporten",
+            "Stäng av skannern"
+          ],
+          "answer": 1,
+          "explain": "Grundorsaksgruppering gör sanering effektiv och minskar buller.",
+          "type": "scenario"
+        },
+        {
+          "q": "Vad är huvudmålet med sårbarhetshantering?",
+          "choices": [
+            "För att få en perfekt poäng",
+            "Att minska risken genom att hitta, prioritera och åtgärda svagheter över tid",
+            "Endast för att samla in loggar",
+            "För att blockera all trafik"
+          ],
+          "answer": 1,
+          "explain": "Målet är en uthållig riskreduktion genom en pågående process.",
+          "type": "mcq"
+        }
+      ]
+    }
+  ]
+}

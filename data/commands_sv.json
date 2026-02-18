@@ -1,0 +1,3775 @@
+[
+  {
+    "id": 1,
+    "name": "docker run",
+    "category": "Docker",
+    "workflow": "Docker-driftsättning",
+    "description": "Kör en ny behållare från en image",
+    "command": "docker run [<options>] <image> [<command>]",
+    "examples": [
+      "docker run myimage:latest",
+      "docker run -d -p 8080:80 myimage:latest",
+      "docker run --name myapp -e ENV_VAR=value myimage:latest"
+    ],
+    "tags": [
+      "behållare",
+      "grund"
+    ],
+    "flags": [
+      {
+        "flag": "-d",
+        "description": "Kör container i bakgrunden och skriv ut container-ID"
+      },
+      {
+        "flag": "-p",
+        "description": "Publicera containerportar till värddatorn"
+      },
+      {
+        "flag": "-it",
+        "description": "Tilldela en TTY och håll stdin öppen"
+      }
+    ],
+    "minimal_usage": "docker run myimage:latest"
+  },
+  {
+    "id": 2,
+    "name": "docker build",
+    "category": "Docker",
+    "workflow": "Docker-driftsättning",
+    "description": "Bygg en image från en Dockerfile",
+    "command": "docker build [<options>] <path|url|->",
+    "examples": [
+      "docker build -t myimage:latest .",
+      "docker build --no-cache -t myimage:latest .",
+      "docker build -f Dockerfile.prod -t myimage:latest ."
+    ],
+    "tags": [
+      "image",
+      "bygg"
+    ],
+    "flags": [
+      {
+        "flag": "-t",
+        "description": "Tagga den byggda imagen med ett namn"
+      },
+      {
+        "flag": "--no-cache",
+        "description": "Bygg utan att använda den lokala byggcachen"
+      },
+      {
+        "flag": "-f",
+        "description": "Ange en alternativ Dockerfil att använda"
+      }
+    ],
+    "minimal_usage": "docker build -t myimage:latest ."
+  },
+  {
+    "id": 3,
+    "name": "docker ps",
+    "category": "Docker",
+    "workflow": "Behållarhantering",
+    "description": "Lista behållare",
+    "command": "docker ps [<options>]",
+    "examples": [
+      "docker ps",
+      "docker ps -a",
+      "docker ps --filter status=exited"
+    ],
+    "tags": [
+      "behållare",
+      "lista"
+    ],
+    "flags": [
+      {
+        "flag": "-a",
+        "description": "Visa alla containrar inklusive stoppade"
+      },
+      {
+        "flag": "--filter",
+        "description": "Filtrera listan med nyckelvärdeuttryck"
+      },
+      {
+        "flag": "-q",
+        "description": "Skriv bara ut behållar-ID:n för skript"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "docker logs",
+    "category": "Docker",
+    "workflow": "Behållarhantering",
+    "description": "Visa loggar för en container",
+    "command": "docker logs [<options>] <container>",
+    "examples": [
+      "docker logs mycontainer",
+      "docker logs -f mycontainer",
+      "docker logs --tail 100 mycontainer"
+    ],
+    "tags": [
+      "felsökning",
+      "behållare"
+    ],
+    "flags": [
+      {
+        "flag": "-f",
+        "description": "Följ loggutdata när den växer"
+      },
+      {
+        "flag": "--tail",
+        "description": "Visa endast de sista N raderna"
+      },
+      {
+        "flag": "--since",
+        "description": "Visa loggar sedan en given tidsstämpel"
+      }
+    ],
+    "minimal_usage": "docker logs mycontainer"
+  },
+  {
+    "id": 5,
+    "name": "docker exec",
+    "category": "Docker",
+    "workflow": "Behållarhantering",
+    "description": "Kör ett kommando i en pågående behållare",
+    "command": "docker exec [<options>] <container> <command> [<args>...]",
+    "examples": [
+      "docker exec mycontainer ls /app",
+      "docker exec -it mycontainer bash",
+      "docker exec -u root mycontainer whoami"
+    ],
+    "tags": [
+      "behållare",
+      "felsökning"
+    ],
+    "flags": [
+      {
+        "flag": "-it",
+        "description": "Tilldela en TTY och håll stdin öppen"
+      },
+      {
+        "flag": "-u",
+        "description": "Kör kommandot som en specifik användare"
+      },
+      {
+        "flag": "-e",
+        "description": "Ställ in miljövariabler för kommandot"
+      }
+    ],
+    "minimal_usage": "docker exec mycontainer ls"
+  },
+  {
+    "id": 6,
+    "name": "docker pull",
+    "category": "Docker",
+    "workflow": "Imagehantering",
+    "description": "Ladda ner en image från ett register",
+    "command": "docker pull [<options>] <name[:tag|@digest]>",
+    "examples": [
+      "docker pull myimage:latest",
+      "docker pull ubuntu:22.04",
+      "docker pull myregistry.com/myimage:1.0"
+    ],
+    "tags": [
+      "image",
+      "register"
+    ],
+    "flags": [
+      {
+        "flag": "-a",
+        "description": "Ladda ner alla taggar för det givna repoet"
+      },
+      {
+        "flag": "--disable-content-trust",
+        "description": "Hoppa över verifieringskontroller av imagesignaturer helt"
+      }
+    ],
+    "minimal_usage": "docker pull myimage:latest"
+  },
+  {
+    "id": 7,
+    "name": "docker images",
+    "category": "Docker",
+    "workflow": "Imagehantering",
+    "description": "Lista lokala images",
+    "command": "docker images [<options>] [<repo[:tag]>]",
+    "examples": [
+      "docker images",
+      "docker images myimage",
+      "docker images --filter dangling=true"
+    ],
+    "tags": [
+      "image",
+      "lista"
+    ],
+    "flags": [
+      {
+        "flag": "-a",
+        "description": "Visa alla images inklusive mellanliggande lager"
+      },
+      {
+        "flag": "--filter",
+        "description": "Filtrera images med nyckelvärdeuttryck"
+      },
+      {
+        "flag": "-q",
+        "description": "Skriv endast ut image-ID:n för skript"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "docker rmi",
+    "category": "Docker",
+    "workflow": "Imagehantering",
+    "description": "Ta bort en eller flera images",
+    "command": "docker rmi [<options>] <image> [<image>...]",
+    "examples": [
+      "docker rmi myimage:latest",
+      "docker rmi -f myimage:latest",
+      "docker rmi $(docker images -q)"
+    ],
+    "tags": [
+      "image",
+      "rensning"
+    ],
+    "flags": [
+      {
+        "flag": "-f",
+        "description": "Tvinga bort imagen även om den används"
+      },
+      {
+        "flag": "--no-prune",
+        "description": "Ta inte bort otaggade överordnade images"
+      }
+    ],
+    "minimal_usage": "docker rmi myimage:latest"
+  },
+  {
+    "id": 9,
+    "name": "docker rm",
+    "category": "Docker",
+    "workflow": "Behållarhantering",
+    "description": "Ta bort en eller flera behållare",
+    "command": "docker rm [<options>] <container> [<container>...]",
+    "examples": [
+      "docker rm mycontainer",
+      "docker rm -f mycontainer",
+      "docker rm $(docker ps -aq)"
+    ],
+    "tags": [
+      "behållare",
+      "rensning"
+    ],
+    "flags": [
+      {
+        "flag": "-f",
+        "description": "Tvinga bort en löpande behållare omedelbart"
+      },
+      {
+        "flag": "-v",
+        "description": "Ta bort anonyma volymer som är kopplade till behållaren"
+      }
+    ],
+    "minimal_usage": "docker rm mycontainer"
+  },
+  {
+    "id": 10,
+    "name": "docker stop",
+    "category": "Docker",
+    "workflow": "Behållarhantering",
+    "description": "Sluta köra containrar",
+    "command": "docker stop [<options>] <container> [<container>...]",
+    "examples": [
+      "docker stop mycontainer",
+      "docker stop -t 30 mycontainer",
+      "docker stop $(docker ps -q)"
+    ],
+    "tags": [
+      "behållare",
+      "livscykel"
+    ],
+    "flags": [
+      {
+        "flag": "-t",
+        "description": "Vänta N sekunder innan behållaren tvångsdödar"
+      }
+    ],
+    "minimal_usage": "docker stop mycontainer"
+  },
+  {
+    "id": 11,
+    "name": "docker start",
+    "category": "Docker",
+    "workflow": "Behållarhantering",
+    "description": "Starta stoppade containrar",
+    "command": "docker start [<options>] <container> [<container>...]",
+    "examples": [
+      "docker start mycontainer",
+      "docker start -a mycontainer",
+      "docker start $(docker ps -aq)"
+    ],
+    "tags": [
+      "behållare",
+      "livscykel"
+    ],
+    "flags": [
+      {
+        "flag": "-a",
+        "description": "Fäst till STDOUT och STDERR efter start"
+      },
+      {
+        "flag": "-i",
+        "description": "Fäst STDIN och håll den öppen"
+      }
+    ],
+    "minimal_usage": "docker start mycontainer"
+  },
+  {
+    "id": 12,
+    "name": "docker inspect",
+    "category": "Docker",
+    "workflow": "Behållarhantering",
+    "description": "Visa detaljerad information för behållare eller images",
+    "command": "docker inspect [<options>] <name|id> [<name|id>...]",
+    "examples": [
+      "docker inspect mycontainer",
+      "docker inspect myimage:latest",
+      "docker inspect --format '{{.State.Status}}' mycontainer"
+    ],
+    "tags": [
+      "felsökning",
+      "inspektera"
+    ],
+    "flags": [
+      {
+        "flag": "--format",
+        "description": "Formatera utdata med en Go-mallsträng"
+      },
+      {
+        "flag": "-f",
+        "description": "Kort alias för formatalternativet"
+      }
+    ],
+    "minimal_usage": "docker inspect mycontainer"
+  },
+  {
+    "id": 13,
+    "name": "docker network ls",
+    "category": "Docker",
+    "workflow": "Nätverk",
+    "description": "Lista Docker-nätverk",
+    "command": "docker network ls [<options>]",
+    "examples": [
+      "docker network ls",
+      "docker network ls --filter driver=bridge",
+      "docker network ls -q"
+    ],
+    "tags": [
+      "nätverk",
+      "lista"
+    ],
+    "flags": [
+      {
+        "flag": "--filter",
+        "description": "Filtrera nätverk med nyckelvärdeuttryck"
+      },
+      {
+        "flag": "-q",
+        "description": "Skriv endast ut nätverks-ID:n för skript"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "name": "docker volume ls",
+    "category": "Docker",
+    "workflow": "Lagring",
+    "description": "Lista Docker-volymer",
+    "command": "docker volume ls [<options>]",
+    "examples": [
+      "docker volume ls",
+      "docker volume ls --filter dangling=true",
+      "docker volume ls -q"
+    ],
+    "tags": [
+      "volym",
+      "lagring"
+    ],
+    "flags": [
+      {
+        "flag": "--filter",
+        "description": "Filtrera volymer med nyckelvärdeuttryck"
+      },
+      {
+        "flag": "-q",
+        "description": "Skriv endast ut volymnamn för skript"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "name": "docker-compose up",
+    "category": "Docker",
+    "workflow": "Docker Compose",
+    "description": "Starta tjänster från docker compose",
+    "command": "docker-compose up [<options>] [<service>...]",
+    "examples": [
+      "docker-compose up",
+      "docker-compose up -d",
+      "docker-compose up --build"
+    ],
+    "tags": [
+      "compose",
+      "orkestrering"
+    ],
+    "flags": [
+      {
+        "flag": "-d",
+        "description": "Kör tjänster i fristående bakgrundsläge"
+      },
+      {
+        "flag": "--build",
+        "description": "Bygg images innan du startar tjänsterna"
+      },
+      {
+        "flag": "--force-recreate",
+        "description": "Återskapa behållare även om konfigurationen är oförändrad"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "name": "docker-compose down",
+    "category": "Docker",
+    "workflow": "Docker Compose",
+    "description": "Stoppa och ta bort docker compose-resurser",
+    "command": "docker-compose down [<options>]",
+    "examples": [
+      "docker-compose down",
+      "docker-compose down --volumes",
+      "docker-compose down --rmi all"
+    ],
+    "tags": [
+      "compose",
+      "rensning"
+    ],
+    "flags": [
+      {
+        "flag": "--volumes",
+        "description": "Ta bort namngivna volymer som deklarerats av projektet"
+      },
+      {
+        "flag": "--rmi",
+        "description": "Ta bort images som används av tjänster helt eller lokalt"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "name": "git status",
+    "category": "Git Bash",
+    "workflow": "Repostatus",
+    "description": "Visa arbetsträdets status",
+    "command": "git status [<options>]",
+    "examples": [
+      "git status",
+      "git status -sb",
+      "git status --ignored"
+    ],
+    "tags": [
+      "Git",
+      "status"
+    ],
+    "flags": [
+      {
+        "flag": "-sb",
+        "description": "Visa kort status med filialinformation"
+      },
+      {
+        "flag": "--ignored",
+        "description": "Inkludera ignorerade filer i statusutdata"
+      },
+      {
+        "flag": "-u",
+        "description": "Visa ospårade filer i statusutgången"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "name": "git add",
+    "category": "Git Bash",
+    "workflow": "Staging av ändringar",
+    "description": "Scenfilinnehåll för nästa commit",
+    "command": "git add [<options>] <file> [<file>...]",
+    "examples": [
+      "git add ./path/file",
+      "git add .",
+      "git add -p ./path"
+    ],
+    "tags": [
+      "Git",
+      "staging"
+    ],
+    "flags": [
+      {
+        "flag": "-A",
+        "description": "Steg alla ändringar inklusive raderingar och byter namn"
+      },
+      {
+        "flag": "-p",
+        "description": "Välj interaktivt bitar av förändringar till scenen"
+      }
+    ],
+    "minimal_usage": "git add ./path/file"
+  },
+  {
+    "id": 19,
+    "name": "git commit",
+    "category": "Git Bash",
+    "workflow": "Commithantering",
+    "description": "Skapa en ny commit från stegvisa ändringar",
+    "command": "git commit [<options>]",
+    "examples": [
+      "git commit -m \"Update\"",
+      "git commit -am \"Fix bug\"",
+      "git commit --amend"
+    ],
+    "tags": [
+      "Git",
+      "commit"
+    ],
+    "flags": [
+      {
+        "flag": "-m",
+        "description": "Använd det givna meddelandet för commit"
+      },
+      {
+        "flag": "-a",
+        "description": "Scen spårade filer innan du gör commit"
+      },
+      {
+        "flag": "--amend",
+        "description": "Ersätt den tidigare commit med nytt innehåll"
+      }
+    ],
+    "minimal_usage": "git commit -m \"Update\""
+  },
+  {
+    "id": 20,
+    "name": "git push",
+    "category": "Git Bash",
+    "workflow": "Fjärråtgärder",
+    "description": "Uppladdningen förbinder sig till ett fjärrlager",
+    "command": "git push [<options>] [<remote>] [<branch>]",
+    "examples": [
+      "git push",
+      "git push origin feature-branch",
+      "git push --force-with-lease"
+    ],
+    "tags": [
+      "Git",
+      "fjärr"
+    ],
+    "flags": [
+      {
+        "flag": "-u",
+        "description": "Ställ in uppströms för den aktuella grenen vid push"
+      },
+      {
+        "flag": "--force-with-lease",
+        "description": "Tvinga tryck endast om fjärrkontrollen inte har rört sig"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "name": "git pull",
+    "category": "Git Bash",
+    "workflow": "Fjärråtgärder",
+    "description": "Hämta och integrera ändringar från en fjärrkontroll",
+    "command": "git pull [<options>] [<remote>] [<branch>]",
+    "examples": [
+      "git pull",
+      "git pull origin main",
+      "git pull --rebase"
+    ],
+    "tags": [
+      "Git",
+      "fjärr"
+    ],
+    "flags": [
+      {
+        "flag": "--rebase",
+        "description": "Basera om lokala åtaganden istället för att slå samman"
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "name": "git branch",
+    "category": "Git Bash",
+    "workflow": "Grenhantering",
+    "description": "Lista, skapa eller ta bort grenar",
+    "command": "git branch [<options>] [<branch>]",
+    "examples": [
+      "git branch",
+      "git branch feature-branch",
+      "git branch -d feature-branch"
+    ],
+    "tags": [
+      "Git",
+      "gren"
+    ],
+    "flags": [
+      {
+        "flag": "-a",
+        "description": "Lista lokala och avlägsna filialer tillsammans"
+      },
+      {
+        "flag": "-d",
+        "description": "Ta bort en gren som är helt sammanfogad"
+      }
+    ],
+    "minimal_usage": "git branch"
+  },
+  {
+    "id": 23,
+    "name": "git checkout",
+    "category": "Git Bash",
+    "workflow": "Grenhantering",
+    "description": "Byt filial eller återställ filer",
+    "command": "git checkout [<options>] <branch>",
+    "examples": [
+      "git checkout feature-branch",
+      "git checkout -b feature-branch",
+      "git checkout -- ./path/file"
+    ],
+    "tags": [
+      "Git",
+      "utcheckning"
+    ],
+    "flags": [
+      {
+        "flag": "-b",
+        "description": "Skapa en ny filial och byt till den"
+      },
+      {
+        "flag": "--",
+        "description": "Separera sökvägar från revisioner när du återställer filer"
+      }
+    ],
+    "minimal_usage": "git checkout feature-branch"
+  },
+  {
+    "id": 24,
+    "name": "git merge",
+    "category": "Git Bash",
+    "workflow": "Sammanslagning",
+    "description": "Slå samman en gren till den aktuella grenen",
+    "command": "git merge [<options>] <branch>",
+    "examples": [
+      "git merge feature-branch",
+      "git merge --no-ff feature-branch",
+      "git merge --abort"
+    ],
+    "tags": [
+      "Git",
+      "sammanslagning"
+    ],
+    "flags": [
+      {
+        "flag": "--no-ff",
+        "description": "Skapa en sammanslagning även när du snabbspolar framåt"
+      },
+      {
+        "flag": "--abort",
+        "description": "Avbryt nuvarande sammanfogning och återställ tillstånd"
+      }
+    ],
+    "minimal_usage": "git merge feature-branch"
+  },
+  {
+    "id": 25,
+    "name": "git log",
+    "category": "Git Bash",
+    "workflow": "Historik",
+    "description": "Visa åtagandehistorik",
+    "command": "git log [<options>]",
+    "examples": [
+      "git log",
+      "git log --oneline --decorate --graph",
+      "git log -n 10"
+    ],
+    "tags": [
+      "Git",
+      "historik"
+    ],
+    "flags": [
+      {
+        "flag": "--oneline",
+        "description": "Visa varje commit på en enda rad"
+      },
+      {
+        "flag": "-n",
+        "description": "Begränsa utdata till de sista N commits"
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "name": "git diff",
+    "category": "Git Bash",
+    "workflow": "Jämförelse",
+    "description": "Visa ändringar mellan commits, grenar och filer",
+    "command": "git diff [<options>] [<commit>] [<commit>]",
+    "examples": [
+      "git diff",
+      "git diff --staged",
+      "git diff main..feature-branch"
+    ],
+    "tags": [
+      "Git",
+      "diff"
+    ],
+    "flags": [
+      {
+        "flag": "--staged",
+        "description": "Visa ändringar arrangerade för nästa commit"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "name": "git stash",
+    "category": "Git Bash",
+    "workflow": "Stashning",
+    "description": "Spara och återställ lokala ändringar",
+    "command": "git stash <push|pop|list|apply> [<options>]",
+    "examples": [
+      "git stash push",
+      "git stash list",
+      "git stash pop"
+    ],
+    "tags": [
+      "Git",
+      "stash"
+    ],
+    "flags": [
+      {
+        "flag": "-u",
+        "description": "Inkludera ospårade filer i stashen"
+      },
+      {
+        "flag": "-m",
+        "description": "Lägg till ett meddelande för stash-posten"
+      }
+    ],
+    "minimal_usage": "git stash push"
+  },
+  {
+    "id": 28,
+    "name": "git remote",
+    "category": "Git Bash",
+    "workflow": "Fjärråtgärder",
+    "description": "Hantera spårade fjärrlager",
+    "command": "git remote <add|remove|show> [<options>] [<name>] [<url>]",
+    "examples": [
+      "git remote -v",
+      "git remote add origin https://github.com/owner/repo.git",
+      "git remote show origin"
+    ],
+    "tags": [
+      "Git",
+      "fjärr"
+    ],
+    "flags": [
+      {
+        "flag": "-v",
+        "description": "Visa fjärrwebbadresser utöver namn"
+      }
+    ],
+    "minimal_usage": "git remote -v"
+  },
+  {
+    "id": 29,
+    "name": "git fetch",
+    "category": "Git Bash",
+    "workflow": "Fjärråtgärder",
+    "description": "Ladda ner objekt och referenser från en fjärrkontroll",
+    "command": "git fetch [<options>] [<remote>]",
+    "examples": [
+      "git fetch",
+      "git fetch origin",
+      "git fetch --prune"
+    ],
+    "tags": [
+      "Git",
+      "hämta"
+    ],
+    "flags": [
+      {
+        "flag": "--prune",
+        "description": "Ta bort fjärrspårningsreferenser som inte längre finns"
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "name": "git reset",
+    "category": "Git Bash",
+    "workflow": "Ångra",
+    "description": "Återställ nuvarande HEAD till ett specifikt tillstånd",
+    "command": "git reset [<options>] [<commit>]",
+    "examples": [
+      "git reset",
+      "git reset --soft HEAD~1",
+      "git reset --hard HEAD~1"
+    ],
+    "tags": [
+      "Git",
+      "återställ"
+    ],
+    "flags": [
+      {
+        "flag": "--soft",
+        "description": "Håll förändringar iscensatta efter att du har flyttat HEAD"
+      },
+      {
+        "flag": "--hard",
+        "description": "Kasta arbetsträd och indexändringar"
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "name": "git rebase",
+    "category": "Git Bash",
+    "workflow": "Rebase",
+    "description": "Återapplicera commits ovanpå en annan bas",
+    "command": "git rebase [<options>] <upstream> [<branch>]",
+    "examples": [
+      "git rebase main",
+      "git rebase -i main",
+      "git rebase --abort"
+    ],
+    "tags": [
+      "Git",
+      "rebase"
+    ],
+    "flags": [
+      {
+        "flag": "-i",
+        "description": "Starta en interaktiv rebase för att redigera commits"
+      },
+      {
+        "flag": "--abort",
+        "description": "Avbryt nuvarande rebase och återställ tillstånd"
+      }
+    ],
+    "minimal_usage": "git rebase main"
+  },
+  {
+    "id": 32,
+    "name": "git tag",
+    "category": "Git Bash",
+    "workflow": "Taggning",
+    "description": "Skapa, lista eller ta bort taggar",
+    "command": "git tag [<options>] [<tag>]",
+    "examples": [
+      "git tag",
+      "git tag v1.0.0",
+      "git tag -d v1.0.0"
+    ],
+    "tags": [
+      "Git",
+      "tagg"
+    ],
+    "flags": [
+      {
+        "flag": "-a",
+        "description": "Skapa en kommenterad tagg med ett meddelande"
+      },
+      {
+        "flag": "-d",
+        "description": "Ta bort en eller flera taggar efter namn"
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "name": "git clone",
+    "category": "Git Bash",
+    "workflow": "Kloning",
+    "description": "Klona ett repo till en ny katalog",
+    "command": "git clone [<options>] <repo> [<directory>]",
+    "examples": [
+      "git clone https://github.com/owner/repo.git",
+      "git clone https://github.com/owner/repo.git ./path",
+      "git clone --depth 1 https://github.com/owner/repo.git"
+    ],
+    "tags": [
+      "Git",
+      "klona"
+    ],
+    "flags": [
+      {
+        "flag": "--depth",
+        "description": "Skapa en ytlig klon med begränsad historik"
+      }
+    ],
+    "minimal_usage": "git clone https://github.com/owner/repo.git"
+  },
+  {
+    "id": 34,
+    "name": "git config",
+    "category": "Git Bash",
+    "workflow": "Konfiguration",
+    "description": "Hämta eller sätt konfigurationsvärden för repot",
+    "command": "git config [<options>] <name> [<value>]",
+    "examples": [
+      "git config --list",
+      "git config --global user.name \"Your Name\"",
+      "git config --global user.email \"you@example.com\""
+    ],
+    "tags": [
+      "Git",
+      "konfiguration"
+    ],
+    "flags": [
+      {
+        "flag": "--global",
+        "description": "Använd den globala konfigurationsfilen för den här inställningen"
+      },
+      {
+        "flag": "--list",
+        "description": "Lista alla konfigurationsvärden som är satta"
+      }
+    ],
+    "minimal_usage": "git config --global user.name \"Your Name\""
+  },
+  {
+    "id": 35,
+    "name": "git show",
+    "category": "Git Bash",
+    "workflow": "Historik",
+    "description": "Visa information om ett objekt",
+    "command": "git show [<options>] [<object>]",
+    "examples": [
+      "git show",
+      "git show HEAD~1",
+      "git show v1.0.0"
+    ],
+    "tags": [
+      "Git",
+      "visa"
+    ],
+    "flags": [
+      {
+        "flag": "--stat",
+        "description": "Visa en sammanfattning av ändringar för objektet"
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "name": "gh repo create",
+    "category": "GitHub CLI",
+    "workflow": "Repohantering",
+    "description": "Skapa ett nytt GitHub-repo",
+    "command": "gh repo create [<name>] [<options>]",
+    "examples": [
+      "gh repo create myapp",
+      "gh repo create myapp --public",
+      "gh repo create myapp --source=./path --remote=origin"
+    ],
+    "tags": [
+      "GitHub",
+      "repo"
+    ],
+    "flags": [
+      {
+        "flag": "--public",
+        "description": "Skapa repot som offentligt repo"
+      },
+      {
+        "flag": "--private",
+        "description": "Skapa repot som privat repo"
+      },
+      {
+        "flag": "--source",
+        "description": "Skapa från en befintlig lokal katalog"
+      }
+    ],
+    "minimal_usage": "gh repo create myapp"
+  },
+  {
+    "id": 37,
+    "name": "gh repo clone",
+    "category": "GitHub CLI",
+    "workflow": "Repohantering",
+    "description": "Klona ett GitHub-repo",
+    "command": "gh repo clone <owner>/<repo> [<directory>] [<options>]",
+    "examples": [
+      "gh repo clone owner/repo",
+      "gh repo clone owner/repo ./path",
+      "gh repo clone owner/repo -- --depth 1"
+    ],
+    "tags": [
+      "GitHub",
+      "repo"
+    ],
+    "flags": [
+      {
+        "flag": "--",
+        "description": "Skicka extra argument till git clone"
+      }
+    ],
+    "minimal_usage": "gh repo clone owner/repo"
+  },
+  {
+    "id": 38,
+    "name": "gh repo view",
+    "category": "GitHub CLI",
+    "workflow": "Repohantering",
+    "description": "Visa ett repo i terminalen",
+    "command": "gh repo view [<owner>/<repo>] [<options>]",
+    "examples": [
+      "gh repo view",
+      "gh repo view owner/repo",
+      "gh repo view owner/repo --web"
+    ],
+    "tags": [
+      "GitHub",
+      "repo"
+    ],
+    "flags": [
+      {
+        "flag": "--web",
+        "description": "Öppna repot i en webbläsare"
+      }
+    ]
+  },
+  {
+    "id": 39,
+    "name": "gh pr create",
+    "category": "GitHub CLI",
+    "workflow": "Pull request-arbetsflöde",
+    "description": "Skapa en pull request",
+    "command": "gh pr create [<options>]",
+    "examples": [
+      "gh pr create --title \"Update\" --body \"\"",
+      "gh pr create --fill",
+      "gh pr create --base main --head feature-branch"
+    ],
+    "tags": [
+      "GitHub",
+      "PR"
+    ],
+    "flags": [
+      {
+        "flag": "--title",
+        "description": "Sätt titel för pull requesten"
+      },
+      {
+        "flag": "--body",
+        "description": "Sätt beskrivning för pull requesten"
+      },
+      {
+        "flag": "--fill",
+        "description": "Fyll i titel och beskrivning från commit-meddelanden"
+      }
+    ],
+    "minimal_usage": "gh pr create --title \"Update\" --body \"\""
+  },
+  {
+    "id": 40,
+    "name": "gh pr view",
+    "category": "GitHub CLI",
+    "workflow": "Pull request-arbetsflöde",
+    "description": "Visa en pull request",
+    "command": "gh pr view <number> [<options>]",
+    "examples": [
+      "gh pr view 123",
+      "gh pr view 123 --comments",
+      "gh pr view 123 --web"
+    ],
+    "tags": [
+      "GitHub",
+      "PR"
+    ],
+    "flags": [
+      {
+        "flag": "--comments",
+        "description": "Inkludera recensionskommentarer i utgången"
+      },
+      {
+        "flag": "--web",
+        "description": "Öppna pull requesten i en webbläsare"
+      }
+    ],
+    "minimal_usage": "gh pr view 123"
+  },
+  {
+    "id": 41,
+    "name": "gh pr merge",
+    "category": "GitHub CLI",
+    "workflow": "Pull request-arbetsflöde",
+    "description": "Merga en pull request",
+    "command": "gh pr merge <number> [<options>]",
+    "examples": [
+      "gh pr merge 123",
+      "gh pr merge 123 --squash",
+      "gh pr merge 123 --delete-branch"
+    ],
+    "tags": [
+      "GitHub",
+      "PR"
+    ],
+    "flags": [
+      {
+        "flag": "--merge",
+        "description": "Skapa en merge commit vid sammanslagning"
+      },
+      {
+        "flag": "--squash",
+        "description": "Squasha commits till en enda commit"
+      },
+      {
+        "flag": "--delete-branch",
+        "description": "Ta bort källgrenen efter sammanslagning"
+      }
+    ],
+    "minimal_usage": "gh pr merge 123"
+  },
+  {
+    "id": 42,
+    "name": "gh pr list",
+    "category": "GitHub CLI",
+    "workflow": "Pull request-arbetsflöde",
+    "description": "Lista pull requests i ett repo",
+    "command": "gh pr list [<options>]",
+    "examples": [
+      "gh pr list",
+      "gh pr list --state open",
+      "gh pr list --author @me"
+    ],
+    "tags": [
+      "GitHub",
+      "PR"
+    ],
+    "flags": [
+      {
+        "flag": "--state",
+        "description": "Filtrera på status: open eller closed"
+      },
+      {
+        "flag": "--author",
+        "description": "Filtrera pull requests efter författare"
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "name": "gh pr checkout",
+    "category": "GitHub CLI",
+    "workflow": "Pull request-arbetsflöde",
+    "description": "Checka ut en pull request lokalt",
+    "command": "gh pr checkout <number> [<options>]",
+    "examples": [
+      "gh pr checkout 123",
+      "gh pr checkout 123 --force",
+      "gh pr checkout 123 --detach"
+    ],
+    "tags": [
+      "GitHub",
+      "PR"
+    ],
+    "flags": [
+      {
+        "flag": "--force",
+        "description": "Återställ lokal gren även om den redan finns"
+      },
+      {
+        "flag": "--detach",
+        "description": "Checka ut pull requesten i detached-läge"
+      }
+    ],
+    "minimal_usage": "gh pr checkout 123"
+  },
+  {
+    "id": 44,
+    "name": "gh issue create",
+    "category": "GitHub CLI",
+    "workflow": "Ärendehantering",
+    "description": "Skapa ett nytt ärende",
+    "command": "gh issue create [<options>]",
+    "examples": [
+      "gh issue create --title \"Bug\" --body \"\"",
+      "gh issue create --label bug --assignee @me",
+      "gh issue create --milestone v1.0.0 --project \"Roadmap\""
+    ],
+    "tags": [
+      "GitHub",
+      "ärende"
+    ],
+    "flags": [
+      {
+        "flag": "--title",
+        "description": "Sätt titel för ärendet"
+      },
+      {
+        "flag": "--body",
+        "description": "Sätt beskrivning för ärendet"
+      },
+      {
+        "flag": "--label",
+        "description": "Lägg till en eller flera etiketter på ärendet"
+      }
+    ],
+    "minimal_usage": "gh issue create --title \"Bug\" --body \"\""
+  },
+  {
+    "id": 45,
+    "name": "gh issue list",
+    "category": "GitHub CLI",
+    "workflow": "Ärendehantering",
+    "description": "Lista ärenden i ett repo",
+    "command": "gh issue list [<options>]",
+    "examples": [
+      "gh issue list",
+      "gh issue list --state open",
+      "gh issue list --assignee @me"
+    ],
+    "tags": [
+      "GitHub",
+      "ärende"
+    ],
+    "flags": [
+      {
+        "flag": "--state",
+        "description": "Filtrera på status: open eller closed"
+      },
+      {
+        "flag": "--assignee",
+        "description": "Filtrera ärenden tilldelade en viss användare"
+      }
+    ]
+  },
+  {
+    "id": 46,
+    "name": "mongosh",
+    "category": "MongoDB",
+    "workflow": "Databasanslutning",
+    "description": "Starta MongoDB-skalet",
+    "command": "mongosh [<connection_string>] [<options>]",
+    "examples": [
+      "mongosh",
+      "mongosh \"mongodb://localhost:27017\"",
+      "mongosh \"mongodb+srv://<user>:<password>@<host>/<db>\""
+    ],
+    "tags": [
+      "MongoDB",
+      "skal"
+    ],
+    "flags": [
+      {
+        "flag": "--norc",
+        "description": "Börja utan att ladda mongosh rc-filen"
+      },
+      {
+        "flag": "--quiet",
+        "description": "Minska utdata och undertryck startmeddelanden"
+      },
+      {
+        "flag": "--eval",
+        "description": "Kör JavaScript och avsluta skalet"
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "name": "show dbs",
+    "category": "MongoDB",
+    "workflow": "Databasinspektion",
+    "description": "Lista databaser på servern",
+    "command": "show dbs",
+    "examples": [
+      "show dbs",
+      "show databases",
+      "show dbs"
+    ],
+    "tags": [
+      "MongoDB",
+      "databas"
+    ],
+    "flags": []
+  },
+  {
+    "id": 48,
+    "name": "use",
+    "category": "MongoDB",
+    "workflow": "Databasval",
+    "description": "Byt till eller skapa en databas",
+    "command": "use <db>",
+    "examples": [
+      "use mydb",
+      "use test",
+      "use myapp"
+    ],
+    "tags": [
+      "MongoDB",
+      "databas"
+    ],
+    "flags": [],
+    "minimal_usage": "use mydb"
+  },
+  {
+    "id": 49,
+    "name": "show collections",
+    "category": "MongoDB",
+    "workflow": "Samlingsinspektion",
+    "description": "Lista samlingar i den aktuella databasen",
+    "command": "show collections",
+    "examples": [
+      "show collections",
+      "show tables",
+      "show collections"
+    ],
+    "tags": [
+      "MongoDB",
+      "samling"
+    ],
+    "flags": []
+  },
+  {
+    "id": 50,
+    "name": "db.collection.find()",
+    "category": "MongoDB",
+    "workflow": "Frågor",
+    "description": "Hitta dokument i en samling",
+    "command": "db.<collection>.find(<query>, <projection>)",
+    "examples": [
+      "db.users.find({})",
+      "db.users.find({ status: \"active\" })",
+      "db.users.find({ age: { $gte: 18 } }, { name: 1, age: 1 })"
+    ],
+    "tags": [
+      "MongoDB",
+      "fråga"
+    ],
+    "flags": [],
+    "minimal_usage": "db.users.find({})"
+  },
+  {
+    "id": 51,
+    "name": "db.collection.insertOne()",
+    "category": "MongoDB",
+    "workflow": "Infogning",
+    "description": "Infoga ett dokument i en samling",
+    "command": "db.<collection>.insertOne(<document>)",
+    "examples": [
+      "db.users.insertOne({ name: \"Alice\" })",
+      "db.users.insertOne({ name: \"Bob\", age: 25 })",
+      "db.users.insertOne({ name: \"Eve\", tags: [\"new\"], createdAt: new Date() })"
+    ],
+    "tags": [
+      "MongoDB",
+      "infoga"
+    ],
+    "flags": [],
+    "minimal_usage": "db.users.insertOne({ name: \"Alice\" })"
+  },
+  {
+    "id": 52,
+    "name": "db.collection.updateOne()",
+    "category": "MongoDB",
+    "workflow": "Uppdatering",
+    "description": "Uppdatera ett dokument i en samling",
+    "command": "db.<collection>.updateOne(<filter>, <update>, <options>)",
+    "examples": [
+      "db.users.updateOne({ name: \"Alice\" }, { $set: { status: \"active\" } })",
+      "db.users.updateOne({ _id: ObjectId(\"<id>\") }, { $inc: { loginCount: 1 } })",
+      "db.users.updateOne({ name: \"Bob\" }, { $set: { age: 26 } }, { upsert: true })"
+    ],
+    "tags": [
+      "MongoDB",
+      "uppdatering"
+    ],
+    "flags": [],
+    "minimal_usage": "db.users.updateOne({ name: \"Alice\" }, { $set: { status: \"active\" } })"
+  },
+  {
+    "id": 53,
+    "name": "db.collection.deleteOne()",
+    "category": "MongoDB",
+    "workflow": "Radering",
+    "description": "Ta bort ett dokument från en samling",
+    "command": "db.<collection>.deleteOne(<filter>)",
+    "examples": [
+      "db.users.deleteOne({ name: \"Alice\" })",
+      "db.users.deleteOne({ _id: ObjectId(\"<id>\") })",
+      "db.users.deleteOne({ status: \"inactive\" })"
+    ],
+    "tags": [
+      "MongoDB",
+      "radera"
+    ],
+    "flags": [],
+    "minimal_usage": "db.users.deleteOne({ name: \"Alice\" })"
+  },
+  {
+    "id": 54,
+    "name": "db.collection.aggregate()",
+    "category": "MongoDB",
+    "workflow": "Aggregering",
+    "description": "Kör en aggregeringspipeline på en samling",
+    "command": "db.<collection>.aggregate([<pipeline>])",
+    "examples": [
+      "db.users.aggregate([{ $match: {} }])",
+      "db.users.aggregate([{ $match: { status: \"active\" } }])",
+      "db.users.aggregate([{ $group: { _id: \"$status\", count: { $sum: 1 } } }])"
+    ],
+    "tags": [
+      "MongoDB",
+      "aggregera"
+    ],
+    "flags": [],
+    "minimal_usage": "db.users.aggregate([{ $match: {} }])"
+  },
+  {
+    "id": 55,
+    "name": "db.collection.countDocuments()",
+    "category": "MongoDB",
+    "workflow": "Frågor",
+    "description": "Räkna dokument som matchar en fråga",
+    "command": "db.<collection>.countDocuments(<query>)",
+    "examples": [
+      "db.users.countDocuments({})",
+      "db.users.countDocuments({ status: \"active\" })",
+      "db.users.countDocuments({ age: { $gte: 18 } })"
+    ],
+    "tags": [
+      "MongoDB",
+      "antal"
+    ],
+    "flags": [],
+    "minimal_usage": "db.users.countDocuments({})"
+  },
+  {
+    "id": 56,
+    "name": "gh repo list",
+    "category": "GitHub CLI",
+    "workflow": "Repohantering",
+    "description": "Lista repos för en användare eller organisation",
+    "command": "gh repo list [<owner>] [<options>]",
+    "examples": [
+      "gh repo list",
+      "gh repo list owner",
+      "gh repo list owner --limit 30"
+    ],
+    "tags": [
+      "GitHub",
+      "repo"
+    ],
+    "flags": [
+      {
+        "flag": "--limit",
+        "description": "Max antal repos att hämta"
+      },
+      {
+        "flag": "--public",
+        "description": "Visa bara offentliga repos i resultatet"
+      },
+      {
+        "flag": "--private",
+        "description": "Visa bara privata repos i resultatet"
+      },
+      {
+        "flag": "--fork",
+        "description": "Inkludera forkade repos i resultatlistan"
+      },
+      {
+        "flag": "--source",
+        "description": "Inkludera repos som inte är forkar i resultatet"
+      },
+      {
+        "flag": "--archived",
+        "description": "Inkludera repoerade repos i resultatlistan"
+      }
+    ]
+  },
+  {
+    "id": 57,
+    "name": "gh repo fork",
+    "category": "GitHub CLI",
+    "workflow": "Repohantering",
+    "description": "Forka ett repo till ditt konto",
+    "command": "gh repo fork <owner>/<repo> [<options>]",
+    "examples": [
+      "gh repo fork owner/repo",
+      "gh repo fork owner/repo --clone",
+      "gh repo fork owner/repo --remote"
+    ],
+    "tags": [
+      "GitHub",
+      "repo"
+    ],
+    "flags": [
+      {
+        "flag": "--clone",
+        "description": "Klona forken efter att repot har forkats"
+      },
+      {
+        "flag": "--remote",
+        "description": "Lägg till forken som en remote med namnet origin"
+      },
+      {
+        "flag": "--org",
+        "description": "Forka repot till en organisation"
+      }
+    ],
+    "minimal_usage": "gh repo fork owner/repo"
+  },
+  {
+    "id": 58,
+    "name": "gh issue view",
+    "category": "GitHub CLI",
+    "workflow": "Ärendehantering",
+    "description": "Visa ett ärende",
+    "command": "gh issue view <number> [<options>]",
+    "examples": [
+      "gh issue view 123",
+      "gh issue view 123 --comments",
+      "gh issue view 123 --web"
+    ],
+    "tags": [
+      "GitHub",
+      "ärende"
+    ],
+    "flags": [
+      {
+        "flag": "--comments",
+        "description": "Inkludera kommentarer i ärendets utdata"
+      },
+      {
+        "flag": "--web",
+        "description": "Öppna ärendet i en webbläsare"
+      },
+      {
+        "flag": "--json",
+        "description": "Skriv ut ärendet i JSON-format"
+      },
+      {
+        "flag": "--jq",
+        "description": "Filtrera JSON-utdata med ett jq-uttryck"
+      },
+      {
+        "flag": "--template",
+        "description": "Formatera utdata med en Go-mall"
+      },
+      {
+        "flag": "--repo",
+        "description": "Välj ett annat repo med owner/repo-värde"
+      }
+    ],
+    "minimal_usage": "gh issue view 123"
+  },
+  {
+    "id": 59,
+    "name": "gh issue close",
+    "category": "GitHub CLI",
+    "workflow": "Ärendehantering",
+    "description": "Stäng ett ärende",
+    "command": "gh issue close <number> [<options>]",
+    "examples": [
+      "gh issue close 123",
+      "gh issue close 123 --comment \"Fixed\"",
+      "gh issue close 123 --reason completed"
+    ],
+    "tags": [
+      "GitHub",
+      "ärende"
+    ],
+    "flags": [
+      {
+        "flag": "--comment",
+        "description": "Lägg till en avslutande kommentar till ärendet"
+      },
+      {
+        "flag": "--reason",
+        "description": "Välj avslutsorsak för ärendet"
+      },
+      {
+        "flag": "--delete-branch",
+        "description": "Ta bort den länkade grenen vid stängning"
+      }
+    ],
+    "minimal_usage": "gh issue close 123"
+  },
+  {
+    "id": 60,
+    "name": "gh pr status",
+    "category": "GitHub CLI",
+    "workflow": "Pull request-arbetsflöde",
+    "description": "Visa status för pull requests i aktuellt repo",
+    "command": "gh pr status [<options>]",
+    "examples": [
+      "gh pr status",
+      "gh pr status --json state,title,number",
+      "gh pr status --web"
+    ],
+    "tags": [
+      "GitHub",
+      "PR"
+    ],
+    "flags": [
+      {
+        "flag": "--json",
+        "description": "Skriv ut status som JSON för skript"
+      },
+      {
+        "flag": "--web",
+        "description": "Öppna pull request-status i en webbläsare"
+      },
+      {
+        "flag": "--jq",
+        "description": "Filtrera JSON-utdata med ett jq-uttryck"
+      },
+      {
+        "flag": "--template",
+        "description": "Formatera JSON-utdata med en Go-mall"
+      },
+      {
+        "flag": "--repo",
+        "description": "Välj ett annat repo med owner/repo-värde"
+      }
+    ]
+  },
+  {
+    "id": 61,
+    "name": "gh pr checks",
+    "category": "GitHub CLI",
+    "workflow": "Pull request-arbetsflöde",
+    "description": "Visa CI-kontroller för en pull request",
+    "command": "gh pr checks [<number>] [<options>]",
+    "examples": [
+      "gh pr checks 123",
+      "gh pr checks 123 --watch",
+      "gh pr checks 123 --required"
+    ],
+    "tags": [
+      "GitHub",
+      "PR"
+    ],
+    "flags": [
+      {
+        "flag": "--watch",
+        "description": "Övervaka kontroller tills de slutförs eller misslyckas"
+      },
+      {
+        "flag": "--required",
+        "description": "Visa endast obligatoriska checkar för PR"
+      },
+      {
+        "flag": "--fail-fast",
+        "description": "Gå ut tidigt när en kontroll misslyckas"
+      },
+      {
+        "flag": "--json",
+        "description": "Skriv ut kontrollresultat i JSON-format"
+      },
+      {
+        "flag": "--jq",
+        "description": "Filtrera JSON-utdata med ett jq-uttryck"
+      },
+      {
+        "flag": "--repo",
+        "description": "Välj ett annat repo med owner/repo-värde"
+      }
+    ],
+    "minimal_usage": "gh pr checks 123"
+  },
+  {
+    "id": 62,
+    "name": "nmap basic scan",
+    "category": "Nmap",
+    "workflow": "Nätverk",
+    "description": "Skanna en värd eller ett nätverk efter öppna portar med hjälp av Nmaps standardskanningsbeteende.",
+    "command": "nmap [<options>] <targets>",
+    "examples": [
+      "nmap 192.168.1.10",
+      "nmap scanme.nmap.org",
+      "nmap -p 22,80,443 10.0.0.5",
+      "nmap -F 192.168.1.0/24"
+    ],
+    "tags": [
+      "grund",
+      "skanning"
+    ],
+    "flags": [
+      {
+        "flag": "-p <ports>",
+        "description": "Välj portar att skanna (t.ex. 22,80,443 eller 1-1024)."
+      },
+      {
+        "flag": "-F",
+        "description": "Snabb skanning (färre portar)."
+      },
+      {
+        "flag": "-Pn",
+        "description": "Hoppa över värdupptäckt och behandla mål som upp."
+      },
+      {
+        "flag": "-n",
+        "description": "Ingen DNS-upplösning."
+      },
+      {
+        "flag": "-v",
+        "description": "Öka detaljnivån i utdata."
+      }
+    ],
+    "minimal_usage": "nmap <target>"
+  },
+  {
+    "id": 63,
+    "name": "ausearch search by key",
+    "category": "Auditd",
+    "workflow": "Logggranskning",
+    "description": "Sök i granskningsloggar efter händelser taggade med en specifik regelnyckel.",
+    "command": "ausearch -k <key> [<options>]",
+    "examples": [
+      "ausearch -k identity",
+      "ausearch -k exec -ts today -i",
+      "ausearch -k config_change -ts 2026-02-01 -te 2026-02-13 -i"
+    ],
+    "tags": [
+      "sök",
+      "loggar"
+    ],
+    "flags": [
+      {
+        "flag": "-k <key>",
+        "description": "Sök efter nyckel definierad i revisionsregler."
+      },
+      {
+        "flag": "-ts <time>",
+        "description": "Starttidsfilter (t.ex. idag, senaste, 2026-02-13 10:00:00)."
+      },
+      {
+        "flag": "-te <time>",
+        "description": "Sluttidsfilter."
+      },
+      {
+        "flag": "-i",
+        "description": "Tolka numeriska ID till namn (UID, GID, syscall-namn)."
+      }
+    ],
+    "minimal_usage": "ausearch -k <key>"
+  },
+  {
+    "id": 64,
+    "name": "lynis audit system",
+    "category": "Lynis",
+    "workflow": "Systemgranskning",
+    "description": "Kör en fullständig säkerhetsgranskning av det lokala systemet.",
+    "command": "lynis audit system [<options>]",
+    "examples": [
+      "sudo lynis audit system",
+      "sudo lynis audit system --warnings-only",
+      "sudo lynis audit system --report-file /var/log/lynis-report.dat"
+    ],
+    "tags": [
+      "granskning",
+      "system"
+    ],
+    "flags": [
+      {
+        "flag": "--quick",
+        "description": "Minska antalet tester (snabbare, mindre noggranna)."
+      },
+      {
+        "flag": "--cronjob",
+        "description": "Kör i cronjob-läge (minimal effekt, lämplig för automatisering)."
+      },
+      {
+        "flag": "--profile <profile>",
+        "description": "Använd en specifik profilkonfiguration."
+      },
+      {
+        "flag": "--warnings-only",
+        "description": "Visa endast varningar i utdata."
+      },
+      {
+        "flag": "--report-file <file>",
+        "description": "Skriv rapportdata till en specifik fil."
+      }
+    ],
+    "minimal_usage": "sudo lynis audit system"
+  },
+  {
+    "id": 65,
+    "name": "freshclam update",
+    "category": "ClamAV",
+    "workflow": "Uppdatering",
+    "description": "Uppdatera ClamAV-virussignaturdatabaser med freshclam.",
+    "command": "freshclam [<options>]",
+    "examples": [
+      "sudo freshclam",
+      "sudo freshclam --foreground --verbose",
+      "sudo freshclam --config-file=/etc/clamav/freshclam.conf"
+    ],
+    "tags": [
+      "uppdatering",
+      "signaturer"
+    ],
+    "flags": [
+      {
+        "flag": "--config-file=<file>",
+        "description": "Använd en alternativ konfigurationsfil."
+      },
+      {
+        "flag": "--datadir=<dir>",
+        "description": "Använd en alternativ databaskatalog."
+      },
+      {
+        "flag": "--foreground",
+        "description": "Kör i förgrunden."
+      },
+      {
+        "flag": "--verbose",
+        "description": "Öka detaljnivån i utdata."
+      }
+    ],
+    "minimal_usage": "sudo freshclam"
+  },
+  {
+    "id": 66,
+    "name": "nmap host discovery",
+    "category": "Nmap",
+    "workflow": "Upptäckt",
+    "description": "Upptäck livevärdar utan att göra en portskanning (användbart för pingsvep).",
+    "command": "nmap -sn [<options>] <targets>",
+    "examples": [
+      "nmap -sn 192.168.1.0/24",
+      "nmap -sn -n 10.0.0.0/24",
+      "nmap -sn --reason 192.168.56.0/24"
+    ],
+    "tags": [
+      "upptäckt",
+      "skanning"
+    ],
+    "flags": [
+      {
+        "flag": "-sn",
+        "description": "Endast värdupptäckt (ingen portskanning)."
+      },
+      {
+        "flag": "-Pn",
+        "description": "Behandla alla värdar som online (hoppa över upptäckt)."
+      },
+      {
+        "flag": "-n",
+        "description": "Ingen DNS-upplösning."
+      },
+      {
+        "flag": "--reason",
+        "description": "Visa varför en värd anses vara uppåt eller nedåt."
+      },
+      {
+        "flag": "--packet-trace",
+        "description": "Visa skickade och mottagna paket (felsökning)."
+      }
+    ],
+    "minimal_usage": "nmap -sn <targets>"
+  },
+  {
+    "id": 67,
+    "name": "nmap scan ports",
+    "category": "Nmap",
+    "workflow": "Nätverk",
+    "description": "Skanna en specifik lista eller intervall av portar på ett eller flera mål.",
+    "command": "nmap -p <ports> [<options>] <targets>",
+    "examples": [
+      "nmap -p 22,80,443 192.168.1.10",
+      "nmap -p 1-1024 10.0.0.5",
+      "nmap --top-ports 100 192.168.1.0/24"
+    ],
+    "tags": [
+      "portar",
+      "skanning"
+    ],
+    "flags": [
+      {
+        "flag": "-p <ports>",
+        "description": "Portlista/intervall. Använd -p- för alla portar."
+      },
+      {
+        "flag": "--top-ports <n>",
+        "description": "Skanna de översta N vanligaste portarna."
+      },
+      {
+        "flag": "-sS",
+        "description": "TCP SYN-skanning (standard vid körning som root)."
+      },
+      {
+        "flag": "-sT",
+        "description": "TCP connect-skanning (standard utan root)."
+      },
+      {
+        "flag": "-v",
+        "description": "Öka detaljnivån i utdata."
+      }
+    ],
+    "minimal_usage": "nmap -p <ports> <targets>"
+  },
+  {
+    "id": 68,
+    "name": "nmap full port scan",
+    "category": "Nmap",
+    "workflow": "Nätverk",
+    "description": "Skanna alla 65 535 TCP-portar på ett mål (långsammare men noggrann).",
+    "command": "nmap -p- [<options>] <targets>",
+    "examples": [
+      "sudo nmap -sS -p- 192.168.1.10",
+      "nmap -sT -p- -T4 10.0.0.5",
+      "sudo nmap -p- --min-rate 1000 192.168.1.10"
+    ],
+    "tags": [
+      "portar",
+      "skanning"
+    ],
+    "flags": [
+      {
+        "flag": "-p-",
+        "description": "Skanna alla portar (1-65535)."
+      },
+      {
+        "flag": "-sS",
+        "description": "TCP SYN-skanning (root)."
+      },
+      {
+        "flag": "-sT",
+        "description": "TCP-anslutningsskanning (icke-root)."
+      },
+      {
+        "flag": "-T<0-5>",
+        "description": "Tidsmall (högre är snabbare)."
+      },
+      {
+        "flag": "--min-rate <n>",
+        "description": "Skicka paket minst n per sekund."
+      }
+    ],
+    "minimal_usage": "nmap -p- <target>"
+  },
+  {
+    "id": 69,
+    "name": "nmap TCP connect scan",
+    "category": "Nmap",
+    "workflow": "Nätverk",
+    "description": "Använd en TCP-anslutningsskanning, användbar när du inte har privilegier för råsocket.",
+    "command": "nmap -sT -p <ports> [<options>] <targets>",
+    "examples": [
+      "nmap -sT 192.168.1.10",
+      "nmap -sT -p 80,443 10.0.0.5",
+      "nmap -sT -Pn -p 22 192.168.1.10"
+    ],
+    "tags": [
+      "TCP",
+      "skanning"
+    ],
+    "flags": [
+      {
+        "flag": "-sT",
+        "description": "TCP connect() skanning."
+      },
+      {
+        "flag": "-p <ports>",
+        "description": "Välj portar att skanna."
+      },
+      {
+        "flag": "-Pn",
+        "description": "Hoppa över värdupptäckt."
+      },
+      {
+        "flag": "-n",
+        "description": "Ingen DNS-upplösning."
+      },
+      {
+        "flag": "-T<0-5>",
+        "description": "Timing mall."
+      }
+    ],
+    "minimal_usage": "nmap -sT <target>"
+  },
+  {
+    "id": 70,
+    "name": "nmap UDP scan",
+    "category": "Nmap",
+    "workflow": "Nätverk",
+    "description": "Skanna UDP-portar (ofta långsammare och kan behöva root-privilegier).",
+    "command": "nmap -sU -p <ports> [<options>] <targets>",
+    "examples": [
+      "sudo nmap -sU -p 53,67,123 192.168.1.10",
+      "sudo nmap -sU -p 1-200 10.0.0.5 -T4"
+    ],
+    "tags": [
+      "UDP",
+      "skanning"
+    ],
+    "flags": [
+      {
+        "flag": "-sU",
+        "description": "UDP-skanning."
+      },
+      {
+        "flag": "-p <ports>",
+        "description": "Välj UDP-portar för att skanna."
+      },
+      {
+        "flag": "--open",
+        "description": "Visa endast öppna (eller möjligen öppna) portar."
+      },
+      {
+        "flag": "-T<0-5>",
+        "description": "Timing mall."
+      },
+      {
+        "flag": "-v",
+        "description": "Öka detaljnivån i utdata."
+      }
+    ],
+    "minimal_usage": "sudo nmap -sU -p <ports> <target>"
+  },
+  {
+    "id": 71,
+    "name": "nmap version detection",
+    "category": "Nmap",
+    "workflow": "Nätverk",
+    "description": "Upptäck tjänster och versioner som körs på öppna portar.",
+    "command": "nmap -sV [<options>] <targets>",
+    "examples": [
+      "nmap -sV 192.168.1.10",
+      "nmap -sV -p 22,80,443 10.0.0.5",
+      "nmap -sV --version-intensity 9 192.168.1.10"
+    ],
+    "tags": [
+      "tjänster",
+      "skanning"
+    ],
+    "flags": [
+      {
+        "flag": "-sV",
+        "description": "Undersök öppna portar för att fastställa tjänst/versionsinformation."
+      },
+      {
+        "flag": "--version-intensity <0-9>",
+        "description": "Ställ in sonderingsintensitet (högre är mer noggrann)."
+      },
+      {
+        "flag": "--version-light",
+        "description": "Begränsa sonder (snabbare, mindre exakt)."
+      },
+      {
+        "flag": "-p <ports>",
+        "description": "Begränsa versionsdetektering till utvalda portar."
+      },
+      {
+        "flag": "-v",
+        "description": "Öka detaljnivån i utdata."
+      }
+    ],
+    "minimal_usage": "nmap -sV <target>"
+  },
+  {
+    "id": 72,
+    "name": "nmap OS detection",
+    "category": "Nmap",
+    "workflow": "Nätverk",
+    "description": "Försök att identifiera måloperativsystemet med TCP/IP-fingeravtryck.",
+    "command": "nmap -O [<options>] <targets>",
+    "examples": [
+      "sudo nmap -O 192.168.1.10",
+      "sudo nmap -O --osscan-guess 10.0.0.5",
+      "sudo nmap -O -Pn 192.168.1.10"
+    ],
+    "tags": [
+      "operativsystem",
+      "skanning"
+    ],
+    "flags": [
+      {
+        "flag": "-O",
+        "description": "Aktivera OS-detektering."
+      },
+      {
+        "flag": "--osscan-guess",
+        "description": "Gissa OS mer aggressivt."
+      },
+      {
+        "flag": "--max-os-tries <n>",
+        "description": "Ställ in maximalt antal OS-detekteringsförsök."
+      },
+      {
+        "flag": "-Pn",
+        "description": "Hoppa över värdupptäckt."
+      },
+      {
+        "flag": "-v",
+        "description": "Öka detaljnivån i utdata."
+      }
+    ],
+    "minimal_usage": "sudo nmap -O <target>"
+  },
+  {
+    "id": 73,
+    "name": "nmap default scripts",
+    "category": "Nmap",
+    "workflow": "Nätverk",
+    "description": "Kör Nmaps standard NSE-skript mot mål (motsvarande --script=default).",
+    "command": "nmap -sC [<options>] <targets>",
+    "examples": [
+      "nmap -sC 192.168.1.10",
+      "nmap -sC -sV -p 80,443 10.0.0.5",
+      "nmap -sC -oN default_scripts.txt 192.168.1.10"
+    ],
+    "tags": [
+      "skript",
+      "skanning"
+    ],
+    "flags": [
+      {
+        "flag": "-sC",
+        "description": "Kör standardskript."
+      },
+      {
+        "flag": "-sV",
+        "description": "Versionsidentifiering (ofta ihopkopplad med skript)."
+      },
+      {
+        "flag": "-p <ports>",
+        "description": "Begränsa skriptkörning till valda portar."
+      },
+      {
+        "flag": "-oN <file>",
+        "description": "Skriv utdata i normalt format."
+      },
+      {
+        "flag": "-v",
+        "description": "Öka detaljnivån i utdata."
+      }
+    ],
+    "minimal_usage": "nmap -sC <target>"
+  },
+  {
+    "id": 74,
+    "name": "nmap run scripts",
+    "category": "Nmap",
+    "workflow": "Nätverk",
+    "description": "Kör ett eller flera NSE-skript efter namn, kategori eller mönster.",
+    "command": "nmap --script <scripts> [--script-args <args>] [<options>] <targets>",
+    "examples": [
+      "nmap --script vuln 192.168.1.10",
+      "nmap --script http-title,http-headers -p 80,443 10.0.0.5",
+      "nmap --script smb-os-discovery -p 445 192.168.1.10"
+    ],
+    "tags": [
+      "skript",
+      "skanning"
+    ],
+    "flags": [
+      {
+        "flag": "--script <scripts>",
+        "description": "Skript, kategorier eller mönster (t.ex. vuln, http-*)."
+      },
+      {
+        "flag": "--script-args <k=v,...>",
+        "description": "Manusargument."
+      },
+      {
+        "flag": "-sV",
+        "description": "Versionsidentifiering (rekommenderas för många skript)."
+      },
+      {
+        "flag": "-p <ports>",
+        "description": "Begränsa till valda portar."
+      },
+      {
+        "flag": "-oA <basename>",
+        "description": "Skriv utdata i flera format."
+      }
+    ],
+    "minimal_usage": "nmap --script <scripts> <target>"
+  },
+  {
+    "id": 75,
+    "name": "nmap output to files",
+    "category": "Nmap",
+    "workflow": "Nätverk",
+    "description": "Spara skanningsresultat till ett eller flera utdataformat för rapportering eller automatisering.",
+    "command": "nmap [<options>] -oA <basename> <targets>",
+    "examples": [
+      "nmap -sV -oN nmap_scan.txt 192.168.1.10",
+      "nmap -sV -oX scan.xml 10.0.0.5",
+      "nmap -sV -oA report_192.168.1.10 192.168.1.10"
+    ],
+    "tags": [
+      "utdata",
+      "skanning"
+    ],
+    "flags": [
+      {
+        "flag": "-oN <file>",
+        "description": "Normal utdata till fil."
+      },
+      {
+        "flag": "-oX <file>",
+        "description": "XML-utdata till fil."
+      },
+      {
+        "flag": "-oG <file>",
+        "description": "Grepable output till fil."
+      },
+      {
+        "flag": "-oA <basename>",
+        "description": "Utdata i normala, XML- och greppbara format."
+      },
+      {
+        "flag": "-v",
+        "description": "Öka detaljnivån i utdata."
+      }
+    ],
+    "minimal_usage": "nmap -oN <file> <target>"
+  },
+  {
+    "id": 76,
+    "name": "nmap timing and speed",
+    "category": "Nmap",
+    "workflow": "Nätverk",
+    "description": "Kontrollera skanningshastighet och prestanda för att balansera smyg, tillförlitlighet och körtid.",
+    "command": "nmap -T<0-5> [<options>] <targets>",
+    "examples": [
+      "nmap -T4 192.168.1.10",
+      "sudo nmap -sS -T3 --host-timeout 2m 10.0.0.0/24",
+      "sudo nmap -sS --min-rate 500 -p- 192.168.1.10"
+    ],
+    "tags": [
+      "tid",
+      "skanning"
+    ],
+    "flags": [
+      {
+        "flag": "-T<0-5>",
+        "description": "Tidsmall från 0 (paranoid) till 5 (galen)."
+      },
+      {
+        "flag": "--min-rate <n>",
+        "description": "Skicka paket minst n per sekund."
+      },
+      {
+        "flag": "--max-rate <n>",
+        "description": "Skicka paket inte snabbare än n per sekund."
+      },
+      {
+        "flag": "--host-timeout <time>",
+        "description": "Ge upp en värd efter denna tid (t.ex. 30s, 5m)."
+      },
+      {
+        "flag": "--scan-delay <time>",
+        "description": "Fördröjning mellan sonder (t.ex. 10 ms, 1 s)."
+      }
+    ],
+    "minimal_usage": "nmap -T4 <target>"
+  },
+  {
+    "id": 77,
+    "name": "auditctl status",
+    "category": "Auditd",
+    "workflow": "Systemgranskning",
+    "description": "Visa granskningssystemets status, inklusive aktiverat tillstånd och inställningar för eftersläpning.",
+    "command": "auditctl -s",
+    "examples": [
+      "sudo auditctl -s"
+    ],
+    "tags": [
+      "status",
+      "granskning"
+    ],
+    "flags": [
+      {
+        "flag": "-s",
+        "description": "Utskriftsstatus."
+      }
+    ],
+    "minimal_usage": "auditctl -s"
+  },
+  {
+    "id": 78,
+    "name": "auditctl list rules",
+    "category": "Auditd",
+    "workflow": "Systemgranskning",
+    "description": "Lista de för närvarande inlästa revisionsreglerna.",
+    "command": "auditctl -l",
+    "examples": [
+      "sudo auditctl -l"
+    ],
+    "tags": [
+      "regler",
+      "lista"
+    ],
+    "flags": [
+      {
+        "flag": "-l",
+        "description": "Lista regler."
+      }
+    ],
+    "minimal_usage": "auditctl -l"
+  },
+  {
+    "id": 79,
+    "name": "auditctl watch path",
+    "category": "Auditd",
+    "workflow": "Systemgranskning",
+    "description": "Titta på en fil eller katalog efter ändringar (t.ex. skrivningar och attributändringar) med hjälp av en regelnyckel.",
+    "command": "auditctl -w <path> -p <permissions> -k <key>",
+    "examples": [
+      "sudo auditctl -w /etc/passwd -p wa -k identity",
+      "sudo auditctl -w /etc/sudoers -p wa -k sudoers",
+      "sudo auditctl -w /var/log -p wa -k log_changes"
+    ],
+    "tags": [
+      "regler",
+      "bevaka"
+    ],
+    "flags": [
+      {
+        "flag": "-w <path>",
+        "description": "Titta på fil eller katalog."
+      },
+      {
+        "flag": "-p <r|w|x|a>",
+        "description": "Behörigheter: läsa, skriva, köra, ändra attribut."
+      },
+      {
+        "flag": "-k <key>",
+        "description": "Bifoga en sökbar nyckel till regeln."
+      },
+      {
+        "flag": "-l",
+        "description": "Lista regler (verifiera att den är laddad)."
+      },
+      {
+        "flag": "-D",
+        "description": "Ta bort alla regler (använd med försiktighet)."
+      }
+    ],
+    "minimal_usage": "auditctl -w <path> -p <permissions> -k <key>"
+  },
+  {
+    "id": 80,
+    "name": "auditctl add syscall rule",
+    "category": "Auditd",
+    "workflow": "Systemgranskning",
+    "description": "Skapa en syscall-granskningsregel och tagga den med en nyckel för senare sökning.",
+    "command": "auditctl -a always,exit -F arch=<b32|b64> -S <syscall> -F <field>=<value> -k <key>",
+    "examples": [
+      "sudo auditctl -a always,exit -F arch=b64 -S execve -F auid>=1000 -F auid!=4294967295 -k exec",
+      "sudo auditctl -a always,exit -F arch=b32 -S execve -F auid>=1000 -F auid!=4294967295 -k exec",
+      "sudo auditctl -a always,exit -F arch=b64 -S openat -F dir=/etc -F perm=wa -k etc_changes"
+    ],
+    "tags": [
+      "regler",
+      "systemanrop"
+    ],
+    "flags": [
+      {
+        "flag": "-a always,exit",
+        "description": "Granskning vid syscall-utgång för matchande händelser."
+      },
+      {
+        "flag": "-F arch=b64|b32",
+        "description": "Välj syscall ABI (lägg ofta till både b64 och b32)."
+      },
+      {
+        "flag": "-S <syscall>",
+        "description": "Syscall-namn (t.ex. execve, openat)."
+      },
+      {
+        "flag": "-F <field>=<value>",
+        "description": "Lägg till filter (t.ex. auid>=1000, uid=0, dir=/etc)."
+      },
+      {
+        "flag": "-k <key>",
+        "description": "Bifoga en nyckel för att söka senare."
+      }
+    ],
+    "minimal_usage": "auditctl -a always,exit -F arch=b64 -S execve -k exec"
+  },
+  {
+    "id": 81,
+    "name": "auditctl delete rules",
+    "category": "Auditd",
+    "workflow": "Systemgranskning",
+    "description": "Ta bort alla för närvarande laddade revisionsregler (använd med försiktighet).",
+    "command": "auditctl -D",
+    "examples": [
+      "sudo auditctl -D",
+      "sudo auditctl -l"
+    ],
+    "tags": [
+      "regler",
+      "återställ"
+    ],
+    "flags": [
+      {
+        "flag": "-D",
+        "description": "Ta bort alla regler."
+      },
+      {
+        "flag": "-l",
+        "description": "Lista regler (verifiera att det är tomt)."
+      }
+    ],
+    "minimal_usage": "auditctl -D"
+  },
+  {
+    "id": 82,
+    "name": "auditctl load rules file",
+    "category": "Auditd",
+    "workflow": "Systemgranskning",
+    "description": "Ladda revisionsregler från en fil (en regel per rad).",
+    "command": "auditctl -R <rules_file>",
+    "examples": [
+      "sudo auditctl -R /etc/audit/rules.d/audit.rules",
+      "sudo auditctl -D && sudo auditctl -R /etc/audit/audit.rules"
+    ],
+    "tags": [
+      "regler",
+      "ladda"
+    ],
+    "flags": [
+      {
+        "flag": "-R <file>",
+        "description": "Läs regler från fil."
+      },
+      {
+        "flag": "-l",
+        "description": "Lista regler efter laddning."
+      },
+      {
+        "flag": "-s",
+        "description": "Kontrollera revisionsstatus."
+      },
+      {
+        "flag": "-D",
+        "description": "Tydliga regler innan lastning."
+      },
+      {
+        "flag": "-w/-a",
+        "description": "Typiska regelformat inuti filen."
+      }
+    ],
+    "minimal_usage": "auditctl -R <rules_file>"
+  },
+  {
+    "id": 83,
+    "name": "aureport exec summary",
+    "category": "Auditd",
+    "workflow": "Logggranskning",
+    "description": "Skapa en sammanfattande rapport grupperad efter körda program.",
+    "command": "aureport -x --summary [<options>]",
+    "examples": [
+      "sudo aureport -x --summary",
+      "sudo aureport -x --summary -i",
+      "sudo aureport -x --summary -ts today"
+    ],
+    "tags": [
+      "rapport",
+      "sammanfattning"
+    ],
+    "flags": [
+      {
+        "flag": "-x",
+        "description": "Körbar rapport."
+      },
+      {
+        "flag": "--summary",
+        "description": "Skriv ut en sammanfattning."
+      },
+      {
+        "flag": "-i",
+        "description": "Tolka numeriska ID till namn."
+      },
+      {
+        "flag": "-ts <time>",
+        "description": "Starttidsfilter."
+      },
+      {
+        "flag": "-te <time>",
+        "description": "Sluttidsfilter."
+      }
+    ],
+    "minimal_usage": "aureport -x --summary"
+  },
+  {
+    "id": 84,
+    "name": "lynis quick audit",
+    "category": "Lynis",
+    "workflow": "Systemgranskning",
+    "description": "Kör en snabbare granskning genom att minska antalet utförda tester.",
+    "command": "lynis audit system --quick [<options>]",
+    "examples": [
+      "sudo lynis audit system --quick",
+      "sudo lynis audit system --quick --warnings-only",
+      "sudo lynis audit system --quick --logfile /var/log/lynis.log"
+    ],
+    "tags": [
+      "granskning",
+      "snabb"
+    ],
+    "flags": [
+      {
+        "flag": "--quick",
+        "description": "Minska antalet tester."
+      },
+      {
+        "flag": "--warnings-only",
+        "description": "Visa endast varningar."
+      },
+      {
+        "flag": "--report-file <file>",
+        "description": "Skriv rapportdata till en specifik fil."
+      },
+      {
+        "flag": "--logfile <file>",
+        "description": "Skriv loggutgången till en specifik fil."
+      },
+      {
+        "flag": "--no-colors",
+        "description": "Inaktivera färgutdata."
+      }
+    ],
+    "minimal_usage": "sudo lynis audit system --quick"
+  },
+  {
+    "id": 85,
+    "name": "lynis audit with profile",
+    "category": "Lynis",
+    "workflow": "Systemgranskning",
+    "description": "Kör en granskning med en specifik profil (baslinje för konfiguration).",
+    "command": "lynis audit system --profile <profile> [<options>]",
+    "examples": [
+      "sudo lynis audit system --profile /etc/lynis/custom.prf",
+      "sudo lynis audit system --profile /etc/lynis/custom.prf --warnings-only",
+      "sudo lynis audit system --profile /etc/lynis/custom.prf --report-file /var/log/lynis-report.dat"
+    ],
+    "tags": [
+      "granskning",
+      "profil"
+    ],
+    "flags": [
+      {
+        "flag": "--profile <profile>",
+        "description": "Välj profil att använda."
+      },
+      {
+        "flag": "--quick",
+        "description": "Minska antalet tester."
+      },
+      {
+        "flag": "--warnings-only",
+        "description": "Visa endast varningar."
+      },
+      {
+        "flag": "--report-file <file>",
+        "description": "Skriv rapportdata till en specifik fil."
+      },
+      {
+        "flag": "--logfile <file>",
+        "description": "Skriv loggutdata till en specifik fil."
+      }
+    ],
+    "minimal_usage": "sudo lynis audit system --profile <profile>"
+  },
+  {
+    "id": 86,
+    "name": "lynis cronjob audit",
+    "category": "Lynis",
+    "workflow": "Systemgranskning",
+    "description": "Kör Lynis i cronjob-läge för schemalagda granskningar (minimal output).",
+    "command": "lynis audit system --cronjob [<options>]",
+    "examples": [
+      "sudo lynis audit system --cronjob",
+      "sudo lynis audit system --cronjob --quick",
+      "sudo lynis audit system --cronjob --report-file /var/log/lynis-report.dat --logfile /var/log/lynis.log"
+    ],
+    "tags": [
+      "granskning",
+      "cron"
+    ],
+    "flags": [
+      {
+        "flag": "--cronjob",
+        "description": "Cronjob-läge."
+      },
+      {
+        "flag": "--quick",
+        "description": "Minska antalet tester."
+      },
+      {
+        "flag": "--report-file <file>",
+        "description": "Skriv rapportdata till en specifik fil."
+      },
+      {
+        "flag": "--logfile <file>",
+        "description": "Skriv loggutdata till en specifik fil."
+      },
+      {
+        "flag": "--warnings-only",
+        "description": "Visa endast varningar."
+      }
+    ],
+    "minimal_usage": "sudo lynis audit system --cronjob"
+  },
+  {
+    "id": 87,
+    "name": "lynis show profiles",
+    "category": "Lynis",
+    "workflow": "Konfiguration",
+    "description": "Lista tillgängliga Lynis-profiler.",
+    "command": "lynis show profiles",
+    "examples": [
+      "lynis show profiles"
+    ],
+    "tags": [
+      "visa",
+      "profiler"
+    ],
+    "flags": [
+      {
+        "flag": "show profiles",
+        "description": "Visa tillgängliga profiler."
+      }
+    ],
+    "minimal_usage": "lynis show profiles"
+  },
+  {
+    "id": 88,
+    "name": "lynis show settings",
+    "category": "Lynis",
+    "workflow": "Konfiguration",
+    "description": "Visa Lynis-inställningar och aktiva konfigurationsvärden.",
+    "command": "lynis show settings [<options>]",
+    "examples": [
+      "lynis show settings",
+      "lynis show settings --profile /etc/lynis/custom.prf"
+    ],
+    "tags": [
+      "visa",
+      "inställningar"
+    ],
+    "flags": [
+      {
+        "flag": "--profile <profile>",
+        "description": "Visa inställningar för en specifik profil."
+      },
+      {
+        "flag": "--no-colors",
+        "description": "Inaktivera färgutdata."
+      },
+      {
+        "flag": "--quiet",
+        "description": "Visa minimal produktion."
+      },
+      {
+        "flag": "--verbose",
+        "description": "Öka detaljnivån i utdata."
+      },
+      {
+        "flag": "--debug",
+        "description": "Aktivera felsökningsläge."
+      }
+    ],
+    "minimal_usage": "lynis show settings"
+  },
+  {
+    "id": 89,
+    "name": "lynis show help",
+    "category": "Lynis",
+    "workflow": "Konfiguration",
+    "description": "Visa tillgängliga kommandoradsalternativ och hjälp för Lynis.",
+    "command": "lynis show options",
+    "examples": [
+      "lynis show options"
+    ],
+    "tags": [
+      "visa",
+      "hjälp"
+    ],
+    "flags": [
+      {
+        "flag": "show options",
+        "description": "Visa Lynis-alternativ."
+      }
+    ],
+    "minimal_usage": "lynis show options"
+  },
+  {
+    "id": 90,
+    "name": "lynis show version",
+    "category": "Lynis",
+    "workflow": "Konfiguration",
+    "description": "Visa den aktuella Lynis-versionen.",
+    "command": "lynis show version",
+    "examples": [
+      "lynis show version"
+    ],
+    "tags": [
+      "visa",
+      "version"
+    ],
+    "flags": [
+      {
+        "flag": "show version",
+        "description": "Visa versionsinformation."
+      }
+    ],
+    "minimal_usage": "lynis show version"
+  },
+  {
+    "id": 91,
+    "name": "lynis update info",
+    "category": "Lynis",
+    "workflow": "Uppdatering",
+    "description": "Visa uppdateringsinformation för din installerade Lynis-version.",
+    "command": "lynis update info",
+    "examples": [
+      "sudo lynis update info"
+    ],
+    "tags": [
+      "uppdatering",
+      "information"
+    ],
+    "flags": [
+      {
+        "flag": "update info",
+        "description": "Visa uppdateringsinformation."
+      }
+    ],
+    "minimal_usage": "sudo lynis update info"
+  },
+  {
+    "id": 92,
+    "name": "clamscan scan file",
+    "category": "ClamAV",
+    "workflow": "Skadlig kod-skanning",
+    "description": "Skanna en enda fil efter skadlig programvara med clamscan.",
+    "command": "clamscan [<options>] <file>",
+    "examples": [
+      "clamscan suspicious.zip",
+      "clamscan -i suspicious.zip",
+      "clamscan --log=scan.log suspicious.zip"
+    ],
+    "tags": [
+      "skanning",
+      "grund"
+    ],
+    "flags": [
+      {
+        "flag": "-i, --infected",
+        "description": "Skriv bara ut infekterade filer."
+      },
+      {
+        "flag": "--log=<file>",
+        "description": "Skriv skanningsresultat till en loggfil."
+      },
+      {
+        "flag": "--no-summary",
+        "description": "Skriv inte ut sammanfattningen i slutet."
+      },
+      {
+        "flag": "--bell",
+        "description": "Pip vid virusupptäckt."
+      }
+    ],
+    "minimal_usage": "clamscan <file>"
+  },
+  {
+    "id": 93,
+    "name": "clamscan recursive scan",
+    "category": "ClamAV",
+    "workflow": "Skadlig kod-skanning",
+    "description": "Skanna rekursivt ett katalogträd efter skadlig programvara.",
+    "command": "clamscan -r [<options>] <path>",
+    "examples": [
+      "clamscan -r /home",
+      "clamscan -r -i /var/www",
+      "clamscan -r / --exclude-dir='^/sys|^/proc' --log=/tmp/clamav_full.log"
+    ],
+    "tags": [
+      "skanning",
+      "rekursiv"
+    ],
+    "flags": [
+      {
+        "flag": "-r, --recursive",
+        "description": "Skanna underkataloger rekursivt."
+      },
+      {
+        "flag": "-i, --infected",
+        "description": "Skriv bara ut infekterade filer."
+      },
+      {
+        "flag": "--log=<file>",
+        "description": "Skriv skanningsresultat till en loggfil."
+      },
+      {
+        "flag": "--exclude-dir=<regex>",
+        "description": "Uteslut kataloger som matchar regex."
+      }
+    ],
+    "minimal_usage": "clamscan -r <path>"
+  },
+  {
+    "id": 94,
+    "name": "clamscan infected only",
+    "category": "ClamAV",
+    "workflow": "Skadlig kod-skanning",
+    "description": "Skanna och visa bara infekterade filer (användbart för stora skanningar).",
+    "command": "clamscan [<options>] -i <path>",
+    "examples": [
+      "clamscan -r -i /home",
+      "clamscan -i suspicious.zip",
+      "clamscan -r -i /var/www --log=/tmp/clamav_infected.log"
+    ],
+    "tags": [
+      "skanning",
+      "infekterade"
+    ],
+    "flags": [
+      {
+        "flag": "-i, --infected",
+        "description": "Skriv bara ut infekterade filer."
+      },
+      {
+        "flag": "-r, --recursive",
+        "description": "Skanna kataloger rekursivt."
+      },
+      {
+        "flag": "--log=<file>",
+        "description": "Skriv skanningsresultat till en loggfil."
+      },
+      {
+        "flag": "--no-summary",
+        "description": "Skriv inte ut sammanfattningen."
+      }
+    ],
+    "minimal_usage": "clamscan -i <path>"
+  },
+  {
+    "id": 95,
+    "name": "clamscan log output",
+    "category": "ClamAV",
+    "workflow": "Skadlig kod-skanning",
+    "description": "Skriv skannade utdata till en loggfil för senare granskning.",
+    "command": "clamscan [<options>] --log=<file> <path>",
+    "examples": [
+      "clamscan -r /home --log=/tmp/clamav_home.log",
+      "clamscan -r -i /var/www --log=/tmp/clamav_www.log"
+    ],
+    "tags": [
+      "skanning",
+      "logg"
+    ],
+    "flags": [
+      {
+        "flag": "--log=<file>",
+        "description": "Skriv skanningsutdata till fil."
+      },
+      {
+        "flag": "-r, --recursive",
+        "description": "Skanna kataloger rekursivt."
+      },
+      {
+        "flag": "-i, --infected",
+        "description": "Skriv bara ut infekterade filer."
+      },
+      {
+        "flag": "--no-summary",
+        "description": "Skriv inte ut sammanfattningen."
+      }
+    ],
+    "minimal_usage": "clamscan --log=<file> <path>"
+  },
+  {
+    "id": 96,
+    "name": "clamscan move infected",
+    "category": "ClamAV",
+    "workflow": "Skadlig kod-skanning",
+    "description": "Flytta infekterade filer till en karantänkatalog (katalog måste finnas).",
+    "command": "clamscan -r [<options>] --move=<dir> <path>",
+    "examples": [
+      "sudo mkdir -p /quarantine",
+      "sudo clamscan -r /home --move=/quarantine -i --log=/tmp/clamav_quarantine.log"
+    ],
+    "tags": [
+      "skanning",
+      "flytta"
+    ],
+    "flags": [
+      {
+        "flag": "--move=<dir>",
+        "description": "Flytta infekterade filer till katalogen."
+      },
+      {
+        "flag": "-r, --recursive",
+        "description": "Skanna kataloger rekursivt."
+      },
+      {
+        "flag": "-i, --infected",
+        "description": "Skriv bara ut infekterade filer."
+      },
+      {
+        "flag": "--log=<file>",
+        "description": "Skriv skanningsresultat till en loggfil."
+      },
+      {
+        "flag": "--no-summary",
+        "description": "Skriv inte ut sammanfattningen."
+      }
+    ],
+    "minimal_usage": "clamscan -r --move=<dir> <path>"
+  },
+  {
+    "id": 97,
+    "name": "clamscan copy infected",
+    "category": "ClamAV",
+    "workflow": "Skadlig kod-skanning",
+    "description": "Kopiera infekterade filer till en karantänkatalog samtidigt som originalen hålls på plats.",
+    "command": "clamscan -r [<options>] --copy=<dir> <path>",
+    "examples": [
+      "sudo mkdir -p /quarantine_copy",
+      "sudo clamscan -r /var/www --copy=/quarantine_copy -i --log=/tmp/clamav_copy.log"
+    ],
+    "tags": [
+      "skanning",
+      "kopiera"
+    ],
+    "flags": [
+      {
+        "flag": "--copy=<dir>",
+        "description": "Kopiera infekterade filer till katalogen."
+      },
+      {
+        "flag": "-r, --recursive",
+        "description": "Skanna kataloger rekursivt."
+      },
+      {
+        "flag": "-i, --infected",
+        "description": "Skriv bara ut infekterade filer."
+      },
+      {
+        "flag": "--log=<file>",
+        "description": "Skriv skanningsresultat till en loggfil."
+      },
+      {
+        "flag": "--no-summary",
+        "description": "Skriv inte ut sammanfattningen."
+      }
+    ],
+    "minimal_usage": "clamscan -r --copy=<dir> <path>"
+  },
+  {
+    "id": 98,
+    "name": "clamscan exclude dirs",
+    "category": "ClamAV",
+    "workflow": "Skadlig kod-skanning",
+    "description": "Uteslut kataloger från rekursiva genomsökningar med ett reguljärt uttryck.",
+    "command": "clamscan -r [<options>] --exclude-dir=<regex> <path>",
+    "examples": [
+      "clamscan -r / --exclude-dir='^/sys|^/proc' --log=/tmp/clamav_scan.log",
+      "clamscan -r /home --exclude-dir='\\.cache$' -i"
+    ],
+    "tags": [
+      "skanning",
+      "exkludera"
+    ],
+    "flags": [
+      {
+        "flag": "--exclude-dir=<regex>",
+        "description": "Hoppa över kataloger som matchar regex."
+      },
+      {
+        "flag": "-r, --recursive",
+        "description": "Skanna kataloger rekursivt."
+      },
+      {
+        "flag": "-i, --infected",
+        "description": "Skriv bara ut infekterade filer."
+      },
+      {
+        "flag": "--log=<file>",
+        "description": "Skriv skanningsresultat till en loggfil."
+      },
+      {
+        "flag": "--no-summary",
+        "description": "Skriv inte ut sammanfattningen."
+      }
+    ],
+    "minimal_usage": "clamscan -r --exclude-dir=<regex> <path>"
+  },
+  {
+    "id": 99,
+    "name": "clamdscan scan via daemon",
+    "category": "ClamAV",
+    "workflow": "Skadlig kod-skanning",
+    "description": "Skanna med clamd-demonen (snabbare för upprepade skanningar än clamscan).",
+    "command": "clamdscan [<options>] <path>",
+    "examples": [
+      "clamdscan /home",
+      "clamdscan --infected /var/www",
+      "sudo clamdscan --fdpass --multiscan --log=/tmp/clamdscan.log /"
+    ],
+    "tags": [
+      "skanning",
+      "daemon"
+    ],
+    "flags": [
+      {
+        "flag": "--fdpass",
+        "description": "Skicka filbeskrivningar till clamd (behövs på vissa system)."
+      },
+      {
+        "flag": "--multiscan",
+        "description": "Använd flera trådar om det stöds."
+      },
+      {
+        "flag": "--log=<file>",
+        "description": "Skriv skanningsutdata till en loggfil."
+      },
+      {
+        "flag": "--infected",
+        "description": "Skriv bara ut infekterade filer."
+      },
+      {
+        "flag": "--verbose",
+        "description": "Öka detaljnivån i utdata."
+      }
+    ],
+    "minimal_usage": "clamdscan <path>"
+  },
+  {
+    "id": 100,
+    "category": "Nmap",
+    "name": "nmap fast scan",
+    "workflow": "Nätverk",
+    "description": "Kör en snabbare skanning med Nmaps inbyggda snabbläge (färre portar).",
+    "command": "nmap -F [<options>] <targets>",
+    "minimal_usage": "nmap -F <target>",
+    "flags": [
+      {
+        "flag": "-F",
+        "description": "Snabb skanning (färre portar)."
+      },
+      {
+        "flag": "-sS",
+        "description": "TCP SYN-skanning (root)."
+      },
+      {
+        "flag": "-sT",
+        "description": "TCP-anslutningsskanning (icke-root)."
+      },
+      {
+        "flag": "-T<0-5>",
+        "description": "Timing mall."
+      },
+      {
+        "flag": "-oN <file>",
+        "description": "Skriv utdata i normalt format."
+      }
+    ],
+    "examples": [
+      "nmap -F 192.168.1.10",
+      "nmap -F -T4 192.168.1.0/24",
+      "nmap -F -oN fast_scan.txt scanme.nmap.org"
+    ],
+    "tags": [
+      "grund",
+      "skanning"
+    ]
+  },
+  {
+    "id": 101,
+    "category": "Nmap",
+    "name": "nmap aggressive scan",
+    "workflow": "Nätverk",
+    "description": "Aktivera aggressiva skanningsfunktioner: OS-detektering, versionsdetektering, standardskript och traceroute.",
+    "command": "nmap -A [<options>] <targets>",
+    "minimal_usage": "sudo nmap -A <target>",
+    "flags": [
+      {
+        "flag": "-A",
+        "description": "Aggressiv skanning (motsvarar flera funktioner kombinerade)."
+      },
+      {
+        "flag": "-sV",
+        "description": "Versionsdetektering."
+      },
+      {
+        "flag": "-O",
+        "description": "OS-detektering."
+      },
+      {
+        "flag": "-sC",
+        "description": "Standardskript."
+      },
+      {
+        "flag": "--traceroute",
+        "description": "Kör traceroute till mål."
+      }
+    ],
+    "examples": [
+      "sudo nmap -A 192.168.1.10",
+      "sudo nmap -A -p 22,80,443 10.0.0.5",
+      "sudo nmap -A -oA aggressive_192.168.1.10 192.168.1.10"
+    ],
+    "tags": [
+      "skanning",
+      "kartläggning"
+    ]
+  },
+  {
+    "id": 102,
+    "category": "Nmap",
+    "name": "nmap disable DNS",
+    "workflow": "Upptäckt",
+    "description": "Hoppa över omvänd DNS-upplösning för att göra skanningar snabbare och undvika DNS-brus.",
+    "command": "nmap -n [<options>] <targets>",
+    "minimal_usage": "nmap -n <target>",
+    "flags": [
+      {
+        "flag": "-n",
+        "description": "Gör aldrig DNS-upplösning."
+      },
+      {
+        "flag": "-sn",
+        "description": "Endast värdupptäckt."
+      },
+      {
+        "flag": "-Pn",
+        "description": "Behandla mål som uppåt."
+      },
+      {
+        "flag": "-p <ports>",
+        "description": "Välj portar att skanna."
+      },
+      {
+        "flag": "-T<0-5>",
+        "description": "Timing mall."
+      }
+    ],
+    "examples": [
+      "nmap -n 192.168.1.10",
+      "nmap -n -sn 10.0.0.0/24",
+      "nmap -n -p 22,80,443 192.168.1.0/24"
+    ],
+    "tags": [
+      "upptäckt",
+      "skanning"
+    ]
+  },
+  {
+    "id": 103,
+    "category": "Nmap",
+    "name": "nmap traceroute",
+    "workflow": "Upptäckt",
+    "description": "Lägg till spårvägsinformation för att se nätverksvägar till mål.",
+    "command": "nmap --traceroute [<options>] <targets>",
+    "minimal_usage": "nmap --traceroute <target>",
+    "flags": [
+      {
+        "flag": "--traceroute",
+        "description": "Kör traceroute till mål efter skanning."
+      },
+      {
+        "flag": "-sn",
+        "description": "Endast värdupptäckt."
+      },
+      {
+        "flag": "-Pn",
+        "description": "Behandla mål som uppåt."
+      },
+      {
+        "flag": "-p <ports>",
+        "description": "Välj portar att skanna."
+      },
+      {
+        "flag": "-oN <file>",
+        "description": "Skriv utdata i normalt format."
+      }
+    ],
+    "examples": [
+      "nmap --traceroute 192.168.1.10",
+      "nmap -sn --traceroute 192.168.1.0/24",
+      "sudo nmap -sS -p 22,80 --traceroute -oN trace_scan.txt 10.0.0.5"
+    ],
+    "tags": [
+      "upptäckt",
+      "spårning"
+    ]
+  },
+  {
+    "id": 104,
+    "category": "Auditd",
+    "name": "ausearch search by time",
+    "workflow": "Logggranskning",
+    "description": "Sök i granskningsloggar inom ett tidsfönster och tolka eventuellt ID till namn.",
+    "command": "ausearch -ts <start> [-te <end>] [<options>]",
+    "minimal_usage": "ausearch -ts today -i",
+    "flags": [
+      {
+        "flag": "-ts <time>",
+        "description": "Starttid (t.ex. idag, nyligen, 2026-02-13 10:00:00)."
+      },
+      {
+        "flag": "-te <time>",
+        "description": "Sluttid."
+      },
+      {
+        "flag": "-i",
+        "description": "Tolka ID till namn."
+      },
+      {
+        "flag": "-k <key>",
+        "description": "Filtrera efter regelnyckel."
+      }
+    ],
+    "examples": [
+      "ausearch -ts today -i",
+      "ausearch -ts 2026-02-01 -te 2026-02-13 -i",
+      "ausearch -ts recent -k exec -i"
+    ],
+    "tags": [
+      "sök",
+      "tid"
+    ]
+  },
+  {
+    "id": 105,
+    "category": "Auditd",
+    "name": "aureport file summary",
+    "workflow": "Logggranskning",
+    "description": "Skapa en sammanfattande rapport grupperad efter filhändelser.",
+    "command": "aureport -f --summary [<options>]",
+    "minimal_usage": "aureport -f --summary",
+    "flags": [
+      {
+        "flag": "-f",
+        "description": "Arkivera rapport."
+      },
+      {
+        "flag": "--summary",
+        "description": "Skriv ut en sammanfattning."
+      },
+      {
+        "flag": "-i",
+        "description": "Tolka numeriska ID till namn."
+      },
+      {
+        "flag": "-ts <time>",
+        "description": "Starttidsfilter."
+      },
+      {
+        "flag": "-te <time>",
+        "description": "Sluttidsfilter."
+      }
+    ],
+    "examples": [
+      "sudo aureport -f --summary",
+      "sudo aureport -f --summary -i",
+      "sudo aureport -f --summary -ts today"
+    ],
+    "tags": [
+      "rapport",
+      "filer"
+    ]
+  },
+  {
+    "id": 106,
+    "category": "Auditd",
+    "name": "aulast login report",
+    "workflow": "Logggranskning",
+    "description": "Visa en senaste rapport baserad på granskningsloggar (användbart för inloggningsaktivitet).",
+    "command": "aulast [<options>]",
+    "minimal_usage": "aulast",
+    "flags": [
+      {
+        "flag": "-f <file>",
+        "description": "Använd den angivna granskningsloggfilen som indata."
+      },
+      {
+        "flag": "--user <name>",
+        "description": "Begränsa rapporten till en specifik användare."
+      },
+      {
+        "flag": "--tty <tty>",
+        "description": "Begränsa rapporten till en specifik tty (t.ex. tty0, pts/1)."
+      },
+      {
+        "flag": "--stdin",
+        "description": "Läs råa revisionsprotokoll från stdin."
+      },
+      {
+        "flag": "--bad",
+        "description": "Rapportera dåliga inloggningsförsök."
+      }
+    ],
+    "examples": [
+      "sudo aulast",
+      "sudo aulast --user root",
+      "sudo aulast -f /var/log/audit/audit.log --tty pts/0",
+      "sudo ausearch --start this-month --raw | sudo aulast --stdin"
+    ],
+    "tags": [
+      "rapport",
+      "inloggningar"
+    ]
+  },
+  {
+    "id": 107,
+    "category": "Auditd",
+    "name": "aulastlog lastlog report",
+    "workflow": "Logggranskning",
+    "description": "Visa en lastlog-liknande rapport baserad på granskningsloggar (senaste inloggning per användare).",
+    "command": "aulastlog [<options>]",
+    "minimal_usage": "aulastlog",
+    "flags": [
+      {
+        "flag": "-u, --user <LOGIN>",
+        "description": "Skriv ut den senaste inloggningsposten endast för den angivna användaren."
+      },
+      {
+        "flag": "--stdin",
+        "description": "Läs råa revisionsprotokoll från stdin."
+      }
+    ],
+    "examples": [
+      "sudo aulastlog",
+      "sudo aulastlog --user root",
+      "sudo ausearch --start this-month --raw | sudo aulastlog --stdin"
+    ],
+    "tags": [
+      "rapport",
+      "inloggningar"
+    ]
+  },
+  {
+    "id": 108,
+    "category": "Lynis",
+    "name": "lynis update check",
+    "workflow": "Uppdatering",
+    "description": "Kontrollera om en uppdatering är tillgänglig (kräver att ett lokalt uppdateringsförråd konfigureras).",
+    "command": "lynis update check",
+    "minimal_usage": "sudo lynis update check",
+    "flags": [
+      {
+        "flag": "update check",
+        "description": "Sök efter uppdateringar."
+      }
+    ],
+    "examples": [
+      "sudo lynis update check"
+    ],
+    "tags": [
+      "uppdatering",
+      "kontroll"
+    ]
+  },
+  {
+    "id": 109,
+    "category": "Lynis",
+    "name": "lynis update release",
+    "workflow": "Uppdatering",
+    "description": "Ladda ner och installera den senaste Lynis-versionen (kräver internetåtkomst).",
+    "command": "lynis update release",
+    "minimal_usage": "sudo lynis update release",
+    "flags": [
+      {
+        "flag": "update release",
+        "description": "Uppdatera Lynis till den senaste versionen."
+      }
+    ],
+    "examples": [
+      "sudo lynis update release"
+    ],
+    "tags": [
+      "uppdatering",
+      "uppgradering"
+    ]
+  },
+  {
+    "id": 110,
+    "category": "Lynis",
+    "name": "lynis warnings only",
+    "workflow": "Systemgranskning",
+    "description": "Kör en granskning och visa varningar endast i utgången.",
+    "command": "lynis audit system --warnings-only [<options>]",
+    "minimal_usage": "sudo lynis audit system --warnings-only",
+    "flags": [
+      {
+        "flag": "--warnings-only",
+        "description": "Visa endast varningar."
+      },
+      {
+        "flag": "--quick",
+        "description": "Minska antalet tester."
+      },
+      {
+        "flag": "--cronjob",
+        "description": "Cronjob-läge."
+      },
+      {
+        "flag": "--report-file <file>",
+        "description": "Skriv rapportdata till en specifik fil."
+      },
+      {
+        "flag": "--logfile <file>",
+        "description": "Skriv loggutdata till en specifik fil."
+      }
+    ],
+    "examples": [
+      "sudo lynis audit system --warnings-only",
+      "sudo lynis audit system --warnings-only --quick"
+    ],
+    "tags": [
+      "granskning",
+      "varningar"
+    ]
+  },
+  {
+    "id": 111,
+    "category": "ClamAV",
+    "name": "clamconf show config",
+    "workflow": "Konfiguration",
+    "description": "Skriv ut den effektiva ClamAV-konfigurationen (användbart för felsökning).",
+    "command": "clamconf [<options>]",
+    "minimal_usage": "clamconf",
+    "flags": [
+      {
+        "flag": "--help",
+        "description": "Visa hjälp."
+      },
+      {
+        "flag": "--version",
+        "description": "Visa versionsinformation."
+      }
+    ],
+    "examples": [
+      "clamconf",
+      "clamconf --version"
+    ],
+    "tags": [
+      "konfiguration",
+      "information"
+    ]
+  },
+  {
+    "id": 112,
+    "category": "ClamAV",
+    "name": "clamdtop monitor clamd",
+    "workflow": "Övervakning",
+    "description": "Övervaka clamd-demonen i realtid (som topp för ClamAV).",
+    "command": "clamdtop [<options>]",
+    "minimal_usage": "clamdtop",
+    "flags": [
+      {
+        "flag": "-h",
+        "description": "Visa hjälp."
+      },
+      {
+        "flag": "-V",
+        "description": "Visa versionsinformation."
+      }
+    ],
+    "examples": [
+      "clamdtop",
+      "clamdtop -h"
+    ],
+    "tags": [
+      "övervakning",
+      "daemon"
+    ]
+  },
+  {
+    "id": 113,
+    "name": "nmap skip host discovery",
+    "category": "Nmap",
+    "workflow": "Upptäckt",
+    "description": "Anta att mål är online och hoppa över värdupptäckt, användbart när ICMP- eller ARP-upptäckt är blockerat.",
+    "command": "nmap -Pn [<options>] <targets>",
+    "minimal_usage": "nmap -Pn <target>",
+    "flags": [
+      {
+        "flag": "-Pn",
+        "description": "Behandla alla värdar som online, hoppa över värdupptäckt."
+      },
+      {
+        "flag": "-p",
+        "description": "Skanna endast angivna portar."
+      },
+      {
+        "flag": "-sV",
+        "description": "Undersök öppna portar för att fastställa tjänst/versionsinformation."
+      },
+      {
+        "flag": "--reason",
+        "description": "Visa anledningen till att en port är i ett visst tillstånd."
+      }
+    ],
+    "examples": [
+      "nmap -Pn 192.168.1.10",
+      "nmap -Pn -p 22,80,443 10.0.0.5",
+      "nmap -Pn -sV --reason 203.0.113.5"
+    ],
+    "tags": [
+      "upptäckt",
+      "skanning"
+    ]
+  },
+  {
+    "id": 114,
+    "name": "nmap targets from file",
+    "category": "Nmap",
+    "workflow": "Upptäckt",
+    "description": "Ladda skanningsmål från en fil (ett mål per rad). Perfekt för repeterbara skanningar och tillgångslistor.",
+    "command": "nmap -iL <inputfile> [<options>]",
+    "minimal_usage": "nmap -iL targets.txt",
+    "flags": [
+      {
+        "flag": "-iL",
+        "description": "Indata från listan över värdar/nätverk."
+      },
+      {
+        "flag": "-sV",
+        "description": "Undersök öppna portar för att fastställa tjänst/versionsinformation."
+      },
+      {
+        "flag": "-oA",
+        "description": "Utdata i de tre stora formaten samtidigt (normal, XML, gripbar)."
+      }
+    ],
+    "examples": [
+      "nmap -iL targets.txt",
+      "nmap -sV -iL targets.txt",
+      "nmap -oA scans/weekly -iL targets.txt"
+    ],
+    "tags": [
+      "upptäckt",
+      "skanning"
+    ]
+  },
+  {
+    "id": 115,
+    "name": "nmap IPv6 scan",
+    "category": "Nmap",
+    "workflow": "Nätverk",
+    "description": "Aktivera IPv6-skanning för IPv6-mål och undernät.",
+    "command": "nmap -6 [<options>] <targets>",
+    "minimal_usage": "nmap -6 <ipv6-target>",
+    "flags": [
+      {
+        "flag": "-6",
+        "description": "Aktivera IPv6-skanning."
+      },
+      {
+        "flag": "-sn",
+        "description": "Endast värdupptäckt (ingen portskanning)."
+      },
+      {
+        "flag": "-sV",
+        "description": "Undersök öppna portar för att fastställa tjänst/versionsinformation."
+      },
+      {
+        "flag": "-p",
+        "description": "Skanna endast angivna portar."
+      }
+    ],
+    "examples": [
+      "nmap -6 2001:db8::1",
+      "nmap -6 -sn 2001:db8::/64",
+      "nmap -6 -sV -p 22,80 2001:db8::1"
+    ],
+    "tags": [
+      "IPv6",
+      "skanning"
+    ]
+  },
+  {
+    "id": 116,
+    "name": "augenrules reload rules",
+    "category": "Auditd",
+    "workflow": "Granskning",
+    "description": "Kompilera regler från /etc/audit/rules.d till /etc/audit/audit.rules och ladda in dem i kärnan.",
+    "command": "sudo augenrules --load",
+    "minimal_usage": "sudo augenrules --load",
+    "flags": [
+      {
+        "flag": "--load",
+        "description": "Slå samman och ladda regler i kärnan."
+      },
+      {
+        "flag": "--check",
+        "description": "Visa om några regelfiler saknar nödvändig äganderätt/behörighet."
+      }
+    ],
+    "examples": [
+      "sudo augenrules --check",
+      "sudo augenrules --load"
+    ],
+    "tags": [
+      "regler",
+      "ladda"
+    ]
+  },
+  {
+    "id": 117,
+    "name": "auditctl enable auditing",
+    "category": "Auditd",
+    "workflow": "Granskning",
+    "description": "Aktivera granskning och lås eventuellt granskningskonfigurationen tills omstart.",
+    "command": "sudo auditctl -e <0|1|2>",
+    "minimal_usage": "sudo auditctl -e 1",
+    "flags": [
+      {
+        "flag": "-e",
+        "description": "Ställ in aktiverad flagga: 0=avaktivera, 1=aktivera, 2=aktivera+lås tills omstart."
+      },
+      {
+        "flag": "-s",
+        "description": "Rapportera revisionsstatus."
+      },
+      {
+        "flag": "-l",
+        "description": "Lista alla regler som för närvarande är inlästa."
+      }
+    ],
+    "examples": [
+      "sudo auditctl -e 1",
+      "sudo auditctl -s",
+      "sudo auditctl -e 2"
+    ],
+    "tags": [
+      "konfiguration",
+      "status"
+    ]
+  },
+  {
+    "id": 118,
+    "name": "lynis show details",
+    "category": "Lynis",
+    "workflow": "Härdning",
+    "description": "Visa detaljerade detaljer för ett specifikt test-ID från revisionsrapporten.",
+    "command": "sudo lynis show details <test-id>",
+    "minimal_usage": "sudo lynis show details <test-id>",
+    "flags": [
+      {
+        "flag": "show",
+        "description": "Visa information istället för att genomföra en revision."
+      },
+      {
+        "flag": "details",
+        "description": "Visa detaljer för ett specifikt test-ID."
+      }
+    ],
+    "examples": [
+      "sudo lynis show details SSH-7408",
+      "sudo lynis show details KRNL-5830"
+    ],
+    "tags": [
+      "visa",
+      "detaljer"
+    ]
+  },
+  {
+    "id": 119,
+    "name": "lynis show categories",
+    "category": "Lynis",
+    "workflow": "Härdning",
+    "description": "Lista tillgängliga testkategorier som du kan rikta in dig på när du kör granskningar.",
+    "command": "lynis show categories",
+    "minimal_usage": "lynis show categories",
+    "flags": [
+      {
+        "flag": "show",
+        "description": "Visa information istället för att genomföra en revision."
+      },
+      {
+        "flag": "categories",
+        "description": "Lista alla tillgängliga kategorier."
+      }
+    ],
+    "examples": [
+      "lynis show categories"
+    ],
+    "tags": [
+      "visa",
+      "information"
+    ]
+  },
+  {
+    "id": 120,
+    "name": "freshclam daemon mode",
+    "category": "ClamAV",
+    "workflow": "Skadlig kod-skanning",
+    "description": "Kör signaturuppdateringen i bakgrunden och leta efter uppdateringar med jämna mellanrum.",
+    "command": "sudo freshclam -d [--checks <n>] [--foreground]",
+    "minimal_usage": "sudo freshclam -d",
+    "flags": [
+      {
+        "flag": "-d",
+        "description": "Kör i demonläge och kontrollera med jämna mellanrum."
+      },
+      {
+        "flag": "--checks",
+        "description": "Antal kontroller per dag (standard är vanligtvis 12)."
+      },
+      {
+        "flag": "--foreground",
+        "description": "Kör inte i bakgrunden (kör i förgrunden)."
+      }
+    ],
+    "examples": [
+      "sudo freshclam -d",
+      "sudo freshclam -d --checks 24",
+      "sudo freshclam -d --foreground"
+    ],
+    "tags": [
+      "uppdatering",
+      "daemon"
+    ]
+  },
+  {
+    "id": 121,
+    "name": "clamscan show version",
+    "category": "ClamAV",
+    "workflow": "Skadlig kod-skanning",
+    "description": "Skriv ut ClamAV-skannerversionen och databasinformation.",
+    "command": "clamscan --version",
+    "minimal_usage": "clamscan --version",
+    "flags": [
+      {
+        "flag": "--version",
+        "description": "Skriv ut versionsinformation och avsluta."
+      }
+    ],
+    "examples": [
+      "clamscan --version"
+    ],
+    "tags": [
+      "grund",
+      "information"
+    ]
+  }
+]

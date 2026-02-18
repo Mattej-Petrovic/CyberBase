@@ -1,0 +1,1008 @@
+{
+  "20": {
+    "service": "FTP data",
+    "transport": "TCP",
+    "summary": "Äldre FTP datakanal i aktivt läge. Ofta blockerad på moderna nätverk.",
+    "what": "TCP port 20 är traditionellt FTP dataporten i aktivt läge. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. FTP är ovanlig eftersom den använder två separata TCP-anslutningar: en kontrollsession på port 21 för kommandon och svar, och en separat dataanslutning för kataloglistor och filinnehåll. I aktivt läge berättar klienten för servern vilken klientport som ska anslutas tillbaka till, och servern initierar dataanslutningen från sin lokala port 20 till den klientporten. I passivt läge väljer servern istället en hög port och klienten ansluter till den, varför FTP är känt för att vara knepigt med brandväggar och NAT. Så när du ser port 20, tänk på aktiva lägesöverföringar och det bredare faktum att FTP öppnar extra anslutningar bortom den ursprungliga inloggningskanalen.",
+    "why": "När du ser port 20 öppen betyder det vanligtvis att äldre FTP är i spel, eller att en brandväggsregel är alltför tillåtande. Det spelar roll eftersom FTP designades innan kryptering var standard, och designen med två kanaler skapar ofta brandvägg och NAT överraskningar.",
+    "how": [
+      "Klienten ansluter till serverkontrolltjänsten på port 21 och förhandlar om en aktiv överföring (PORT eller EPRT).",
+      "Servern öppnar en ny TCP-anslutning från dess port 20 till en klientspecifik adress och port.",
+      "Dataanslutningen bär filen eller listan och stängs sedan medan kontrollanslutningen förblir uppe."
+    ],
+    "pitfalls": [
+      "Förutsatt att port 20 alltid bär data. Många FTP-distributioner använder passivt läge där data använder en servervald hög port istället.",
+      "NAT och brandväggar släpper den serverinitierade anslutningen i aktivt läge.",
+      "Behandla FTP som en porttjänst och glömma det extra dataflödet."
+    ],
+    "security": [
+      "Föredrar SFTP eller HTTPS baserade överföringar för internet. Om FTP måste finnas, begränsa det till interna nätverk.",
+      "Inaktivera aktivt läge om du inte har ett starkt skäl och en explicit brandväggspolicy för det.",
+      "Övervaka för anonym åtkomst och oväntade upp- och nedladdningar."
+    ],
+    "alternatives": [
+      "SFTP (SSH, port 22)",
+      "FTPS (FTP över TLS)"
+    ],
+    "example": "En äldre byggserver hämtar fortfarande artefakter från en FTP-värd. Kontrollsessionen är den 21, men själva filen anländer på en separat anslutning skapad av servern, varför brandväggen behöver en explicit regel för det aktiva dataflödet.",
+    "references": []
+  },
+  "21": {
+    "service": "FTP control",
+    "transport": "TCP",
+    "summary": "Klassisk FTP kommandokanal. Dataflödet är separat och använder ofta andra portar.",
+    "what": "TCP port 21 är den klassiska FTP kontrollporten. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En FTP-server lyssnar på port 21 för kontrollsessionen där klienten loggar in och skickar kommandon som lista, ändra katalog och begära en filöverföring. Kontrollanslutningen är inte där fildata normalt färdas. När en överföring startar skapar FTP en andra TCP-anslutning för den faktiska datan, antingen serverinitierad i aktivt läge eller klientinitierad till en servervald port i passivt läge. Att tvåkanalsdesign är den praktiska anledningen till att port 21 ofta dyker upp tillsammans med andra portar i brandväggsregler. Ur säkerhetssynpunkt innebär en exponerad FTP-kontrollport vanligtvis att autentiseringsuppgifter och filöverföringsbeteende kan nås från nätverket, och det är ett attraktivt mål för brute force och felkonfiguration.",
+    "why": "Port 21-exponering är ett vanligt fynd vid skanningar. Det spelar roll eftersom klassiska FTP skickar autentiseringsuppgifter och data i klartext om den inte är inpackad i TLS, och eftersom den separata datakanalen kan slå hål genom brandväggar om den är felkonfigurerad.",
+    "how": [
+      "Klienten öppnar en TCP-anslutning till port 21 och utbyter kommandon och svar.",
+      "För varje överföring skapar FTP en separat dataanslutning (aktivt läge använder serverport 20, passivt läge använder en servervald hög port).",
+      "Servern upprätthåller behörigheter och filsystemåtgärder och stänger sedan dataanslutningen efter varje överföring."
+    ],
+    "pitfalls": [
+      "Lämnar vanlig FTP tillgänglig från opålitliga nätverk.",
+      "Att glömma passivt läge kräver ett förutsägbart portintervall för att tillåtas genom brandväggar.",
+      "Förutsatt stark autentisering. Många FTP-servrar är konfigurerade med svaga eller delade konton."
+    ],
+    "security": [
+      "Föredrar SFTP eller HTTPS. Om du måste använda FTP, använd explicit FTPS med stark TLS och inaktivera klartextinloggningar.",
+      "Begränsa till IP och kräver starka inloggningsuppgifter och revision.",
+      "Hårda servern och inaktivera anonym åtkomst om du inte verkligen behöver det."
+    ],
+    "alternatives": [
+      "SFTP (SSH, port 22)",
+      "FTPS (FTP över TLS)"
+    ],
+    "example": "Du kör en sårbarhetssökning och ser port 21 öppen. En snabb kontroll i en paketinsamling visar USER och PASS i klartext, vilket är en tydlig signal för att migrera arbetsflödet till SFTP eller för att genomdriva TLS.",
+    "references": []
+  },
+  "22": {
+    "service": "SSH",
+    "transport": "TCP",
+    "summary": "Säker fjärrinloggning och grund för filöverföring. Används vanligtvis för administratörsåtkomst.",
+    "what": "TCP port 22 är standardporten för SSH. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En SSH-server binder till port 22 och väntar i ett lyssningsläge. När du ansluter öppnar din klient en TCP-session från en tillfällig källport till serverns IP-adress och destinationsport 22, slutför TCP-handskakningen och startar sedan protokollet SSH ovanpå den anslutningen. SSH förhandlar om kryptering, autentiserar användaren eller nyckeln och multiplexerar sedan en anslutning till kanaler för ett interaktivt skal, körning av ett enda kommando, filöverföring via SFTP eller vidarebefordran av port. Det är därför att skanna efter 22 är ett vanligt sätt att hitta fjärradministrationsytor. Om du förstår portar kan du se varför flytta SSH till en annan port minskar bruset men tar inte bort risken: tjänsten är fortfarande tillgänglig, bara vid en annan mötesplats.",
+    "why": "SSH är en av de mest säkerhetskänsliga tjänsterna i de flesta miljöer. Den är kraftfull till sin design, så en exponerad eller svagt skyddad SSH-tjänst är en vanlig ingångspunkt. Det dyker också upp överallt inom automatisering, säkerhetskopiering och serverhantering.",
+    "how": [
+      "Klienten ansluter och förhandlar algoritmer för nyckelutbyte, kryptering och integritet.",
+      "Servern bevisar sin identitet med en värdnyckel, sedan autentiserar användaren med en nyckel eller lösenord.",
+      "Efter autentisering öppnar SSH en eller flera kanaler för skal, kommandon, portvidarebefordran eller SFTP."
+    ],
+    "pitfalls": [
+      "Tillåter lösenordsautentisering från internet utan hastighetsbegränsning.",
+      "Återanvända nycklar i många system eller aldrig rotera dem.",
+      "Ignorera värdnyckeländringar, vilket kan gömma man i mitten attacker eller komprometterade värdar."
+    ],
+    "security": [
+      "Föredrar nyckelbaserad autentisering, inaktivera svaga chiffer och begränsa med nätverk eller VPN.",
+      "Använd MFA eller kortlivade certifikat där det är möjligt och logga alla autentiseringshändelser.",
+      "Behandla SSH-nycklar som hemligheter: skydda dem, rotera dem och ta bort åtkomst när andra går."
+    ],
+    "alternatives": [
+      "SSM eller bastionåtkomst",
+      "VPN sedan SSH på privata IPs"
+    ],
+    "example": "En utvecklare kör git-operationer mot en server. Under huven autentiseras en SSH-session med en nyckel, sedan öppnar servern en kanal för git-kommandot och returnerar resultaten över den krypterade strömmen.",
+    "references": []
+  },
+  "23": {
+    "service": "Telnet",
+    "transport": "TCP",
+    "summary": "Äldre fjärrterminal i klartext. Mestadels osäkert förutom i hårt kontrollerade labb.",
+    "what": "TCP port 23 används traditionellt av Telnet för fjärrterminalåtkomst. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En Telnet-server lyssnar på port 23 och en klient öppnar en TCP-anslutning från en tillfällig källport till destinationsport 23. Efter handskakningen flyter tangenttryckningar och utdata som vanlig text utan inbyggd kryptering. I praktiken betyder det att användarnamn, lösenord och kommandon kan läsas eller ändras av alla som kan observera eller avlyssna trafiken på vägen. Det är därför Telnet till stor del är äldre idag och ersätts av SSH på port 22 för säker administration. Om du fortfarande hittar 23 öppna, indikerar det ofta äldre nätverksutrustning, labbmiljöer eller felkonfigurerade hanteringsgränssnitt som bör isoleras.",
+    "why": "Telnet spelar roll eftersom du fortfarande hittar det på gammal nätverksutrustning, inbäddade enheter och labbmiljöer. Ur ett säkerhetsperspektiv är en exponerad Telnet-tjänst nästan alltid ett problem eftersom referenser kan fångas och sessioner kan kapas.",
+    "how": [
+      "Klienten ansluter och börjar omedelbart skicka tangenttryckningar och ta emot terminalutdata.",
+      "Valfri Telnet alternativförhandling kan justera terminalbeteende, men det lägger inte till konfidentialitet.",
+      "Autentisering och kommandon körs helt i klartext om inte en extern tunnel används."
+    ],
+    "pitfalls": [
+      "Använder Telnet på delade nätverk där angripare kan sniffa trafik.",
+      "Lämnar standardinloggningsuppgifter på enheter som exponerar Telnet.",
+      "Att anta ett privat VLAN betyder säkert. Många interna hot börjar inuti nätverket."
+    ],
+    "security": [
+      "Inaktivera Telnet och använd SSH istället.",
+      "Om du inte kan ta bort det, begränsa till ett hanteringsnätverk och lägg till stark övervakning.",
+      "Leta efter Telnet i skanningar och loggar eftersom det ofta indikerar föråldrade enheter."
+    ],
+    "alternatives": [
+      "SSH (22)",
+      "Konsol eller utanför bandhantering"
+    ],
+    "example": "En tekniker ansluter till en switch från ett WiFi-nätverk. Alla i samma segment med en sniffer kan fånga inloggningen och återanvända den, vilket är anledningen till att moderna enheter som standard är SSH.",
+    "references": []
+  },
+  "25": {
+    "service": "SMTP relay",
+    "transport": "TCP",
+    "summary": "Server till server e-postöverföring. Inte avsett för slutanvändare.",
+    "what": "TCP port 25 används för SMTP, protokollet som flyttar e-post mellan e-postservrar. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En sändande server öppnar en TCP-anslutning från en tillfällig källport till en mottagande server på destinationsport 25, slutför handskakningen och utbyter sedan SMTP-kommandon för att överföra ett meddelande till nästa hopp. Port 25 är i första hand för server till server relä på det öppna internet. Slutanvändarklienter och applikationer ska vanligtvis inte skicka e-post direkt till slumpmässiga servrar på 25, varför meddelandeinlämning vanligtvis görs på port 587 eller 465 med autentisering. Eftersom missbruk är vanligt, begränsar många nätverk utgående 25, och felkonfigurerade servrar som accepterar oautentiserat relä på 25 vänjer sig snabbt för skräppost. När du ser 25 exponerade är nyckelfrågan om det avsiktligt är en e-postväxlare och om den är härdad, patchad och konfigurerad för att vägra öppet relä.",
+    "why": "Om port 25 är öppen inkommande kan din värd fungera som en e-postväxlare eller ett relä. Felkonfiguration kan göra det till ett öppet relä, vilket är en snabb väg till svartlistning. Som incidentrespons är oväntad SMTP den 25 också ett vanligt tecken på skadlig programvara som försöker exfiltrera data via e-post.",
+    "how": [
+      "En klientmailserver öppnar en TCP-anslutning och talar SMTP-kommandon för att leverera ett meddelande.",
+      "Servern tillämpar policy, spamkontroller och routingbeslut och accepterar och ställer sedan i kö meddelandet.",
+      "Den mottagande servern kan vidarebefordra meddelandet internt eller vidarebefordra det vidare till nästa hopp."
+    ],
+    "pitfalls": [
+      "Kör ett öppet relä eller svaga antispamkontroller.",
+      "Låter ansökningar skicka e-post direkt på 25 istället för att använda inlämning på 587.",
+      "Förutsatt att kryptering sker automatiskt. SMTP börjar vanligtvis i klartext om inte STARTTLS förhandlas fram och tillämpas."
+    ],
+    "security": [
+      "Använd port 587 för autentiserad inlämning och behåll 25 endast för server till server.",
+      "Kräv STARTTLS där så är lämpligt och övervaka för onormala volymer.",
+      "Begränsa vidarebefordran till betrodda avsändare och förstärk din MTA-konfiguration."
+    ],
+    "alternatives": [
+      "SMTP inlämning (587)",
+      "SMTPS bidrag (465)"
+    ],
+    "example": "Ditt företags e-postgateway tar emot e-post från internet den 25. En annan MTA ansluter, förhandlar STARTTLS och överför ett meddelande som sedan skannas och levereras till interna brevlådor.",
+    "references": []
+  },
+  "53": {
+    "service": "DNS",
+    "transport": "UDP och TCP",
+    "summary": "Domain Name System frågor och svar. UDP för de flesta uppslagningar, TCP för överföringar och stora svar.",
+    "what": "Port 53 är standardporten för DNS, och det är ett bra exempel på varför transportprotokollet har lika stor betydelse som portnumret. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. De flesta vardagliga DNS-uppslagningar använder UDP 53: en klient skickar en liten fråga från en tillfällig källport till resolvern på destinationsport 53, och resolvern svarar tillbaka till den källporten. TCP 53 är också viktigt. Den används när ett svar inte passar i ett enda UDP-meddelande, när tillförlitlighet krävs och för zonöverföringar mellan auktoritativa servrar. I riktiga nätverk innebär detta att brandväggar ofta måste tillåta både UDP och TCP 53 för resolvers och auktoritativa DNS, även om du bara tänker på den snabba UDP sökvägen. Säkerhetsmässigt kan exponerad DNS missbrukas för informationsinsamling, förstärkningsattacker om rekursion är öppen och som en kontrollkanal när angripare tunnlar data genom DNS-frågor.",
+    "why": "DNS är grundläggande. Om DNS är felkonfigurerad eller äventyrad, omdirigeras användarna, tjänsterna misslyckas och säkerhetskontrollerna går sönder. I säkerhetsarbete är DNS-trafik också en guldgruva för upptäckt eftersom den visar vad värdar försöker nå och kan avslöja tunnling eller kommando- och kontrollmönster.",
+    "how": [
+      "En klient skickar en fråga till en resolver och ber om en post som A, AAAA eller MX.",
+      "Resolvern svarar från cacheminnet eller frågar rekursivt efter auktoritativa servrar och returnerar resultatet.",
+      "Om svaret är för stort eller behöver tillförlitlighet faller utbytet tillbaka till TCP för samma port."
+    ],
+    "pitfalls": [
+      "Exponera en auktoritativ DNS-server utan ordentlig härdning eller hastighetsbegränsning.",
+      "Förutsatt att DNS alltid är UDP och glömmer TCP-baserade överföringar och stora svar.",
+      "Ignorera delad horisont DNS skillnader mellan interna och externa zoner."
+    ],
+    "security": [
+      "Separera rekursiva resolvers från auktoritativa servrar och begränsa vem som kan fråga vad.",
+      "Använd DNSSEC-validering där så är lämpligt och övervaka för ovanliga frågemönster.",
+      "Skydda mot förstärkningsmissbruk med hastighetsbegränsande och svarsstorlekskontroller."
+    ],
+    "alternatives": [
+      "DNS över TLS (853)",
+      "DNS över HTTPS (443)"
+    ],
+    "example": "En webbläsare laddar en webbplats. Den frågar den konfigurerade resolvern för domänen IP över UDP 53. Resolvern returnerar ett cachat svar och webbläsaren ansluter sedan till platsen på 443.",
+    "references": []
+  },
+  "67": {
+    "service": "DHCP server",
+    "transport": "UDP",
+    "summary": "Serversidan av DHCP. Ger IP-konfiguration till klienter på ett lokalt nätverk.",
+    "what": "UDP port 67 är den välkända serverporten för DHCP. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. DHCP existerar eftersom en ny maskin ofta inte känner till sin IP-adress, standardgateway eller DNS inställningar ännu. En DHCP-server lyssnar på UDP 67 så att klienter kan upptäcka den utan föregående konfiguration. Eftersom DHCP använder UDP och ofta sänder, finns det ingen anslutningskonfiguration som TCP. En klient använder vanligtvis UDP 68 och sänder ett upptäcktsmeddelande. Servern på 67 svarar med ett erbjudande, klienten begär den erbjudna adressen och servern bekräftar leasingavtalet tillsammans med alternativ som router och DNS. När du förstår portrollerna kan du läsa paketfångningar och se det verkliga flödet: trafik på klientsidan kopplad till 68, svar på serversidan kopplad till 67. Säkerhetsmässigt kan oseriösa DHCP-servrar dela ut skadliga gateways eller DNS-servrar, så dessa portar är vanligtvis begränsade till betrodda nätverkssegment.",
+    "why": "DHCP är en kontrollpunkt för nätverksåtkomst. En oseriös DHCP-server kan omdirigera klienter till skadliga DNS eller gateways. Operativt ser DHCP-problem ut som slumpmässiga anslutningsfel, så att förstå flödet hjälper dig att felsöka snabbt.",
+    "how": [
+      "En ny klient sänder en DHCPDISCOVER eftersom den ännu inte har en IP-adress.",
+      "Servern svarar med ett DHCPOFFER, sedan begär klienten erbjudandet och servern bekräftar med DHCPACK.",
+      "Hyresavtalet förnyas senare med unicast där det är möjligt, eller sänds vid behov."
+    ],
+    "pitfalls": [
+      "Rogue DHCP-servrar på samma segment som delar ut dåliga gateways eller DNS-servrar.",
+      "Att glömma DHCP korsar vanligtvis inte routrar utan en reläagent.",
+      "Hyresavtal som är för långa eller för korta skapar churn eller åtgärdar utmattning."
+    ],
+    "security": [
+      "Använd DHCP snooping, betrodda portar eller nätverksåtkomstkontroller för att förhindra oseriösa servrar.",
+      "Logga leasinguppdrag och varna om oväntade alternativändringar.",
+      "Segmentera nätverk så att gästenheter inte kan påverka infrastrukturtjänster."
+    ],
+    "alternatives": [
+      "Statisk adressering för infrastruktur",
+      "IPv6 SLAAC med skyddsräcken"
+    ],
+    "example": "Du kopplar in en bärbar dator till en konferensrumsport. Den sänder för DHCP, får ett erbjudande från byggnadens DHCP-server och konfigurerar sedan IP, gateway och DNS inom några sekunder.",
+    "references": []
+  },
+  "68": {
+    "service": "DHCP client",
+    "transport": "UDP",
+    "summary": "Klientsidan av DHCP. Enheter använder den för att begära och förnya IP-konfigurationen.",
+    "what": "UDP port 68 är den välkända klientporten för DHCP. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En DHCP-klient binder till UDP 68 så att svar från servrar på ett tillförlitligt sätt når rätt lokala process under uppstart. Detta är särskilt viktigt eftersom klienten kan börja utan IP-adress, skicka från 0.0.0.0 till en sändningsdestination samtidigt som den behöver ta emot ett erbjudande. I ett typiskt leasingflöde upptäcker och begär klienten på 68 sändningar meddelanden, och servern på 67 svarar med erbjudande- och bekräftelsemeddelanden som inkluderar en adressleasing plus inställningar som DNS och standardgateway. Eftersom det tidiga utbytet kan sändas och oautentiseras spelar nätverkskontroller som switchportsäkerhet, DHCP snooping eller betrodda VLAN-gränser mycket. Om en angripare kan injicera DHCP-svar till port 68, kan de omdirigera trafik eller bryta anslutningen genom att dela ut dålig konfiguration.",
+    "why": "I paketfångningar, ser UDP 68 trafik hjälper dig att diagnostisera varför en värd inte får en adress. Ur säkerhetssynpunkt hjälper det också att upptäcka oseriöst DHCP-beteende och felkopplade segment.",
+    "how": [
+      "Klienten skickar DHCPDISCOVER från 0.0.0.0 till sändningsadressen, källport 68.",
+      "Klienten får ett DHCPOFFER och svarar med DHCPREQUEST.",
+      "Klienten tillämpar inställningarna DHCPACK och förnyar senare innan hyresavtalet löper ut."
+    ],
+    "pitfalls": [
+      "Klienter har fastnat i en loop eftersom erbjudanden blockeras av VLAN, ACL eller saknade reläagenter.",
+      "Flera DHCP-servrar orsakar fladdrande mellan olika konfigurationer.",
+      "Förutsatt att klienten är trasig när det verkliga problemet är uppströms switchsäkerhet eller reläkonfiguration."
+    ],
+    "security": [
+      "Använd fångar på åtkomstswitchen eller värden för att bekräfta upptäckten och erbjudandets flöde.",
+      "Lås ner DHCP med snooping och betrodda upplänkar.",
+      "Dokumentera vilka VLAN som använder vilka DHCP scopes så felpatchning är uppenbart."
+    ],
+    "alternatives": [
+      "Statisk IP för fasta värdar",
+      "IPv6 SLAAC med RA-skydd"
+    ],
+    "example": "En VoIP-telefon startar och skickar omedelbart DHCPDISCOVER från UDP 68. Om switchen blockerar den på grund av DHCP snooping felkonfiguration, får telefonen aldrig en IP och verkar död.",
+    "references": []
+  },
+  "80": {
+    "service": "HTTP",
+    "transport": "TCP",
+    "summary": "Standard för okrypterad webbtrafik. Används ofta för omdirigeringar och interna tjänster.",
+    "what": "TCP port 80 är standardporten för HTTP. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En webbserver binder till port 80 och lyssnar. När din webbläsare besöker en HTTP-URL, öppnar den en TCP-anslutning från en tillfällig källport till destinationsport 80, slutför TCP-handskakningen och skickar sedan en HTTP-förfrågan såsom en GET för en sökväg. Servern svarar med statuskoder, rubriker och innehåll, och samma anslutning kan återanvändas för flera förfrågningar beroende på HTTP-versionen och behålla inställningarna. Port 80 spelar roll eftersom den ofta används för omdirigeringar till HTTPS, hälsokontroller eller äldre webbplatser, och den är vanligen tillgänglig via brandväggar. Säkerhetsmässigt har vanlig HTTP ingen kryptering eller integritet. Autentiseringsuppgifter, sessionscookies och innehåll kan observeras eller ändras under överföring, så moderna implementeringar flyttar vanligtvis riktiga inloggningar och känslig trafik till HTTPS på port 443.",
+    "why": "HTTP har betydelse eftersom många interna instrumentpaneler, enhetsadministratörsgränssnitt och äldre appar fortfarande körs utan kryptering. I säkerhetstermer läcker vanlig HTTP cookies och referenser, möjliggör innehållsinjektion och gör sessionskapning enklare.",
+    "how": [
+      "Klienten öppnar en TCP-anslutning och skickar en HTTP-förfrågningsrad, rubriker och eventuellt en text.",
+      "Servern svarar med en statuskod, rubriker och en text som HTML eller JSON.",
+      "Anslutningar kan återanvändas med keep alive, eller stängas efter svaret beroende på rubriker och versioner."
+    ],
+    "pitfalls": [
+      "Lämna autentiseringssidor på HTTP och anta att det är bra på ett internt nätverk.",
+      "Att blanda HTTP och HTTPS resurser vilket skapar problem med nedgradering och blandat innehåll.",
+      "Förutsatt att port 80 är ofarligt eftersom huvudsidan använder 443. Många dolda adminpaneler lever på 80."
+    ],
+    "security": [
+      "Omdirigera till HTTPS och använd HSTS på den säkra webbplatsen.",
+      "Blockera eller begränsa hanteringsgränssnitt på 80, särskilt på internetkanten.",
+      "Logga och övervaka ovanliga sökvägar och användaragenter för skanningsbeteende."
+    ],
+    "alternatives": [
+      "HTTPS (443)",
+      "HTTP över ett privat VPN"
+    ],
+    "example": "En webbserver lyssnar på 80 bara för att skicka en 301-omdirigering till samma värd på 443. Om du ser riktig apptrafik på 80 är det ett tecken på att något fortfarande körs utan TLS.",
+    "references": []
+  },
+  "110": {
+    "service": "POP3",
+    "transport": "TCP",
+    "summary": "Ladda ner postlåda i äldre stil. Klartext som standard om den inte har uppgraderats till TLS.",
+    "what": "TCP port 110 används av POP3, ett äldre protokoll för att hämta e-post från en brevlåda. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En POP3-server lyssnar på 110 och en e-postklient ansluter från en tillfällig källport, slutför TCP-handskakningen och autentiserar och utfärdar sedan kommandon för att lista och hämta meddelanden. Den typiska POP-modellen är att ladda ner och eventuellt ta bort, vilket innebär att klienten ofta drar e-post till en enhet snarare än att hålla status synkroniserad mellan enheter som IMAP gör. Utan kryptering skickar POP3 autentiseringsuppgifter och meddelandeinnehåll i klartext, vilket är anledningen till att säkra varianter använder TLS via STARTTLS eller den implicita TLS porten 995. Ur säkerhetssynpunkt är exponerade POP3-tjänster frekventa mål för lösenordssprayning och kontokapning, och de kan även exponera meddelandeinnehåll.",
+    "why": "POP3 finns fortfarande i äldre e-postinställningar och vissa enheter. För säkerhets skull är klartext POP3 en röd flagga. I drift kan POP-stilarbetsflöden också dölja problem med lagring på serversidan eftersom e-posten snabbt lämnar servern.",
+    "how": [
+      "Klienten ansluter till servern och autentiserar med ett användarnamn och lösenord.",
+      "Klienten listar meddelanden, hämtar valda meddelanden och raderar dem om du vill.",
+      "Sessionen avslutas och servern verkställer raderingar, medan lokal e-postlagring blir källan till sanningen."
+    ],
+    "pitfalls": [
+      "Använder klartext POP3 över opålitliga nätverk.",
+      "Förutsatt att POP3 beter sig som IMAP. Den är inte designad för synkronisering med flera enheter.",
+      "Lämna gamla konton aktiverade eftersom POP-klienter ofta körs i flera år utan förändring."
+    ],
+    "security": [
+      "Föredrar POP3S på 995 eller IMAPS på 993, eller använd moderna leverantörs-API:er.",
+      "Inaktivera autentisering av klartext och framtvinga starka lösenord och MFA där det är möjligt.",
+      "Övervaka efter brute force-försök och ovanliga inloggningsplatser."
+    ],
+    "alternatives": [
+      "POP3S (995)",
+      "IMAP (143) eller IMAPS (993)"
+    ],
+    "example": "En skrivare använder POP3 på 110 för att hämta jobb från en brevlåda. Om anslutningen inte är krypterad kan alla med nätverkssynlighet fånga inloggningsuppgifterna för brevlådan.",
+    "references": []
+  },
+  "123": {
+    "service": "NTP",
+    "transport": "UDP",
+    "summary": "Tidssynkronisering. Små paket, stor inverkan på säkerhet och tillförlitlighet.",
+    "what": "UDP port 123 används av NTP, tidssynkroniseringsprotokollet. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. NTP är vanligtvis UDP eftersom meddelandena är små och periodiska. En klient skickar en begäran från en tillfällig källport till en server på destinationsport 123, och servern svarar med tidsstämplar som låter klienten uppskatta klockförskjutning och nätverksfördröjning. Klienten justerar sedan sin klocka gradvis och upprepar processen, ibland med flera servrar för att förbättra noggrannheten och motståndskraften. Tid är ett säkerhetsberoende: certifikat, loggar, Kerberos och incidenttidslinjer antar alla att klockorna är nära verkligheten. Exponerad eller felkonfigurerad NTP kan också missbrukas för reflektion och förstärkningsattacker, och angripare kan försöka flytta tiden för att bryta validering eller förvirra logganalys, vilket är anledningen till att åtkomstkontroller och autentiserade lägen är relevanta.",
+    "why": "Tidsdrift orsakar förvirrande loggar och trasig säkerhet. Kerberos, TLS och många API-autentiseringsscheman antar att klockorna är nära. NTP missbrukas också vid reflektionsattacker, så att exponera öppen NTP för internet kan skapa risker.",
+    "how": [
+      "Klienten skickar en tidsförfrågan till en NTP-server, vanligtvis med ett litet UDP-paket.",
+      "Serversvar med tidsstämplar som låter klienten uppskatta offset och nätverksfördröjning.",
+      "Klienten disciplinerar sin klocka gradvis, upprepar sedan regelbundet och kan konsultera flera servrar."
+    ],
+    "pitfalls": [
+      "Tillåter offentliga NTP-servrar utan hastighetsbegränsning, vilket möjliggör missbruk av förstärkning.",
+      "Pekar många klienter till en enda ömtålig server, vilket skapar en enda felpunkt.",
+      "Förutsatt att tiden är korrekt även när virtuella maskiner är avstängda eller nätverkspartitioner."
+    ],
+    "security": [
+      "Begränsa vem som kan fråga dina NTP-servrar och föredra autentiserad NTP eller säkra tidskällor där stöds.",
+      "Använd flera uppströmskällor och övervaka offset och stratums hälsa.",
+      "Validera tidssynkronisering för kritiska autentiseringssystem som domänkontrollanter."
+    ],
+    "alternatives": [
+      "Autentiserad NTP",
+      "Leverantörshanterad tidssynkronisering"
+    ],
+    "example": "Under en skanning ser du loggtidsstämplar ur funktion. Grundorsaken är en misslyckad NTP-synkronisering på en server, varför tidskontroller är lika viktiga som CPU- eller diskkontroller.",
+    "references": []
+  },
+  "139": {
+    "service": "NetBIOS Session Service",
+    "transport": "TCP",
+    "summary": "Äldre Windows-sessionslager för SMB över NetBIOS. Mestadels ersatt av 445.",
+    "what": "TCP port 139 är NetBIOS Session Service, som historiskt användes för att överföra SMB fildelning över NetBIOS på Windows-nätverk. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. Vid verklig användning öppnar en klient en TCP-anslutning till port 139, förhandlar en NetBIOS-session och talar sedan SMB-kommandon för att autentisera, lista resurser och läsa eller skriva filer. Moderna Windows använder SMB direkt över TCP 445 i de flesta miljöer, men 139 visas fortfarande på äldre system, äldre enhetsfirmware och felkonfigurerade nätverk där NetBIOS är aktiverat. Eftersom fildelningsytor är av högt värde, är öppen 139 vanligen associerad med exponering av autentiseringsuppgifter, aktieuppräkning och rörelse i sidled när en angripare väl är inne i ett nätverk. Att förstå porten hjälper dig att tolka skanningar: 139 innebär ofta äldre Windows-fildelningsbeteende snarare än en modern härdad SMB-stack.",
+    "why": "Port 139 spelar roll eftersom den ofta signalerar föråldrad konfiguration, äldre enheter eller avslappnad exponering för Windows-fildelning. Vid säkerhetsskanning är 139 och 445 höga signalportar för sidorörelser och autentiseringsattacker.",
+    "how": [
+      "En klient upprättar en NetBIOS-session och talar sedan SMB över den sessionen.",
+      "Namnupplösning och upptäckt är ofta knutna till äldre NetBIOS-mekanismer.",
+      "Många miljöer inaktiverar den här sökvägen och förlitar sig på SMB över 445 istället."
+    ],
+    "pitfalls": [
+      "Lämna NetBIOS aktiverat över undernät när det inte behövs.",
+      "Exponera Windows-fildelning för opålitliga nätverk.",
+      "Förutsatt att blockering 445 räcker. Vissa system kan fortfarande acceptera SMB över 139."
+    ],
+    "security": [
+      "Inaktivera NetBIOS där det är möjligt och använd moderna SMB-inställningar med signering och härdning.",
+      "Begränsa 139 och 445 till betrodda segment och övervaka autentiseringsförsök.",
+      "Lagra äldre system som fortfarande kräver NetBIOS och planerar en migrering."
+    ],
+    "alternatives": [
+      "SMB över TCP (445)"
+    ],
+    "example": "En genomsökning hittar 139 öppna på en server. Det tyder på att NetBIOS är aktiverat och att SMB kan nås via äldre sökvägar, så du granskar fildelningsexponeringen och skärper brandväggsreglerna.",
+    "references": []
+  },
+  "143": {
+    "service": "IMAP",
+    "transport": "TCP",
+    "summary": "Synkroniseringsprotokoll för brevlåda. Klartext som standard om inte uppgraderats med TLS eller StartTLS.",
+    "what": "TCP port 143 används av IMAP, ett protokoll för e-postsynkronisering. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En IMAP-server lyssnar på 143 och klienter ansluter från tillfälliga källportar. Efter TCP-handskakningen kan klienten uppgradera sessionen till TLS med STARTTLS, sedan autentisera och synkronisera mappar och meddelandetillstånd som läsflaggor och raderingar. Till skillnad från POP3, håller IMAP postlådan på servern och är designad för flera enheter, så klienter hämtar ofta rubriker och laddar bara ner hela texter när det behövs. Den praktiska säkerhetsdetaljen är att port 143 kan starta i klartext om inte TLS upprätthålls, vilket skapar risk om klienter skickar inloggningsuppgifter före uppgradering. Det är därför många miljöer föredrar IMAPS på port 993 där kryptering etableras omedelbart, och varför övervakning av brute force på IMAP-portar är vanligt.",
+    "why": "IMAP är vanligt i företag och på äldre distributioner. Ur ett säkerhetsperspektiv är klartext IMAP riskabelt, och felkonfigurerad IMAP kan vara ett mål för brute force och referensfyllning.",
+    "how": [
+      "Klienten ansluter och autentiserar och listar sedan mappar och meddelandemetadata.",
+      "Klienten hämtar meddelandetexter på begäran och uppdaterar flaggor som läst eller raderat.",
+      "Om STARTTLS stöds och krävs, uppgraderas anslutningen till TLS innan autentiseringsuppgifter skickas."
+    ],
+    "pitfalls": [
+      "Tillåter autentisering i klartext utan att tvinga fram STARTTLS.",
+      "Att anta att IMAP betyder att all e-post är säker på servern. Retention beror fortfarande på säkerhetskopiering och policy.",
+      "Lämna gamla klienter som inte stöder moderna autentiseringsmetoder."
+    ],
+    "security": [
+      "Föredrar IMAPS på 993 eller upprätthåll STARTTLS med starka chiffersviter.",
+      "Aktivera hastighetsbegränsning och övervaka för autentiseringsavvikelser.",
+      "Överväg modern OAuth-baserad autentisering där den stöds av din leverantör."
+    ],
+    "alternatives": [
+      "IMAPS (993)"
+    ],
+    "example": "En mobil e-postapp använder IMAP för att hålla inkorgens tillstånd konsekvent. Varje gång du markerar ett meddelande som läst skickar klienten ett IMAP-kommando och servern uppdaterar flaggan för alla enheter.",
+    "references": []
+  },
+  "161": {
+    "service": "SNMP",
+    "transport": "UDP",
+    "summary": "Övervakning av nätverksenheter. Läser räknare och ibland skriver config, beroende på behörigheter.",
+    "what": "UDP port 161 används av SNMP, vilket gör det möjligt för ledningssystem att fråga nätverksenheter för mätvärden och status. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En SNMP-agent lyssnar på UDP 161. Ett övervakningssystem skickar en begäran från en tillfällig källport till destinationsporten 161 och ber om specifika objektidentifierare, och enheten svarar med värden som gränssnittsräknare, CPU, minne och enhetsidentitetsinformation. Vissa distributioner tillåter också skrivoperationer som ändrar konfigurationen, vilket gör åtkomstkontrollen kritisk. Äldre SNMP-versioner använder community-strängar och ingen kryptering, så alla som kan nå port 161 och gissa strängen kan räkna upp ditt nätverk eller ännu värre. I praktiken begränsar försvarare 161 till hanteringsnätverk och föredrar SNMPv3 med autentisering och integritet så att trafik och referenser inte exponeras.",
+    "why": "SNMP finns överallt i nätverksdrift. Säkerhetsmässigt använder äldre SNMP-versioner svaga community-strängar och saknar kryptering. Exponerad SNMP kan läcka nätverkstopologi och enhetsinformation, och skrivåtkomst kan vara katastrofal.",
+    "how": [
+      "Ett övervakningssystem skickar en SNMP GET eller GETNEXT till en enhet och frågar efter specifika OID.",
+      "Enheten svarar med värden och statuskoder, vanligtvis över UDP.",
+      "För konfigurationsändringar kan en SNMP SET användas om åtkomstkontrollen tillåter det."
+    ],
+    "pitfalls": [
+      "Använder SNMPv1 eller v2c med standardgemenskapssträngar som offentliga eller privata.",
+      "Tillåter SNMP från breda nätverk istället för endast från övervakningsservrar.",
+      "Att glömma att UDP-baserade protokoll kan förfalskas eller missbrukas för eftertanke om de är felkonfigurerade."
+    ],
+    "security": [
+      "Föredrar SNMPv3 med autentisering och sekretess aktiverat.",
+      "Begränsa UDP 161 till hanteringsnätverk och en liten uppsättning övervakningsvärdar.",
+      "Granska community-strängar och inaktivera skrivåtkomst om det inte krävs och kontrolleras."
+    ],
+    "alternatives": [
+      "SNMPv3",
+      "Leverantörs API:er över HTTPS"
+    ],
+    "example": "En övervakningsplattform frågar en switch varje minut på UDP 161 och läser gränssnittsräknare. Om communitysträngen läcker kan en angripare räkna upp hela enheten och ibland ändra inställningar.",
+    "references": []
+  },
+  "162": {
+    "service": "SNMP trap",
+    "transport": "UDP",
+    "summary": "Asynkrona varningar från enheter till ledningssystem.",
+    "what": "UDP port 162 används för SNMP-fällor och -informerar, som är oönskade varningsmeddelanden som skickas från enheter till ett hanteringssystem. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. Istället för att bli avfrågad kan en enhet skicka en händelse till chefen på destinationsport 162 när något händer, såsom nedkoppling, temperaturlarm eller autentiseringsfel. Eftersom det här är UDP finns det ingen anslutningskonfiguration, och tillförlitligheten beror på nätverket och på om information med bekräftelser används. Driftmässigt är fällor bra för snabb signal, men de är också lätta att förfalska om du accepterar dem var som helst, och de kan skapa varna stormar under avbrott. Att förstå portrollen gör det lättare att felsöka övervakningsluckor: om fällor saknas, leta efter blockerade UDP 162, felkonfigurerade destinationer eller överbelastade samlare.",
+    "why": "Fällor är användbara för snabb upptäckt, men de är också lätta att förfalska om du inte kontrollerar var de kommer ifrån. Felstyrda fällor kan läcka interna detaljer, och saknade fällor kan skapa döda fläckar om du litar för mycket på dem.",
+    "how": [
+      "En enhet upptäcker en händelse och skickar ett trapmeddelande till den konfigurerade managern IP och port 162.",
+      "Chefen analyserar OID och mappar dem till en varning eller biljett.",
+      "Vissa varianter använder informationsmeddelanden som förväntar sig en bekräftelse, vilket förbättrar tillförlitligheten."
+    ],
+    "pitfalls": [
+      "Acceptera fällor från vilken källa som helst, vilket möjliggör falska varningar eller bulleröversvämningar.",
+      "Förutsatt att fällor är tillförlitliga. UDP leverans kan minska under trängsel.",
+      "Att inte anpassa fällkonfigurationen med övervaknings- och incidentarbetsflöden."
+    ],
+    "security": [
+      "Tillåt bara fällor från kända enhets IP-områden och föredrar SNMPv3 där det är möjligt.",
+      "Kombinera fällor med polling så att du upptäcker fel även om fällor tappas bort.",
+      "Logg- och hastighetsgränsbearbetning för att undvika varningsstormar."
+    ],
+    "alternatives": [
+      "Syslog (514)",
+      "Strömmande telemetri över TLS"
+    ],
+    "example": "Ett routergränssnitt går ner och skickar omedelbart en SNMP-fälla till NMS på 162, vilket skapar en varning. Om fällan aldrig kommer fram visar polling fortfarande förändringen av gränssnittstillståndet.",
+    "references": []
+  },
+  "389": {
+    "service": "LDAP",
+    "transport": "TCP och UDP",
+    "summary": "Katalogsökningar och katalogtjänster för autentisering. Ofta knuten till Active Directory.",
+    "what": "Port 389 används för LDAP, ett katalogprotokoll som många företagsidentitetssystem är beroende av. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. Katalogservrar lyssnar på 389 så att applikationer kan binda, söka efter användare och grupper och läsa attribut som driver auktoriseringsbeslut. Den mesta LDAP-trafiken är över TCP eftersom den involverar förfrågnings- och svarsutbyten och kan inkludera större nyttolaster. UDP 389 finns också för CLDAP, en anslutningsfri variant som används i vissa upptäckts- och uppslagsscenarier, varför skanningar ibland visar båda. Ett typiskt verkligt flöde är: klienten ansluter till port 389, utför en bindning (ofta med ett tjänstkonto), kör sökningar med filter och kan uppgradera till TLS med StartTLS innan den skickar inloggningsuppgifter om den är korrekt konfigurerad. Säkerhetsmässigt kan en exponerad katalogport läcka hela din organisationsstruktur och möjliggöra autentiseringsattacker, så miljöer begränsar vanligtvis 389 till betrodda applikationsnätverk och kräver StartTLS eller LDAPS på 636.",
+    "why": "Katalogtjänster är högvärdiga mål. Att exponera LDAP utan kryptering kan läcka inloggningsuppgifter och katalogstruktur. Felkonfigurerad LDAP-åtkomst möjliggör också privilegieskalering genom gruppupptäckt och svaga tjänstkonton.",
+    "how": [
+      "Klienten ansluter och utför en bindningsoperation för att autentisera eller upprätta en anonym session om det tillåts.",
+      "Klienten utför sökningar efter användare, grupper eller attribut med LDAP-filter.",
+      "Alternativt kan anslutningen uppgraderas till TLS med StartTLS, eller så använder du LDAPS på 636 för implicit TLS."
+    ],
+    "pitfalls": [
+      "Tillåter enkel bindning över klartext där lösenord kan fångas.",
+      "Ge katalogläsåtkomst för brett, vilket läcker känsliga attribut.",
+      "Förväxlar LDAP med Kerberos. LDAP används ofta för uppslagningar även när Kerberos gör huvudautentiseringen."
+    ],
+    "security": [
+      "Använd StartTLS eller LDAPS och kräv stark autentisering.",
+      "Begränsa vem som kan fråga i katalogen och övervaka bindningsfel och ovanliga sökmönster.",
+      "Härda tjänstekonton och ta bort onödiga anonyma bindningar."
+    ],
+    "alternatives": [
+      "LDAPS (636)",
+      "StartTLS på 389"
+    ],
+    "example": "En ansökan måste kontrollera gruppmedlemskap. Den binder till LDAP, söker efter användar-DN och frågar sedan efter gruppattribut för att avgöra om åtkomst ska tillåtas.",
+    "references": []
+  },
+  "443": {
+    "service": "HTTPS",
+    "transport": "TCP och UDP",
+    "summary": "Krypterad webbtrafik. Vanligast TCP och allt oftare UDP för HTTP över QUIC.",
+    "what": "Port 443 är standardporten för HTTPS, vilket betyder att HTTP bärs in i en TLS skyddad kanal. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. I det vanliga TCP-baserade fallet öppnar klienten en TCP-anslutning till destinationsport 443, utför TCP-handskakningen och utför sedan en TLS-handskakning där servern bevisar sin identitet med ett certifikat och båda sidor härleder krypteringsnycklar. Först då flödar HTTP förfrågningar och svar inuti den krypterade tunneln, ofta med anslutningsåteranvändning för många förfrågningar. Moderna webbstackar använder också HTTP över QUIC, känd som HTTP/3, som körs över UDP på port 443. Det är därför du kan se både TCP 443 och UDP 443 involverade i webbtrafik. Port 443 spelar roll eftersom det är den vanligaste externt nåbara tjänsten på internet, så det är både en affärskritisk ingångspunkt och en favorit gömställe för tunnling och kommando och kontroll. Kryptering skyddar transportkonfidentialitet, men programsårbarheter, svag autentisering och felkonfiguration är fortfarande de verkliga riskerna på 443.",
+    "why": "Port 443 är den vanligaste externa exponeringen på internet. Säkerhetsställning beror på TLS-konfiguration, certifikathygien och applikationssäkerhet. I utredningar kan 443-trafik vara legitim webbanvändning eller så kan den dölja tunnling, proxyservrar och kommando och kontroll.",
+    "how": [
+      "Klienten öppnar en TCP-anslutning och utför en TLS-handskakning för att komma överens om nycklar och verifiera certifikatet.",
+      "Inne i den krypterade tunneln skickar klienten HTTP-förfrågningar och tar emot svar.",
+      "Moderna stackar kan använda HTTP/2 eller HTTP/3, och kan återanvända anslutningar för många förfrågningar."
+    ],
+    "pitfalls": [
+      "Att anta att HTTPS betyder säkert. Transporten är krypterad men applikationen kan fortfarande vara sårbar.",
+      "Svaga TLS-inställningar, utgångna certifikat eller saknad certifikatvalidering i klienter.",
+      "Exponera administratörsändpunkter på 443 eftersom det känns normalt, utan åtkomstkontroller."
+    ],
+    "security": [
+      "Använd starka TLS-konfigurationer och automatisera certifikatrotation.",
+      "Tillämpa webbsäkerhetskontroller som WAF-regler, hastighetsbegränsning och robust autentisering.",
+      "Inspektera loggar för ovanliga sökvägar, användaragenter och begärandevolymer. Kryptering tar inte bort behovet av synlighet."
+    ],
+    "alternatives": [
+      "mTLS för interna API:er",
+      "Privat nätverksexponering via VPN"
+    ],
+    "example": "En användare besöker en webbplats. Webbläsaren verifierar certifikatet under TLS-handskakningen och skickar sedan en HTTP GET. Även om trafiken är krypterad visar serverloggarna fortfarande sökvägen och statuskoden.",
+    "references": []
+  },
+  "465": {
+    "service": "SMTPS submissions",
+    "transport": "TCP",
+    "summary": "Implicit TLS e-postinlämning. Vanligt med klienter som kräver kryptering från första bytet.",
+    "what": "TCP port 465 används vanligtvis för SMTP meddelandeinlämning med implicit TLS. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En inlämningsserver lyssnar på 465 och förväntar sig kryptering omedelbart. Klienten ansluter från en tillfällig källport, slutför TCP-handskakningen och startar sedan TLS-handskakningen innan några SMTP-kommandon skickas. Efter att TLS-kanalen har etablerats, autentiserar klienten och skickar meddelanden för leverans. Den viktigaste praktiska skillnaden från STARTTLS-baserad inlämning är att kryptering startar från första bytet, vilket minskar nedgraderingsrisken om klienter och servrar är korrekt konfigurerade. Ur ett säkerhetsperspektiv bör 465 inte bete sig som ett öppet internetrelä på port 25. Det är vanligtvis en autentiserad tjänst för användare och appar, så förebyggande av missbruk, hastighetsgränser och legitimationshygien har lika stor betydelse som TLS.",
+    "why": "Du kommer att se 465 i e-postklientkonfigurationer och vissa värdleverantörer. Av säkerhetsskäl kan implicit TLS minska nedgraderingsrisken om klienter och servrar är korrekt konfigurerade. Operativt är det fortfarande submission, inte server-till-server-relä, så det paras ihop med autentisering och policykontroller.",
+    "how": [
+      "Klienten ansluter och förhandlar omedelbart TLS innan några SMTP-kommandon skickas.",
+      "Klienten autentiserar och skickar sedan ett meddelande med SMTP-kommandon i den krypterade sessionen.",
+      "Servern tillämpar inlämningspolicyer såsom hastighetsgränser och avsändarens identitetskontroller."
+    ],
+    "pitfalls": [
+      "Blandar ihop 465 med port 25 reläregler och exponerar det som en relätjänst.",
+      "Tillåter svag autentisering bara för att transporten är krypterad.",
+      "Felkonfigurerad TLS som tillåter gamla versioner eller svaga chiffer."
+    ],
+    "security": [
+      "Behandla 465 som inlämning: Kräv autentisering och upprätthåll sändningspolicyer.",
+      "Härda TLS, föredrar moderna versioner och övervaka för autentiseringsmissbruk.",
+      "Blockera det från det offentliga internet om du inte avsiktligt tillhandahåller e-post för användare."
+    ],
+    "alternatives": [
+      "SMTP inlämning (587)"
+    ],
+    "example": "En e-postapp använder port 465 eftersom den förväntar sig TLS omedelbart. När TLS-handskakningen är klar, autentiserar appen och skickar utgående e-post till leverantören.",
+    "references": []
+  },
+  "514": {
+    "service": "Syslog",
+    "transport": "UDP och TCP",
+    "summary": "Gemensam avverkningstransport. UDP 514 är traditionell, men pålitlig och TLS varianter finns.",
+    "what": "Port 514 är allmänt associerad med syslog, ett vanligt sätt som enheter skickar loggmeddelanden till en central samlare. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. Traditionellt använder syslog UDP 514: varje händelse skickas som ett oberoende datagram från en avsändarens källport till destinationsport 514, vilket håller omkostnaden låg men innebär att meddelanden kan släppas eller komma ur funktion under överbelastning. Vissa distributioner använder TCP 514 för bättre leveransbeteende, och säker syslog görs ofta via en TLS-omslagen variant på andra portar. I praktiken analyserar, tidsstämplar och vidarebefordrar syslog-samlaren händelser till SIEM och varningspipelines, så porten representerar ofta ditt synlighetslager. Säkerhetsmässigt kan oautentiserad syslog läcka känsliga händelser eller tillåta falska loggposter om någon kan skicka till samlaren, varför åtkomstkontroll och listor över betrodda avsändare är avgörande.",
+    "why": "Central loggning är kärnan för upptäckt och felsökning. Syslog i sig är ofta oautentiserad och okrypterad, så exponering kan läcka känsliga händelser eller tillåta loggförfalskning. För försvarare är öppna syslog-lyssnare också en signal för att hårdna och begränsa åtkomsten.",
+    "how": [
+      "En enhet formaterar en händelse till ett syslog-meddelande och skickar det till insamlaren, ofta över UDP 514.",
+      "Samlaren analyserar, tidsstämplar och lagrar meddelandet och vidarebefordrar det sedan till SIEM eller larmledningar.",
+      "Om tillförlitlighet behövs används TCP-baserad syslog eller buffrad vidarebefordran istället för rå UDP."
+    ],
+    "pitfalls": [
+      "Skickar syslog över UDP över opålitliga nätverk där meddelanden kan läsas eller ändras.",
+      "Förutsatt att UDP leverans är tillförlitlig under incidenter när nätverken är överbelastade.",
+      "Accepterar syslog från vilken källa som helst, vilket möjliggör förfalskade händelser och brus."
+    ],
+    "security": [
+      "Begränsa vem som kan skicka till din syslog-samlare och föredra autentiserade, krypterade transporter där det är möjligt.",
+      "Buffer på avsändaren eller använd TCP för att minska förlusten under toppar.",
+      "Normalisera och validera källor så att falska loggar är lättare att upptäcka."
+    ],
+    "alternatives": [
+      "Syslog över TLS",
+      "Agentbaserad loggning"
+    ],
+    "example": "En brandvägg skickar deny-händelser till en loggserver på 514. Under en DDoS sjunker UDP spike och du förlorar synlighet, vilket är anledningen till att många team använder buffring eller TCP för kritiska loggar.",
+    "references": []
+  },
+  "587": {
+    "service": "SMTP submission",
+    "transport": "TCP",
+    "summary": "Autentiserad e-postinlämning från klienter och applikationer. Föredraget för utgående e-post från användare.",
+    "what": "TCP port 587 är standardporten för SMTP meddelandeinlämning, vilket betyder e-post som skickas från användare eller applikationer till deras utgående e-postserver. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En inlämningsserver lyssnar på 587 och en klient ansluter från en tillfällig källport. Efter TCP-handskakningen utbyter de två sidorna SMTP-kommandon, och sessionen uppgraderas vanligtvis till TLS med STARTTLS innan autentiseringsuppgifterna skickas. Klienten autentiserar och skickar meddelandet, och servern tillämpar policy och vidarebefordrar det vidare. Detta skiljer sig från port 25, som huvudsakligen är server-till-server-relä, och från port 465, som förväntar sig TLS omedelbart snarare än att förhandla om en uppgradering. Ur säkerhetssynpunkt är 587 designad för autentisering och missbrukskontroller. Om det är felkonfigurerat som ett öppet relä eller om autentiseringsuppgifterna är svaga, kan angripare använda den för att skicka skräppost eller för att imitera användare.",
+    "why": "Att använda 587 minskar skräppostrisken eftersom du kan tillämpa autentisering, hastighetsgränser och avsändarpolicy. I säkerhetsgranskningar bör applikationer som skickar e-post använda inlämning snarare än att försöka prata direkt till det öppna internet på port 25.",
+    "how": [
+      "Klienten ansluter och utfärdar SMTP-kommandon för att identifiera sig själv och förhandla om kapacitet.",
+      "Klienten uppgraderar till TLS med STARTTLS vid behov, och autentiserar och skickar meddelandet.",
+      "Servern tillämpar inlämningsregler och vidarebefordrar meddelandet till mottagarna."
+    ],
+    "pitfalls": [
+      "Använder 25 för applikationens utgående e-post och blir sedan blockerad av nätverk eller svartlistad.",
+      "Misslyckas med att kräva TLS, vilket tillåter nedgraderingsattacker på opportunistiska STARTTLS.",
+      "Hårdkodning av referenser i appar utan rotation eller hemlighetshantering."
+    ],
+    "security": [
+      "Kräv autentisering och tillämpa hastighetsgränser och avsändarpolicyer.",
+      "Kräv TLS och validera certifikat på klienter där så är möjligt.",
+      "Använd appspecifika referenser eller OAuth och rotera hemligheter."
+    ],
+    "alternatives": [
+      "SMTPS bidrag (465)",
+      "Providers e-post-API över HTTPS"
+    ],
+    "example": "En webbapplikation skickar e-postmeddelanden om lösenordsåterställning. Den ansluter till leverantören på 587, förhandlar STARTTLS, autentiserar med ett tjänstekonto och skickar meddelandet för leverans.",
+    "references": []
+  },
+  "636": {
+    "service": "LDAPS",
+    "transport": "TCP",
+    "summary": "LDAP över implicit TLS. Gemensamt för säkra katalogbindningar och sökningar.",
+    "what": "TCP port 636 används för LDAPS, vilket är LDAP med TLS från första bytet. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En katalogserver lyssnar på 636 efter klienter som kräver kryptering omedelbart, istället för att ansluta på 389 och förhandla StartTLS. Det verkliga flödet är: TCP-handskakning, sedan TLS-handskakning med certifikatvalidering, sedan LDAP-bindning och katalogoperationer i den krypterade sessionen. Detta skyddar autentiseringsuppgifter och katalogattribut under överföring, men det gör inte automatiskt katalogåtkomst säker. Behörigheter, tjänstkontoomfång och övervakning avgör fortfarande hur mycket data som exponeras om ett konto äventyras. Operativt spelar certifikatförtroende mycket här. Om klienter inte kan validera certifikatet LDAPS kan autentiseringen misslyckas i stor skala eller så kan användarna lära sig att ignorera varningar.",
+    "why": "Säker katalogtrafik förhindrar stöld av autentiseringsuppgifter och läckage av attribut. LDAPS är vanligt i företagsappar som integreras med kataloger. Felkonfigurerade LDAPS-certifikat kan bryta autentisering i stor skala, så att förstå det är också viktigt operativt.",
+    "how": [
+      "Klienten ansluter och startar en TLS-handskakning omedelbart, vilket validerar servercertifikatet.",
+      "Klienten utför en LDAP-bindning inuti den krypterade kanalen.",
+      "Klienten kör sökningar och läser attribut, stänger sedan anslutningen eller återanvänder den för flera operationer."
+    ],
+    "pitfalls": [
+      "Att använda självsignerade certifikat utan korrekt förtroendedistribution, vilket orsakar klientfel.",
+      "Att behandla LDAPS som automatiskt säkert samtidigt som det tillåter svaga bindningar eller breda läsningar.",
+      "Öppnar 636 för nätverk som aldrig ska fråga i katalogen."
+    ],
+    "security": [
+      "Använd certifikat utfärdade av en betrodd intern PKI och automatisera förnyelse.",
+      "Begränsa åtkomsten till kända applikationsundernät och övervaka bindningsmönster.",
+      "Förstärk katalogbehörigheterna så att tjänster bara läser vad de behöver."
+    ],
+    "alternatives": [
+      "StartTLS på 389"
+    ],
+    "example": "En intern tjänst verifierar medlemskap i användargrupp. Den ansluter till 636, validerar katalogcertifikatet och utför sedan en LDAP-sökning över den krypterade kanalen.",
+    "references": []
+  },
+  "989": {
+    "service": "FTPS data",
+    "transport": "TCP",
+    "summary": "Implicit FTPS datakanal. Mindre vanligt än explicit FTPS den 21 med förhandlade TLS.",
+    "what": "TCP port 989 är associerad med datakanalen för implicit FTPS i vissa distributioner. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. FTPS är FTP med TLS, men FTP behåller sin klassiska design med två anslutningar: en kanal för kontrollkommandon och en annan för data. I äldre implicita FTPS-inställningar använde kontrollkanalen port 990 och datakanalen använde port 989, med TLS förväntad omedelbart på dessa portar. Många moderna miljöer föredrar explicit FTPS på port 21 där TLS förhandlas, eller SFTP på port 22, eftersom det förenklar brandväggen och minskar antalet rörliga delar. Den verkliga implikationen är att även när kryptering finns, kan FTP-stil dataanslutningar fortfarande kräva extra portar och försiktig NAT hantering, så att se 989 öppen bör utlösa en kontroll att överföringsmetoden fortfarande är nödvändig och korrekt begränsad.",
+    "why": "Den här porten är viktig eftersom FTPS fortfarande ärver FTPs separata datakanalbeteende. Även när det är krypterat kan det vara smärtsamt med brandväggar och NAT. När du ser 989 öppen, validera om tjänsten krävs och om en enklare överföringsmetod skulle minska attackytan.",
+    "how": [
+      "Klient och server upprättar en TLS-skyddad kontroll- och datarelation enligt läget FTPS som används.",
+      "Dataöverföringar sker över en dedikerad anslutning som kan använda port 989 i implicita inställningar.",
+      "Brandväggar måste fortfarande tillåta de förhandlade dataflödena, ofta över dynamiska intervall."
+    ],
+    "pitfalls": [
+      "Förutsatt att FTPS är en enda porttjänst och glömmer den extra dataanslutningen.",
+      "Felkonfigurerad TLS som tillåter gamla versioner eller svaga chiffer.",
+      "Lämnar äldre implicit FTPS öppen när moderna klienter använder explicit FTPS eller SFTP."
+    ],
+    "security": [
+      "Föredra SFTP eller HTTPS baserade överföringar för enkelhet och färre brandväggsöverraskningar.",
+      "Om FTPS krävs, dokumentera och begränsa portintervallen och upprätthålla stark TLS.",
+      "Övervaka för brute force och ovanliga överföringsmönster."
+    ],
+    "alternatives": [
+      "Explicit FTPS den 21",
+      "SFTP (22)"
+    ],
+    "example": "En partner insisterar på implicit FTPS. Ditt brandväggsteam måste tillåta en förutsägbar uppsättning portar och bekräfta att datakanalen verkligen förhandlar som förväntat, annars misslyckas överföringar periodvis.",
+    "references": []
+  },
+  "990": {
+    "service": "FTPS control",
+    "transport": "TCP",
+    "summary": "Implicit FTPS kontrollkanal. Äldre tillvägagångssätt för FTP över TLS.",
+    "what": "TCP port 990 är associerad med kontrollkanalen för implicit FTPS. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. Med implicit FTPS lyssnar en server på 990 och klienten förväntar sig att starta en TLS-handskakning omedelbart efter att TCP-anslutningen har upprättats. När den säkra tunneln är uppe, autentiserar klienten och skickar FTP kontrollkommandon inuti den krypterade kanalen. Filinnehåll och kataloglistor färdas fortfarande över separata dataanslutningar, ofta med konfigurerade passiva intervall snarare än en enda fast port. Eftersom detta beteende med två kanaler är lätt att felkonfigurera, föredrar många team SFTP eller HTTPS baserade överföringsflöden. Om 990 avslöjas, behandla den som vilken internetbaserad autentiseringstjänst som helst: den kan utsättas för brute force-attacker, den behöver stark TLS och god kontohygien, och den bör begränsas till kända partners där det är möjligt.",
+    "why": "Port 990 är viktigt eftersom det ofta visas på äldre apparater och partnerintegrationer. Säkerhetsmässigt är det bättre än vanlig text FTP, men det ger fortfarande FTP komplexitet och kan utöka brandväggsexponeringen för datakanaler.",
+    "how": [
+      "Klienten ansluter och utför en TLS-handskakning omedelbart.",
+      "Klienten autentiserar och utfärdar FTP kontrollkommandon i den krypterade sessionen.",
+      "Dataöverföringar använder separata anslutningar och kan använda konfigurerade portintervall snarare än en enda fast port."
+    ],
+    "pitfalls": [
+      "Förutsatt att implicit FTPS är standard överallt. Många klienter och servrar föredrar explicit FTPS den 21.",
+      "Öppna breda portintervall för passiv data utan att begränsa vem som kan ansluta.",
+      "Lämna anonyma eller svaga konton aktiverade eftersom transporten är krypterad."
+    ],
+    "security": [
+      "Föredrar SFTP eller explicit FTPS den 21 med starka TLS-policyer.",
+      "Begränsa portintervall och IP-källor och logga all åtkomst.",
+      "Granska konton regelbundet och inaktivera anonym åtkomst om det inte krävs."
+    ],
+    "alternatives": [
+      "Explicit FTPS den 21",
+      "SFTP (22)"
+    ],
+    "example": "En skanning visar 990 öppen. Du bekräftar att det är en gammal filöverföringsintegration, minskar sedan exponeringen genom att begränsa käll-IP-adresser och flytta till SFTP på ett privat nätverk.",
+    "references": []
+  },
+  "993": {
+    "service": "IMAPS",
+    "transport": "TCP",
+    "summary": "IMAP över implicit TLS. Standard säker postlådesynkroniseringsport.",
+    "what": "TCP port 993 används av IMAPS, vilket betyder IMAP med implicit TLS. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En e-postserver lyssnar på 993 och klienter ansluter förväntar sig kryptering omedelbart. Sessionen börjar med en TCP-handskakning och sedan en TLS-handskakning, varefter klienten autentiserar och synkroniserar mappar, rubriker och meddelandeflaggor. Den praktiska fördelen jämfört med vanlig IMAP på 143 är att kryptering etableras innan några referenser skickas, vilket undviker STARTTLS nedgradering och felordningsproblem när klienter är felkonfigurerade. Ur ett säkerhetsperspektiv skyddar IMAPS data under överföring men hindrar inte kontokompromettering, så hastighetsbegränsning, MFA och övervakning av ovanlig postlådeåtkomst är fortfarande viktiga.",
+    "why": "IMAPS är vanligt för säker e-poståtkomst. Det spelar roll eftersom brevlådor innehåller känsliga uppgifter och eftersom identitetsstöld ofta följs av postlådeåtkomst. Stark autentisering och övervakning är lika viktigt som kryptering.",
+    "how": [
+      "Klienten ansluter och förhandlar TLS omedelbart och validerar servercertifikatet.",
+      "Klienten autentiserar och synkroniserar mappar, rubriker och meddelandeflaggor.",
+      "Klienten hämtar meddelandekroppar efter behov och håller servern som källan till sanningen."
+    ],
+    "pitfalls": [
+      "Förlitar sig på svaga lösenord eftersom transporten är krypterad.",
+      "Lämna äldre autentiseringsmetoder aktiverade när moderna leverantörer stödjer starkare metoder.",
+      "Ignorera certifikatförtroendeproblem som leder till att användare klickar sig igenom varningar."
+    ],
+    "security": [
+      "Framtvinga stark autentisering och MFA där det är möjligt, plus hastighetsbegränsning.",
+      "Övervaka efter misstänkta inloggningar och mönster för postlådeåtkomst.",
+      "Håll TLS-konfigurationen modern och automatisera certifikatförnyelsen."
+    ],
+    "alternatives": [
+      "IMAP med STARTTLS (143)"
+    ],
+    "example": "En användare läser e-post på två enheter. Båda ansluter till 993, autentiserar och ser samma mapptillstånd eftersom IMAP spårar meddelandeflaggor på servern.",
+    "references": []
+  },
+  "995": {
+    "service": "POP3S",
+    "transport": "TCP",
+    "summary": "POP3 över implicit TLS. Säker nedladdning av brevlådor, fortfarande enklare än IMAP.",
+    "what": "TCP port 995 används av POP3S, vilket betyder POP3 med implicit TLS. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En server lyssnar på 995 och klienten upprättar en TCP-session, sedan en TLS-session, innan den autentiseras. Efter det listar och hämtar klienten meddelanden, vanligtvis laddar ner dem till lokal lagring istället för att hålla serversidans tillstånd synkroniserat som IMAP. Den modellen är anledningen till att POP fortfarande används för enkla inställningar och äldre klienter, men det betyder också att kvarhållning och incidentrespons beror på var e-post lagras och säkerhetskopieras. Säkerhetsmässigt tar POP3S bort autentiseringsuppgifter i klartext på tråden, men svaga lösenord, brist på MFA och exponerade tjänster gör fortfarande port 995 till ett vanligt mål för autentiseringsattacker.",
+    "why": "POP3S spelar roll eftersom vissa enheter och äldre klienter fortfarande är beroende av POP. Ur ett försvarsperspektiv hjälper säker transport, men du måste fortfarande skydda konton från brute force och överväga retention och backup-implikationer.",
+    "how": [
+      "Klienten ansluter och förhandlar TLS omedelbart.",
+      "Klienten autentiserar, listar meddelanden, hämtar dem och kan ta bort dem från servern.",
+      "Klienten lagrar meddelanden lokalt och avslutar sessionen."
+    ],
+    "pitfalls": [
+      "Använder POP för scenarier med flera enheter och förlorar sedan konsistensen i e-posttillståndet.",
+      "Svag kontosäkerhet som leder till att postlådan kompromitteras.",
+      "Förutsatt att TLS löser allt. Serversidans policy och övervakning krävs fortfarande."
+    ],
+    "security": [
+      "Föredrar IMAPS när du behöver synkronisering med flera enheter, eller leverantörs-API:er för appar.",
+      "Framtvinga starka lösenord och MFA och övervaka misslyckade inloggningar.",
+      "Inaktivera äldre klartext POP3 på 110."
+    ],
+    "alternatives": [
+      "IMAPS (993)",
+      "Moderna e-post-API:er över HTTPS"
+    ],
+    "example": "En gammal e-postklient stöder endast POP3S. Den ansluter till 995, autentiserar, laddar ner ny e-post och arkiverar den lokalt, varför serverlagring kanske inte speglar vad användaren fortfarande har.",
+    "references": []
+  },
+  "1433": {
+    "service": "MS SQL Server",
+    "transport": "TCP",
+    "summary": "Standardavlyssnare för Microsoft SQL Server. Flyttas ofta eller proxias i hårda miljöer.",
+    "what": "TCP port 1433 är standardavlyssnaren för Microsoft SQL Server i många distributioner. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En SQL Server-instans binder till 1433 så att klientapplikationer kan hitta databasmotorn. En klient ansluter från en tillfällig källport, slutför TCP-handskakningen, förhandlar SQL Server-protokollet, autentiserar och skickar sedan frågor samtidigt som den tar emot resultatuppsättningar under samma session. Många applikationer använder anslutningspoolning, så ett litet antal långlivade anslutningar kan bära många transaktioner, vilket är anledningen till att du kan se stadig trafik även när användaraktiviteten är ojämn. Ur ett säkerhetsperspektiv representerar databasportar högt värde dataåtkomst. Att exponera 1433 bortom applikationsnivån ökar risken för brute force, utökar rörelsevägar i sidled och kan förvandla en komprometterad värd till ett dataintrång.",
+    "why": "Databasportar är högt värderade. Om 1433 avslöjas utöver vad som är nödvändigt kan angripare bruteforce-angrepp med läckta autentiseringsuppgifter, utnyttja opatchade sårbarheter eller pivotera in i datalagret. Även internt ökar övertillåten åtkomst till databasnivån spridningsradien.",
+    "how": [
+      "Klienten öppnar en TCP-anslutning och förhandlar om SQL Server-protokollet och sessionsinställningarna.",
+      "Klienten autentiserar, skickar sedan frågor och tar emot resultatuppsättningar över samma anslutning.",
+      "Anslutningar slås ofta samman av applikationer för prestanda, vilket håller sessionerna öppna."
+    ],
+    "pitfalls": [
+      "Exponerar 1433 direkt på internet.",
+      "Använda delade eller svaga databaskonton och bädda in autentiseringsuppgifter i kod.",
+      "Förutsatt att nätverkets tillgänglighet är lika med auktorisering. Många intrång börjar med lateral förflyttning in i databasnivån."
+    ],
+    "security": [
+      "Begränsa åtkomsten till applikationsundernät och använd brandväggar eller privata slutpunkter.",
+      "Patcha regelbundet och inaktivera oanvända funktioner.",
+      "Övervaka efter misslyckade inloggningar, ovanliga frågemönster och dataexfiltreringssignaler."
+    ],
+    "alternatives": [
+      "Hanterad databas med privata slutpunkter",
+      "Databas proxy"
+    ],
+    "example": "En applikationsserver ansluter till SQL Server på 1433 med en poolad anslutning. Om en arbetsstation också kan nå 1433, kan en angripare som äventyrar arbetsstationen försöka fylla på autentiseringsuppgifter mot databasen.",
+    "references": []
+  },
+  "1521": {
+    "service": "Oracle SQL*Net",
+    "transport": "TCP",
+    "summary": "Oracle-lyssnarport för databasanslutningar. Konfigurationen kan variera beroende på miljö.",
+    "what": "TCP port 1521 används ofta av Oracle Database-lyssnare. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. Oracle-lyssnarprocessen binder till 1521 och accepterar inkommande klientsessioner. En klient ansluter från en tillfällig källport, slutför TCP-handskakningen, förhandlar Oracle Net-protokollet, autentiserar och kör därefter frågor och transaktioner över den etablerade sessionen. I stora miljöer kan en lyssnare fronta flera databasinstanser och tjänster, så det exakta beteendet beror på konfigurationen, men porten representerar fortfarande ingångspunkten till datanivån. Säkerhetsmässigt skannas öppen 1521 ofta, och opatchade lyssnare eller svaga referenser kan avslöja känsliga databaser. Den säkraste hållningen är tät nätverkssegmentering, stark autentisering och övervakning av ovanliga anslutningsmönster.",
+    "why": "Liksom alla databasportar är 1521 känslig. Det kan avslöja tjänstens metadata och bli ett mål för brute force och utnyttjandeförsök. Många miljöer håller Oracle-lyssnare på privata nätverk och förmedlar åtkomst genom applikationsnivåer.",
+    "how": [
+      "Klienten ansluter till lyssnaren och förhandlar Oracle Net-protokollet.",
+      "Klienten identifierar den önskade tjänsten, autentiserar sedan och upprättar en session.",
+      "Frågor och resultat flödar över sessionen, ofta med anslutningspoolning i applikationslagret."
+    ],
+    "pitfalls": [
+      "Att exponera lyssnaren för breda nätverk eller internet.",
+      "Lämna standardkonton eller svaga lösenord på plats.",
+      "Förutsatt att lyssnarporten är lika med en databas. Flera tjänster kan nås bakom en lyssnare."
+    ],
+    "security": [
+      "Begränsa nätverksåtkomst till lyssnaren och upprätthåll starka autentiserings- och krypteringsalternativ där det stöds.",
+      "Lagra och härda databasen och lyssnarkonfigurationen.",
+      "Övervaka för uppräkning och onormala anslutningsförsök."
+    ],
+    "alternatives": [
+      "Privat lyssnare bakom appnivå",
+      "Databasgateway"
+    ],
+    "example": "En rapporteringsapp ansluter till en Oracle-lyssnare på 1521 med ett tjänstnamn. Lyssnaren dirigerar sessionen till rätt databasinstans, varför åtkomstkontroll bör tillämpas på både nätverks- och databaslager.",
+    "references": []
+  },
+  "1723": {
+    "service": "PPTP",
+    "transport": "TCP",
+    "summary": "Äldre VPN-kontrollkanal. Dataplanet använder GRE och säkerhetsmodellen är föråldrad.",
+    "what": "TCP port 1723 används av PPTP, ett äldre VPN-protokoll, och det visar att en port endast kan representera en del av en större tunnel. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. PPTP använder TCP 1723 för kontrollkanalen där klienten och servern förhandlar om tunnelinstallation och autentisering. Den faktiska användardatan överförs separat med GRE, vilket är IP-protokoll 47, inte TCP eller UDP, så en fungerande PPTP-anslutning kräver vanligtvis att både TCP 1723 och GRE tillåts genom brandväggar. I praktiken upprättar en klient först kontrollanslutningen till port 1723, tunneln skapas och sedan kapslas PPP-ramar in i GRE för datavägen. Säkerhetsmässigt anses PPTP vara föråldrad på grund av kända kryptografiska svagheter, så att se 1723 öppen indikerar ofta äldre fjärråtkomst som bör migreras till moderna VPN:er.",
+    "why": "PPTP är huvudsakligen en risksignal. Dess kryptografiska val är föråldrade och det är allmänt avskräckt. Om du tycker att PPTP är aktiverat bör du anta att det finns av äldre skäl och prioritera en migrering till ett modernt VPN.",
+    "how": [
+      "Klienten ansluter till 1723 för att ställa in en kontrollsession och förhandla om PPP-parametrar.",
+      "En GRE-tunnel bär den inkapslade datatrafiken.",
+      "Autentisering och kryptering beror på de valda PPP-mekanismerna, som är svaga enligt moderna standarder."
+    ],
+    "pitfalls": [
+      "Förutsatt att PPTP är säkert eftersom det kallas ett VPN.",
+      "Blockering endast 1723 och glömma GRE krävs för tunneln.",
+      "Lämna det aktiverat för kompatibilitet långt efter att det behövs."
+    ],
+    "security": [
+      "Föredrar moderna VPN som WireGuard eller IPsec baserade lösningar.",
+      "Om PPTP inte kan tas bort omedelbart, begränsa det till ett litet internt användningsfall och planera en tidslinje för att ta bort det.",
+      "Övervaka anslutningar och inaktivera svaga autentiseringsmetoder."
+    ],
+    "alternatives": [
+      "WireGuard",
+      "L2TP/IPsec",
+      "OpenVPN"
+    ],
+    "example": "En fjärranvändare ansluter till en äldre PPTP-server. Kontrollsessionen är på 1723, men själva trafiken är inne i GRE. Många brandväggar behandlar denna kombination olika, vilket är en anledning till att PPTP orsakar supportärenden.",
+    "references": []
+  },
+  "2049": {
+    "service": "NFS",
+    "transport": "TCP och UDP",
+    "summary": "Nätverksfilsystem. Beror ofta på ytterligare RPC-tjänster och strikt nätverksomfattning.",
+    "what": "Port 2049 används av NFS, nätverksfilsystemet, för att dela filsystem över nätverket. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En NFS-server lyssnar på 2049 så att klienter kan montera exporter och utföra filoperationer på distans som om de vore lokala. En klient ansluter, förhandlar om NFS-versionen och inställningarna och utför sedan läs-, skrivnings- och metadataoperationer när fjärrproceduren anropar över sessionen. Beroende på NFS version och miljö kan andra RPC-relaterade tjänster vara inblandade för upptäckt och låsning, vilket kan utöka uppsättningen av nödvändiga flöden bortom en enda port. Ur säkerhetssynpunkt kan NFS exponera stora datavolymer om exporten är alltför tillåtande, och historiskt sett har vissa distributioner förlitat sig på nätverksförtroende mer än stark autentisering, så segmentering och export med minst privilegier har betydelse.",
+    "why": "NFS är kraftfull och riskabel om den exponeras brett. Det kan läcka filer, möjliggöra obehöriga skrivningar och bli en pivotpunkt. I moln- och datacenternätverk är NFS ofta begränsad till specifika undernät och stöds av starka identitetskontroller och exportpolicyer.",
+    "how": [
+      "Klienten kontaktar NFS-servern 2049 och förhandlar om NFS-versionen och alternativen.",
+      "Klienten monterar exporterade sökvägar och utför filoperationer som RPC-anrop.",
+      "Åtkomstbeslut beror på exportkonfiguration, klientidentitetsmappning och ibland Kerberos-baserad autentisering."
+    ],
+    "pitfalls": [
+      "Exponera NFS-exporter för breda nätverk eller för opålitliga klienter.",
+      "Förutsatt att användaridentitet upprätthålls när exporter konfigureras med svag mappning.",
+      "Att glömma att NFS prestanda och tillförlitlighet beror på nätverkslatens och korrekt låsbeteende."
+    ],
+    "security": [
+      "Begränsa NFS till privata nätverk och endast de klienter som behöver det.",
+      "Använd starka exportpolicyer och överväg Kerberos-baserade säkerhetslägen där sådana finns.",
+      "Övervaka monteringar och åtkomstmönster och lagerexponerade exporter."
+    ],
+    "alternatives": [
+      "SMB med signering",
+      "Objektlagrings-API:er"
+    ],
+    "example": "Ett datorkluster monterar en delad datauppsättning från en NFS-server. Om en arbetsstation också kan nå 2049 kan en angripare montera export- och kopieringsdata, så nätverksomfattning är lika viktigt som behörigheter.",
+    "references": []
+  },
+  "3306": {
+    "service": "MySQL",
+    "transport": "TCP",
+    "summary": "Standard MySQL databasport. Används ofta av appar och administratörsverktyg.",
+    "what": "TCP port 3306 är standardporten för MySQL. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En MySQL-server binder till 3306 och klientapplikationer ansluter från tillfälliga källportar. Efter TCP-handskakningen utbyter handskakningen för protokollet MySQL funktioner och autentiseringsdata, och sedan skickar klienten SQL-frågor medan servern returnerar resultatuppsättningar. I riktiga applikationer håller anslutningspooler sessioner öppna för prestanda, så databasexponering är ofta långlivad och förutsägbar, vilket hjälper försvarare att använda normalt beteende. Säkerhetsmässigt bör 3306 sällan vara tillgänglig från slutanvändarnätverk eller internet. Om det avslöjas kan angripare brute force-konton, utnyttja sårbara serverversioner eller missbruka alltför privilegierade programuppgifter för att exfiltrera data.",
+    "why": "Databastjänster är kritiska tillgångar. Exponerade MySQL-portar bjuder in brute force och exploateringsförsök. Till och med i ett nätverk ökar bred åtkomst till 3306 effekten av en komprometterad värd, så segmentering och minsta privilegie spelar roll.",
+    "how": [
+      "Klienten öppnar en anslutning och förhandlar om handskakningen MySQL, inklusive kapacitetsflaggor.",
+      "Klienten autentiserar och skickar sedan frågor och tar emot resultat under sessionen.",
+      "Applikationer använder ofta anslutningspooler, så en komprometterad appnod kan komma åt datalagret kontinuerligt."
+    ],
+    "pitfalls": [
+      "Tillåter fjärråtkomst till root eller använder delade administratörskonton.",
+      "Exponera 3306 för internet eller för användarens VLAN.",
+      "Hoppa över TLS på databasanslutningar när du korsar opålitliga nätverk eller delad infrastruktur."
+    ],
+    "security": [
+      "Begränsa åtkomst till applikationsundernät och kräv stark autentisering och minst privilegierade användare.",
+      "Aktivera TLS för klientanslutningar där så är lämpligt och korrigera servern regelbundet.",
+      "Övervaka för ovanliga inloggningar, långa frågor och datadumpningsmönster."
+    ],
+    "alternatives": [
+      "Databas proxy",
+      "Hanterade MySQL med privat nätverk"
+    ],
+    "example": "En webbapp ansluter till MySQL på 3306 från ett app-undernät. Om en utvecklarbärbar dator också kan nå 3306, kan identitetsstöld på den bärbara datorn leda direkt till databasåtkomst.",
+    "references": []
+  },
+  "3389": {
+    "service": "RDP",
+    "transport": "TCP",
+    "summary": "Windows Remote Desktop. Högt värdemål för brute force- och ransomware-operatörer.",
+    "what": "TCP port 3389 är standardporten för Remote Desktop Protocol, som tillhandahåller en interaktiv fjärrsession till Windows-system. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En RDP-tjänst lyssnar på 3389 och en klient ansluter från en tillfällig källport för att starta en session. Efter TCP-handskakningen förhandlar klienten och servern om säkerhet och sessionsparametrar, och med Network Level Authentication autentiseras användaren innan hela skrivbordssessionen skapas. Sessionen innehåller sedan skärmuppdateringar, urklipp, filomdirigering och inmatningshändelser. Eftersom RDP är fullständig fjärrkontroll, är det ett högvärdigt mål. Exponerad 3389 är kraftigt skannad och är associerad med lösenordssprayning, brute force och utnyttjande av opatchade sårbarheter. I praktiken placerar säkra konstruktioner RDP bakom VPN- eller hoppvärdar, upprätthåller MFA och övervakar efter misslyckade inloggningar och ovanligt skapande av sessioner.",
+    "why": "RDP exponering är en stor riskfaktor. Angripare bruteforce-angrepp med läckta autentiseringsuppgifter, utnyttja okorrigerade brister eller köp läckta autentiseringsuppgifter och använd sedan RDP för interaktiv kontroll. Även internt kan överdriven RDP åtkomst påskynda sidorörelser.",
+    "how": [
+      "Klienten ansluter och förhandlar sessionsparametrar och kryptering.",
+      "Användaren autentiserar, helst med nätverksnivåautentisering innan hela skrivbordssessionen har upprättats.",
+      "Sessionen innehåller skärmuppdateringar, inmatning, urklipp och ibland funktioner för enhetskartläggning och filöverföring."
+    ],
+    "pitfalls": [
+      "Publicerar RDP direkt på internet utan MFA och stark åtkomstkontroll.",
+      "Tillåter svaga lösenord eller delade konton.",
+      "Lämna omdirigering av urklipp och enhet aktiverade där det inte behövs."
+    ],
+    "security": [
+      "Använd VPN eller en bastionsvärd, framtvinga MFA och begränsa med IP och enhetshållning.",
+      "Aktivera NLA och behåll Windows patchat.",
+      "Övervaka inloggningar, lockouthändelser och ovanliga sessionslängder eller geografiska platser."
+    ],
+    "alternatives": [
+      "Fjärrhantering via VPN",
+      "Arbetsstationer med privilegierad åtkomst",
+      "SSM eller bastionslösningar"
+    ],
+    "example": "En MSP exponerar RDP för att hantera servrar. Efter en lösenordsläcka loggar en angripare in och distribuerar ransomware. Den säkrare designen är VPN plus MFA och en hoppvärd med tight revision.",
+    "references": []
+  },
+  "5432": {
+    "service": "PostgreSQL",
+    "transport": "TCP",
+    "summary": "Standard PostgreSQL lyssnare. Skyddas ofta bakom appnivåer och privata nätverk.",
+    "what": "TCP port 5432 är standardporten för PostgreSQL. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. Postgres-servern lyssnar på 5432 och klienter ansluter från tillfälliga källportar. Flödet är: TCP-handskakning, protokoll- och parameterförhandling, autentisering, sedan SQL-frågor och resultatuppsättningar över den etablerade sessionen. Som med andra databaser använder applikationer ofta anslutningspooler och långlivade sessioner, vilket kan dölja det verkliga antalet användaråtgärder bakom en liten uppsättning anslutningar. Säkerhetsmässigt är 5432 en direkt väg till data. Att exponera det för brett möjliggör brute force, attacker för återanvändning av autentiseringsuppgifter och dataexfiltrering om applikationsroller är överprivilegierade. Nätverkssegmentering plus minst privilegierade roller och övervakning är de praktiska kontrollerna.",
+    "why": "PostgreSQL innehåller ofta affärskritiska data. Att exponera 5432 brett kan tillåta autentiseringsattacker och dataexfiltrering. Många incidenter börjar med en enda komprometterad värd som kan nå databasnivån, så segmentering och minsta privilegium är avgörande.",
+    "how": [
+      "Klienten ansluter och förhandlar protokollversion och sessionsinställningar.",
+      "Klienten autentiserar och skickar sedan frågor och tar emot resultat.",
+      "Applikationer återanvänder ofta poolade anslutningar, så en enda appnod kan göra många förfrågningar snabbt."
+    ],
+    "pitfalls": [
+      "Exponera 5432 för internet eller användarnätverk.",
+      "Körs med autentiseringsuppgifter på superanvändarnivå i applikationer.",
+      "Ignorerar TLS och rollbaserade behörigheter när trafik korsar delade nätverk."
+    ],
+    "security": [
+      "Begränsa nätverksåtkomst och upprätthåll minst privilegierade roller.",
+      "Aktivera TLS och korrigera regelbundet, inklusive tillägg.",
+      "Övervaka för ovanliga inloggningsförsök och stora dataexporter."
+    ],
+    "alternatives": [
+      "Privata slutpunkter",
+      "Databas proxy"
+    ],
+    "example": "En CI-pipeline kör migrering mot Postgres på 5432. Om den porten är tillgänglig från utvecklare bärbara datorer kan en komprometterad bärbar dator försöka samma referenser, så åtkomsten bör begränsas till CI-runner-nätverket.",
+    "references": []
+  },
+  "5900": {
+    "service": "VNC",
+    "transport": "TCP",
+    "summary": "Fjärrskrivbordsprotokoll. Säkerheten beror mycket på konfiguration och tunnling.",
+    "what": "TCP port 5900 används ofta av VNC, ett fjärrskrivbord och skärmdelningsprotokoll. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En VNC-server binder till 5900 och en klient ansluter från en tillfällig källport. Efter TCP-handskakningen förhandlar de två sidorna om protokollalternativ och autentisering, sedan streamar servern skärmuppdateringar medan klienten skickar mus- och tangentbordshändelser. Många VNC-implementeringar erbjöd historiskt svag kryptering eller ingen, så den säkra hållningen är att behandla VNC som en endast intern tjänst eller att slå in den i en säker tunnel som SSH eller en VPN. Ur ett säkerhetsperspektiv är exponerad 5900 ett vanligt fynd vid skanningar och kan leda till obehörig åtkomst till skrivbordet om lösenorden är svaga eller tjänsten är felkonfigurerad.",
+    "why": "VNC är ett vanligt fynd vid interna skanningar och på labbsystem. Exponerad VNC kan leda till full interaktiv kontroll, så den behandlas som en högeffektiv tjänst som liknar RDP. Även med kryptering förblir svaga lösenord och brist på MFA ett problem.",
+    "how": [
+      "Klienten ansluter och förhandlar om protokollet VNC och autentiseringsmetoder som stöds.",
+      "Användaren autentiserar och servern strömmar rambuffertuppdateringar samtidigt som den tar emot indatahändelser.",
+      "Om VNC är tunnlad, åker VNC-trafiken in i SSH eller ett VPN istället för att exponeras direkt."
+    ],
+    "pitfalls": [
+      "Kör VNC utan kryptering eller med standardlösenord.",
+      "Exponerar 5900 bortom ett ledningsnätverk.",
+      "Förutsatt att en tunnlad installation är säker samtidigt som tunnelns slutpunkter lämnas dåligt skyddade."
+    ],
+    "security": [
+      "Kräv en VPN- eller SSH-tunnel, framtvinga stark autentisering och begränsa efter nätverk.",
+      "Inaktivera oanvända VNC-servrar och korrigera regelbundet.",
+      "Övervaka för upprepade autentiseringsfel och nya lyssningstjänster."
+    ],
+    "alternatives": [
+      "RDP med NLA",
+      "Fjärrsupportverktyg med MFA"
+    ],
+    "example": "En Linux-arbetsstation kör VNC för fjärrsupport. Teamet inaktiverar direkt 5900-exponering och kräver vidarebefordran av SSH port, så endast autentiserade SSH-användare kan nå VNC-servern.",
+    "references": []
+  },
+  "6379": {
+    "service": "Redis",
+    "transport": "TCP",
+    "summary": "I minnesdatalager. Farligt när det exponeras eftersom det ofta förutsätter betrodda nätverk.",
+    "what": "TCP port 6379 är standardporten för Redis, ett datalager i minnet som ofta används för cachning, sessioner och köer. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. En Redis-server binder till 6379 och klienter ansluter från tillfälliga källportar, slutför TCP-handskakningen och utfärdar sedan enkla kommandon som GET och SET för att läsa och skriva nycklar. Redis är snabb delvis för att protokollet är enkelt och förutsätter en pålitlig nätverksmiljö som standard. Det antagandet är säkerhetsproblemet: om port 6379 kan nås från opålitliga nätverk kan angripare ofta läsa data, ändra konfiguration eller missbruka Redis-funktioner för uthållighet och sidorörelse. I verkliga distributioner bör porten endast kunna nås från programnivån, skyddad med autentisering och ACL där det är tillgängligt, och övervakas för ovanliga kommandon och åtkomstmönster.",
+    "why": "Redis exponering är hög risk eftersom en angripare ofta kan läsa känslig cachad data, manipulera programbeteende eller missbruka administrativa kommandon. Offentligt exponerade Redis har använts för kryptominering, datastöld och attacker i ransomware-stil.",
+    "how": [
+      "Klienten ansluter och skickar kommandon som GET, SET och PUBLISH över en beständig TCP-anslutning.",
+      "Servern bearbetar kommandon i minnet och returnerar små svar mycket snabbt.",
+      "Valfri beständighet och replikering kan ansluta ytterligare noder, vilket utökar attackytan om den inte är segmenterad."
+    ],
+    "pitfalls": [
+      "Bindning Redis till 0.0.0.0 utan autentisering eller nätverkskontroller.",
+      "Att anta en icke-standardport eller obskyrt värdnamn ger säkerhet.",
+      "Lämna farliga kommandon aktiverade när de inte behövs."
+    ],
+    "security": [
+      "Behåll Redis på privata nätverk, kräver autentisering och använd TLS där det stöds.",
+      "Begränsa kommandon och konfigurera ACL:er för att begränsa vad klienter kan göra.",
+      "Övervaka för oväntade nycklar, replikeringsändringar och höga CPU-mönster som indikerar missbruk."
+    ],
+    "alternatives": [
+      "Hanterade Redis med privat nätverk",
+      "Memcachade eller appnivåcacher med skyddsräcken"
+    ],
+    "example": "En webbapp lagrar sessionstokens i Redis. Om 6379 utsätts för internet kan en angripare räkna upp nycklar och stjäla sessioner, så den korrekta designen är privata subnät plus ACL och autentisering.",
+    "references": []
+  },
+  "8080": {
+    "service": "HTTP alt",
+    "transport": "TCP",
+    "summary": "Gemensam alternativ HTTP-port för proxyservrar, appservrar och adminpaneler.",
+    "what": "TCP port 8080 är en mycket vanlig alternativ HTTP port som används av proxyservrar, applikationsservrar och utvecklings- eller administratörsgränssnitt. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. Team väljer ofta 8080 när port 80 är reserverad, när de körs bakom en omvänd proxy eller när en produkt skickar ett sekundärt webbgränssnitt. Nätverksbeteendet är detsamma som HTTP på 80: klienten ansluter från en tillfällig källport, slutför TCP-handskakningen, skickar sedan HTTP-förfrågningar och tar emot svar. Den viktiga verkliga detaljen är att 8080 inte garanterar att den är säker eller intern. Många bortglömda adminpaneler och felsökningsslutpunkter finns här, ibland med svagare autentisering än huvudsidan. Så när 8080 är öppen är den rätta frågan vilken webbtjänst det är, vem som ska nå den och om den är patchad och åtkomstkontrollerad som vilken annan webbyta som helst på internet.",
+    "why": "8080 spelar roll eftersom det är en vanlig plats där dolda adminpaneler bor. Angripare skannar det hela tiden. Internt använder team det också för iscensättningstjänster, vilket kan läcka data om brandväggsreglerna är för avslappnade.",
+    "how": [
+      "Klienten ansluter och talar HTTP liknande port 80.",
+      "Tjänsten kan vara en proxy, en webbapp eller ett hanteringsgränssnitt, ofta med annan autentisering än huvudwebbplatsen.",
+      "Vissa miljöer använder 8080 som en backend-port bakom en lastbalanserare som avslutar TLS någon annanstans."
+    ],
+    "pitfalls": [
+      "Förutsatt att 8080 bara är intern och lämnar svaga standarduppgifter.",
+      "Exponera backend-tjänster direkt utan TLS eller autentisering.",
+      "Att glömma att begränsa det när en tillfällig felsökningsserver blir permanent."
+    ],
+    "security": [
+      "Behandla 8080 som en förstklassig webbexponering: autentisera, korrigera och logga den.",
+      "Begränsa hanteringsgränssnittet till VPN- eller adminnätverk.",
+      "Inventera vad som körs på 8080 och ta bort döda tjänster."
+    ],
+    "alternatives": [
+      "HTTP på 80",
+      "HTTPS på 443"
+    ],
+    "example": "En Kubernetes ingångskontroller avslöjar en intern statussida på 8080. Om den porten är tillgänglig från användarnätverk kan den läcka rutter och tjänstnamn, så du begränsar den till klusteradministratörsnätverket.",
+    "references": []
+  },
+  "8443": {
+    "service": "HTTPS alt",
+    "transport": "TCP",
+    "summary": "Vanlig alternativ HTTPS-port, ofta för hanteringskonsoler och applikationsservrar.",
+    "what": "TCP port 8443 är en vanlig alternativ HTTPS port, som ofta används för hanteringskonsoler, utvecklarverktyg och applikationsservrar. En port är ett transportlagernummer som används tillsammans med en IP-adress och ett protokoll som TCP eller UDP för att dirigera trafik till rätt tjänst på en värd. En serverprocess binder en socket till en port och lyssnar, medan en klient vanligtvis väljer en tillfällig källport för utgående anslutningar. Kombinationen av käll- och destinations-IP-adresser, käll- och destinationsportar och transportprotokollet identifierar unikt ett flöde så att operativsystemet kan hålla många konversationer åtskilda. Brandväggar, NAT och skannrar talar om portar eftersom destinationsporten är den stabila mötespunkten som exponerar en tjänst för nätverket. Den beter sig vanligtvis som HTTPS på 443: klienten ansluter från en tillfällig källport, slutför en TCP-handskakning, utför en TLS-handskakning med certifikatvalidering och utbyter sedan HTTP-förfrågningar och svar inuti den krypterade kanalen. Anledningen till att den här porten är viktig är praktisk: produkter lägger ibland ett privilegierat administratörsgränssnitt på 8443, separat från den offentliga platsen på 443, och dessa gränssnitt kan ha standardinloggningsuppgifter eller svagare härdning. Om 8443 är nåbar, behandla den som en förstklassig webbexponering. Verifiera vem som kan komma åt den, se till modern TLS och stark autentisering och lita inte på säkerhetskontroller som bara täcker standardportar.",
+    "why": "8443 är relevant eftersom många administratörsgränssnitt levereras med standardreferenser och självsignerade certifikat. Angripare letar efter det i skanningar. Från en försvarssynpunkt är det en plats där du kan leta efter bortglömda gränssnitt för hantering som kringgår dina vanliga säkerhetskontroller.",
+    "how": [
+      "Klienten ansluter och utför en TLS-handskakning som liknar vilken HTTPS-tjänst som helst.",
+      "HTTP-förfrågningar flödar sedan in i den krypterade kanalen, ofta för administratörs- eller programslutpunkter.",
+      "Certifikatförtroende och TLS-konfiguration avgör hur säkert transportlagret är."
+    ],
+    "pitfalls": [
+      "Använda självsignerade certifikat och utbilda användare för att klicka igenom varningar.",
+      "Lämna leverantörens standardlösenord på hanteringskonsoler.",
+      "Förutsatt att säkerhetskontroller på 443 gäller även här. Många proxyservrar och WAF:er täcker bara standardportar."
+    ],
+    "security": [
+      "Tillämpa samma TLS och autentiseringsstandarder som 443 och behåll programvaran patchad.",
+      "Begränsa åtkomsten till hanteringsgränssnitt via VPN eller godkännandelistor.",
+      "Övervaka efter genomsökning och inloggningsförsök och inaktivera oanvända konsoler."
+    ],
+    "alternatives": [
+      "HTTPS på 443 bakom en omvänd proxy",
+      "mTLS för administratörsslutpunkter"
+    ],
+    "example": "En enhet exponerar ett webbadmin-gränssnitt på 8443 med ett självsignerat certifikat. Du placerar den bakom en VPN och roterar autentiseringsuppgifter och ersätter sedan certifikatet med ett från din interna CA.",
+    "references": []
+  }
+}
+

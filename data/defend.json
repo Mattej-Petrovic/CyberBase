@@ -1,0 +1,2157 @@
+{
+  "_version": 9,
+  "detectionAndLogging": [
+    {
+      "id": "log-types",
+      "title": "Log Types Overview",
+      "intro": "Different log types answer different questions. Strong detection comes from collecting the right sources, keeping clocks consistent, and making events searchable with clear, normalized fields.",
+      "objectives": [
+        "Explain what system, authentication, application, and network logs are used for",
+        "Pick a practical baseline of log sources that supports common investigations",
+        "Understand why normalization, time sync, retention, and integrity controls matter"
+      ],
+      "atAGlance": [
+        {
+          "title": "What logs answer",
+          "items": [
+            "What happened, when it happened, and what changed",
+            "Who did it and which identity was used",
+            "Where it originated and what it reached",
+            "Whether it succeeded and what followed"
+          ]
+        },
+        {
+          "title": "Core log families",
+          "items": [
+            "System and service logs for stability and service activity",
+            "Authentication and audit logs for identity and privileged actions",
+            "Network logs for reachability and policy decisions",
+            "Application logs for business actions and API behavior"
+          ]
+        },
+        {
+          "title": "Common mistakes",
+          "items": [
+            "Keeping logs local only, making deletion and tampering easier",
+            "Time drift and mixed time zones that break timelines",
+            "Unparsed data and inconsistent field names",
+            "Collecting noise without a clear investigation use case"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "title": "Core log categories",
+          "paragraphs": [
+            "System logs describe what the operating system and core services are doing. Use them to confirm reboots, service restarts, update activity, and signs of instability such as disk, memory, or driver errors.",
+            "Authentication and audit logs describe who accessed what and what privileged actions were taken. Use them to investigate logins, failed attempts, privilege elevation, account changes, and security relevant configuration changes.",
+            "Application logs describe what a specific application is doing. Use them to trace user actions, API calls, validation failures, and business events, and to connect an incident to an app feature or transaction.",
+            "Network logs describe connectivity and policy decisions. Use them to understand who talked to what, through which ports, and whether traffic was allowed, denied, redirected, or resolved through DNS."
+          ]
+        },
+        {
+          "title": "Normalization and time",
+          "bullets": [
+            "Normalize key fields such as user, host, source_ip, dest_ip, action, outcome, and reason so searches work across tools",
+            "Store timestamps in UTC for correlation, and keep the original timezone only for display when needed",
+            "Verify time sync and log pipelines continuously so you notice drift, gaps, or parsing failures early"
+          ],
+          "callout": {
+            "type": "warn",
+            "title": "Why time sync matters",
+            "text": "Incident timelines depend on event order. If clocks drift, a single login and follow on action can look reversed, and correlations across hosts become unreliable."
+          }
+        },
+        {
+          "title": "Retention and integrity",
+          "bullets": [
+            "Set retention based on investigation needs, then budget storage for the log sources that provide the highest security value",
+            "Protect high value logs with central storage, least privilege access, and backups or write-once controls where possible",
+            "Alert on missing hosts, sudden volume drops, or disabled logging so you catch blind spots fast"
+          ]
+        }
+      ],
+      "signals": [
+        "A host that stops sending logs or has repeated gaps during business hours",
+        "Security or audit events drop sharply while other logs continue normally",
+        "Unexpected clock changes, repeated NTP failures, or sudden timezone shifts",
+        "Error and restart spikes that coincide with authentication anomalies"
+      ],
+      "references": [
+        {
+          "label": "NIST SP 800-92 Guide to Computer Security Log Management",
+          "url": "https://csrc.nist.gov/pubs/sp/800/92/final"
+        }
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Think in questions, not sources",
+            "paragraphs": [
+              "A good logging plan starts with the questions you expect to answer during incidents. For example: who authenticated, what changed, which process ran, where it connected, and whether it succeeded.",
+              "Once you know the questions, map them to sources. System logs cover stability and service activity. Auth and audit logs cover identity and privileged actions. Network logs cover reachability and policy decisions. Application logs capture business and API behavior.",
+              "A practical technique: write a one page incident question list for your environment, then add a log source for each unanswered question.",
+              "• Identity questions: who logged in, from where, and with what method",
+              "• Change questions: what was installed, modified, or started",
+              "• Network questions: what talked to what, and what was blocked",
+              "• Data questions: what was accessed, exported, or deleted"
+            ]
+          },
+          {
+            "title": "Normalization and field mapping",
+            "paragraphs": [
+              "Normalization is how you make different sources searchable in one consistent way. It lets you write one query that works across many log types.",
+              "Choose consistent field names for the same idea across sources, such as user, host, process, src_ip, dst_ip, action, and result. Keep the raw event too so you can revisit parsing later.",
+              "Treat parsing quality as a security concern. If a key field stops extracting correctly, detections can silently degrade.",
+              "• Keep a short list of critical fields per log family and monitor them",
+              "• Prefer structured logs when available, but ingest unstructured logs too"
+            ]
+          },
+          {
+            "title": "Time, integrity, and retention",
+            "paragraphs": [
+              "Time synchronization is a security control. If clocks drift, timelines break and correlations fail. Use a common time source across servers, endpoints, and network devices, and watch for sudden time jumps.",
+              "Protect log integrity with access control and immutability where possible. Logs are evidence, so you want visibility into changes, deletions, and collection failures.",
+              "Retention is a tradeoff between cost and investigation depth. A common approach is fast searchable storage for recent data, and cheaper archival storage for older data you may still need during a longer incident.",
+              "Centralize logs so you can search consistently and reduce the risk of local log deletion on a compromised host."
+            ]
+          },
+          {
+            "title": "Operational checks that prevent surprises",
+            "paragraphs": [
+              "Validate the full pipeline: generation, collection, transport, parsing, storage, and search. Many failures happen in the middle due to rate limits, queue drops, or parser errors.",
+              "Track simple health signals: log volume trends per source, ingestion delay, parser error counts, and missing critical fields.",
+              "Create a small set of synthetic events you can generate on purpose, so you can confirm end to end visibility any time you suspect a gap."
+            ]
+          },
+          {
+            "title": "Picking sources by investigation use case",
+            "paragraphs": [
+              "Different investigations need different log types. Authentication questions need identity logs. Lateral movement often needs endpoint and remote management logs. Data access questions need application and database logs.",
+              "Start with a minimum set that covers identity, endpoint, network perimeter, DNS, and critical applications. Expand based on what you actually run and what threats you care about."
+            ]
+          },
+          {
+            "title": "Common pitfalls and how to avoid them",
+            "paragraphs": [
+              "Too much noise is a common failure mode. Collecting everything is not a strategy if no one can search it. Prefer high value events first, then expand with measurement.",
+              "Do not rely on a single source for critical conclusions. Use at least two perspectives when possible, such as endpoint plus network, or application plus database.",
+              "Standardize on UTC for storage and always preserve the original timestamp, since time zones and daylight changes create confusion during response."
+            ]
+          },
+          {
+            "title": "Starter checklist",
+            "paragraphs": [
+              "• Define key incident questions and map each to sources",
+              "• Synchronize clocks and store timestamps consistently",
+              "• Centralize logs and validate parsing of critical fields",
+              "• Protect log access and integrity, then set retention expectations",
+              "• Build repeatable searches for common incidents and validate regularly"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "auth-logs",
+      "title": "Auth Logs",
+      "intro": "Authentication logs show who attempted access, from where, and whether it worked. They are essential for spotting brute force, password spraying, suspicious successes, and misuse of privileged accounts.",
+      "objectives": [
+        "Interpret common authentication outcomes and fields such as user, source, method, and reason",
+        "Detect brute force, spraying, and suspicious success patterns using simple rules and baselines",
+        "Understand why privileged access requires stricter monitoring and faster response"
+      ],
+      "sections": [
+        {
+          "title": "What to collect",
+          "bullets": [
+            "Successful and failed authentication attempts with user, source, host, method, and failure reason",
+            "Privilege use and elevation events (for example sudo, admin role use, or new privileged sessions)",
+            "MFA and step up authentication events when available, including approvals, denials, and timeouts",
+            "Account lifecycle changes such as creation, disablement, password resets, lockouts, and group membership updates"
+          ]
+        },
+        {
+          "title": "How attackers show up in auth logs",
+          "table": {
+            "headers": [
+              "Pattern",
+              "What you see",
+              "Why it matters",
+              "Typical response"
+            ],
+            "rows": [
+              [
+                "Brute force",
+                "High volume failures for one account from one or a few sources",
+                "Direct guessing against a target account or service",
+                "Throttle and block sources, require MFA, and review exposed services"
+              ],
+              [
+                "Password spraying",
+                "Low rate failures spread across many accounts from one source",
+                "Designed to avoid lockout policies while testing common passwords",
+                "Detect across users and time windows, block source, and enforce stronger auth"
+              ],
+              [
+                "Fail then succeed",
+                "A success shortly after multiple failures for the same account",
+                "Often indicates guessed credentials or stolen passwords being validated",
+                "Investigate the device and session, rotate credentials, and review recent activity"
+              ],
+              [
+                "Impossible travel",
+                "Logins from distant networks or locations in an unrealistically short time",
+                "May indicate token theft, shared accounts, or risky VPN usage",
+                "Revoke sessions, require step up authentication, and verify user activity"
+              ]
+            ]
+          }
+        },
+        {
+          "title": "Make logs actionable",
+          "bullets": [
+            "Baseline typical login sources and hours per account so anomalies stand out",
+            "Use tighter alert thresholds for high value and admin accounts, and alert on first time access",
+            "Correlate sign ins with endpoint, VPN, and firewall data to confirm whether access was expected"
+          ]
+        }
+      ],
+      "signals": [
+        "Many failures for a single user in a short period",
+        "One source attempting many different users over time",
+        "A privileged account authenticating from a new device or network",
+        "Successful login followed by unusual privilege use or outbound connections"
+      ],
+      "references": [
+        {
+          "label": "NIST SP 800-92 Guide to Computer Security Log Management",
+          "url": "https://csrc.nist.gov/pubs/sp/800/92/final"
+        }
+      ],
+      "atAGlance": [
+        {
+          "title": "High value fields",
+          "items": [
+            "User and account type (human, service, admin)",
+            "Source (IP, device, location, logon type)",
+            "Target (host, service, application)",
+            "Result and reason (success, failure cause)"
+          ]
+        },
+        {
+          "title": "What to detect first",
+          "items": [
+            "Repeated failures and password spraying patterns",
+            "Success after many failures for the same user",
+            "New device or new source for a privileged user",
+            "Privilege use shortly after a new login"
+          ]
+        },
+        {
+          "title": "Fast triage checks",
+          "items": [
+            "Is the account expected and currently active",
+            "Is the source expected for that user",
+            "Is the target a system they should access",
+            "Is there follow on activity that confirms intent"
+          ]
+        }
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "How to read an auth event",
+            "paragraphs": [
+              "Auth logs usually describe an attempt and its result. Focus on who tried, from where, to what, how they authenticated, and why it failed if it failed.",
+              "In Linux you often see auth records in /var/log/auth.log or /var/log/secure, and on systemd systems the same events can be queried through journald. In Windows, the Security event log captures detailed logon activity such as successful and failed logons.",
+              "Separate authentication from authorization. Authentication is proving identity. Authorization is what the identity is allowed to do after login."
+            ]
+          },
+          {
+            "title": "Reliable detection patterns",
+            "paragraphs": [
+              "Count based patterns can be useful, but context matters. A burst of failures from one source might be a password spray, or it might be a misconfigured service. Add enrichment like asset criticality, known admin workstations, and expected locations.",
+              "Look for sequences that suggest compromise: many failures followed by a success, success from a new device right after a password reset, or privilege use shortly after a new login.",
+              "Prefer detections that include a clear next step. For example, pivot from a suspicious login to process activity and network connections on the same host."
+            ]
+          },
+          {
+            "title": "Privileged access deserves its own rules",
+            "paragraphs": [
+              "Separate privileged authentication from normal authentication. Admin actions should be rare and well defined, so they are easier to alert on.",
+              "Track sudo usage on Linux and privileged group usage on Windows and in cloud control planes. Monitor creation of new admin accounts, new SSH keys, and changes to MFA or access policies.",
+              "Use keys or consistent labels in audit rules and searches so you can retrieve the full story quickly during an incident."
+            ]
+          },
+          {
+            "title": "Triage that reduces false positives",
+            "paragraphs": [
+              "A fast triage flow asks three questions: is the identity expected, is the source expected, and is the target expected.",
+              "Then examine the method and reason code. For example, many failures can be normal if a service is using old credentials, but the same pattern for a human user at unusual hours deserves attention.",
+              "Close the loop by checking for follow on activity like new sessions, new processes, remote management tools, or access to sensitive data."
+            ]
+          },
+          {
+            "title": "Linux versus Windows versus cloud identity signals",
+            "paragraphs": [
+              "Linux auth telemetry often reflects SSH, sudo, PAM, and local account events. It is strong for spotting brute force attempts, new keys, and privilege escalation through sudo.",
+              "Windows identity telemetry can include logon type, authentication package, and target account details, which helps differentiate interactive logons from service logons.",
+              "Cloud identity logs often include MFA results, device posture, conditional access decisions, and risky sign in signals. Treat identity as a system across on prem, cloud, VPN, and remote access."
+            ]
+          },
+          {
+            "title": "Sessionization and correlation",
+            "paragraphs": [
+              "An auth event is rarely the end of the story. Link it to a session and then to actions. Correlate logons with process creation, remote execution, and access to privileged resources.",
+              "If telemetry provides a session identifier, keep it. If not, approximate sessions using user, source, target, and a time window that matches your environment."
+            ]
+          },
+          {
+            "title": "Starter hunts",
+            "paragraphs": [
+              "• Top failed logins by user and by source in the last day",
+              "• Success after many failures for the same user",
+              "• Successful logins for privileged accounts from new sources",
+              "• New service accounts or new SSH keys",
+              "• Privilege use shortly after a new login"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "fw-logs",
+      "title": "Firewall Logs",
+      "intro": "Firewall logs record allow and deny decisions at network boundaries and host firewalls. They help you validate segmentation, detect scanning, and spot unexpected outbound activity that may indicate command and control or data exfiltration.",
+      "objectives": [
+        "Use firewall logs to understand exposure, segmentation, and egress behavior",
+        "Recognize scan patterns, misconfigurations, and policy drift in log data",
+        "Design firewall logging that supports investigations without creating noise"
+      ],
+      "sections": [
+        {
+          "title": "What firewall logs should include",
+          "bullets": [
+            "Timestamp, action (allow or deny), rule name or id, interface, protocol, and ports",
+            "Source and destination IP plus direction, and user or device identity when available",
+            "Connection context such as state, bytes or packets, NAT translation, and drop reason when provided"
+          ]
+        },
+        {
+          "title": "Detection ideas",
+          "table": {
+            "headers": [
+              "Pattern",
+              "What you see",
+              "Why it matters",
+              "Security effect of acting"
+            ],
+            "rows": [
+              [
+                "Port scan",
+                "One source hitting many ports or many hosts with frequent denies",
+                "Often reconnaissance before exploitation attempts",
+                "Block or rate limit the source and verify that exposed services are intentional"
+              ],
+              [
+                "Unexpected egress",
+                "New destinations, unusual ports, or traffic to domains that are rare for that host",
+                "May indicate malware command and control or staging for exfiltration",
+                "Contain the host, block destinations, and hunt for the same pattern across endpoints"
+              ],
+              [
+                "Policy drift",
+                "New broad allow rules or sudden spikes in hits on an existing rule",
+                "Increases attack surface and can hide malicious traffic",
+                "Review change control, tighten rules, and add alerts on high risk rule changes"
+              ]
+            ]
+          }
+        }
+      ],
+      "signals": [
+        "Deny spikes from a single source or toward a critical service",
+        "Outbound connections to new destinations that are rare for the environment",
+        "Allow rules that suddenly receive heavy traffic outside normal hours"
+      ],
+      "references": [
+        {
+          "label": "NIST SP 800-41 Rev.1 Guidelines on Firewalls and Firewall Policy",
+          "url": "https://csrc.nist.gov/pubs/sp/800/41/r1/final"
+        },
+        {
+          "label": "Configure Windows Firewall logging",
+          "url": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/network-security/windows-firewall/configure-logging"
+        }
+      ],
+      "atAGlance": [
+        {
+          "title": "What firewall logs show",
+          "items": [
+            "A policy decision (allowed, denied, rejected)",
+            "Who talked to whom and on what protocol",
+            "Which rule or zone matched the traffic",
+            "When and where the traffic hit the firewall"
+          ]
+        },
+        {
+          "title": "High signal views",
+          "items": [
+            "Denies to admin ports and sensitive segments",
+            "New outbound destinations from servers",
+            "East west traffic spikes between segments",
+            "Repeated denies from one source across many targets"
+          ]
+        },
+        {
+          "title": "Gotchas",
+          "items": [
+            "NAT can hide the original internal source",
+            "Stateful logging may capture only the first packet",
+            "Rate limits can hide scan shapes",
+            "Allowed traffic logging can explode volume fast"
+          ]
+        }
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Interpreting a firewall decision",
+            "paragraphs": [
+              "A firewall log is a policy decision at a moment in time. Read it like a sentence: an action happened because a rule matched for a protocol, source, destination, and port.",
+              "Extract a consistent core set of fields: action, rule name or id, direction, interface, src_ip, dst_ip, src_port, dst_port, protocol, and any zone or policy label.",
+              "Always confirm what you are looking at. Some devices log pre NAT addresses, some log post NAT addresses, and some can log both."
+            ]
+          },
+          {
+            "title": "Logging without drowning in noise",
+            "paragraphs": [
+              "Logging every allowed connection is usually too noisy. A practical approach is to log denies, plus a curated set of allows that indicate risk, such as new outbound destinations, admin ports, and traffic to sensitive segments.",
+              "If you use sampling or rate limiting, document it. During scanning, rate limits can hide the shape of an attack. Prefer full detail for key assets and segments."
+            ]
+          },
+          {
+            "title": "Scan patterns versus normal behavior",
+            "paragraphs": [
+              "Port scans often look like many short attempts to many ports or many hosts. Combine firewall logs with endpoint signals when possible to confirm whether a legitimate process made the attempts.",
+              "Normal behavior has patterns. A web server receiving many inbound connections is normal. A database server receiving random inbound ports is not.",
+              "Baseline by role. Segment your searches by server class, user subnet, and critical assets to reduce noise."
+            ]
+          },
+          {
+            "title": "Egress and segmentation as detection surfaces",
+            "paragraphs": [
+              "Egress is often where detection is easiest. Outbound connections from servers that should not talk to the internet are high value.",
+              "Segmentation decisions are also strong signals. If a host starts talking to a segment it never touched before, investigate the process and the identity behind it.",
+              "Pair firewall logs with DNS and proxy logs to understand the domain context behind an outbound connection."
+            ]
+          },
+          {
+            "title": "NAT, state, and other gotchas",
+            "paragraphs": [
+              "NAT can change what you see. You might need both the internal and external addresses to trace activity back to a host. Make sure you know where NAT occurs in your path.",
+              "Stateful firewalls may log only the first packet of a flow, or only denies. Understand whether you get per packet logs, per connection logs, or summaries, because this changes how you interpret volume."
+            ]
+          },
+          {
+            "title": "Practical investigations with firewall logs",
+            "paragraphs": [
+              "When you see a deny, ask what it tried to do and whether the host should ever attempt it. If the destination is external, check whether it appears in DNS logs and proxy logs for the same time window.",
+              "When you see a new allow to a rare destination, treat it as a lead. Identify the originating process from endpoint telemetry and confirm whether the destination is expected for that application."
+            ]
+          },
+          {
+            "title": "Starter hunts",
+            "paragraphs": [
+              "• Denies to admin ports from user subnets",
+              "• New outbound destinations from servers",
+              "• East west traffic spikes between segments",
+              "• Repeated denies from one source across many targets",
+              "• High volume outbound connections to one destination"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "dns-logs",
+      "title": "DNS Logs",
+      "intro": "DNS logs are high value because most connections begin with name resolution. They help you identify suspicious domains, domain generation behavior, and signs of DNS tunneling or misconfiguration.",
+      "objectives": [
+        "Understand what a DNS query and response represent in an investigation",
+        "Use baselines to spot rare domains, unusual query types, and abnormal failure rates",
+        "Recognize indicators of tunneling and domain generation without relying on exact signatures"
+      ],
+      "sections": [
+        {
+          "title": "What to collect",
+          "bullets": [
+            "Client identifier, queried name, query type, response code, and the returned answers",
+            "Resolver actions such as allow, block, redirect, or sinkhole, including the policy reason when available",
+            "Latency and failure rates so you can detect outages, abuse, and resolver misconfiguration"
+          ]
+        },
+        {
+          "title": "Common suspicious patterns",
+          "table": {
+            "headers": [
+              "Pattern",
+              "What you see",
+              "Why it matters",
+              "Typical response"
+            ],
+            "rows": [
+              [
+                "High NXDOMAIN",
+                "Many lookups that return non existent domains from one host",
+                "Often DGA activity, typos, or blocked malware retry loops",
+                "Inspect top queried names, check the endpoint, and block known bad domains"
+              ],
+              [
+                "Long labels",
+                "Very long or high entropy subdomains with steady volume",
+                "Can indicate data being encoded into DNS queries (tunneling)",
+                "Review the domain and query structure, block if malicious, and investigate the host"
+              ],
+              [
+                "Rare TLDs",
+                "New or uncommon TLDs and domains suddenly become frequent",
+                "Often used in phishing and commodity malware infrastructure",
+                "Enrich and validate, then block or sinkhole and monitor impacted hosts"
+              ]
+            ]
+          }
+        }
+      ],
+      "signals": [
+        "A sudden spike in NXDOMAIN or SERVFAIL responses",
+        "Domains with high entropy labels that appear machine generated",
+        "One endpoint generating far more DNS queries than comparable systems"
+      ],
+      "atAGlance": [
+        {
+          "title": "High value fields",
+          "items": [
+            "Client identity (host, IP, subnet)",
+            "Query details (qname, qtype)",
+            "Response details (rcode, answers)",
+            "Timing (timestamp, response time)"
+          ]
+        },
+        {
+          "title": "Strong early signals",
+          "items": [
+            "Newly seen domains queried by critical hosts",
+            "Many NXDOMAIN responses from one client",
+            "High volume unique subdomains under one domain",
+            "Unusual query types such as frequent TXT"
+          ]
+        },
+        {
+          "title": "Safe response",
+          "items": [
+            "Confirm with endpoint and proxy logs before blocking broadly",
+            "Prefer resolver level controls for consistent enforcement",
+            "Use allow lists for business critical domains",
+            "Document changes so you can roll back quickly"
+          ]
+        }
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "DNS basics that matter in investigations",
+            "paragraphs": [
+              "DNS is often the first observable step before a connection. If a host resolves a domain, it is a strong hint that it may try to connect to the returned address soon after.",
+              "Capture key fields consistently: client, resolver, qname, qtype, rcode, answers, and response time.",
+              "Preserve both the query and the response when possible, because answers can change over time and caches can mask what happened later."
+            ]
+          },
+          {
+            "title": "Baselines beat guesswork",
+            "paragraphs": [
+              "A baseline can be a rolling list of common domains per subnet and per application. When you know what normal looks like, rare domains and rare query types stand out quickly.",
+              "Baselines should be contextual. A developer workstation, a server, and a kiosk have different normal. Compare like with like.",
+              "Track first seen for domains in your environment. It is a simple but powerful enrichment field during investigations."
+            ]
+          },
+          {
+            "title": "Tunneling and abuse signals",
+            "paragraphs": [
+              "DNS tunneling and abuse often show odd query shapes and odd volumes. Very long subdomains, high entropy labels, frequent TXT queries, and many unique subdomains under one domain are common warning signs.",
+              "Repeated NXDOMAIN responses can indicate domain generation behavior, typos, or a misconfigured application. Use context to decide which.",
+              "Correlate suspicious DNS with outbound connections to the resolved IPs, and with process activity on the host that made the queries."
+            ]
+          },
+          {
+            "title": "Enrichment and blocking safely",
+            "paragraphs": [
+              "Enrichment makes DNS logs far more useful. Map domains to category, reputation, and ownership when you can. Even basic enrichment like first seen and who queried helps.",
+              "Blocking should be careful and reversible. Prefer resolver level controls so you can log the decision and apply policy consistently.",
+              "Use allow lists for critical business domains, and document changes so you can roll back quickly if you break something."
+            ]
+          },
+          {
+            "title": "Resolver view versus authoritative view",
+            "paragraphs": [
+              "Where you log DNS matters. Resolver logs show what your clients asked. Authoritative logs show what the world asked your domains. They answer different questions.",
+              "For detection and logging inside an organization, resolver logs are usually the most valuable because they tie activity back to internal clients."
+            ]
+          },
+          {
+            "title": "Modern DNS features that affect visibility",
+            "paragraphs": [
+              "Encrypted DNS options can reduce visibility at traditional network sensors. If clients use DNS over HTTPS directly to external resolvers, your internal resolver logs may not see the queries.",
+              "A practical approach is to enforce approved resolvers and monitor for direct outbound traffic to known public resolver services."
+            ]
+          },
+          {
+            "title": "Starter hunts",
+            "paragraphs": [
+              "• Newly seen domains queried by critical hosts",
+              "• Many NXDOMAIN responses from one client",
+              "• Unusual qtype usage such as frequent TXT for one domain",
+              "• High volume unique subdomains under one parent",
+              "• Domains with very long labels compared to baseline"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "siem",
+      "title": "SIEM Basics",
+      "intro": "A SIEM brings logs together, parses them into consistent fields, adds context, and correlates behaviors across time. Start with a small set of high value detections, measure noise, and iterate.",
+      "objectives": [
+        "Explain ingestion, parsing, normalization, enrichment, and correlation in simple terms",
+        "Build detections that are testable, maintainable, and tied to clear response actions",
+        "Use dashboards and triage workflows to reduce time to investigate and contain incidents"
+      ],
+      "sections": [
+        {
+          "title": "SIEM workflow",
+          "table": {
+            "headers": [
+              "Stage",
+              "What happens",
+              "Why it matters",
+              "Outputs"
+            ],
+            "rows": [
+              [
+                "Ingest",
+                "Collect events from endpoints, servers, network, and cloud services",
+                "Without coverage you cannot detect or investigate reliably",
+                "Connectors, forwarders, and ingestion pipelines"
+              ],
+              [
+                "Normalize",
+                "Parse logs and map fields into a consistent schema",
+                "Makes searches portable and correlation predictable",
+                "Unified fields such as user, host, source_ip, and outcome"
+              ],
+              [
+                "Enrich",
+                "Add asset, identity, and business context plus known bad indicators",
+                "Improves prioritization and reduces false positives",
+                "Entity context, risk scoring, and tagging"
+              ],
+              [
+                "Detect",
+                "Run rules and analytics that look for behaviors over time",
+                "Turns raw events into actionable alerts",
+                "Alerts with evidence, timelines, and links to raw logs"
+              ],
+              [
+                "Respond",
+                "Triage, contain, eradicate, and document lessons learned",
+                "Reduces impact and improves future detections",
+                "Cases, playbooks, and feedback into tuning"
+              ]
+            ]
+          }
+        },
+        {
+          "title": "Make it sustainable",
+          "bullets": [
+            "Start with a few high confidence use cases and add more only after tuning",
+            "Test detections with known good and known bad scenarios, then track false positives",
+            "Document ownership, severity, and response steps so alerts lead to consistent action"
+          ]
+        }
+      ],
+      "atAGlance": [
+        {
+          "title": "Core capabilities",
+          "items": [
+            "Collect and store logs centrally",
+            "Parse and normalize fields for search",
+            "Correlate events and trigger alerts",
+            "Support investigation and reporting"
+          ]
+        },
+        {
+          "title": "What good data looks like",
+          "items": [
+            "Consistent timestamps and time zone handling",
+            "Stable fields like user, host, src_ip, action",
+            "Low parser error rates and clear source tagging",
+            "Enrichment for assets and identity context"
+          ]
+        },
+        {
+          "title": "A workable workflow",
+          "items": [
+            "Detect, validate signal quality, add context",
+            "Decide: close, monitor, or escalate to incident",
+            "Document what you learned and tune rules",
+            "Review gaps and improve logging coverage"
+          ]
+        }
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Ingestion and parsing: where quality is won",
+            "paragraphs": [
+              "Ingestion is not complete until you can query reliably. Track which sources are onboarded, whether they arrive on time, and whether key fields parse correctly.",
+              "Parsing failures are silent risk. If a parser stops extracting user or src_ip, detections may still run but become far less useful. Monitor parsing health as a first class metric.",
+              "Keep source metadata. Always tag events with source system, environment, and collection path so you can troubleshoot and trust your searches."
+            ]
+          },
+          {
+            "title": "Detection engineering for beginners",
+            "paragraphs": [
+              "Start with a small set of detections you can explain and validate. Good starters map to clear attacker behaviors such as brute force, new admin creation, suspicious remote access, or unexpected outbound connections.",
+              "Write detections to be actionable: what happened, why it matters, what to check next, and what to do if confirmed.",
+              "Prefer stable fields and avoid brittle string matching when possible. If the data is messy, fix parsing first."
+            ]
+          },
+          {
+            "title": "Triage flow that scales",
+            "paragraphs": [
+              "A scalable triage flow is consistent. Verify signal quality, check context, then decide. Use a short checklist so different analysts reach similar conclusions.",
+              "Capture evidence and pivots: related events, time windows, affected assets, and user context. This reduces repeated work and improves handoffs.",
+              "If your SIEM supports cases, use them to link related alerts and document tuning decisions."
+            ]
+          },
+          {
+            "title": "Continuous improvement loop",
+            "paragraphs": [
+              "Treat detections as products. Each rule should have an owner, a purpose, test data, and a tuning history.",
+              "Review false positives and missed detections regularly. If an incident required data you did not have, that is a logging gap to close.",
+              "Use post incident reviews to update both logging requirements and detection logic, then validate the changes."
+            ]
+          },
+          {
+            "title": "A simple data model makes everything easier",
+            "paragraphs": [
+              "SIEMs work best when fields mean the same thing everywhere. Adopt a consistent schema for core fields like user, host, process, src_ip, dst_ip, action, and result.",
+              "Enrichment fits naturally into this model. Add asset tags, business owner, and criticality so detections can prioritize what matters.",
+              "Keep raw events alongside parsed fields so you can reprocess as your data model evolves."
+            ]
+          },
+          {
+            "title": "Alert quality: signal, severity, and confidence",
+            "paragraphs": [
+              "Not every suspicious event is an incident. Use severity to describe impact if true, and confidence to describe how likely it is true. This separation improves prioritization.",
+              "Prefer fewer high quality alerts over many low value ones. If you generate too many alerts, triage becomes random and real incidents get missed.",
+              "Include context in alerts: who, what, where, and why, plus suggested pivots."
+            ]
+          },
+          {
+            "title": "Retention, access, and operational hygiene",
+            "paragraphs": [
+              "Retention should match investigation needs and cost constraints. Keep fast searchable data for the period you most often investigate, then archive older data for longer lookbacks.",
+              "Protect the SIEM itself. Restrict who can delete data or disable sources. Log changes to ingestion settings and detection rules, because these are high value attacker targets.",
+              "Measure ingestion delay, dropped events, and storage health so you know when your visibility is degraded."
+            ]
+          },
+          {
+            "title": "Starter roadmap",
+            "paragraphs": [
+              "• Inventory log sources and onboard the highest value ones first",
+              "• Normalize key fields and monitor parsing health",
+              "• Build a small detection set and document triage steps",
+              "• Add enrichment for assets and identity",
+              "• Tune regularly, then expand coverage with measured scope"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "hardening": [
+    {
+      "id": "win",
+      "title": "Windows",
+      "intro": "Windows hardening is about reducing attack surface, protecting credentials and data, and enforcing secure settings consistently. Start from a baseline, then layer on controls that block common abuse paths and make changes measurable.",
+      "objectives": [
+        "Apply a baseline and keep configuration drift under control",
+        "Reduce privilege and protect credentials from theft and reuse",
+        "Harden common initial access paths such as macros, scripts, and remote management",
+        "Verify hardening with logs, alerts, and simple spot checks"
+      ],
+      "atAGlance": [
+        {
+          "title": "Main goals",
+          "items": [
+            "Consistency through baselines and policy enforcement",
+            "Least privilege and strong authentication for admin actions",
+            "Prevention controls that break common malware chains",
+            "Visibility so you can prove controls are working"
+          ]
+        },
+        {
+          "title": "High impact controls",
+          "items": [
+            "Microsoft security baselines deployed via GPO or Intune",
+            "BitLocker for data at rest with managed recovery keys",
+            "Credential protections such as Credential Guard where supported",
+            "Attack Surface Reduction rules tuned from audit to block"
+          ]
+        },
+        {
+          "title": "Practical workflow",
+          "items": [
+            "Start in a pilot ring, measure impact, then expand rollout",
+            "Document exceptions as business decisions, not one off hacks",
+            "Recheck drift periodically and after major Windows updates",
+            "Treat local admin, remote access, and script execution as top risk areas"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "title": "Overview",
+          "paragraphs": [
+            "A useful mental model is to harden Windows in layers. First you reduce what is reachable and what can run, then you limit what an attacker can do if they get in, and finally you add visibility so you can detect drift and suspicious behavior.",
+            "In managed environments, the biggest security wins come from consistency. A well tested baseline plus tight admin controls usually beats a long list of random tweaks applied inconsistently.",
+            "When you add stricter prevention controls such as ASR rules or application control, do it deliberately: start in audit, look at what would have been blocked, then move to enforce with narrowly scoped exclusions."
+          ],
+          "bullets": [
+            "Default deny inbound and minimize remote management exposure",
+            "Prefer modern authentication with MFA for privileged actions",
+            "Reduce local admin use and rotate local admin secrets",
+            "Log what matters and centralize it if you have more than a few endpoints"
+          ],
+          "callout": {
+            "type": "tip",
+            "title": "Baseline first, tuning second",
+            "text": "Baselines give you a safe starting point. Tuning is where you adapt to real apps and workflows without losing control of the security posture."
+          }
+        },
+        {
+          "title": "Hardening actions",
+          "paragraphs": [
+            "Use the toggle to switch between a low friction home baseline and a stricter security baseline."
+          ],
+          "toggle": {
+            "default": "home",
+            "options": [
+              {
+                "key": "home",
+                "label": "Home Baseline"
+              },
+              {
+                "key": "security",
+                "label": "Security Baseline"
+              }
+            ],
+            "views": {
+              "home": {
+                "table": {
+                  "headers": [
+                    "Action",
+                    "What you do",
+                    "Why you do it",
+                    "Security effect"
+                  ],
+                  "rows": [
+                    [
+                      "Keep Windows Update and app updates enabled",
+                      "Enable automatic updates for Windows and keep common apps updated (browser, Office, PDF reader).",
+                      "Most real world compromises rely on known vulnerabilities that already have patches.",
+                      "Closes known bugs and reduces exposure to commodity exploitation."
+                    ],
+                    [
+                      "Use a standard user for daily work",
+                      "Create a separate admin account for installs and system changes. Use the standard account by default.",
+                      "Admin sessions make phishing and malware far more damaging.",
+                      "Limits what malicious code can change without an elevation prompt."
+                    ],
+                    [
+                      "Turn on Microsoft Defender protections",
+                      "Ensure real time protection is enabled and keep cloud based protection and sample submission on when possible.",
+                      "Built in protections stop a large portion of common malware and suspicious behavior.",
+                      "Blocks or disrupts many commodity threats early in the chain."
+                    ],
+                    [
+                      "Enable BitLocker where available",
+                      "Turn on device or volume encryption and store the recovery key safely (Microsoft account or a secure vault).",
+                      "Lost or stolen devices are a frequent cause of data exposure.",
+                      "Protects data at rest from offline access."
+                    ],
+                    [
+                      "Harden browser and macro settings",
+                      "Prefer modern browsers, keep SmartScreen or reputation based protection enabled, and restrict macros to trusted sources.",
+                      "Many initial infections start from the browser or document execution.",
+                      "Reduces drive by downloads and malicious macro execution."
+                    ],
+                    [
+                      "Keep Windows Defender Firewall on",
+                      "Ensure the firewall is enabled for all profiles and do not disable it for troubleshooting.",
+                      "The host firewall is your last line when the network is not trusted.",
+                      "Reduces exposure to unsolicited inbound traffic and simple lateral movement."
+                    ],
+                    [
+                      "Remove legacy protocols and unused features",
+                      "Disable SMBv1 and uninstall or disable components you do not use (for example old remote access tools).",
+                      "Legacy features often exist mainly for compatibility and increase attack surface.",
+                      "Fewer reachable services and fewer weak protocol options."
+                    ]
+                  ]
+                }
+              },
+              "security": {
+                "table": {
+                  "headers": [
+                    "Action",
+                    "What you do",
+                    "Why you do it",
+                    "Security effect"
+                  ],
+                  "rows": [
+                    [
+                      "Deploy Microsoft security baselines",
+                      "Use Microsoft recommended baselines and deploy via GPO or Intune. Track compliance and exceptions.",
+                      "Baselines reduce misconfiguration risk and help prevent drift.",
+                      "Creates repeatable, auditable hardening across devices."
+                    ],
+                    [
+                      "Enforce strong admin identity",
+                      "Require MFA for privileged access, use dedicated admin accounts, and restrict where admin logons are allowed.",
+                      "Compromised admin credentials enable full takeover and rapid lateral movement.",
+                      "Raises the cost of credential theft and reduces privilege abuse."
+                    ],
+                    [
+                      "Rotate and protect local admin secrets",
+                      "Use Windows LAPS to manage unique local admin passwords per device and control who can retrieve them.",
+                      "Shared local admin passwords turn one compromise into many.",
+                      "Reduces lateral movement and persistence options."
+                    ],
+                    [
+                      "Enable credential protections where supported",
+                      "Enable features such as Credential Guard and virtualization based security when hardware and OS support it.",
+                      "Credential dumping is a common post compromise technique.",
+                      "Makes credential theft harder and reduces reuse risk."
+                    ],
+                    [
+                      "Use Attack Surface Reduction rules",
+                      "Run ASR in audit first, tune exclusions, then enforce. Monitor rule hits and investigate high quality signals.",
+                      "ASR blocks common abuse paths involving scripts, macros, and living off the land tooling.",
+                      "Prevents or disrupts many ransomware and intrusion chains."
+                    ],
+                    [
+                      "Apply application control for high risk systems",
+                      "Use AppLocker or Windows Defender Application Control for servers or privileged workstations where feasible.",
+                      "If untrusted code cannot run, many attacks stop early.",
+                      "Strong reduction in execution based attack surface."
+                    ],
+                    [
+                      "Harden remote management",
+                      "Limit RDP and WinRM exposure, require NLA, restrict to management networks or VPN, and log all admin sessions.",
+                      "Remote management is powerful and commonly targeted.",
+                      "Reduces internet facing exposure and improves traceability."
+                    ],
+                    [
+                      "Strengthen firewall policy and logging",
+                      "Default block inbound, allow only required ports per profile, enable firewall logging, and forward key logs centrally.",
+                      "Firewalls fail silently if you do not monitor them.",
+                      "Better containment and better investigation evidence."
+                    ],
+                    [
+                      "Centralize logging and alerting",
+                      "Forward security relevant events to a central platform, define alert rules for admin changes and suspicious execution.",
+                      "Local logs are easy to tamper with after compromise.",
+                      "Improves detection and supports incident response."
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          "callout": {
+            "type": "warn",
+            "title": "Pilot strict controls",
+            "text": "Stricter baselines and ASR rules can break legacy apps. Use audit mode, test in rings, and document exceptions intentionally."
+          }
+        }
+      ],
+      "signals": [
+        "Baseline compliance drops or devices drift from policy",
+        "New local administrator memberships without a change request",
+        "Unexpected remote logons or RDP from unusual networks",
+        "ASR or application control events aligned with suspicious process trees"
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Mental model: hardening as layered risk reduction",
+            "paragraphs": [
+              "Hardening is about shaping the default behavior of a system so that common mistakes do not turn into full compromise. On Windows, that means you reduce the number of ways code can run, reduce the value of stolen credentials, and reduce what a network path can reach.",
+              "A practical mental model is to think in layers that each block a different class of failure: identity and privileges, code execution, network exposure, data protection, and recovery. If one layer fails, the next one limits blast radius.",
+              "Another way to think about it is time: prevent what you can, detect what you cannot prevent, and make recovery predictable. Many real incidents are not one big bug, they are a chain of small gaps plus time.",
+              "• Attack surface is everything that can accept input or execute logic. Reduce it first because it lowers the amount you must monitor.",
+              "• Privilege is the accelerator pedal for attackers. Keep it rare and keep evidence when it is used.",
+              "• Trust is contextual. A device can be trusted in one network and risky in another, so your baseline must survive mobility and change."
+            ]
+          },
+          {
+            "title": "Baseline priorities for a Windows workstation",
+            "paragraphs": [
+              "Good Windows hardening is less about a long checklist and more about protecting a few high value paths. The main path is the credential path: how users authenticate, how secrets are stored, and how admin access is granted.",
+              "Strong guardrails here prevent common lateral movement patterns: password reuse, cached credentials, token theft, and silent persistence via scheduled tasks or startup entries.",
+              "A second path is the execution path. You want fewer places where unsigned or unexpected code can run, and you want high friction for risky execution modes such as Office macros, script hosts, and living off the land tooling.",
+              "There is an important tradeoff: tightening execution controls can break legacy apps and developer workflows. The right approach is to segment by role, for example a stricter baseline for standard users and a documented exception profile for dedicated dev boxes.",
+              "A third path is the data path. Encryption is not only for theft, it also changes what an attacker can do after a device is lost, reimaged, or partially compromised.",
+              "Finally, plan for resiliency. If you cannot rebuild a machine quickly, your baseline will slowly drift because people avoid changes they fear they cannot undo."
+            ]
+          },
+          {
+            "title": "Common traps that weaken Windows hardening",
+            "paragraphs": [
+              "A common failure mode is baseline drift that happens quietly. One urgent fix becomes a permanent setting, then another, until the endpoint is effectively unmanaged even if it looks hardened on day one.",
+              "Another failure mode is convenience admin. If daily work is done with admin rights, every browser exploit and every phishing attachment inherits power you never intended to give it.",
+              "Watch for tool conflicts. Multiple security agents, legacy VPN clients, and old drivers can disable or weaken protections in subtle ways, or push users to turn off controls to make work possible.",
+              "Be careful with remote administration. Remote access is sometimes necessary, but the dangerous pattern is broad reachability with weak authentication and no visibility. Limit who can reach it, and make it noisy when it is used.",
+              "• Exception sprawl: a good baseline plus many undocumented exceptions is usually worse than a slightly looser baseline with clear rules.",
+              "• Trusting the local machine too much: local admin, local secrets, and local policy edits are precisely what attackers aim to control."
+            ]
+          },
+          {
+            "title": "Operational workflow: make the baseline durable",
+            "paragraphs": [
+              "The durable approach is policy first. Define a baseline that is applied repeatedly, then measure drift. Treat the baseline as a living artifact with owners and review cycles, not as a one time setup.",
+              "Use staged rollout. Apply changes to a small set of machines, observe breakage and support tickets, then expand. Hardening that causes frequent disruption will be bypassed by users and administrators.",
+              "Build a small exception process that is safe by design. An exception should be explicit, time limited, and paired with compensating controls like stronger monitoring or reduced network access.",
+              "When you need to relax hardening, do it for a clear reason, not because it is annoying. Safe exceptions often look like this: dedicated dev machine, isolated test environment, or temporary access for break fix with session logging.",
+              "Document exceptions in a way that survives staff turnover:",
+              "• What changed and where it applies",
+              "• Why it is needed and what risk it introduces",
+              "• Owner, expiry date, and how it will be reviewed"
+            ]
+          },
+          {
+            "title": "Verification and evidence: how you know it is working",
+            "paragraphs": [
+              "Verification is where Windows hardening becomes real. You want checks that answer two questions: are the intended controls enabled, and would you notice if they changed tomorrow.",
+              "Practical checks can be done with built in tools and management reporting. A healthy endpoint typically shows: current patch level, active malware protections, disk encryption enabled, and a firewall profile that matches the network context.",
+              "Look for concrete evidence rather than assumptions. For example, do not assume encryption is enabled because you intended it. Confirm it. Do not assume Defender is active because it is installed. Confirm its protection state.",
+              "Good also means observable. Your logs should capture security relevant change such as new local admins, new services, new scheduled tasks, and suspicious scripting activity. If a change is not logged anywhere, it is hard to defend long term.",
+              "How to verify, and what good looks like:",
+              "• System updates: devices report recent successful updates and no long backlog",
+              "• Identity: standard users are not local admins, admin group changes are rare and reviewed",
+              "• Data: encryption status is on and recovery keys are managed, not lost",
+              "• Network: inbound rules are minimal and logging is enabled at least for drops on risky profiles",
+              "When verification finds gaps, decide whether to tighten the baseline or add monitoring. The worst outcome is to discover gaps repeatedly and never change either."
+            ]
+          }
+        ]
+      },
+      "references": [
+        {
+          "label": "Security Compliance Toolkit",
+          "url": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/device-management/windows-security-configuration-framework/security-compliance-toolkit-10"
+        },
+        {
+          "label": "Windows security baselines",
+          "url": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/device-management/windows-security-configuration-framework/windows-security-baselines"
+        },
+        {
+          "label": "Attack surface reduction overview",
+          "url": "https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction"
+        },
+        {
+          "label": "ASR rules reference",
+          "url": "https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction-rules-reference"
+        },
+        {
+          "label": "Microsoft Security Compliance Toolkit download",
+          "url": "https://www.microsoft.com/en-us/download/details.aspx?id=55319"
+        },
+        {
+          "label": "NIST Guide to General Server Security",
+          "url": "https://csrc.nist.gov/pubs/sp/800/123/final"
+        }
+      ]
+    },
+    {
+      "id": "linux",
+      "title": "Linux",
+      "intro": "Linux hardening is about minimalism, strong authentication, and predictable configuration. You reduce the number of running services, enforce least privilege, and use built in security features such as MAC, auditing, and firewalls to make compromise harder and easier to detect.",
+      "objectives": [
+        "Reduce attack surface by disabling what you do not need",
+        "Harden authentication and privilege escalation paths",
+        "Apply kernel and package updates safely and consistently",
+        "Validate hardening with simple checks and meaningful logging"
+      ],
+      "atAGlance": [
+        {
+          "title": "Main goals",
+          "items": [
+            "Minimal exposed services and clear ownership of changes",
+            "Strong SSH and sudo configuration",
+            "Defense in depth with MAC, firewalling, and auditing",
+            "Fast recovery with backups and known good configs"
+          ]
+        },
+        {
+          "title": "High impact controls",
+          "items": [
+            "Automatic security updates where appropriate",
+            "SSH key auth and restricted login policy",
+            "Firewall default deny inbound with explicit allowed ports",
+            "SELinux or AppArmor enforcing on supported systems"
+          ]
+        },
+        {
+          "title": "Practical workflow",
+          "items": [
+            "Baseline build, then harden in small steps with verification",
+            "Use configuration management to avoid snowflake servers",
+            "Log and monitor auth, privilege, and network changes",
+            "Review installed packages and running services regularly"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "title": "Overview",
+          "paragraphs": [
+            "Linux hardening starts with reducing complexity. Every enabled service, open port, and installed package is another place for a vulnerability or misconfiguration to exist.",
+            "Most compromises succeed because of weak authentication, exposed management services, or unpatched software. Your first priority is to make remote access predictable and to keep updates flowing.",
+            "For stricter environments, use mandatory access control, auditing, and file integrity checks to add layers that still matter after a user account is compromised."
+          ],
+          "bullets": [
+            "Remove or disable unused services and listening daemons",
+            "Prefer SSH keys and restrict who can log in and from where",
+            "Use sudo intentionally and avoid direct root login",
+            "Keep time synchronized and logs retained for investigations"
+          ],
+          "callout": {
+            "type": "tip",
+            "title": "Hardening is easier before production",
+            "text": "Build a secure image first, then clone it. Retrofitting hardening on many unique systems is slow and error prone."
+          }
+        },
+        {
+          "title": "Hardening actions",
+          "paragraphs": [
+            "Use the toggle to switch between a low friction home baseline and a stricter security baseline."
+          ],
+          "toggle": {
+            "default": "home",
+            "options": [
+              {
+                "key": "home",
+                "label": "Home Baseline"
+              },
+              {
+                "key": "security",
+                "label": "Security Baseline"
+              }
+            ],
+            "views": {
+              "home": {
+                "table": {
+                  "headers": [
+                    "Action",
+                    "What you do",
+                    "Why you do it",
+                    "Security effect"
+                  ],
+                  "rows": [
+                    [
+                      "Keep packages up to date",
+                      "Enable regular updates for the OS and key packages. Reboot when required for kernel or libc updates.",
+                      "Many exploits target known vulnerabilities that already have patches.",
+                      "Reduces exposure to commodity exploitation."
+                    ],
+                    [
+                      "Disable unused services",
+                      "List enabled services and disable anything you do not use. Close unused ports.",
+                      "A service you do not need is pure risk.",
+                      "Smaller attack surface and fewer remote entry points."
+                    ],
+                    [
+                      "Use a host firewall",
+                      "Enable a firewall tool (ufw, firewalld, or nftables wrapper) and default deny inbound. Allow only required ports.",
+                      "Local firewalls contain mistakes and reduce lateral movement.",
+                      "Fewer reachable services and clearer network posture."
+                    ],
+                    [
+                      "Harden SSH basics",
+                      "Use SSH keys, disable direct root login, and limit which users can SSH in.",
+                      "SSH is a common brute force and credential stuffing target.",
+                      "Stronger auth and reduced exposure to password attacks."
+                    ],
+                    [
+                      "Use sudo, avoid shared accounts",
+                      "Give named users sudo where needed and avoid logging in as root.",
+                      "Shared accounts destroy accountability and increase blast radius.",
+                      "Better traceability and reduced privilege misuse."
+                    ],
+                    [
+                      "Basic logging and log rotation",
+                      "Ensure journald or syslog is running and logs are rotated and retained long enough for troubleshooting.",
+                      "Without logs you cannot explain incidents or failures.",
+                      "Improves detection and forensics readiness."
+                    ],
+                    [
+                      "Backups and recovery plan",
+                      "Back up critical configs and data. Test restores, not just backup jobs.",
+                      "Hardening does not prevent every incident. Recovery matters.",
+                      "Limits downtime and reduces ransom leverage."
+                    ]
+                  ]
+                }
+              },
+              "security": {
+                "table": {
+                  "headers": [
+                    "Action",
+                    "What you do",
+                    "Why you do it",
+                    "Security effect"
+                  ],
+                  "rows": [
+                    [
+                      "Apply a documented baseline",
+                      "Use a CIS aligned baseline or vendor hardening guide and manage it as code.",
+                      "A baseline reduces drift and makes audits possible.",
+                      "Repeatable posture across fleets and faster investigation."
+                    ],
+                    [
+                      "Enforce MAC (SELinux or AppArmor)",
+                      "Keep SELinux or AppArmor in enforcing mode where supported and fix denials rather than disabling it.",
+                      "MAC limits what compromised processes can access even with user level execution.",
+                      "Contains exploitation and reduces privilege escalation paths."
+                    ],
+                    [
+                      "Centralize authentication and restrict SSH",
+                      "Disable password auth where possible, restrict users and source networks, and consider MFA for privileged access.",
+                      "Passwords are easy to brute force and easy to phish.",
+                      "Reduces credential abuse and limits remote entry."
+                    ],
+                    [
+                      "Harden sudo and privilege escalation",
+                      "Limit sudoers entries to specific commands, require re authentication, and monitor sudo usage.",
+                      "Over broad sudo turns a user compromise into full root quickly.",
+                      "Reduces lateral movement and persistence options."
+                    ],
+                    [
+                      "Enable and tune auditd",
+                      "Enable auditd and deploy rules focused on auth, privilege, and critical files. Forward audit logs centrally.",
+                      "Audit trails are valuable when you need to answer who did what and when.",
+                      "Improves detection and supports incident response."
+                    ],
+                    [
+                      "Kernel and network hardening",
+                      "Apply safe sysctl settings for networking and disable unsafe legacy behaviors when not needed.",
+                      "Many attacks rely on weak defaults and legacy compatibility.",
+                      "Reduces exploitation surface and improves resilience."
+                    ],
+                    [
+                      "File integrity monitoring",
+                      "Use a file integrity tool (for example AIDE) on critical paths and alert on unexpected changes.",
+                      "Attackers often modify binaries, configs, and cron jobs for persistence.",
+                      "Detects tampering and supports containment."
+                    ],
+                    [
+                      "Logging pipeline and alerting",
+                      "Ship auth and audit logs to a central system and alert on suspicious patterns such as repeated failures or new privileged groups.",
+                      "Local logs can be deleted after compromise.",
+                      "Higher chance of detecting incidents early."
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          "callout": {
+            "type": "warn",
+            "title": "Do not disable MAC to fix an app",
+            "text": "If SELinux or AppArmor blocks an action, treat it as a signal. Adjust policy or the app, not the security layer."
+          }
+        }
+      ],
+      "signals": [
+        "New listening ports or services enabled outside of change windows",
+        "Repeated SSH authentication failures or logins from unusual locations",
+        "Unexpected sudo usage or changes to sudoers files",
+        "Changes to critical configs, cron jobs, or system binaries"
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Mental model: reduce what is reachable and what is allowed",
+            "paragraphs": [
+              "Linux hardening is easiest when you treat the system as a collection of small, composable permissions. The core idea is simple: reduce what is reachable, reduce what is allowed, and reduce what is trusted.",
+              "A useful mental model is exposure times permission equals risk. Exposure is open services and reachable interfaces. Permission is what code can do after it starts. Trust is what packages and configurations you accept as valid.",
+              "Linux gives you many controls, but the hard part is consistency. Small differences between hosts, distributions, and teams can create gaps that attackers exploit because the environment becomes unpredictable.",
+              "• Minimize services and listening sockets because they define remote input.",
+              "• Minimize privileges and capabilities because they define local impact.",
+              "• Minimize trust boundaries by separating roles, users, and workloads."
+            ]
+          },
+          {
+            "title": "Baseline priorities for Linux systems",
+            "paragraphs": [
+              "Real world Linux incidents often start with one of three patterns: an exposed service, a weak credential path, or a supply chain surprise. A good baseline prioritizes controls that block these patterns across many workloads.",
+              "Service exposure is not only about ports. It is also about who can reach them, which interface they bind to, and whether they run with unnecessary permissions. Default to bind only to what you need.",
+              "Credential paths include SSH, local accounts, API tokens in files, and application secrets. Hardening is partly about reducing where secrets live and partly about limiting what an attacker can do if one leaks.",
+              "Supply chain risk is operational. If you install from many sources, run unknown scripts as root, or skip updates, your baseline is fragile. Prefer fewer repositories, signed packages, and a repeatable install story.",
+              "Tradeoff to expect: hardening can cost convenience. Tight permissions and strict services can break automation and developer tools. The safe approach is to separate environments or roles instead of weakening everything for everyone.",
+              "When you need compatibility, aim for narrower changes, such as allowing one service feature, rather than broad changes like disabling a control globally."
+            ]
+          },
+          {
+            "title": "Common traps on Linux hardening",
+            "paragraphs": [
+              "A frequent trap is hardening the host but forgetting the app. If the application runs as root, writes secrets to world readable files, or has no patch cadence, host hardening is forced to compensate and often fails.",
+              "Another trap is trusting network boundaries too much. Many Linux servers are reachable from places people did not intend because of VPNs, cloud security groups, container networks, or flat internal networks.",
+              "Privilege creep is also common. Over time, more users get sudo access, more services run as privileged, and more exceptions are added. The baseline slowly becomes a suggestion rather than a rule.",
+              "Over hardening can be a trap too. If you make changes that are hard to troubleshoot, operators will bypass them under pressure. That creates a split brain environment with undocumented behavior.",
+              "• Silent failures: a control is configured but not enforced, for example a policy in permissive mode or a service started with a different unit file.",
+              "• Inconsistent configuration: the same role behaves differently across hosts, which makes both monitoring and incident response harder."
+            ]
+          },
+          {
+            "title": "Containment: MAC, isolation, and safer defaults",
+            "paragraphs": [
+              "Containment is where Linux shines when used deliberately. Think in terms of reducing what a process can see, touch, and call. Even if code execution happens, containment can prevent privilege escalation and data theft.",
+              "Use mandatory access control when appropriate. SELinux or AppArmor can be frustrating at first, but they provide a strong boundary that is hard to replicate with file permissions alone. The tradeoff is policy maintenance and troubleshooting skill.",
+              "Isolation tools matter too. Namespaces, cgroups, and container runtimes can be part of a hardening story, but only if you treat them as security boundaries with clear assumptions.",
+              "Systemd can also reduce risk by limiting a service at runtime, such as restricting file system access and system calls. This is powerful because it hardens the service without requiring code changes.",
+              "When to relax containment: often for legacy software, vendor agents, or debugging. The safe pattern is to relax only for the specific service and keep the rest strict, then write down the reason and a plan to revisit.",
+              "Document exceptions with a test: what will you check later to confirm you can tighten again without breaking production."
+            ]
+          },
+          {
+            "title": "Verification and evidence: logs, audits, and integrity checks",
+            "paragraphs": [
+              "Verification on Linux should focus on effective state, not intended state. Many systems look hardened on paper but run with different runtime settings, custom unit overrides, or outdated packages.",
+              "Start with exposure checks: list listening ports, services, and interfaces. Good looks like only expected services are listening, and management services are reachable only from controlled networks.",
+              "Then verify privilege and integrity: check which accounts have sudo, which services run as root, and whether critical files are protected from modification. If you use integrity tooling, confirm it is actually reporting changes.",
+              "How to verify, and what good looks like:",
+              "• Exposure: no unexpected listening sockets, and firewalls or security groups match documented intent",
+              "• Accounts: minimal sudo users, no stale accounts, and clear ownership for service accounts",
+              "• Policy: SELinux is enforcing or AppArmor profiles are applied where intended, not quietly disabled",
+              "• Drift: configuration management reports converge, and manual edits are rare and reviewed",
+              "When to relax this: for short lived lab hosts or isolated build machines. Even then, write down what is relaxed, and keep at least basic patching and account hygiene because those failures travel easily between environments."
+            ]
+          }
+        ]
+      },
+      "references": [
+        {
+          "label": "RHEL security hardening guide",
+          "url": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/8/html-single/security_hardening/index"
+        },
+        {
+          "label": "SUSE Security and Hardening Guide",
+          "url": "https://documentation.suse.com/sles/15-SP7/single-html/SLES-security/book-security.html"
+        },
+        {
+          "label": "NIST Guide to General Server Security",
+          "url": "https://csrc.nist.gov/pubs/sp/800/123/final"
+        },
+        {
+          "label": "sshd_config manual",
+          "url": "https://man7.org/linux/man-pages/man5/sshd_config.5.html"
+        }
+      ]
+    },
+    {
+      "id": "macos",
+      "title": "macOS",
+      "intro": "macOS hardening focuses on protecting data at rest, controlling app execution, and enforcing secure settings through configuration profiles where possible. For managed fleets, MDM is the mechanism that makes hardening consistent and measurable.",
+      "objectives": [
+        "Protect local data with encryption and strong screen lock policy",
+        "Reduce risk from untrusted apps and risky user behaviors",
+        "Limit network exposure and harden remote access workflows",
+        "Use management tooling to enforce settings and prove compliance"
+      ],
+      "atAGlance": [
+        {
+          "title": "Main goals",
+          "items": [
+            "FileVault and secure lock screen settings to protect local data",
+            "Gatekeeper and app controls to reduce untrusted execution",
+            "Firewall and sharing settings to reduce network exposure",
+            "Consistent enforcement through MDM or configuration profiles"
+          ]
+        },
+        {
+          "title": "High impact controls",
+          "items": [
+            "FileVault managed with device management where possible",
+            "Firewall enabled, with stealth mode when appropriate",
+            "Limit admin privileges and require elevation intentionally",
+            "Control privacy permissions for sensitive apps"
+          ]
+        },
+        {
+          "title": "Practical workflow",
+          "items": [
+            "Start from a baseline profile, then add stricter policies gradually",
+            "Test changes against common apps and developer workflows",
+            "Use inventory plus compliance reporting to catch drift",
+            "Treat sharing services and remote access as top risk areas"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "title": "Overview",
+          "paragraphs": [
+            "macOS security is strongest when you keep the platform defaults intact and add enforcement through profiles, not manual tweaks. The main risks are untrusted software execution, stolen devices, and broad user permissions.",
+            "Home users should prioritize encryption, a strong lock policy, and keeping updates current. Managed environments should prioritize MDM enforced settings, consistent identity controls, and reduced local admin use.",
+            "When you harden macOS, avoid breaking core workflows by focusing first on high confidence controls: encryption, firewall, app execution guardrails, and tight admin boundaries."
+          ],
+          "bullets": [
+            "Keep macOS and common apps updated",
+            "Use FileVault and protect recovery keys",
+            "Reduce local admin access and separate admin tasks",
+            "Limit sharing services and monitor remote access"
+          ],
+          "callout": {
+            "type": "tip",
+            "title": "Prefer profiles over manual tuning",
+            "text": "Configuration profiles and MDM provide consistent enforcement and make it easier to verify settings across many Macs."
+          }
+        },
+        {
+          "title": "Hardening actions",
+          "paragraphs": [
+            "Use the toggle to switch between a low friction home baseline and a stricter security baseline. Actions assume modern macOS settings and profile based management where possible."
+          ],
+          "toggle": {
+            "default": "home",
+            "options": [
+              {
+                "key": "home",
+                "label": "Home Baseline"
+              },
+              {
+                "key": "security",
+                "label": "Security Baseline"
+              }
+            ],
+            "views": {
+              "home": {
+                "table": {
+                  "headers": [
+                    "Action",
+                    "What you do",
+                    "Why you do it",
+                    "Security effect"
+                  ],
+                  "rows": [
+                    [
+                      "Keep macOS updated",
+                      "Enable automatic updates for macOS and common apps. Reboot promptly for security updates.",
+                      "Updates fix vulnerabilities that attackers use.",
+                      "Reduces exposure to known exploits."
+                    ],
+                    [
+                      "Enable FileVault",
+                      "Turn on FileVault full disk encryption and store recovery information safely.",
+                      "A stolen laptop is a data breach if the disk is readable offline.",
+                      "Protects data at rest."
+                    ],
+                    [
+                      "Strong screen lock and password",
+                      "Use a strong password, short idle lock time, and require password immediately after sleep or screen saver.",
+                      "Physical access is common and often overlooked.",
+                      "Reduces risk from opportunistic access and theft."
+                    ],
+                    [
+                      "Enable the firewall",
+                      "Turn on the macOS firewall and review which apps are allowed incoming connections.",
+                      "It reduces unsolicited inbound connections on untrusted networks.",
+                      "Reduces exposure to network discovery and inbound probing."
+                    ],
+                    [
+                      "Use stealth mode when on public networks",
+                      "Enable stealth mode if you travel or use public WiFi frequently.",
+                      "It reduces responses to certain network probes.",
+                      "Lowers visibility to opportunistic scanning."
+                    ],
+                    [
+                      "Use a standard user for daily work",
+                      "Avoid running as admin for daily tasks and use elevation only when needed.",
+                      "Admin sessions magnify the impact of phishing and untrusted software.",
+                      "Limits privilege misuse and accidental risky changes."
+                    ],
+                    [
+                      "Keep Gatekeeper enabled",
+                      "Allow apps from the App Store and identified developers unless you have a specific reason to override.",
+                      "It reduces the chance of running untrusted or tampered apps.",
+                      "Reduces untrusted execution risk."
+                    ]
+                  ]
+                }
+              },
+              "security": {
+                "table": {
+                  "headers": [
+                    "Action",
+                    "What you do",
+                    "Why you do it",
+                    "Security effect"
+                  ],
+                  "rows": [
+                    [
+                      "Enforce baseline via MDM or profiles",
+                      "Use configuration profiles to enforce a baseline: updates, lock policy, firewall, and security settings.",
+                      "Manual hardening drifts quickly across fleets.",
+                      "Consistent posture and measurable compliance."
+                    ],
+                    [
+                      "Manage FileVault with device management",
+                      "Enable FileVault through MDM and escrow recovery keys using an approved workflow.",
+                      "Recovery handling is part of secure encryption operations.",
+                      "Protects data at rest while keeping recovery controlled."
+                    ],
+                    [
+                      "Restrict local admin and elevate intentionally",
+                      "Minimize local admin users, use separate admin accounts, and consider admin approval workflows in managed environments.",
+                      "Local admin enables persistence and security disablement.",
+                      "Reduces attacker control after initial compromise."
+                    ],
+                    [
+                      "Tighten firewall policy and remote services",
+                      "Enable firewall and restrict sharing services. Disable remote login and screen sharing unless required and then restrict to management networks.",
+                      "Built in services can expose systems unexpectedly on networks.",
+                      "Reduced remote entry points and improved containment."
+                    ],
+                    [
+                      "Control privacy permissions (PPPC)",
+                      "Use profiles to manage privacy permissions for sensitive resources such as Full Disk Access, screen recording, and accessibility.",
+                      "Attackers and unwanted software abuse these permissions for persistence and data access.",
+                      "Reduces privilege abuse at the OS permission layer."
+                    ],
+                    [
+                      "Harden developer and admin tooling",
+                      "Standardize on approved tools, restrict untrusted kernel extensions, and monitor for new LaunchAgents and LaunchDaemons.",
+                      "Persistence on macOS often uses launch mechanisms and trusted tooling abuse.",
+                      "Improves prevention and detection of persistence."
+                    ],
+                    [
+                      "Centralize logging and detection",
+                      "Collect security relevant logs and integrate with EDR where available. Alert on admin changes and suspicious execution patterns.",
+                      "Local only visibility is fragile after compromise.",
+                      "Better detection and faster response."
+                    ],
+                    [
+                      "Limit inbound reachability",
+                      "Use network controls or VPN for management access. Avoid exposing macOS services directly to the internet.",
+                      "Reducing exposure often beats adding more local controls.",
+                      "Lower attack surface and reduced brute force risk."
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          "callout": {
+            "type": "warn",
+            "title": "Be careful with blanket blocks",
+            "text": "Overly strict app controls can break legitimate workflows. Start with enforcement on the highest risk areas and expand with measured exceptions."
+          }
+        }
+      ],
+      "signals": [
+        "FileVault disabled or recovery key handling changes unexpectedly",
+        "Firewall or sharing services toggled off without a change request",
+        "New admin users or privilege changes",
+        "New LaunchAgents or LaunchDaemons that do not match expected software"
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Mental model: keep strong defaults and control execution",
+            "paragraphs": [
+              "macOS hardening works best when you respect the platform model: strong defaults plus explicit user consent for sensitive actions. The goal is to keep those defaults intact and reduce paths that bypass them.",
+              "A useful mental model is execution trust plus data trust. Execution trust is which code is allowed to run and how it gains permissions. Data trust is which identities can access sensitive data and how loss or theft is handled.",
+              "Many macOS controls are built around user intent, for example prompts and privacy permissions. Hardening is partly about making prompts meaningful and partly about preventing silent bypass through excessive admin rights.",
+              "• Keep the OS security features enabled because they are designed to work together.",
+              "• Control who is an admin because admin rights can override many protections.",
+              "• Treat configuration profiles as the durable way to express policy."
+            ]
+          },
+          {
+            "title": "Baseline priorities for macOS endpoints",
+            "paragraphs": [
+              "A strong baseline for macOS focuses on code execution controls and on protecting user data. The largest practical risk is untrusted software plus user granted permissions, which can look legitimate while still being harmful.",
+              "Execution control is more subtle than on some platforms. Gatekeeper, notarization, and privacy prompts reduce risk, but they depend on users not being trained to click through. Design your baseline so users see fewer confusing prompts.",
+              "Data protection is also operational: encryption, strong screen lock, and secure backups reduce the damage of a lost laptop and reduce the pressure to weaken controls for convenience.",
+              "Tradeoff to expect: creative and developer workflows often need broader permissions, unsigned tools, or additional network access. The safe approach is to scope those needs to specific machines or profiles rather than making the entire fleet permissive.",
+              "Another tradeoff is privacy versus monitoring. More telemetry can help detection, but it can also create user trust issues. Be explicit about what you collect, why, and who can access it.",
+              "When you relax controls, prefer reversible relaxations, like granting a specific permission for a specific app, instead of disabling a platform control globally."
+            ]
+          },
+          {
+            "title": "Common traps that undermine macOS security",
+            "paragraphs": [
+              "A common trap is over reliance on the idea that macOS is secure by default. Defaults help, but real risk appears when users run third party software, keep local admin, or ignore update prompts for weeks.",
+              "Another trap is using admin accounts for daily work. Many permission prompts become less meaningful if the user can always approve changes without friction and without oversight.",
+              "Be careful with third party security tools that require deep system access. They can expand attack surface and can push users to disable protections. Use them only when you have a clear benefit and an update plan.",
+              "Fleet management failures also show up as security issues: unmanaged devices, inconsistent profiles, and missing inventory create blind spots that attackers love.",
+              "• Permission fatigue: if users see too many prompts, they will approve everything. Reduce noise so real prompts stand out.",
+              "• Shadow IT: one unapproved tool with broad permissions can undermine the entire baseline."
+            ]
+          },
+          {
+            "title": "Practical hardening for single devices and fleets",
+            "paragraphs": [
+              "For single devices, durability comes from habits: update cadence, least privilege, and a simple inventory of what is installed. For fleets, durability comes from policy enforcement through configuration profiles and MDM.",
+              "An operational hardening approach is to separate baseline controls from role based additions. The baseline covers fundamentals, then you add role profiles for developers, designers, or support, each with scoped exceptions.",
+              "Plan for failure modes like lost devices, stolen credentials, and compromised user accounts. Your hardening is stronger if you can revoke access quickly and wipe or lock devices when needed.",
+              "When to relax this: some teams need kernel extensions, debugging tools, or local services. The safe pattern is to keep those devices in a separate management group, require stronger authentication, and increase monitoring for those groups.",
+              "Document the reason and the boundary: what is allowed, where it is allowed, and what compensating control reduces risk.",
+              "Treat relaxations as temporary until proven necessary. Review them on a schedule because many exceptions only exist due to old workflows."
+            ]
+          },
+          {
+            "title": "Verification and evidence: what to check regularly",
+            "paragraphs": [
+              "Verification on macOS should balance settings checks with behavior checks. It is possible for a device to have correct settings but still be risky because of installed software and granted permissions.",
+              "Start with the basics: encryption status, screen lock posture, update status, and whether platform security features are enabled. Good looks like a device that is current and does not require special steps to stay protected.",
+              "Then verify the sensitive permission surface. Review which apps have access to full disk, accessibility, screen recording, camera, microphone, and automation. Good looks like a short list of approved apps with clear justification.",
+              "How to verify, and what good looks like:",
+              "• Platform protections: key protections are enabled and not in a reduced security mode without a documented reason",
+              "• Admin posture: daily users are standard users where possible, and admin elevation is deliberate",
+              "• Inventory: installed apps are known, and unsigned or unnotarized apps are rare and reviewed",
+              "When to relax this: lab machines, isolated demo devices, or dedicated dev endpoints. Document what is relaxed and require a reset plan, for example re enrollment or re imaging, so relaxations do not drift into long term exposure."
+            ]
+          }
+        ]
+      },
+      "references": [
+        {
+          "label": "Apple Platform Security guide",
+          "url": "https://help.apple.com/pdf/security/en_US/apple-platform-security-guide.pdf"
+        },
+        {
+          "label": "Manage FileVault with device management",
+          "url": "https://support.apple.com/guide/deployment/manage-filevault-with-device-management-dep0a2cb7686/web"
+        },
+        {
+          "label": "Use stealth mode on macOS firewall",
+          "url": "https://support.apple.com/guide/mac-help/mh17133/mac"
+        },
+        {
+          "label": "Intune macOS endpoint protection settings",
+          "url": "https://learn.microsoft.com/en-us/intune/intune-service/protect/endpoint-protection-macos"
+        }
+      ]
+    },
+    {
+      "id": "ssh",
+      "title": "SSH",
+      "intro": "SSH is often the primary remote administration channel. Hardening SSH is about strong authentication, tight access control, and safe operational practices so that remote access remains reliable without being an easy entry point.",
+      "objectives": [
+        "Configure SSH for strong authentication and limited exposure",
+        "Reduce brute force risk and tighten who can log in",
+        "Use modern operational practices for admin access and key handling",
+        "Validate changes safely and avoid locking yourself out"
+      ],
+      "atAGlance": [
+        {
+          "title": "Main goals",
+          "items": [
+            "Keys or certificates instead of passwords where possible",
+            "No direct root login and clear user allow lists",
+            "Restricted network exposure and rate limiting",
+            "Logging so you can investigate access attempts"
+          ]
+        },
+        {
+          "title": "High impact controls",
+          "items": [
+            "Disable PasswordAuthentication if feasible",
+            "Set PermitRootLogin to no or prohibit password based root login",
+            "Use AllowUsers or AllowGroups to limit access",
+            "Use a bastion or VPN instead of exposing SSH publicly"
+          ]
+        },
+        {
+          "title": "Practical workflow",
+          "items": [
+            "Test changes in a second session before restarting sshd",
+            "Keep emergency access plans and known good configs",
+            "Rotate keys and remove access promptly when people leave",
+            "Monitor auth logs for failed logins and unusual sources"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "title": "Overview",
+          "paragraphs": [
+            "SSH hardening is less about secret magic settings and more about controlling trust boundaries. Decide who can reach the SSH service, who can authenticate, and what they can do after login.",
+            "Key based authentication is usually stronger than passwords because it is not vulnerable to online guessing in the same way. Combining keys with network restrictions and rate limiting drastically reduces brute force risk.",
+            "Operational safety matters. Always apply changes while you have a second open session, and validate config syntax before restarting the service."
+          ],
+          "bullets": [
+            "Prefer keys or certificates and disable passwords where possible",
+            "Disallow direct root login and use sudo for elevation",
+            "Restrict access by user, group, and source network",
+            "Log and monitor authentication events"
+          ],
+          "callout": {
+            "type": "warn",
+            "title": "Avoid self lockout",
+            "text": "Before restarting sshd, keep a second session open and validate configuration syntax. One mistake can cut off remote access."
+          }
+        },
+        {
+          "title": "Hardening actions",
+          "paragraphs": [
+            "Each action below is safe on most systems, but always validate in a test session. Not every environment can disable passwords immediately, so treat the list as a progression."
+          ],
+          "table": {
+            "headers": [
+              "Action",
+              "What you do",
+              "Why you do it",
+              "Security effect"
+            ],
+            "rows": [
+              [
+                "Use SSH keys for authentication",
+                "Generate per user keys, store private keys securely, and deploy public keys to authorized keys.",
+                "Keys are resistant to online guessing and can be rotated per user.",
+                "Reduces credential stuffing and brute force effectiveness."
+              ],
+              [
+                "Disable password authentication where feasible",
+                "Set PasswordAuthentication to no and ensure all users have working keys first.",
+                "Passwords are easy to brute force and easy to phish.",
+                "Eliminates password based brute force as an entry path."
+              ],
+              [
+                "Disable direct root login",
+                "Set PermitRootLogin to no or at least prohibit password based root login and use sudo for elevation.",
+                "Root is a high value target and often brute forced.",
+                "Reduces direct privilege takeover risk."
+              ],
+              [
+                "Restrict who can log in",
+                "Use AllowUsers or AllowGroups to define explicit allowed identities.",
+                "A smaller allowed set reduces exposure and simplifies monitoring.",
+                "Limits access and reduces account abuse risk."
+              ],
+              [
+                "Limit network exposure",
+                "Bind SSH to management interfaces, use firewall rules, and prefer VPN or a bastion host for internet access.",
+                "If fewer networks can reach SSH, fewer attackers can test credentials.",
+                "Large reduction in attack surface."
+              ],
+              [
+                "Enable rate limiting and abuse controls",
+                "Use tools such as fail2ban or firewall rate limits to slow repeated failures.",
+                "Attackers rely on high volume guessing.",
+                "Reduces brute force throughput and noise."
+              ],
+              [
+                "Use modern crypto defaults",
+                "Keep OpenSSH updated and avoid enabling legacy ciphers or weak key types for compatibility unless required.",
+                "Legacy crypto options are weaker and increase risk.",
+                "Improves confidentiality and integrity of sessions."
+              ],
+              [
+                "Log and monitor SSH activity",
+                "Collect auth logs and alert on repeated failures, new source locations, and admin logons.",
+                "SSH attacks are visible if you look at the right signals.",
+                "Improves detection and investigation quality."
+              ],
+              [
+                "Use separate admin accounts",
+                "Do not use personal accounts for privileged tasks. Use sudo with auditability.",
+                "It reduces accidental privilege creep and improves accountability.",
+                "Better traceability and reduced blast radius."
+              ]
+            ]
+          },
+          "callout": {
+            "type": "tip",
+            "title": "Change one thing at a time",
+            "text": "Do not flip many SSH settings at once. Apply, validate, and document each change so you can roll back safely."
+          }
+        }
+      ],
+      "signals": [
+        "Repeated authentication failures from many IP addresses",
+        "Successful logons from new geographies or unusual subnets",
+        "Unexpected root login attempts or sudo spikes",
+        "New keys added to authorized keys without a tracked change"
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Mental model: SSH is your management plane",
+            "paragraphs": [
+              "SSH is not just a login tool, it is a control plane. If SSH fails, your attacker gains the same management reach that your administrators have. That is why SSH hardening should be treated like protecting an API for full system control.",
+              "A useful mental model is identity plus channel plus authority. Identity is how you authenticate. Channel is how sessions are established and forwarded. Authority is what the session can do once connected.",
+              "SSH hardening succeeds when you make identity strong, make sessions predictable, and make privileged actions auditable. You also need to avoid lockouts, because lockout pressure causes people to weaken configs permanently.",
+              "• Reduce who can attempt login, not only who can succeed.",
+              "• Reduce what a session can reach, for example by limiting forwarding and limiting admin scope.",
+              "• Increase evidence: session logs and clear records of key ownership."
+            ]
+          },
+          {
+            "title": "Baseline priorities in sshd configuration",
+            "paragraphs": [
+              "The biggest security gain usually comes from controlling authentication methods and narrowing the set of allowed users. Keys are safer than passwords when managed well, but unmanaged keys can become an invisible backdoor.",
+              "Key management has tradeoffs: if you disable password logins, you must be confident in your key lifecycle, including rotation and revocation. Otherwise a stolen private key becomes a long lived credential.",
+              "Modern SSH hardening is also about restricting risky features that are convenient but expand reach, such as agent forwarding, TCP forwarding, and unrestricted port tunnels.",
+              "Another tradeoff is usability in automation. CI systems and config management need access. The safe pattern is to use separate service accounts, scoped principals, and constrained commands rather than giving broad interactive access.",
+              "When you adopt stricter settings, plan a safe rollout so you can confirm access before you close the last door.",
+              "A good configuration is one you can explain. If you cannot explain why a directive exists, it will be misused during incident response."
+            ]
+          },
+          {
+            "title": "Common traps in SSH hardening",
+            "paragraphs": [
+              "A common failure mode is treating SSH as set and forget. Over time, more keys get added, old accounts stay enabled, and exceptions are made for convenience. The access surface slowly grows.",
+              "Another trap is relying on network location only. SSH exposed to internal networks still gets attacked through compromised endpoints, VPN access, and misrouted traffic. Assume attackers can reach internal SSH eventually.",
+              "Operational mistakes also matter: admins test changes on the wrong host, forget to reload, or maintain multiple config files that behave differently than expected.",
+              "Watch for hidden reachability through forwarding. A user with SSH access can often create tunnels that bypass network controls if forwarding is not constrained.",
+              "• Orphaned keys: keys without owners are high risk because you cannot rotate them with confidence.",
+              "• Break glass misuse: emergency access that becomes daily access is a predictable path to weak authentication."
+            ]
+          },
+          {
+            "title": "Safe rollout and change control",
+            "paragraphs": [
+              "Safe change control for SSH is not bureaucracy, it is how you avoid lockouts and avoid weakening controls under pressure. Always validate new settings in a parallel session before closing your last working session.",
+              "Roll out changes in stages. Start with a canary host, then a subset of hosts, then the fleet. If you have a bastion model, apply stricter rules at the bastion first because it is the choke point.",
+              "Use explicit allow lists for who can log in and from where. This reduces the chance that an unexpected account or key works silently.",
+              "When to relax hardening: sometimes you need temporary password auth for a vendor, or a temporary tunnel for migration. The safe pattern is time boxed access plus monitoring, then automatic reversion.",
+              "Document exceptions like you would document firewall rules: scope, owner, expiry, and test steps to confirm removal.",
+              "Prefer to relax by narrowing scope instead of weakening globally, for example allow one user from one source network for a short period."
+            ]
+          },
+          {
+            "title": "Logging and detection that complements hardening",
+            "paragraphs": [
+              "SSH hardening needs detection to catch what hardening cannot prevent, such as stolen keys or insider misuse. The goal is to make abnormal access visible quickly.",
+              "Verification starts with confirming effective configuration, not just what is written in a file. Different includes and match blocks can make two hosts behave differently even if they look similar.",
+              "How to verify, and what good looks like:",
+              "• Effective config: you can confirm the final evaluated config and it matches your intent",
+              "• Access surface: login attempts come from expected networks, and the allowed user list is short",
+              "• Auth behavior: password auth is disabled where intended, and key based auth is tied to known owners",
+              "• Session evidence: logs show who connected, from where, and what was executed for privileged paths",
+              "When to relax this: emergency recovery and initial bootstrap. Document the bootstrap window, keep it short, and ensure the host transitions into the standard baseline automatically.",
+              "Treat any permanent relaxation as a risk acceptance. Pair it with compensating controls such as tighter network scope, stronger MFA at a gateway, or session recording."
+            ]
+          }
+        ]
+      },
+      "references": [
+        {
+          "label": "sshd_config manual",
+          "url": "https://man7.org/linux/man-pages/man5/sshd_config.5.html"
+        },
+        {
+          "label": "OpenSSH on Debian manpage",
+          "url": "https://manpages.debian.org/testing/openssh-server/sshd_config.5.en.html"
+        }
+      ]
+    },
+    {
+      "id": "fw",
+      "title": "Firewall",
+      "intro": "Firewall hardening is about enforcing least privilege for network flows. A good firewall policy blocks by default, allows only what is required, and is managed as a living artifact with reviews, logging, and change control.",
+      "objectives": [
+        "Design rules that reflect real application needs and trust boundaries",
+        "Reduce inbound and outbound exposure with least privilege",
+        "Make firewall changes reviewable, testable, and reversible",
+        "Use logging to validate policy and support investigations"
+      ],
+      "atAGlance": [
+        {
+          "title": "Main goals",
+          "items": [
+            "Default deny where possible with explicit allow rules",
+            "Clear segmentation between zones and roles",
+            "Rule lifecycle management with owners and reviews",
+            "Logs that are useful, not just noisy"
+          ]
+        },
+        {
+          "title": "High impact controls",
+          "items": [
+            "Ingress allow lists based on app ports and sources",
+            "Egress controls for servers and admin networks",
+            "Separate management plane from user and internet zones",
+            "Regular rule review and cleanup to prevent sprawl"
+          ]
+        },
+        {
+          "title": "Practical workflow",
+          "items": [
+            "Document the intended flows before writing rules",
+            "Implement least privilege and verify with logs and testing",
+            "Review rules on a schedule and remove stale exceptions",
+            "Treat firewall changes as code with versioned backups"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "title": "Overview",
+          "paragraphs": [
+            "A firewall is not just a device or a feature. It is the policy that decides which network flows are allowed. Most firewall failures come from unclear requirements and unchecked exception growth.",
+            "Least privilege networking starts with understanding trust boundaries. Different zones should have different rules, and management traffic should be treated as high risk and tightly controlled.",
+            "Logging is part of the control. You need enough visibility to validate that rules match reality and to investigate suspicious traffic, but not so much that everything becomes noise."
+          ],
+          "bullets": [
+            "Start with default deny inbound where feasible",
+            "Allow only required sources and destinations, not entire subnets by habit",
+            "Segment by role: users, servers, management, and internet edge",
+            "Review rules regularly and remove stale entries"
+          ],
+          "callout": {
+            "type": "tip",
+            "title": "Policy first, rules second",
+            "text": "Write the policy in plain language before you write rules. It prevents accidental exposure and makes reviews much easier."
+          }
+        },
+        {
+          "title": "Hardening actions",
+          "paragraphs": [
+            "Use the toggle to switch between a home baseline and a stricter security baseline. The same principles apply, but the security baseline adds governance and tighter outbound control."
+          ],
+          "toggle": {
+            "default": "home",
+            "options": [
+              {
+                "key": "home",
+                "label": "Home Baseline"
+              },
+              {
+                "key": "security",
+                "label": "Security Baseline"
+              }
+            ],
+            "views": {
+              "home": {
+                "table": {
+                  "headers": [
+                    "Action",
+                    "What you do",
+                    "Why you do it",
+                    "Security effect"
+                  ],
+                  "rows": [
+                    [
+                      "Default block inbound",
+                      "Block unsolicited inbound connections and only allow services you intentionally expose.",
+                      "Most home devices do not need inbound services on the internet.",
+                      "Reduces exposure to scans and opportunistic exploitation."
+                    ],
+                    [
+                      "Allow established and related traffic",
+                      "Use stateful rules so replies to outbound connections are permitted automatically.",
+                      "It keeps usability while still blocking unsolicited inbound.",
+                      "Maintains functionality without opening broad inbound rules."
+                    ],
+                    [
+                      "Limit admin services to your LAN",
+                      "If you run SSH or admin UIs, restrict them to local networks or VPN only.",
+                      "Admin interfaces are common attack targets.",
+                      "Reduces remote takeover risk."
+                    ],
+                    [
+                      "Keep router and firewall firmware updated",
+                      "Apply vendor updates and disable remote management unless you truly need it.",
+                      "Edge devices are high value and often targeted.",
+                      "Reduces risk from edge device vulnerabilities."
+                    ],
+                    [
+                      "Enable basic logging for blocks",
+                      "Log dropped inbound attempts and review occasionally for unusual patterns.",
+                      "You cannot validate policy without visibility.",
+                      "Provides evidence of scanning and blocked attempts."
+                    ],
+                    [
+                      "Use DNS filtering if available",
+                      "Use a trusted resolver or filtering service to block known malicious domains.",
+                      "Many threats rely on DNS for command and control.",
+                      "Reduces exposure to malicious infrastructure."
+                    ],
+                    [
+                      "Separate guest WiFi",
+                      "Use a guest network for untrusted devices and visitors.",
+                      "Segmentation reduces lateral movement risk at home.",
+                      "Contains compromise to a smaller zone."
+                    ]
+                  ]
+                }
+              },
+              "security": {
+                "table": {
+                  "headers": [
+                    "Action",
+                    "What you do",
+                    "Why you do it",
+                    "Security effect"
+                  ],
+                  "rows": [
+                    [
+                      "Define a firewall policy with owners",
+                      "Document allowed flows per zone, assign owners, and require review for exceptions.",
+                      "Without governance, rules become a pile of permanent exceptions.",
+                      "Improves control quality and reduces accidental exposure."
+                    ],
+                    [
+                      "Default deny plus explicit allow per application",
+                      "Allow only required ports and protocols for each app and restrict by source and destination.",
+                      "Broad rules are easy to abuse and hard to audit.",
+                      "Reduces attack surface and lateral movement paths."
+                    ],
+                    [
+                      "Segment networks into zones",
+                      "Separate user, server, management, and internet edge zones and enforce explicit inter zone policy.",
+                      "Segmentation limits blast radius after compromise.",
+                      "Contains incidents and reduces pivot opportunities."
+                    ],
+                    [
+                      "Implement egress controls",
+                      "Restrict outbound traffic for servers and sensitive networks. Allow only required destinations and ports.",
+                      "Many attacks rely on outbound access for command and control and data exfiltration.",
+                      "Reduces exfiltration and C2 reliability."
+                    ],
+                    [
+                      "Harden management access",
+                      "Restrict firewall management to dedicated admin networks, use MFA, and log all changes.",
+                      "Firewall admin access is a top tier asset.",
+                      "Reduces risk of policy tampering."
+                    ],
+                    [
+                      "Enable meaningful logging and retention",
+                      "Log denies on critical boundaries, sample allows where needed, and retain logs centrally for investigations.",
+                      "Logs support detection and incident response.",
+                      "Improves detection and supports forensics."
+                    ],
+                    [
+                      "Review and clean up rules on a schedule",
+                      "Run periodic reviews to remove stale rules and tighten over broad ones.",
+                      "Rule sprawl is the most common real world firewall failure mode.",
+                      "Reduces hidden exposure and improves maintainability."
+                    ],
+                    [
+                      "Test changes and keep rollback plans",
+                      "Use staging or controlled change windows and keep versioned backups of firewall configs.",
+                      "Firewalls are critical infrastructure. Bad changes cause outages.",
+                      "Safer operations and faster recovery."
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          "callout": {
+            "type": "warn",
+            "title": "Avoid silent allow rules",
+            "text": "Rules that allow broad traffic without review accumulate quietly. If you cannot explain a rule, you should probably remove or tighten it."
+          }
+        }
+      ],
+      "signals": [
+        "Sudden increase in allowed outbound traffic from a server role",
+        "New rules added without a ticket or owner",
+        "Long lived rules that no one can justify",
+        "Repeated inbound blocks from a single source scanning multiple ports"
+      ],
+      "deepDive": {
+        "sections": [
+          {
+            "title": "Mental model: a firewall enforces allowed flows",
+            "paragraphs": [
+              "A firewall is the policy enforcement point for network flows. The deep idea is not blocking random ports, it is expressing intent: which systems may talk, on which protocols, for which purpose, and under which conditions.",
+              "A useful mental model is allow listed flows plus state. You define the small set of allowed flows, and the firewall tracks connection state so that return traffic is handled safely.",
+              "The hard part is that networks change. Services move, ports change, and dependencies appear. A good firewall posture anticipates change by making rules readable, scoped, and reviewable.",
+              "• A rule is a business decision expressed as network logic.",
+              "• Scope is security: tighter source, destination, and service scope is almost always safer than broad rules.",
+              "• Logging is part of enforcement because visibility changes behavior and supports incident response."
+            ]
+          },
+          {
+            "title": "Baseline priorities for firewall policy",
+            "paragraphs": [
+              "Good firewall policy starts with an inventory and a model of trust zones. Even on a single host firewall, you still have zones, for example loopback, local subnet, VPN, and internet.",
+              "Tradeoffs are real. A strict default deny posture reduces risk but increases operational load because new dependencies break until you explicitly allow them. That is why documentation and change flow matters.",
+              "Another tradeoff is between coarse rules that are easy to manage and fine rules that are safer. Coarse rules are tempting, but they often hide unnecessary exposure that becomes expensive later.",
+              "In real environments, the failure mode is usually not a missing rule, it is an overly broad rule created during an outage and never revisited.",
+              "When you must open access quickly, use a time boxed rule, a narrow scope, and a follow up review. This keeps the emergency from becoming the baseline.",
+              "Policy should also include what you do not allow, for example which outbound destinations are forbidden or which management ports must never be exposed."
+            ]
+          },
+          {
+            "title": "Common traps in firewall configuration",
+            "paragraphs": [
+              "One common trap is mixing environments in the same rule set. When production, staging, and labs share broad rules, the least hardened environment becomes a stepping stone.",
+              "Another trap is shadow rules and rule ordering. You can have a strict looking policy that is bypassed by one earlier broad allow rule, especially when rules are added quickly.",
+              "Logging can also go wrong. Logging everything creates noise and storage problems. Logging nothing removes evidence. The practical path is to log policy violations and sensitive events, then tune.",
+              "Beware of implicit allowances. Some platforms automatically allow established connections, local services, or certain helper protocols. If you do not understand these behaviors, your model of exposure can be wrong.",
+              "• Any any rules are rarely justified. If you think you need one, it usually means you do not yet understand the dependency.",
+              "• Exceptions without owners are forever, and forever exceptions become the real policy."
+            ]
+          },
+          {
+            "title": "Egress control and the detection advantage",
+            "paragraphs": [
+              "Egress control is where many teams get surprising value, but it comes with tradeoffs. Blocking unknown outbound connections can limit data exfiltration and malware callbacks, but it can also break software updates and cloud services.",
+              "A practical approach is to start with visibility. Measure outbound destinations, then restrict gradually. Many environments succeed with allow listing for a small set of servers and a monitor first approach for endpoints.",
+              "Egress rules also improve detection. If only a few destinations are normal, unusual outbound traffic stands out and can trigger investigation.",
+              "When to relax egress controls: developer laptops, build systems, and research machines often need broad outbound access. The safe pattern is to separate them into a distinct policy group and increase monitoring rather than weakening egress rules everywhere.",
+              "Document egress exceptions especially carefully because outbound access often intersects with privacy and business operations.",
+              "Use clear tags or comments so you can answer, later, why a flow exists and who approved it."
+            ]
+          },
+          {
+            "title": "Lifecycle: review, testing, and safe change",
+            "paragraphs": [
+              "Firewall hardening is a lifecycle activity. You should expect rules to be added, removed, and tuned. The difference between safe and unsafe environments is whether that lifecycle is controlled.",
+              "Verification should check both intent and effect. A rule that exists but is never hit might be dead code. A rule that is hit constantly might be too broad or might reflect a missing upstream control.",
+              "How to verify, and what good looks like:",
+              "• Default posture: non required inbound traffic is denied by default, and explicit allows are narrow",
+              "• Coverage: management access is restricted to known sources and is logged for investigation",
+              "• Change safety: rule changes are reviewed and tested, and emergency changes are revisited",
+              "• Evidence: logs or counters allow you to see denies and critical allows without drowning in noise",
+              "When to relax this: during migrations, incident response, or temporary vendor access. Document the scope and the rollback plan, then schedule a review to remove the relaxation.",
+              "Good firewalls are boring. If you cannot describe the rule set quickly, you probably cannot defend it during an incident."
+            ]
+          }
+        ]
+      },
+      "references": [
+        {
+          "label": "NIST Guidelines on Firewalls and Firewall Policy",
+          "url": "https://csrc.nist.gov/pubs/sp/800/41/r1/final"
+        },
+        {
+          "label": "NIST Guide to General Server Security",
+          "url": "https://csrc.nist.gov/pubs/sp/800/123/final"
+        }
+      ]
+    }
+  ]
+}
