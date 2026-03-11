@@ -339,7 +339,7 @@
     {% set sections = derived %}
   {% endif %}
   {% if sections %}
-  <details class="group rounded-2xl border border-white/10 bg-white/[0.03] ct-deepdive {{ extra_classes }}">
+  <details class="group rounded-2xl border border-white/10 bg-white/[0.03] ct-deepdive {{ extra_classes }}" data-ai-explain-scope="true">
     <summary class="cursor-pointer list-none p-6 hover:bg-white/[0.02] transition rounded-2xl">
       <div class="flex flex-col items-center text-center gap-1">
         <h2 class="text-xl font-semibold text-white uppercase tracking-[0.08em]">{{ _('Deep Dive') | upper }}</h2>

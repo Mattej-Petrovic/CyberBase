@@ -37,12 +37,12 @@ except Exception:  # pragma: no cover
 
 logger = logging.getLogger(__name__)
 
-MODEL_ID = "gemini-2.5-flash"
+MODEL_ID = "gemini-2.5-flash-lite"
 MODEL_VERSION = MODEL_ID
 PROMPT_VERSION = "4"
 
 EXPLAIN_CACHE_TTL_SECONDS = 7 * 24 * 60 * 60
-MAX_REQUESTS_PER_DAY = 3
+MAX_REQUESTS_PER_DAY = 10
 COOLDOWN_SECONDS = 10.0
 
 SESSION_COOKIE_NAME = "cb_session_id"
@@ -428,7 +428,7 @@ def handle_ai_request(
             "ok": False,
             "error": {
                 "code": "daily_limit",
-                "message": _("AI limit reached for today. You get 3 requests per day. Try again tomorrow."),
+                "message": _("AI limit reached for today. You get 10 requests per day. Try again tomorrow."),
             },
         }
 

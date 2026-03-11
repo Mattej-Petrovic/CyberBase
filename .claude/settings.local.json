@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r \"GOOGLE_API_KEY\\\\|API_KEY\\\\|api_key\\\\|apiKey\" c:UsersMatqkDesktopWGrindSchoolGithubCyberBase --include=*.py --include=*.js --include=*.ts --include=*.env)",
+      "WebSearch"
+    ]
+  }
+}

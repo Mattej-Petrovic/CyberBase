@@ -272,7 +272,7 @@ Key changes
   async function getFirebaseAuth() {
     if (firebaseAuthCache) return firebaseAuthCache;
     try {
-      const [{ initializeApp }, { getAuth, onAuthStateChanged }] = await Promise.all([
+      const [{ initializeApp, getApps, getApp }, { getAuth, onAuthStateChanged }] = await Promise.all([
         import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js"),
         import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js"),
       ]);
@@ -280,7 +280,7 @@ Key changes
         ? window.__FIREBASE_CONFIG__
         : null;
       if (!conf) return null;
-      const app = initializeApp(conf);
+      const app = getApps().length ? getApp() : initializeApp(conf);
       const auth = getAuth(app);
       firebaseAuthCache = { auth, onAuthStateChanged };
       return firebaseAuthCache;
@@ -302,7 +302,7 @@ Key changes
         const timer = setTimeout(() => {
           if (unsub) unsub();
           resolve(null);
-        }, 300);
+        }, 2000);
         unsub = fb.onAuthStateChanged(auth, async (user) => {
           clearTimeout(timer);
           if (unsub) unsub();
@@ -500,11 +500,18 @@ Key changes
   function findScopeEl(node) {
     if (!node) return null;
     let el = node.nodeType === 1 ? node : node.parentElement;
+    let found = null;
     while (el) {
-      if (el.getAttribute && el.getAttribute("data-ai-explain-scope") === "true") return el;
-      el = el.parentElement;
+      if (el.getAttribute && el.getAttribute("data-ai-explain-scope") === "true") found = el;
+      if (el.parentElement) {
+        el = el.parentElement;
+      } else {
+        // Traverse out of shadow DOM if parentElement is null (e.g. Chrome <details> UA shadow root)
+        const root = el.getRootNode ? el.getRootNode() : null;
+        el = (root && root.host) ? root.host : null;
+      }
     }
-    return null;
+    return found;
   }
 
   function hasMeaningfulSelection(text) {
@@ -546,8 +553,8 @@ Key changes
     selectionWrapEl.classList.remove("hidden");
 
     const rect = range.getBoundingClientRect();
-    const top = Math.max(10, rect.top + window.scrollY - 40);
-    const left = Math.min(window.innerWidth - 220, Math.max(10, rect.left + window.scrollX));
+    const top = Math.max(70, rect.top - 40);
+    const left = Math.min(window.innerWidth - 220, Math.max(10, rect.left));
     selectionWrapEl.style.top = `${top}px`;
     selectionWrapEl.style.left = `${left}px`;
   }
@@ -630,6 +637,7 @@ Key changes
 
       document.addEventListener("mouseup", showSelectionButtonIfNeeded);
       document.addEventListener("keyup", showSelectionButtonIfNeeded);
+      document.addEventListener("selectionchange", showSelectionButtonIfNeeded);
       document.addEventListener("scroll", () => {
         if (!selectionWrapEl.classList.contains("hidden")) showSelectionButtonIfNeeded();
       });
