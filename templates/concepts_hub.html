@@ -3,10 +3,10 @@
 {% block title %}{{ _('Concepts') }}{% endblock %}
 
 {% block content %}
-<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+<div class="mx-auto max-w-7xl py-10 sm:py-12">
 
   <div class="mb-8">
-    <h1 class="text-3xl font-bold text-white">{{ _('Concepts') }}</h1>
+    <h1 class="text-3xl sm:text-4xl font-bold text-white">{{ _('Concepts') }}</h1>
     <p class="mt-2 text-slate-300">{{ _('Explore categories and drill into details.') }}</p>
   </div>
 
@@ -22,13 +22,13 @@
     {% for title, slug, items, icon, desc in cards %}
       {% set limit = 9 if slug in ['frameworks-and-standards','networking-and-protocols'] else 6 %}
       {% set min_to_toggle = 10 if slug in ['frameworks-and-standards','networking-and-protocols'] else 7 %}
-      <section class="rounded-2xl border border-slate-700/60 bg-slate-900/30 p-6 shadow-xl" x-data="{ isExpanded: false, limit: {{ limit }} }">
+      <section class="min-w-0 rounded-2xl border border-slate-700/60 bg-slate-900/30 p-5 sm:p-6 shadow-xl" x-data="{ isExpanded: false, limit: {{ limit }} }">
         <div class="flex items-start justify-between gap-4">
-          <div>
-            <h2 class="text-xl font-semibold text-white">{{ title }}</h2>
+          <div class="min-w-0">
+            <h2 class="text-xl font-semibold text-white break-words">{{ title }}</h2>
             <p class="mt-1 text-sm text-slate-300">{{ desc }}</p>
           </div>
-          <div class="text-2xl opacity-80">{{ icon }}</div>
+          <div class="shrink-0 text-2xl opacity-80">{{ icon }}</div>
         </div>
 
         {% if slug != 'ports' %}
@@ -36,20 +36,20 @@
             {% for item in items %}
                 <a href="{{ url_for('concept_detail', cat=slug, cid=item.id) }}" data-i="{{ loop.index }}"
                  x-show="isExpanded || (Number($el.dataset.i) <= limit)"
-                 class="group rounded-xl border border-slate-700/60 bg-slate-900/40 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800/60 hover:border-slate-600 transition">
-                <span class="font-medium">{{ item.name }}</span>
+                 class="group min-w-0 rounded-xl border border-slate-700/60 bg-slate-900/40 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800/60 hover:border-slate-600 transition">
+                <span class="block font-medium break-words">{{ item.name }}</span>
               </a>
             {% endfor %}
           </div>
         {% else %}
-          <div class="mt-5 grid grid-cols-3 gap-2">
+          <div class="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-2">
             {% for port in items %}
               <a href="{{ url_for('concept_detail', cat='ports', cid=port.port) }}" data-i="{{ loop.index }}"
                  x-show="isExpanded || (Number($el.dataset.i) <= limit)"
-                 class="group rounded-xl border border-slate-700/60 bg-slate-900/40 px-3 py-2 hover:bg-slate-800/60 hover:border-slate-600 transition">
-                <div class="flex flex-col leading-tight">
+                 class="group min-w-0 rounded-xl border border-slate-700/60 bg-slate-900/40 px-3 py-2 hover:bg-slate-800/60 hover:border-slate-600 transition">
+                <div class="flex min-w-0 flex-col leading-tight">
                   <span class="text-sm text-white font-semibold">{{ port.port }}</span>
-                  <span class="text-xs text-slate-300">{{ port.name }}</span>
+                  <span class="text-xs text-slate-300 break-words">{{ port.name }}</span>
                 </div>
               </a>
             {% endfor %}

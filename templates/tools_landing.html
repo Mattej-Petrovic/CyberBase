@@ -10,34 +10,34 @@
 
   <!-- Header -->
   <header class="max-w-4xl mx-auto text-center space-y-4">
-    <h1 class="text-4xl md:text-5xl font-bold tracking-tight">{{ _('Toolbox') }}</h1>
+    <h1 class="text-4xl md:text-5xl font-bold tracking-tight break-words">{{ _('Toolbox') }}</h1>
 
   </header>
 
   <!-- Cards -->
   <div class="min-h-[30vh] md:min-h-[40vh] lg:min-h-[45vh] flex items-center">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full mt-6 md:mt-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full mt-6 md:mt-10">
 
     <!-- CLI -->
-    <section class="rounded-2xl border border-slate-700/70 bg-slate-900/45 shadow-lg shadow-black/10 hover:shadow-black/20 smooth-hover overflow-hidden h-full flex flex-col text-[15px]">
-      <div class="p-7 flex-1 flex flex-col gap-4">
+    <section class="min-w-0 rounded-2xl border border-slate-700/70 bg-slate-900/45 shadow-lg shadow-black/10 hover:shadow-black/20 smooth-hover overflow-hidden h-full flex flex-col text-[15px]">
+      <div class="p-6 md:p-7 flex-1 flex flex-col gap-4">
         <div class="flex items-start justify-between gap-4">
-          <div class="space-y-1">
-            <h2 class="text-2xl font-semibold">{{ _('CLI Tools') }}</h2>
+          <div class="min-w-0 space-y-1">
+            <h2 class="text-2xl font-semibold break-words">{{ _('CLI Tools') }}</h2>
             <p class="text-base text-gray-400">
               {{ _('Terminal utilities with clear syntax, flags, and examples.') }}
             </p>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex shrink-0 items-center gap-2">
             <span class="text-2xl" aria-hidden="true">&#9000;</span>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <template x-for="t in (tools.cliTools || [])" :key="t.id">
             <a :href="'/tools/' + t.id"
-               class="px-3 py-2 rounded-xl bg-slate-950/70 border border-slate-700/80 text-[15px] text-gray-200 hover:border-blue-400/80 hover:bg-slate-950 hover:text-white smooth-hover font-mono">
-              <span x-text="t.name"></span>
+               class="min-w-0 px-3 py-2 rounded-xl bg-slate-950/70 border border-slate-700/80 text-[15px] text-gray-200 hover:border-blue-400/80 hover:bg-slate-950 hover:text-white smooth-hover font-mono">
+              <span class="block break-words" x-text="t.name"></span>
             </a>
           </template>
         </div>
@@ -53,25 +53,25 @@
     </section>
 
     <!-- GUI -->
-    <section class="rounded-2xl border border-slate-700/70 bg-slate-900/45 shadow-lg shadow-black/10 hover:shadow-black/20 smooth-hover overflow-hidden h-full flex flex-col text-[15px]">
-      <div class="p-7 flex-1 flex flex-col gap-4">
+    <section class="min-w-0 rounded-2xl border border-slate-700/70 bg-slate-900/45 shadow-lg shadow-black/10 hover:shadow-black/20 smooth-hover overflow-hidden h-full flex flex-col text-[15px]">
+      <div class="p-6 md:p-7 flex-1 flex flex-col gap-4">
         <div class="flex items-start justify-between gap-4">
-          <div class="space-y-1">
-            <h2 class="text-2xl font-semibold">{{ _('GUI Tools') }}</h2>
+          <div class="min-w-0 space-y-1">
+            <h2 class="text-2xl font-semibold break-words">{{ _('GUI Tools') }}</h2>
             <p class="text-base text-gray-400">
               {{ _('Visual tools and analyzers with what to look for and how to use them.') }}
             </p>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex shrink-0 items-center gap-2">
             <span class="text-2xl" aria-hidden="true">&#128421;</span>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <template x-for="g in (tools.guiTools || [])" :key="g.id">
             <a :href="'/tools/' + g.id"
-               class="px-3 py-2 rounded-xl bg-slate-950/70 border border-slate-700/80 text-[15px] text-gray-200 hover:border-blue-400/80 hover:bg-slate-950 hover:text-white smooth-hover">
-              <span x-text="g.name"></span>
+               class="min-w-0 px-3 py-2 rounded-xl bg-slate-950/70 border border-slate-700/80 text-[15px] text-gray-200 hover:border-blue-400/80 hover:bg-slate-950 hover:text-white smooth-hover">
+              <span class="block break-words" x-text="g.name"></span>
             </a>
           </template>
         </div>
@@ -87,16 +87,16 @@
     </section>
 
     <!-- Detection -->
-    <section class="rounded-2xl border border-slate-700/70 bg-slate-900/45 shadow-lg shadow-black/10 hover:shadow-black/20 smooth-hover overflow-hidden h-full flex flex-col text-[15px]">
-      <div class="p-7 flex-1 flex flex-col gap-4">
+    <section class="min-w-0 rounded-2xl border border-slate-700/70 bg-slate-900/45 shadow-lg shadow-black/10 hover:shadow-black/20 smooth-hover overflow-hidden h-full flex flex-col text-[15px]">
+      <div class="p-6 md:p-7 flex-1 flex flex-col gap-4">
         <div class="flex items-start justify-between gap-4">
-          <div class="space-y-1">
-            <h2 class="text-2xl font-semibold">{{ _('Detection Tools') }}</h2>
+          <div class="min-w-0 space-y-1">
+            <h2 class="text-2xl font-semibold break-words">{{ _('Detection Tools') }}</h2>
             <p class="text-base text-gray-400">
               {{ _('IDS and monitoring tools with quick actions you actually use.') }}
             </p>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex shrink-0 items-center gap-2">
             <span class="text-2xl" aria-hidden="true">&#128752;</span>
           </div>
         </div>
@@ -105,18 +105,18 @@
           <div class="text-sm text-gray-500">{{ _('No detection tools added yet.') }}</div>
         </template>
 
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <template x-if="tools.detectionTool && tools.detectionTool.id">
             <a :href="'/tools/' + tools.detectionTool.id"
-               class="px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-700/80 text-[15px] text-gray-200 hover:border-blue-400/80 hover:bg-slate-950 hover:text-white smooth-hover">
-              <span class="font-medium" x-text="tools.detectionTool.name"></span>
+               class="min-w-0 px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-700/80 text-[15px] text-gray-200 hover:border-blue-400/80 hover:bg-slate-950 hover:text-white smooth-hover">
+              <span class="block font-medium break-words" x-text="tools.detectionTool.name"></span>
             </a>
           </template>
 
           <template x-for="d in (tools.detectionTools || [])" :key="d.id">
             <a :href="'/tools/' + d.id"
-               class="px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-700/80 text-[15px] text-gray-200 hover:border-blue-400/80 hover:bg-slate-950 hover:text-white smooth-hover">
-              <span class="font-medium" x-text="d.name"></span>
+               class="min-w-0 px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-700/80 text-[15px] text-gray-200 hover:border-blue-400/80 hover:bg-slate-950 hover:text-white smooth-hover">
+              <span class="block font-medium break-words" x-text="d.name"></span>
             </a>
           </template>
         </div>

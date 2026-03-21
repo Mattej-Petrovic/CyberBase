@@ -41,7 +41,7 @@
 {% endmacro %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 ct-concept-page" data-ai-explain-scope="true">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 ct-concept-page" data-ai-explain-scope="true">
   {% if not_found %}
     <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-8">
       <h1 class="text-2xl font-semibold text-white mb-2">{{ _('Not found') }}</h1>
@@ -58,7 +58,7 @@
     <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
         <div class="text-slate-300 text-sm mb-2">{{ category }}</div>
-        <h1 class="text-3xl md:text-4xl font-semibold tracking-tight text-white">
+        <h1 class="text-3xl md:text-4xl font-semibold tracking-tight text-white break-words">
           {{ title }}
         </h1>
         {% if item.summary %}
@@ -82,9 +82,9 @@
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 space-y-6">
+    <div class="min-w-0 lg:col-span-2 space-y-6">
 
-      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-maincard">
+      <div class="min-w-0 bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-maincard">
         <h2 class="text-lg font-semibold text-white mb-3">{{ _('What it is') }}</h2>
         {% set is_ports_view = is_ports | default(false) %}
         {% set what_text = learn.what if learn.what is defined else (item.intro or _('No description available.')) %}
@@ -150,7 +150,7 @@
       </div>
 
       {% if learn.how is defined and learn.how %}
-      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-maincard">
+      <div class="min-w-0 bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-maincard">
         <h2 class="text-lg font-semibold text-white mb-3">{{ _('How it works in broad strokes') }}</h2>
         <ol class="list-decimal list-inside text-slate-300 space-y-2">
           {% for step in learn.how %}
@@ -161,7 +161,7 @@
       {% endif %}
 
       {% if learn.example is defined and learn.example %}
-      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-maincard">
+      <div class="min-w-0 bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-maincard">
         <h2 class="text-lg font-semibold text-white mb-3">{{ _('Concrete example') }}</h2>
         <p class="text-slate-300 leading-relaxed">{{ learn.example }}</p>
       </div>
@@ -169,16 +169,16 @@
 
     </div>
 
-    <div class="space-y-6">
+    <div class="min-w-0 space-y-6">
       {% if learn.why is defined and learn.why %}
-      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
+      <div class="min-w-0 bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
         <h2 class="text-lg font-semibold text-white mb-3">{{ _('Why it matters') }}</h2>
         <p class="text-slate-300 leading-relaxed">{{ learn.why }}</p>
       </div>
       {% endif %}
 
       {% if learn.security is defined and learn.security %}
-      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
+      <div class="min-w-0 bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
         <h2 class="text-lg font-semibold text-white mb-3">{{ _('Security angle') }}</h2>
         <ul class="list-disc list-inside text-slate-300 space-y-1">
           {% for s in learn.security %}
@@ -189,7 +189,7 @@
       {% endif %}
 
       {% if learn.pitfalls is defined and learn.pitfalls %}
-      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
+      <div class="min-w-0 bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
         <h2 class="text-lg font-semibold text-white mb-3">{{ _('Common pitfalls') }}</h2>
         <ul class="list-disc list-inside text-slate-300 space-y-1">
           {% for p in learn.pitfalls %}
@@ -200,7 +200,7 @@
       {% endif %}
 
       {% if learn.selfTest is defined and learn.selfTest %}
-      <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
+      <div class="min-w-0 bg-slate-900/60 border border-slate-700 rounded-2xl p-6 ct-sidecard">
         <h2 class="text-lg font-semibold text-white mb-3">{{ _('Quick self test') }}</h2>
         <ul class="list-disc list-inside text-slate-300 space-y-1">
           {% for q in learn.selfTest %}

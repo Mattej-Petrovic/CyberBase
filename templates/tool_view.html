@@ -375,17 +375,17 @@
 {% endmacro %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto px-4 py-10 ct-tool-page" data-ai-explain-scope="true">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 ct-tool-page" data-ai-explain-scope="true">
   <a href="{{ url_for('toolbox_hub') }}" class="text-slate-400 hover:text-white transition">&larr; {{ _('Back to Toolbox') }}</a>
 
   <div class="mt-6">
-    <h1 class="text-3xl font-bold text-white">{{ tool.name }}</h1>
+    <h1 class="text-3xl font-bold text-white break-words">{{ tool.name }}</h1>
     <p class="mt-2 text-slate-300/90 text-lg leading-7 tracking-[0.01em] max-w-[70ch]">{{ tool.tagline }}</p>
 
     {% if tool.overview %}
     <div class="mt-8 grid gap-6 lg:grid-cols-3 items-stretch">
 
-      <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 ct-hero-card">
+      <div class="min-w-0 rounded-2xl border border-white/10 bg-white/[0.03] p-6 ct-hero-card">
         <div>
           <h2 class="text-lg font-semibold text-white text-center">{{ _('What it is') }}</h2>
           <div class="mx-auto mt-2 h-px w-11/12 bg-white/10"></div>
@@ -393,7 +393,7 @@
         </div>
       </div>
 
-      <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 ct-hero-card">
+      <div class="min-w-0 rounded-2xl border border-white/10 bg-white/[0.03] p-6 ct-hero-card">
         <div>
           <h2 class="text-lg font-semibold text-white text-center">{{ _('How it works') }}</h2>
           <div class="mx-auto mt-2 h-px w-11/12 bg-white/10"></div>
@@ -401,7 +401,7 @@
         </div>
       </div>
 
-      <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 ct-hero-card">
+      <div class="min-w-0 rounded-2xl border border-white/10 bg-white/[0.03] p-6 ct-hero-card">
         <div>
           <h2 class="text-lg font-semibold text-white text-center">{{ _('Use it for') }}</h2>
           <div class="mx-auto mt-2 h-px w-11/12 bg-white/10"></div>
@@ -422,14 +422,14 @@
 
     {% set _items_class = 'items-stretch' if tool.id in ['nslookup', 'suricata'] else 'items-start' %}
     <div class="mt-8 grid gap-3 lg:grid-cols-12 {{ _items_class }}">
-      <div class="lg:col-span-8">
+      <div class="min-w-0 lg:col-span-8">
         {% if tool.id in ['nslookup', 'suricata'] %}
           {{ usage_card(tool, 'h-full') }}
         {% else %}
           {{ usage_card(tool) }}
         {% endif %}
       </div>
-      <div class="lg:col-span-4">
+      <div class="min-w-0 lg:col-span-4">
         {% if tool.id in ['nslookup', 'suricata'] %}
           {{ quick_panel_card(tool, 'h-full') }}
         {% else %}
