@@ -47,6 +47,138 @@ msgstr "Begrepp"
 msgid "Defend"
 msgstr "Försvar"
 
+#: templates/base.html templates/home.html
+msgid "DevSecOps"
+msgstr "DevSecOps"
+
+#: templates/devsecops_hub.html
+msgid "Secure the delivery pipeline from source code to cloud runtime."
+msgstr "Bygg in äkerhet i leveranskedjan från källkod till molnruntime."
+
+#: templates/devsecops_hub.html
+msgid "Containers"
+msgstr "Behållare"
+
+#: templates/devsecops_hub.html
+msgid "Package and isolate workloads with container hardening, image hygiene, and runtime controls."
+msgstr "Paketera och isolera arbetslaster med härdning av behållare, bildhygien och kontroll av körning."
+
+#: templates/devsecops_hub.html
+msgid "Orchestration"
+msgstr "Orkestrering"
+
+#: templates/devsecops_hub.html
+msgid "Run and secure clusters with clear scheduling, access, policy, and network boundaries."
+msgstr "Driv och skydda kluster med tydlig schemaläggning, åtkomst, policy och nätverksgränser."
+
+#: templates/devsecops_hub.html
+msgid "CI/CD"
+msgstr "CI/CD"
+
+#: templates/devsecops_hub.html
+msgid "Treat build and release pipelines as security-critical systems with repeatable checks and approvals."
+msgstr "Behandla bygg- och releasepipelines som säkerhetskritiska system med repeterbara kontroller och godkännanden."
+
+#: templates/devsecops_hub.html
+msgid "Infrastructure as Code"
+msgstr "Infrastruktur som kod"
+
+#: templates/devsecops_hub.html
+msgid "Define, review, and secure infrastructure through versioned configuration and automated validation."
+msgstr "Definiera, granska och säkra infrastruktur genom versionsstyrd konfiguration och automatiserad validering."
+
+#: templates/devsecops_hub.html
+msgid "Supply Chain"
+msgstr "Leveranskedja"
+
+#: templates/devsecops_hub.html
+msgid "Protect dependencies, artifacts, and provenance from source to deployment."
+msgstr "Skydda beroenden, artefakter och härkomst från källkod till driftsättning."
+
+#: templates/devsecops_hub.html
+msgid "Application & Cloud Security"
+msgstr "Applikations- och molnsäkerhet"
+
+#: templates/devsecops_hub.html
+msgid "Secure applications and cloud platforms with layered controls, observability, and least privilege."
+msgstr "Säkra applikationer och molnplattformar med lager av kontroller, observerbarhet och minsta privilegium."
+
+#: templates/devsecops_hub.html
+msgid "Secrets, Identity, Runtime"
+msgstr "Hemligheter, identitet och körning"
+
+#: templates/devsecops_hub.html
+msgid "Protect secrets, identities, and runtime behavior across delivery and execution environments."
+msgstr "Skydda hemligheter, identiteter och körningsbeteende i leverans- och exekveringsmiljöer."
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Docker"
+msgstr "Docker"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Container Security"
+msgstr "Containersäkerhet"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Kubernetes"
+msgstr "Kubernetes"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Kubernetes Security"
+msgstr "Kubernetes-säkerhet"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "CI/CD Foundations"
+msgstr "CI/CD-grunder"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Pipeline Security"
+msgstr "Pipelinesäkerhet"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Security Testing"
+msgstr "Säkerhetstestning"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "IaC Foundations"
+msgstr "IaC-grunder"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Terraform"
+msgstr "Terraform"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "IaC Security"
+msgstr "IaC-säkerhet"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Dependency Security"
+msgstr "Beroendesäkerhet"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Artifact Integrity"
+msgstr "Artefaktintegritet"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Application Security"
+msgstr "Applikationssäkerhet"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Cloud Security"
+msgstr "Molnsäkerhet"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Secrets Management"
+msgstr "Hantering av hemligheter"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Workload Identity"
+msgstr "Arbetslastidentitet"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Runtime Security"
+msgstr "Körningssäkerhet"
+
 #: app.py:1161
 #, python-format
 msgid "Tool - %(kind)s"
@@ -2012,3 +2144,7 @@ msgstr "Ange din e-post för att återställa lösenordet."
 #: templates/auth/login.html:137
 msgid "Password reset email sent. Check your inbox."
 msgstr "Lösenordsåterställning skickad via e-post. Kontrollera inkorgen."
+
+#: templates/devsecops_detail.html
+msgid "Back to DevSecOps"
+msgstr "Tillbaka till DevSecOps"

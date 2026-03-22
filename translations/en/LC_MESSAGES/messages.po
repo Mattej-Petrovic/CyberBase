@@ -47,6 +47,10 @@ msgstr "Concept"
 msgid "Defend"
 msgstr "Defend"
 
+#: templates/base.html templates/home.html
+msgid "DevSecOps"
+msgstr "DevSecOps"
+
 #: app.py:1161
 #, python-format
 msgid "Tool - %(kind)s"
@@ -1108,6 +1112,134 @@ msgstr "Defend topics"
 msgid "Hardening and detection"
 msgstr "Hardening and detection"
 
+#: templates/devsecops_hub.html
+msgid "Secure the delivery pipeline from source code to cloud runtime."
+msgstr "Secure the delivery pipeline from source code to cloud runtime."
+
+#: templates/devsecops_hub.html
+msgid "Containers"
+msgstr "Containers"
+
+#: templates/devsecops_hub.html
+msgid "Package and isolate workloads with container hardening, image hygiene, and runtime controls."
+msgstr "Package and isolate workloads with container hardening, image hygiene, and runtime controls."
+
+#: templates/devsecops_hub.html
+msgid "Orchestration"
+msgstr "Orchestration"
+
+#: templates/devsecops_hub.html
+msgid "Run and secure clusters with clear scheduling, access, policy, and network boundaries."
+msgstr "Run and secure clusters with clear scheduling, access, policy, and network boundaries."
+
+#: templates/devsecops_hub.html
+msgid "CI/CD"
+msgstr "CI/CD"
+
+#: templates/devsecops_hub.html
+msgid "Treat build and release pipelines as security-critical systems with repeatable checks and approvals."
+msgstr "Treat build and release pipelines as security-critical systems with repeatable checks and approvals."
+
+#: templates/devsecops_hub.html
+msgid "Infrastructure as Code"
+msgstr "Infrastructure as Code"
+
+#: templates/devsecops_hub.html
+msgid "Define, review, and secure infrastructure through versioned configuration and automated validation."
+msgstr "Define, review, and secure infrastructure through versioned configuration and automated validation."
+
+#: templates/devsecops_hub.html
+msgid "Supply Chain"
+msgstr "Supply Chain"
+
+#: templates/devsecops_hub.html
+msgid "Protect dependencies, artifacts, and provenance from source to deployment."
+msgstr "Protect dependencies, artifacts, and provenance from source to deployment."
+
+#: templates/devsecops_hub.html
+msgid "Application & Cloud Security"
+msgstr "Application & Cloud Security"
+
+#: templates/devsecops_hub.html
+msgid "Secure applications and cloud platforms with layered controls, observability, and least privilege."
+msgstr "Secure applications and cloud platforms with layered controls, observability, and least privilege."
+
+#: templates/devsecops_hub.html
+msgid "Secrets, Identity, Runtime"
+msgstr "Secrets, Identity, Runtime"
+
+#: templates/devsecops_hub.html
+msgid "Protect secrets, identities, and runtime behavior across delivery and execution environments."
+msgstr "Protect secrets, identities, and runtime behavior across delivery and execution environments."
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Docker"
+msgstr "Docker"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Container Security"
+msgstr "Container Security"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Kubernetes"
+msgstr "Kubernetes"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Kubernetes Security"
+msgstr "Kubernetes Security"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "CI/CD Foundations"
+msgstr "CI/CD Foundations"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Pipeline Security"
+msgstr "Pipeline Security"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Security Testing"
+msgstr "Security Testing"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "IaC Foundations"
+msgstr "IaC Foundations"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Terraform"
+msgstr "Terraform"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "IaC Security"
+msgstr "IaC Security"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Dependency Security"
+msgstr "Dependency Security"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Artifact Integrity"
+msgstr "Artifact Integrity"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Application Security"
+msgstr "Application Security"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Cloud Security"
+msgstr "Cloud Security"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Secrets Management"
+msgstr "Secrets Management"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Workload Identity"
+msgstr "Workload Identity"
+
+#: templates/devsecops_hub.html templates/devsecops_detail.html
+msgid "Runtime Security"
+msgstr "Runtime Security"
+
 #: templates/home.html:271
 msgid "Recently used"
 msgstr "Recently used"
@@ -1582,6 +1714,10 @@ msgstr ""
 #: templates/tool_view.html:379
 msgid "Back to Toolbox"
 msgstr ""
+
+#: templates/devsecops_detail.html
+msgid "Back to DevSecOps"
+msgstr "Back to DevSecOps"
 
 #: templates/tool_view.html:392
 msgid ""

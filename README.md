@@ -13,6 +13,7 @@ With the app, you can:
 - look up copy-ready commands with syntax, flags, and examples
 - explore tools and understand what they do, how they work, and when to use them
 - read about core cybersecurity concepts, principles, frameworks, protocols, and ports
+- review DevSecOps topics covering containers, CI/CD pipelines, IaC, supply chain, and cloud security
 - review defensive topics such as detection, logging, and hardening
 - take short quizzes across multiple security topics
 - paste or upload logs and inspect suspicious patterns with a rule-based analyzer
@@ -25,6 +26,7 @@ The goal is not to replace official documentation or professional tooling. It is
 - **Command Library**: Searchable, copy-ready commands with minimal usage, flags, workflows, and examples.
 - **Toolbox**: CLI, GUI, and detection tool pages with explanations, usage patterns, GUI cheat sheets, quick panels, and deep dives.
 - **Concepts**: Frameworks and standards, principles and identity, networking and protocols, and ports with structured detail pages.
+- **DevSecOps**: Structured topic pages covering containers, orchestration, CI/CD pipelines, infrastructure as code, supply chain security, and cloud runtime security.
 - **Defend**: Detection/logging topics and hardening guidance for common platforms and services.
 - **Log Analyzer**: Upload or paste logs to detect risky patterns with a deterministic, rule-based engine and JSON API support.
 - **Quiz**: Topic-based question sets with randomized runs and answer review.
@@ -39,6 +41,7 @@ The goal is not to replace official documentation or professional tooling. It is
 - `16` tool pages across CLI, GUI, and detection tooling
 - `61` concept entries, including `36` common ports
 - `10` defend topics across detection/logging and hardening
+- `7` DevSecOps sections covering containers, orchestration, CI/CD, IaC, supply chain, and cloud security
 - `13` quiz topics with randomized question sets
 - `EN` and `SV` language support
 

@@ -234,6 +234,14 @@ def load_defend() -> Any:
     return load_json("defend.json")
 
 
+def load_devsecops() -> Any:
+    if _current_locale_code() == "sv":
+        sv_path = os.path.join(DATA_DIR, "devsecops_sv.json")
+        if os.path.exists(sv_path):
+            return load_json("devsecops_sv.json")
+    return load_json("devsecops.json")
+
+
 def _current_locale_code() -> str:
     if not has_request_context():
         return "en"
@@ -910,6 +918,7 @@ def home():
     tools = load_tools()
     concepts = load_concepts()
     defend = load_defend()
+    devsecops = load_devsecops()
     commands = load_commands()
 
     cli = tools.get("cliTools", []) or []
@@ -1062,6 +1071,28 @@ def home():
                     }
                 )
 
+    if isinstance(devsecops, dict):
+        for category in devsecops.get("sections", []) or []:
+            if not isinstance(category, dict):
+                continue
+            section_id = category.get("id")
+            if not section_id:
+                continue
+            for topic in category.get("topics", []) or []:
+                if not isinstance(topic, dict):
+                    continue
+                topic_id = topic.get("id")
+                if not topic_id:
+                    continue
+                candidates.append(
+                    {
+                        "kind": _("DevSecOps"),
+                        "title": topic.get("title") or _("DevSecOps"),
+                        "desc": topic.get("summary") or topic.get("intro") or category.get("summary") or "",
+                        "href": f"/devsecops/{section_id}/{topic_id}",
+                    }
+                )
+
     quick_picks = _pick_n(candidates, 3)
 
     return render_template(
@@ -1143,7 +1174,7 @@ def api_commands():
 @app.route("/api/search")
 def api_search():
     q = (request.args.get("q") or "").strip()
-    empty = {"commands": [], "tools": [], "concepts": [], "ports": [], "defend": []}
+    empty = {"commands": [], "tools": [], "concepts": [], "ports": [], "devsecops": [], "defend": []}
     if not q:
         return jsonify(empty)
 
@@ -1158,7 +1189,14 @@ def api_search():
                 return True
         return False
 
-    results: dict[str, list[dict[str, Any]]] = {"commands": [], "tools": [], "concepts": [], "ports": [], "defend": []}
+    results: dict[str, list[dict[str, Any]]] = {
+        "commands": [],
+        "tools": [],
+        "concepts": [],
+        "ports": [],
+        "devsecops": [],
+        "defend": [],
+    }
 
     try:
         commands = load_commands()
@@ -1279,6 +1317,28 @@ def api_search():
                         }
                     )
 
+        devsecops = load_devsecops()
+        if isinstance(devsecops, dict):
+            for category in devsecops.get("sections", []) or []:
+                if not isinstance(category, dict):
+                    continue
+                section_id = category.get("id")
+                if not section_id:
+                    continue
+                for it in category.get("topics", []) or []:
+                    if not isinstance(it, dict):
+                        continue
+                    title = it.get("title") or ""
+                    if match_any(title, it.get("summary"), it.get("intro"), category.get("title"), category.get("summary")):
+                        results["devsecops"].append(
+                            {
+                                "title": title,
+                                "category": _("DevSecOps"),
+                                "href": f"/devsecops/{section_id}/{it.get('id')}",
+                                "snippet": _snippet(str(it.get("summary") or it.get("intro") or category.get("summary") or "")),
+                            }
+                        )
+
     except Exception:
         return jsonify(empty)
 
@@ -1286,6 +1346,7 @@ def api_search():
     results["tools"] = _limit(results["tools"], 10)
     results["concepts"] = _limit(results["concepts"], 10)
     results["ports"] = _limit(results["ports"], 10)
+    results["devsecops"] = _limit(results["devsecops"], 10)
     results["defend"] = _limit(results["defend"], 10)
 
     return jsonify(results)
@@ -1601,6 +1662,12 @@ def concepts_hub():
     return render_template("concepts_hub.html", concepts=concepts)
 
 
+@app.route("/devsecops")
+def devsecops_hub():
+    devsecops = load_devsecops()
+    return render_template("devsecops_hub.html", devsecops=devsecops)
+
+
 @app.route("/resource-hub")
 def resource_hub():
     return render_template("resource_hub.html")
@@ -1718,6 +1785,52 @@ def concept_detail(cat: str, cid: str):
 def defend_hub():
     defend = load_defend()
     return render_template("defend_hub.html", defend=defend)
+
+
+@app.route("/devsecops/<section>/<topic>")
+def devsecops_detail(section: str, topic: str):
+    devsecops = load_devsecops()
+    categories = devsecops.get("sections", []) if isinstance(devsecops, dict) else []
+    category_item = next((x for x in categories if str(x.get("id")) == str(section)), None)
+
+    if not category_item:
+        return (
+            render_template(
+                "devsecops_detail.html",
+                item={},
+                title=_("Not found"),
+                category=_("DevSecOps"),
+                section_id=section,
+                not_found=True,
+            ),
+            404,
+        )
+
+    topics = category_item.get("topics", []) if isinstance(category_item, dict) else []
+    item = next((x for x in topics if str(x.get("id")) == str(topic)), None)
+    category_title = category_item.get("title") or _("DevSecOps")
+
+    if not item:
+        return (
+            render_template(
+                "devsecops_detail.html",
+                item={},
+                title=_("Not found"),
+                category=category_title,
+                section_id=section,
+                not_found=True,
+            ),
+            404,
+        )
+
+    return render_template(
+        "devsecops_detail.html",
+        item=item,
+        title=item.get("title", _("DevSecOps")),
+        category=category_title,
+        section_id=section,
+        not_found=False,
+    )
 
 
 @app.route("/defend/<section>/<topic>")

@@ -80,6 +80,7 @@ Key changes
     if (path.startsWith("/command-library") || path.startsWith("/commands")) section = t("commandLibrary", "Command Library");
     else if (path.startsWith("/toolbox") || path.startsWith("/tools")) section = t("toolbox", "Toolbox");
     else if (path.startsWith("/concepts")) section = t("concepts", "Concepts");
+    else if (path.startsWith("/devsecops")) section = t("devsecops", "DevSecOps");
     else if (path.startsWith("/defend")) section = t("defend", "Defend");
 
     const h1 = document.querySelector("main h1") || document.querySelector("h1");
@@ -666,4 +667,3 @@ Key changes
     init();
   }
 })();
-
