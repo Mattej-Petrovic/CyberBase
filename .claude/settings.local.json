@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"c:/Users/Matqk/Desktop/W/Grind/School/Github/CyberBase/data/attack_flows\"*)",
+      "Bash(python -m babel.messages.frontend compile -d translations)",
+      "Bash(msgfmt \"translations/sv/LC_MESSAGES/messages.po\" -o \"translations/sv/LC_MESSAGES/messages.mo\")",
+      "Bash(python -c \"import py_compile; py_compile.compile\\(''app.py'', doraise=True\\)\")",
+      "Bash(python -c \":*)",
+      "Bash(ls -la \"c:/Users/Matqk/Desktop/W/Grind/School/Github/CyberBase/templates/attack_flows\"*)",
+      "Bash(grep -A2 'msgid \"\"Attack Flows\"\"' \"c:/Users/Matqk/Desktop/W/Grind/School/Github/CyberBase/translations/sv/LC_MESSAGES/messages.po\")",
+      "Bash(python3:*)",
+      "Bash(python -c \"import app\")"
+    ]
+  }
+}

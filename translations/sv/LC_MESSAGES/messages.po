@@ -1343,6 +1343,14 @@ msgstr ""
 "Handlingsdrivna checklistor för loggning, detektering och härdning i "
 "verkliga miljöer."
 
+#: templates/home.html
+msgid ""
+"See how real attacks unfold step by step, from reconnaissance to impact, "
+"through the eyes of attacker, defender, and victim."
+msgstr ""
+"Se hur riktiga attacker utspelar sig steg för steg, från spaning till "
+"påverkan, genom angriparens, försvararens och offrets ögon."
+
 #: templates/home.html:383
 msgid ""
 "Curated resources for deeper learning, trusted guidance, and continued "
@@ -2148,3 +2156,67 @@ msgstr "Lösenordsåterställning skickad via e-post. Kontrollera inkorgen."
 #: templates/devsecops_detail.html
 msgid "Back to DevSecOps"
 msgstr "Tillbaka till DevSecOps"
+
+#: templates/attack_flows_hub.html templates/attack_flow_detail.html templates/base.html
+msgid "Attack Flows"
+msgstr "Attackflöden"
+
+#: templates/attack_flows_hub.html
+msgid "Step-by-step breakdowns of real-world attack patterns. Each flow shows what the attacker does, what the defender can do, and what the victim experiences — phase by phase."
+msgstr "Steg-för-steg-genomgångar av verkliga attackmönster. Varje flöde visar vad angriparen gör, vad försvararen kan göra och vad offret upplever — fas för fas."
+
+#: templates/attack_flow_detail.html
+msgid "Attack not found"
+msgstr "Attacken hittades inte"
+
+#: templates/attack_flow_detail.html
+msgid "The attack flow you are looking for does not exist."
+msgstr "Attackflödet du letar efter finns inte."
+
+#: templates/attack_flow_detail.html
+msgid "Back to Attack Flows"
+msgstr "Tillbaka till Attackflöden"
+
+#: templates/attack_flow_detail.html
+msgid "Severity"
+msgstr "Allvarlighetsgrad"
+
+#: templates/attack_flow_detail.html
+msgid "phases"
+msgstr "faser"
+
+#: templates/attack_flow_detail.html
+msgid "Related"
+msgstr "Relaterade"
+
+#: templates/attack_flow_detail.html
+msgid "Related Attacks"
+msgstr "Relaterade Attacker"
+
+#: templates/attack_flow_detail.html
+msgid "Attacker"
+msgstr "Angripare"
+
+#: templates/attack_flow_detail.html
+msgid "Defender"
+msgstr "Försvarare"
+
+#: templates/attack_flow_detail.html
+msgid "Victim"
+msgstr "Offer"
+
+#: templates/attack_flow_detail.html
+msgid "Tools / Indicators"
+msgstr "Verktyg / Indikatorer"
+
+#: templates/attack_flow_detail.html
+msgid "Indicators"
+msgstr "Indikatorer"
+
+#: templates/home.html
+msgid "Step-by-step attack patterns"
+msgstr "Steg-för-steg attackmönster"
+
+#: templates/home.html
+msgid "Attack Flow"
+msgstr "Attackflöde"

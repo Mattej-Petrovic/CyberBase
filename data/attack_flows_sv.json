@@ -1,0 +1,996 @@
+{
+  "_fileVersion": {
+    "version": 1,
+    "buildsOn": 0,
+    "updated": "2026-03-26",
+    "notes": "Attackflöden v1 – sju vanliga attackmönster med flerperspektivsfaser"
+  },
+  "attacks": [
+    {
+      "id": "phishing",
+      "name": "Nätfiske",
+      "slug": "phishing",
+      "short_description": "Social manipulationsattack som lurar offer att avslöja inloggningsuppgifter eller installera skadlig programvara genom bedrägliga e-postmeddelanden, meddelanden eller webbplatser.",
+      "icon": "🎣",
+      "severity": 4,
+      "mitre_id": "T1566",
+      "related_attacks": ["brute-force", "ransomware", "man-in-the-middle"],
+      "phases": [
+        {
+          "name": "Spaning",
+          "order": 1,
+          "attacker": {
+            "title": "Insamling av underrättelser om målet",
+            "description": "Angriparen börjar med att kartlägga sin måltavla noggrant. Det handlar om att samla in så mycket offentligt tillgänglig information som möjligt – exempelvis namn, e-postadresser, organisationsstruktur och vilka tekniska plattformar som används. Denna fas kallas OSINT (Open Source Intelligence) och sker helt utan att offret märker något, eftersom all information redan finns fritt tillgänglig på internet.",
+            "tools_or_indicators": ["theHarvester", "Maltego", "LinkedIn-spaning", "Hunter.io", "Shodan"],
+            "mitre_techniques": ["T1589", "T1591", "T1593"]
+          },
+          "defender": {
+            "title": "Begränsa den publika attackytan",
+            "description": "Försvararen behöver minska mängden information som är offentligt tillgänglig om organisationen. Det innebär att regelbundet granska vad som syns på sociala medier, webbplatser och i offentliga register. Ju mindre en angripare kan ta reda på utan att larma, desto svårare blir det att skapa trovärdiga nätfiskemeddelanden.",
+            "tools_or_indicators": ["OSINT-revisioner", "Informationspolicy för anställda", "Övervakning av domänexponering"],
+            "mitre_techniques": ["T1589"]
+          },
+          "victim": {
+            "title": "Ovetande exponering av personlig information",
+            "description": "Offret har i detta skede ingen aning om att en attack förbereds. Ofta har personen utan att tänka på det delat information på LinkedIn, sociala medier eller i offentliga dokument som gör det enkelt för angriparen att bygga en trovärdig profil. Det kan vara allt från jobbtitel och e-postformat till vilka system man arbetar med dagligen.",
+            "tools_or_indicators": ["LinkedIn-profiler", "Offentliga kontaktuppgifter", "Metadata i delade dokument"],
+            "mitre_techniques": ["T1589.002"]
+          }
+        },
+        {
+          "name": "Vapenförberedelse",
+          "order": 2,
+          "attacker": {
+            "title": "Konstruktion av bedrägligt innehåll",
+            "description": "Nu skapar angriparen det faktiska nätfiskematerialet. Det kan vara ett e-postmeddelande som ser ut att komma från IT-avdelningen, en falsk inloggningssida som är en exakt kopia av den riktiga, eller ett dokument med inbäddad skadlig kod. GoPhish är ett ramverk med öppen källkod som gör det möjligt att bygga och hantera nätfiskekampanjer med realistiska e-postmallar och falska landningssidor.",
+            "tools_or_indicators": ["GoPhish", "SET (Social Engineering Toolkit)", "Evilginx2", "Homoglyfdomäner", "HTML-kloning av inloggningssidor"],
+            "mitre_techniques": ["T1566.001", "T1566.002", "T1204.001"]
+          },
+          "defender": {
+            "title": "Proaktiv identifiering av nätfiskeinfrastruktur",
+            "description": "Försvaret kan försöka upptäcka förberedelserna genom att övervaka nyregistrerade domäner som liknar den egna organisationens. Verktyg som DNSTwist söker automatiskt efter domännamn med stavningsvarianter eller homoglyfer – tecken som ser likadana ut men tekniskt skiljer sig. Tidig upptäckt gör det möjligt att blockera domänen innan kampanjen ens startar.",
+            "tools_or_indicators": ["DNSTwist", "Övervakning av nyregistrerade domäner", "Sandboxanalys av bilagor", "URLScan.io"],
+            "mitre_techniques": ["T1566.001", "T1566.002"]
+          },
+          "victim": {
+            "title": "Ingen synlig påverkan ännu",
+            "description": "Offret påverkas fortfarande inte direkt i denna fas. Angriparen bygger upp sin infrastruktur i bakgrunden – registrerar domäner, konfigurerar e-postservrar och förbereder landningssidor. Det är först i nästa fas som offret kommer i kontakt med det bedrägliga materialet.",
+            "tools_or_indicators": [],
+            "mitre_techniques": []
+          }
+        },
+        {
+          "name": "Leverans",
+          "order": 3,
+          "attacker": {
+            "title": "Utskick av nätfiskemeddelandet",
+            "description": "Angriparen skickar det bedrägliga meddelandet till offret. För att undvika att fastna i spamfilter försöker man kringgå skyddsmekanismer som SPF (Sender Policy Framework) och DKIM (DomainKeys Identified Mail) – protokoll som verifierar att avsändardomänen verkligen är den den utger sig för att vara. Vanliga tekniker inkluderar att använda komprometterade e-postkonton med giltiga autentiseringsposter, eller att utnyttja betrodda molntjänster som vidarebefordrar meddelandet.",
+            "tools_or_indicators": ["Komprometterade SMTP-servrar", "SPF/DKIM-förbigång", "Betrodda molntjänster som vidarebefordrare", "Tidsinställda utskick"],
+            "mitre_techniques": ["T1566.001", "T1566.002", "T1078"]
+          },
+          "defender": {
+            "title": "Filtrering och blockering av e-post",
+            "description": "Här spelar organisationens e-postsäkerhet en avgörande roll. SPF-, DKIM- och DMARC-konfigurationer kontrollerar att inkommande e-post verkligen kommer från den avsändare den påstår sig komma ifrån. DMARC-policyer kan ställas in för att automatiskt avvisa meddelanden som inte klarar kontrollen. Utöver det bör organisationen ha sandboxlösningar som öppnar och analyserar bilagor i en isolerad miljö innan de når mottagaren.",
+            "tools_or_indicators": ["SPF/DKIM/DMARC-konfiguration", "E-postgateway med sandboxing", "URL-omskrivning och klickskydd", "Microsoft Defender for Office 365"],
+            "mitre_techniques": ["T1566.001", "T1566.002"]
+          },
+          "victim": {
+            "title": "Mottagande av bedrägligt meddelande",
+            "description": "Offret får ett e-postmeddelande som ser legitimt ut – kanske från chefen, IT-avdelningen eller en välkänd tjänst. Meddelandet innehåller ofta en uppmaning att agera snabbt, till exempel att byta lösenord omedelbart eller bekräfta kontoinformation. Denna brådska är avsiktlig och syftar till att offret ska klicka utan att tänka efter.",
+            "tools_or_indicators": ["E-post i inkorgen", "Brådskande ämnesrader", "Förfalskade avsändaradresser"],
+            "mitre_techniques": ["T1566.001"]
+          }
+        },
+        {
+          "name": "Exploatering",
+          "order": 4,
+          "attacker": {
+            "title": "Aktivering av den skadliga payloaden",
+            "description": "När offret klickar på länken eller öppnar bilagan aktiveras den skadliga delen av attacken. Det kan innebära att offret omdirigeras till en falsk inloggningssida, att ett makro i ett Word-dokument kör skadlig kod, eller att en webbläsarexploit utnyttjar en sårbarhet. Angriparen förlitar sig helt på att offret utför en handling – detta kallas social ingenjörskonst.",
+            "tools_or_indicators": ["Skadliga makron i Office-dokument", "Falska inloggningssidor", "Drive-by-nedladdningar", "Webbläsarexploits"],
+            "mitre_techniques": ["T1204.001", "T1204.002", "T1059.005"]
+          },
+          "defender": {
+            "title": "Detektering av misstänkt beteende på klienten",
+            "description": "Endpointskydd (EDR) på offrets dator kan upptäcka om ett dokument försöker starta PowerShell, om en webbläsare omdirigeras till en känd skadlig domän, eller om ovanliga processer skapas. Dessutom kan webbproxyer blockera åtkomst till nyregistrerade eller okategoriserade domäner, vilket förhindrar att offret ens når den falska inloggningssidan.",
+            "tools_or_indicators": ["EDR-lösningar (CrowdStrike, SentinelOne)", "Webbproxyfiltrering", "Makroblockeringspolicyer", "Application Whitelisting"],
+            "mitre_techniques": ["T1204.001", "T1204.002"]
+          },
+          "victim": {
+            "title": "Interaktion med det skadliga innehållet",
+            "description": "Offret klickar på länken eller öppnar bilagan, ofta utan att misstänka något. Den falska webbsidan ser identisk ut med den riktiga – samma logotyp, samma layout, samma färger. Eller så öppnas dokumentet och ber om att aktivera makron för att visa innehållet. I detta ögonblick har angriparen fått den åtkomst som behövs.",
+            "tools_or_indicators": ["Klick på skadlig länk", "Aktivering av makron", "Inmatning av inloggningsuppgifter på falsk sida"],
+            "mitre_techniques": ["T1204.001", "T1204.002"]
+          }
+        },
+        {
+          "name": "Insamling av inloggningsuppgifter",
+          "order": 5,
+          "attacker": {
+            "title": "Fångst av lösenord och sessionstokens",
+            "description": "Angriparen samlar nu in offrets inloggningsuppgifter. Evilginx2 är ett omvänd proxy-verktyg som placerar sig mellan offret och den riktiga inloggningssidan och fångar upp inloggningsuppgifter och sessionscookies i realtid. Till skillnad från enkla falska sidor kan Evilginx2 även kringgå multifaktorautentisering (MFA) genom att fånga upp sessionscookien som skapas efter att offret genomfört sin MFA-verifiering.",
+            "tools_or_indicators": ["Evilginx2", "Modlishka", "Muraena", "GoPhish", "Loggning av tangentbordsinmatning"],
+            "mitre_techniques": ["T1556", "T1539", "T1111"]
+          },
+          "defender": {
+            "title": "Detektering av stulna inloggningsuppgifter",
+            "description": "Organisationen bör övervaka inloggningar efter ovanliga mönster – exempelvis inloggningar från nya geografiska platser, okända enheter eller vid ovanliga tidpunkter. FIDO2-baserade hårdvarunycklar som YubiKey är resistenta mot proxy-attacker som Evilginx2 eftersom autentiseringen är bunden till den exakta domänen, vilket gör att en falsk domän inte kan slutföra inloggningen.",
+            "tools_or_indicators": ["FIDO2/WebAuthn-hårdvarunycklar", "Inloggningsanalys och anomalidetektion", "Conditional Access-policyer", "Omöjlig resa-varningar"],
+            "mitre_techniques": ["T1556", "T1539"]
+          },
+          "victim": {
+            "title": "Uppgifter avslöjade utan vetskap",
+            "description": "Offret har matat in sitt användarnamn och lösenord och eventuellt godkänt en MFA-utmaning – allt på vad som verkade vara den riktiga inloggningssidan. Från offrets perspektiv fungerade allt normalt, kanske omdirigerades man till den riktiga tjänsten efteråt. Men i bakgrunden har angriparen redan fångat upp alla uppgifter och kan nu logga in som offret.",
+            "tools_or_indicators": ["Inmatade lösenord", "Godkända MFA-uppmaningar", "Stulna sessionscookies"],
+            "mitre_techniques": ["T1078"]
+          }
+        },
+        {
+          "name": "Etablering av persistence",
+          "order": 6,
+          "attacker": {
+            "title": "Säkra långvarig åtkomst",
+            "description": "Med stulna inloggningsuppgifter i hand säkrar angriparen sin position. Det kan innebära att lägga till en ny MFA-enhet på offrets konto, skapa vidarebefordringsregler i e-posten som skickar kopior av alla meddelanden till angriparen, eller installera en bakdörr för fjärråtkomst. Målet är att behålla åtkomsten även om offret byter lösenord.",
+            "tools_or_indicators": ["Tillägg av ny MFA-enhet", "Regler för e-postvidarebefordran", "OAuth-applikationssamtycke", "Bakdörrar och webshells"],
+            "mitre_techniques": ["T1098", "T1114.003", "T1136", "T1505.003"]
+          },
+          "defender": {
+            "title": "Upptäck och bryt persistensmekanismer",
+            "description": "Säkerhetsteamet måste aktivt leta efter tecken på att en angripare har etablerat sig. Det innebär att granska nya MFA-enheter som registrerats, vidarebefordringsregler i e-postsystem, nyligen beviljade OAuth-behörigheter och ovanliga inloggningssessioner. Snabb låsning av komprometterade konton och återkallande av alla aktiva sessioner är kritiskt för att bryta angriparens tillgång.",
+            "tools_or_indicators": ["Granskning av MFA-registreringar", "Kontroll av e-postregler", "OAuth-samtyckesgranskning", "Sessionsinvalidering"],
+            "mitre_techniques": ["T1098", "T1114.003"]
+          },
+          "victim": {
+            "title": "Kontot har kapats",
+            "description": "Offret kan fortfarande logga in normalt och märker kanske inte att kontot har komprometterats. Angriparen arbetar tyst i bakgrunden – läser e-post, skickar meddelanden i offrets namn och använder kontot som språngbräda för ytterligare attacker mot kollegor och organisationen. Utan proaktiv övervakning kan denna situation pågå i veckor eller månader.",
+            "tools_or_indicators": ["Okända MFA-enheter på kontot", "Dolda vidarebefordringsregler", "Ovanliga inloggningssessioner"],
+            "mitre_techniques": ["T1078"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "brute-force",
+      "name": "Brute force-attack",
+      "slug": "brute-force",
+      "short_description": "Systematisk attack som testar alla möjliga lösenordskombinationer eller använder vanliga lösenordslistor för att få obehörig åtkomst till konton och system.",
+      "icon": "🔨",
+      "severity": 3,
+      "mitre_id": "T1110",
+      "related_attacks": ["phishing", "lateral-movement"],
+      "phases": [
+        {
+          "name": "Målidentifiering",
+          "order": 1,
+          "attacker": {
+            "title": "Kartläggning av inloggningsportaler och tjänster",
+            "description": "Angriparen börjar med att identifiera vilka inloggningssidor och tjänster som är exponerade mot internet. Det kan vara webbapplikationer med inloggningsformulär, SSH-servrar, RDP-portar eller VPN-gateways. Verktyg som Nmap skannar nätverk och identifierar öppna portar, medan Shodan söker efter internetexponerade tjänster globalt utan att behöva skanna själv.",
+            "tools_or_indicators": ["Nmap", "Shodan", "Censys", "Wappalyzer", "Gobuster"],
+            "mitre_techniques": ["T1046", "T1595"]
+          },
+          "defender": {
+            "title": "Minimera exponerade inloggningsytor",
+            "description": "Organisationen bör inventera alla tjänster som accepterar autentisering och är åtkomliga från internet. Tjänster som inte behöver vara publikt tillgängliga ska placeras bakom VPN eller nolltillitslösningar. Att dölja versionsinformation och felmeddelanden som avslöjar om ett användarnamn existerar minskar angriparens informationsunderlag.",
+            "tools_or_indicators": ["Inventering av publika tjänster", "VPN-konfiguration", "Generiska felmeddelanden vid inloggning"],
+            "mitre_techniques": ["T1046"]
+          },
+          "victim": {
+            "title": "Ingen direkt påverkan ännu",
+            "description": "Användaren märker inget i detta skede. Angriparen samlar information passivt eller genom automatiserade skanningar som inte syns för den enskilda användaren. Däremot kan organisationens säkerhetsteam eventuellt se ökad skanningsaktivitet i brandväggsloggar och IDS-system.",
+            "tools_or_indicators": [],
+            "mitre_techniques": []
+          }
+        },
+        {
+          "name": "Förberedelse av lösenordslistor",
+          "order": 2,
+          "attacker": {
+            "title": "Framtagning av anpassade ordlistor",
+            "description": "Angriparen sammanställer listor med potentiella lösenord. RockYou.txt är en berömd läckt lösenordslista med miljontals riktiga lösenord som människor faktiskt har använt. CeWL är ett verktyg som crawlar en specifik webbplats och bygger en ordlista baserad på ord som finns på sidan – användbart för att skapa organisationsspecifika gissningar. Utöver detta kombineras vanliga lösenordsmönster med kända uppgifter om målet.",
+            "tools_or_indicators": ["RockYou.txt", "CeWL", "Crunch", "CUPP (Common User Password Profiler)", "SecLists"],
+            "mitre_techniques": ["T1110.002", "T1589.001"]
+          },
+          "defender": {
+            "title": "Implementera starka lösenordskrav",
+            "description": "Det bästa försvaret mot ordlisteattacker är att se till att organisationens lösenord inte finns på vanliga listor. Moderna riktlinjer rekommenderar långa lösenordsfraser istället för korta komplexa lösenord. Verktyg kan kontrollera nya lösenord mot kända läckta databaser – exempelvis HaveIBeenPwned-API:t – och blockera lösenord som redan förekommit i dataintrång.",
+            "tools_or_indicators": ["HaveIBeenPwned-kontroll vid lösenordsbyte", "Blockeringslistor för vanliga lösenord", "Policy för lösenordslängd och fraser"],
+            "mitre_techniques": ["T1110.002"]
+          },
+          "victim": {
+            "title": "Svaga lösenord utgör en tyst risk",
+            "description": "Användare som valt enkla eller återanvända lösenord löper störst risk. Många väljer lösenord baserade på personlig information – husdjursnamn, födelseår eller favoritlag – som är relativt enkla att gissa med anpassade ordlistor. Utan medvetenhet om riskerna fortsätter användaren med sina vanor ovetande om det förestående hotet.",
+            "tools_or_indicators": ["Återanvända lösenord", "Enkla lösenordsmönster", "Personlig information i lösenord"],
+            "mitre_techniques": ["T1110.001"]
+          }
+        },
+        {
+          "name": "Automatiserat angrepp",
+          "order": 3,
+          "attacker": {
+            "title": "Systematisk testning av inloggningsuppgifter",
+            "description": "Nu startar den faktiska attacken. Hydra är ett nätverksbaserat verktyg som automatiskt testar kombinationer av användarnamn och lösenord mot inloggningstjänster som SSH, RDP, HTTP och FTP. Hashcat och John the Ripper används istället för att knäcka lösenordshashar offline – det vill säga om angriparen redan fått tag på en databas med krypterade lösenord. Hashcat utnyttjar grafikkortets beräkningskraft för att testa miljarder kombinationer per sekund.",
+            "tools_or_indicators": ["Hydra", "Hashcat", "John the Ripper", "Medusa", "Burp Suite Intruder"],
+            "mitre_techniques": ["T1110.001", "T1110.002", "T1110.003"]
+          },
+          "defender": {
+            "title": "Detektera och bromsa automatiserade inloggningsförsök",
+            "description": "Försvararna behöver system som upptäcker och reagerar på stora mängder misslyckade inloggningsförsök. Kontolåsning efter ett visst antal misslyckade försök, progressiv fördröjning mellan inloggningsförsök och CAPTCHA-utmaningar bromsar automatiserade attacker kraftigt. SIEM-system kan korrelera loggar från flera tjänster och larma när samma IP-adress testar inloggning mot många konton samtidigt.",
+            "tools_or_indicators": ["Kontolåsningspolicyer", "Progressiv fördröjning (rate limiting)", "CAPTCHA", "SIEM-korrelation av inloggningsloggar", "Fail2Ban"],
+            "mitre_techniques": ["T1110.001", "T1110.003"]
+          },
+          "victim": {
+            "title": "Kontot utsätts för tusentals inloggningsförsök",
+            "description": "Beroende på organisationens konfiguration kan offret märka att kontot låses upprepade gånger, eller så sker attacken helt i bakgrunden. Vid lösenordsbespraying – där angriparen testar ett fåtal vanliga lösenord mot många konton – riskerar ingen enskild användare att bli utelåst, vilket gör attacken svårare att upptäcka.",
+            "tools_or_indicators": ["Upprepade kontolåsningar", "Inloggningsnotifikationer från okända platser"],
+            "mitre_techniques": ["T1110.003"]
+          }
+        },
+        {
+          "name": "Autentiseringsförbigång",
+          "order": 4,
+          "attacker": {
+            "title": "Kringgående av ytterligare säkerhetslager",
+            "description": "Även om angriparen har hittat rätt lösenord kan multifaktorautentisering (MFA) stå i vägen. Angriparen kan försöka kringgå MFA genom att bombardera offret med push-notiser tills personen godkänner av ren utmattning – en teknik som kallas MFA-fatigue. Andra metoder inkluderar att utnyttja SIM-swapping för att ta över SMS-baserad tvåfaktorsautentisering, eller att använda stulna sessionstokens.",
+            "tools_or_indicators": ["MFA-fatigue (upprepade push-notiser)", "SIM-swapping", "Sessionstoken-stöld", "Exfiltrering av TOTP-hemligheter"],
+            "mitre_techniques": ["T1111", "T1539", "T1621"]
+          },
+          "defender": {
+            "title": "Härda multifaktorautentisering",
+            "description": "Organisationen bör använda phishing-resistenta MFA-metoder som FIDO2-hårdvarunycklar istället för SMS eller push-notiser. Nummermatchning i push-notiser – där användaren måste ange en kod som visas på skärmen – minskar risken för MFA-fatigue avsevärt. Villkorad åtkomst baserad på enhetsregistrering och nätverksplats ger ytterligare skydd.",
+            "tools_or_indicators": ["FIDO2-hårdvarunycklar", "Nummermatchning i push-notiser", "Villkorad åtkomst (Conditional Access)", "SIM-skyddstjänster"],
+            "mitre_techniques": ["T1111", "T1621"]
+          },
+          "victim": {
+            "title": "MFA-bombardemang och förvirring",
+            "description": "Offret kan plötsligt få upprepade förfrågningar om att godkänna en inloggning på sin telefon, trots att de inte försökt logga in. Många godkänner till slut av frustration eller för att de tror att det är ett systemfel. Detta enda misstag ger angriparen full tillgång till kontot trots att MFA var aktiverat.",
+            "tools_or_indicators": ["Oväntade MFA-notiser", "Upprepade SMS-koder", "Push-förfrågningar vid ovanliga tidpunkter"],
+            "mitre_techniques": ["T1621"]
+          }
+        },
+        {
+          "name": "Exploatering efter åtkomst",
+          "order": 5,
+          "attacker": {
+            "title": "Utnyttjande av den komprometterade åtkomsten",
+            "description": "Med giltig åtkomst utforskar angriparen vad kontot har tillgång till. Det kan innebära att läsa känsliga e-postmeddelanden, komma åt delade filer, eller använda kontot som utgångspunkt för att angripa andra system internt. Angriparen försöker också eskalera sina privilegier – till exempel genom att hitta tjänstekonton med högre behörigheter eller administratörsåtkomst.",
+            "tools_or_indicators": ["Intern spaning", "Privilegieeskalering", "Dataexfiltration", "Pivotering till andra system"],
+            "mitre_techniques": ["T1078", "T1087", "T1021"]
+          },
+          "defender": {
+            "title": "Övervakning av kontobeteende efter inloggning",
+            "description": "Även efter en lyckad inloggning ska systemet övervaka vad kontot gör. UEBA (User and Entity Behavior Analytics) bygger en baslinje för varje användares normala beteende och larmar vid avvikelser – som plötslig åtkomst till ovanliga resurser, nedladdning av stora datamängder eller inloggning vid ovanliga tidpunkter. Tidig upptäckt kan begränsa skadan avsevärt.",
+            "tools_or_indicators": ["UEBA-lösningar", "Privileged Access Management (PAM)", "Nätverkssegmentering", "Övervakning av dataåtkomst"],
+            "mitre_techniques": ["T1078", "T1087"]
+          },
+          "victim": {
+            "title": "Kontot används av någon annan",
+            "description": "Offrets konto används nu aktivt av angriparen. Om kontot har tillgång till känslig information kan den läsas eller kopieras. Kollegor kan få meddelanden från offrets konto som i verkligheten skickas av angriparen. Utan beteendeanalys kan denna situation vara svår att upptäcka, särskilt om angriparen är försiktig och agerar inom rimliga mönster.",
+            "tools_or_indicators": ["Ovanlig aktivitet i kontot", "Åtkomst till resurser man normalt inte använder", "Meddelanden man inte skickat"],
+            "mitre_techniques": ["T1078"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "sql-injection",
+      "name": "SQL-injektion",
+      "slug": "sql-injection",
+      "short_description": "Kodinjektionsteknik som utnyttjar sårbarheter i databasanslutna applikationer för att manipulera, extrahera eller förstöra data genom att infoga skadliga SQL-kommandon.",
+      "icon": "💉",
+      "severity": 5,
+      "mitre_id": "T1190",
+      "related_attacks": ["supply-chain-attack"],
+      "phases": [
+        {
+          "name": "Applikationsspaning",
+          "order": 1,
+          "attacker": {
+            "title": "Kartläggning av webbapplikationens struktur",
+            "description": "Angriparen börjar med att systematiskt utforska webbapplikationen för att förstå dess uppbyggnad. Det handlar om att identifiera alla sidor, formulär, API-ändpunkter och parametrar som interagerar med en databas. Burp Suite är ett kraftfullt proxyverktyg som fångar upp all trafik mellan webbläsaren och servern, vilket gör det möjligt att se exakt vilka förfrågningar som skickas – inklusive dolda parametrar som inte syns i webbläsaren.",
+            "tools_or_indicators": ["Burp Suite", "OWASP ZAP", "Gobuster", "Wappalyzer", "Manuell genomgång av webbapplikationen"],
+            "mitre_techniques": ["T1190", "T1595.002"]
+          },
+          "defender": {
+            "title": "Minimera informationsläckage från applikationen",
+            "description": "Webbapplikationen bör konfigureras så att den avslöjar så lite som möjligt om sin interna struktur. Detaljerade felmeddelanden som visar databastyp, tabellnamn eller SQL-syntax ska aldrig visas för slutanvändare – istället ska generiska felmeddelanden returneras. WAF (Web Application Firewall) kan dessutom upptäcka och blockera skanningsverktyg baserat på deras trafikmönster.",
+            "tools_or_indicators": ["Generiska felmeddelanden", "WAF (Web Application Firewall)", "Döljande av serverversionsinformation", "Begränsning av API-dokumentation"],
+            "mitre_techniques": ["T1190"]
+          },
+          "victim": {
+            "title": "Applikationen kartläggs utan synliga effekter",
+            "description": "Användarna av webbapplikationen märker ingenting ovanligt. Angriparens spaning ser ut som vanlig webbsurfning – man besöker sidor, fyller i formulär och observerar svaren. Den enda ledtråden finns i serverloggar, där man eventuellt kan se systematiskt mönster i förfrågningarna.",
+            "tools_or_indicators": ["Ovanliga trafikmönster i loggar", "Systematiska förfrågningar mot olika ändpunkter"],
+            "mitre_techniques": ["T1595.002"]
+          }
+        },
+        {
+          "name": "Identifiering av injektionspunkter",
+          "order": 2,
+          "attacker": {
+            "title": "Testning av inmatningsfält för sårbarhet",
+            "description": "Angriparen testar varje inmatningsfält och parameter genom att skicka specialtecken som enkla citattecken ('), semikolon (;) och SQL-nyckelord. Om applikationen returnerar databasfelmeddelanden eller beter sig annorlunda har angriparen hittat en injektionspunkt – ett ställe där användarinmatning tolkas som databaskommandon istället för vanlig text. Sqlmap är ett automatiserat verktyg som kan testa hundratals injektionstekniker mot varje parameter och snabbt identifiera sårbara punkter.",
+            "tools_or_indicators": ["sqlmap", "Burp Suite Repeater", "Manuella SQL-testpayloads", "Felmeddelanden från databasen"],
+            "mitre_techniques": ["T1190"]
+          },
+          "defender": {
+            "title": "Indatavalidering och preparerade frågor",
+            "description": "Det mest effektiva skyddet mot SQL-injektion är att använda preparerade frågor (prepared statements) med parameterbindning. Denna teknik separerar SQL-koden från användarinmatningen på en fundamental nivå, så att databasen aldrig tolkar inmatning som kommandon. Utöver detta bör all indata valideras mot förväntade format – om ett fält ska innehålla ett nummer ska allt annat avvisas direkt.",
+            "tools_or_indicators": ["Preparerade frågor (Prepared Statements)", "ORM-ramverk med parameterbindning", "Indatavalidering och vitlistning", "WAF med SQL-injektionsregler"],
+            "mitre_techniques": ["T1190"]
+          },
+          "victim": {
+            "title": "Konstiga tecken i formulär väcker sällan uppmärksamhet",
+            "description": "Om andra användare skulle se vad angriparen skriver i sökfält eller formulär skulle det se konstigt ut – strängar som ' OR 1=1-- eller UNION SELECT NULL. Men i praktiken syns dessa tester bara i serverloggar. Vanliga användare fortsätter använda applikationen utan att märka att den testas för sårbarheter.",
+            "tools_or_indicators": ["Onormala tecken i formulärinmatning", "Databasfelmeddelanden som visas för användare"],
+            "mitre_techniques": ["T1190"]
+          }
+        },
+        {
+          "name": "Utformning av payload",
+          "order": 3,
+          "attacker": {
+            "title": "Byggande av skadliga SQL-frågor",
+            "description": "Med en bekräftad injektionspunkt konstruerar angriparen mer avancerade SQL-frågor. UNION-baserade injektioner lägger till extra databasfrågor som returnerar data från andra tabeller – exempelvis användartabellen med lösenord. Blind SQL-injektion används när applikationen inte visar databasresultat direkt; istället ställer angriparen ja/nej-frågor till databasen och drar slutsatser baserat på om sidan beter sig annorlunda. Error-baserad injektion framtvingar felmeddelanden som läcker intern databasinformation.",
+            "tools_or_indicators": ["UNION SELECT-payloads", "Blind SQL-injektion (boolean-baserad)", "Tidsbaserad blind injektion (SLEEP/WAITFOR)", "Error-baserad injektion", "sqlmap med avancerade flaggor"],
+            "mitre_techniques": ["T1190"]
+          },
+          "defender": {
+            "title": "Djupgående skydd i flera lager",
+            "description": "Utöver preparerade frågor bör organisationen implementera minsta-privilegieprincipen för databaskonton – applikationen ska aldrig köra med administratörsrättigheter i databasen. Lagrade procedurer med hårdkodade frågor begränsar vilka operationer som överhuvudtaget är möjliga. WAF-regler kan blockera kända injektionsmönster, men ska aldrig vara det enda skyddslagret.",
+            "tools_or_indicators": ["Minsta-privilegieprincipen för DB-konton", "Lagrade procedurer", "WAF-signaturer för injektionsmönster", "Regelbunden säkerhetsgranskning av kod"],
+            "mitre_techniques": ["T1190"]
+          },
+          "victim": {
+            "title": "Databasen börjar läcka information",
+            "description": "Applikationen kan börja visa oväntade resultat, laddas långsammare (vid tidsbaserade attacker) eller visa felmeddelanden. De flesta användare skulle avfärda detta som tekniska problem. I verkligheten extraherar angriparen systematiskt information från databasen – tabellnamn, kolumner och slutligen känsliga data som lösenord och personuppgifter.",
+            "tools_or_indicators": ["Långsamma svarstider", "Ovanliga felmeddelanden", "Oväntade resultat i webbapplikationen"],
+            "mitre_techniques": ["T1190"]
+          }
+        },
+        {
+          "name": "Dataextraktion",
+          "order": 4,
+          "attacker": {
+            "title": "Systematisk utvinning av databasinnehåll",
+            "description": "Angriparen extraherar nu data i stor skala. Först kartläggs alla databaser, tabeller och kolumner med information_schema – en metadatatabell som finns i de flesta databassystem och beskriver databasens struktur. Sedan hämtas det faktiska innehållet: användarkonton, lösenord (ofta i hashad form), personuppgifter, affärshemligheter eller finansiell data. Sqlmap kan automatisera hela denna process och dumpa hela databaser med ett enda kommando.",
+            "tools_or_indicators": ["sqlmap --dump", "information_schema-frågor", "Uttag av lösenordshashar", "Hämtning av kreditkortsuppgifter"],
+            "mitre_techniques": ["T1005", "T1213"]
+          },
+          "defender": {
+            "title": "Övervakning av databasaktivitet",
+            "description": "Database Activity Monitoring (DAM) loggar och analyserar alla frågor som körs mot databasen i realtid. Ovanliga frågemönster – som upprepade UNION SELECT-frågor eller åtkomst till information_schema – triggar larm. Kryptering av känsliga fält i databasen gör att även om data extraheras är den oläsbar utan dekrypteringsnycklarna, som bör förvaras separat från databasen.",
+            "tools_or_indicators": ["Database Activity Monitoring (DAM)", "Kryptering av känsliga fält", "DLP-system (Data Loss Prevention)", "Larm vid massuttag av data"],
+            "mitre_techniques": ["T1005", "T1213"]
+          },
+          "victim": {
+            "title": "Känslig data hämtas utan användarnas vetskap",
+            "description": "Användarna märker ingenting medan deras personuppgifter, lösenord och annan känslig information kopieras från databasen. Processen kan ta allt från sekunder till timmar beroende på datamängd och injektionsmetod. Denna data kan sedan säljas på darknet, användas för identitetsstöld eller som utpressningsunderlag.",
+            "tools_or_indicators": ["Inga synliga tecken för slutanvändare", "Data finns redan hos angriparen"],
+            "mitre_techniques": ["T1005"]
+          }
+        },
+        {
+          "name": "Privilegieeskalering",
+          "order": 5,
+          "attacker": {
+            "title": "Eskalering av databas- och systembehörigheter",
+            "description": "Angriparen försöker nu få högre behörigheter i databassystemet eller till och med på den underliggande servern. I Microsoft SQL Server kan kommandot xp_cmdshell aktiveras för att köra operativsystemkommandon direkt från databasen. I MySQL kan LOAD_FILE och INTO OUTFILE användas för att läsa och skriva filer på servern. Om databaskontot har överdrivna behörigheter kan angriparen ta full kontroll över servern.",
+            "tools_or_indicators": ["xp_cmdshell (MSSQL)", "LOAD_FILE / INTO OUTFILE (MySQL)", "Skapande av nya databaskonton", "Aktivering av administrativa funktioner"],
+            "mitre_techniques": ["T1068", "T1505.001"]
+          },
+          "defender": {
+            "title": "Begränsa databasserverns funktionalitet",
+            "description": "Farliga funktioner som xp_cmdshell ska vara avaktiverade som standard och aldrig aktiveras i produktionsmiljöer. Databasanvändarkonton ska följa minsta-privilegieprincipen – webbapplikationen behöver sällan mer än SELECT, INSERT och UPDATE på specifika tabeller. Filsystembehörigheter för databasprocessen ska vara strikt begränsade, och nätverkssegmentering ska förhindra att databasservern kommunicerar direkt med internet.",
+            "tools_or_indicators": ["Avaktivering av xp_cmdshell", "Strikt behörighetsstyrning i databasen", "Nätverkssegmentering av databasservrar", "Regelbundna behörighetsgranskningar"],
+            "mitre_techniques": ["T1068", "T1505.001"]
+          },
+          "victim": {
+            "title": "Hela servern kan vara komprometterad",
+            "description": "I detta skede handlar det inte längre bara om databasen. Om angriparen lyckas köra operativsystemkommandon via databasen är hela servern potentiellt komprometterad. Det kan innebära åtkomst till andra applikationer på samma server, interna nätverksresurser och i värsta fall möjlighet att installera persistent skadlig programvara.",
+            "tools_or_indicators": ["Komprometterad databasserver", "Åtkomst till filsystemet", "Möjlighet till nätverkspivotering"],
+            "mitre_techniques": ["T1068"]
+          }
+        },
+        {
+          "name": "Dataexfiltrering eller destruktion",
+          "order": 6,
+          "attacker": {
+            "title": "Exfiltrering av data eller sabotage av databasen",
+            "description": "I den sista fasen flyttar angriparen ut all värdeful data från nätverket, eller förstör den för att orsaka maximal skada. Exfiltrering kan ske genom DNS-tunnlar, krypterade kanaler eller genom att helt enkelt ladda upp data till en molntjänst. Destruktiva attacker kan innebära DROP TABLE-kommandon som raderar hela tabeller, eller kryptering av databasen som del i en utpressningsattack.",
+            "tools_or_indicators": ["DNS-tunnling för dataexfiltrering", "DROP TABLE/DATABASE-kommandon", "Kryptering av databasinnehåll", "Radering av loggar"],
+            "mitre_techniques": ["T1048", "T1485", "T1486", "T1070"]
+          },
+          "defender": {
+            "title": "Säkerhetskopiering och katastrofåterställning",
+            "description": "Regelbundna, testade säkerhetskopior som förvaras offline eller i en annan nätverkszon är det ultimata skyddet mot dataförstörelse. DLP-system övervakar nätverkstrafiken efter tecken på storskalig dataöverföring till okända destinationer. Databasloggning och integritetsövervakning kan upptäcka oauktoriserade ändringar och massraderingar innan skadan blir permanent.",
+            "tools_or_indicators": ["Offline-säkerhetskopior", "DLP-system", "Databasintegritetsövervakning", "Incidentresponsplan för dataintrång"],
+            "mitre_techniques": ["T1048", "T1485"]
+          },
+          "victim": {
+            "title": "Data är stulen eller förlorad",
+            "description": "Effekten drabbar nu alla användare av tjänsten. Personuppgifter kan vara läckta och spridas på internet, kontoinformation kan ha sålts, eller hela tjänsten kan vara otillgänglig på grund av databasförstörelse. Organisationen ställs inför juridiska konsekvenser under GDPR, förlorat kundförtroende och potentiellt enorma kostnader för återställning och hantering av dataintrånget.",
+            "tools_or_indicators": ["Läckta personuppgifter", "Otillgänglig tjänst", "GDPR-notifieringskrav"],
+            "mitre_techniques": ["T1485", "T1486"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "man-in-the-middle",
+      "name": "Man-in-the-middle-attack",
+      "slug": "man-in-the-middle",
+      "short_description": "Avlyssningsattack där angriparen i hemlighet placerar sig mellan två kommunicerande parter och läser samt potentiellt ändrar all trafik i realtid.",
+      "icon": "👤",
+      "severity": 4,
+      "mitre_id": "T1557",
+      "related_attacks": ["phishing", "lateral-movement"],
+      "phases": [
+        {
+          "name": "Nätverkspositionering",
+          "order": 1,
+          "attacker": {
+            "title": "Placering i nätverkets trafikflöde",
+            "description": "Angriparen måste först positionera sig så att nätverkstrafik passerar genom deras enhet. ARP-spoofing är den vanligaste metoden i lokala nätverk – angriparen skickar falska ARP-svar som lurar andra enheter att skicka sin trafik via angriparens dator istället för den riktiga routern. Bettercap är ett modernt verktyg som automatiserar denna process och erbjuder ett helt ramverk för nätverksattacker, medan Ettercap är det klassiska verktyget för samma ändamål.",
+            "tools_or_indicators": ["Bettercap", "Ettercap", "ARP-spoofing", "DHCP-spoofing", "Falska Wi-Fi-accesspunkter (Evil Twin)"],
+            "mitre_techniques": ["T1557.002", "T1557.001"]
+          },
+          "defender": {
+            "title": "Skydda nätverksinfrastrukturen",
+            "description": "Dynamic ARP Inspection (DAI) är en switchfunktion som validerar ARP-meddelanden mot en betrodd databas och blockerar falska ARP-svar. DHCP Snooping bygger upp denna betrodda databas automatiskt. Port security på switchar begränsar vilka MAC-adresser som får kommunicera på varje port. Dessa funktioner måste aktiveras medvetet – de flesta switchar har dem avaktiverade som standard.",
+            "tools_or_indicators": ["Dynamic ARP Inspection (DAI)", "DHCP Snooping", "Port Security", "802.1X nätverksautentisering", "Trådlös intrångsdetektering"],
+            "mitre_techniques": ["T1557.002"]
+          },
+          "victim": {
+            "title": "Trafiken omdirigeras obemärkt",
+            "description": "Offrets dator uppdaterar sin ARP-tabell baserat på de falska svaren och börjar skicka all sin nätverkstrafik via angriparens enhet. Ur offrets perspektiv fungerar internet precis som vanligt – sidor laddas, e-post skickas och tas emot. Den enda möjliga indikationen kan vara marginellt långsammare anslutning, vilket de flesta avfärdar som normala nätverksfluktuationer.",
+            "tools_or_indicators": ["Ingen märkbar skillnad för användaren", "Eventuellt något långsammare anslutning"],
+            "mitre_techniques": ["T1557.002"]
+          }
+        },
+        {
+          "name": "Trafikavlyssning",
+          "order": 2,
+          "attacker": {
+            "title": "Passiv avlyssning och analys av nätverkstrafik",
+            "description": "Nu kan angriparen se all trafik som passerar genom sin enhet. Wireshark är ett nätverksanalysverktyg som fångar upp och visuellt presenterar varje paket – man kan se webbsidor som besöks, e-postmeddelanden, DNS-förfrågningar och mycket mer. Okrypterad trafik (HTTP, FTP, Telnet) visas i klartext, inklusive lösenord och sessionstokens. Även krypterad trafik avslöjar metadata som vilka servrar offret kommunicerar med.",
+            "tools_or_indicators": ["Wireshark", "tcpdump", "NetworkMiner", "Bettercap sniffer-modul"],
+            "mitre_techniques": ["T1040"]
+          },
+          "defender": {
+            "title": "Kryptera all nätverkstrafik",
+            "description": "Kryptering är det viktigaste försvaret mot avlyssning. HTTPS ska vara obligatoriskt för all webbtrafik, och HSTS (HTTP Strict Transport Security) förhindrar att webbläsare ens försöker kommunicera okrypterat. VPN-tunnlar krypterar all trafik från enheten, oavsett destination. Nätverksövervakning kan dessutom identifiera enheter som vidarebefordrar ovanligt stora mängder trafik.",
+            "tools_or_indicators": ["HTTPS Everywhere / HSTS", "VPN-klienter", "Nätverksflödesanalys", "IDS-signaturer för ARP-anomalier"],
+            "mitre_techniques": ["T1040"]
+          },
+          "victim": {
+            "title": "Varje webbsida och varje klick övervakas",
+            "description": "Allt offret gör på nätverket syns nu för angriparen. Webbplatser som besöks, sökningar, inloggningar på okrypterade sidor och filöverföringar – allt fångas upp. Även för krypterad trafik kan angriparen se vilka domäner som kontaktas, vid vilka tidpunkter och hur mycket data som överförs, vilket ger en detaljerad bild av offrets beteendemönster.",
+            "tools_or_indicators": ["All okrypterad data är synlig", "DNS-förfrågningar avslöjar besökta sidor", "Metadata om krypterade anslutningar"],
+            "mitre_techniques": ["T1040"]
+          }
+        },
+        {
+          "name": "SSL/TLS-nedgradering",
+          "order": 3,
+          "attacker": {
+            "title": "Nedgradering av krypterade anslutningar",
+            "description": "Eftersom de flesta moderna webbplatser använder HTTPS-kryptering försöker angriparen tvinga nedgradering till okrypterad HTTP. SSLstrip är ett verktyg som sitter mellan offret och servern och omvandlar HTTPS-länkar till HTTP – offret tror att anslutningen är säker medan trafiken i verkligheten är okrypterad. Angriparen kan också presentera falska SSL-certifikat, men detta genererar vanligtvis varningar i webbläsaren som uppmärksamma användare bör reagera på.",
+            "tools_or_indicators": ["SSLstrip", "Bettercap HSTS bypass", "Falska SSL-certifikat", "WPAD-manipulation"],
+            "mitre_techniques": ["T1557.002", "T1040"]
+          },
+          "defender": {
+            "title": "Framtvinga kryptering utan undantag",
+            "description": "HSTS-konfiguration med förhandsregistrering (preloading) i webbläsare gör att webbläsaren aldrig ens försöker skicka en okrypterad förfrågan till domänen. Certifikatpinning binder applikationen till ett specifikt certifikat, vilket gör att falska certifikat omedelbart avvisas. Organisationer bör även utbilda användare att aldrig ignorera certifikatvarningar i webbläsaren – dessa varningar existerar av en anledning.",
+            "tools_or_indicators": ["HSTS med preloading", "Certificate Pinning", "DANE/TLSA DNS-poster", "Utbildning om certifikatvarningar"],
+            "mitre_techniques": ["T1557.002"]
+          },
+          "victim": {
+            "title": "Krypteringsskyddet försvinner obemärkt",
+            "description": "Om SSLstrip lyckas ser offret ingen hänglåsikon i webbläsaren, men många användare lägger inte märke till detta. Moderna webbläsare har blivit bättre på att varna, men äldre webbläsare och applikationer kan vara sårbara. Om ett falskt certifikat presenteras visas en varning – men studier visar att en stor andel användare klickar sig förbi varningar utan att läsa dem.",
+            "tools_or_indicators": ["Saknad hänglåsikon i webbläsaren", "Certifikatvarningar", "HTTP istället för HTTPS i adressfältet"],
+            "mitre_techniques": ["T1557.002"]
+          }
+        },
+        {
+          "name": "Sessionskapning",
+          "order": 4,
+          "attacker": {
+            "title": "Stöld av aktiva sessioner",
+            "description": "Med tillgång till okrypterad trafik kan angriparen fånga upp sessionscookies – små dataposter som webbplatser använder för att hålla reda på att en användare är inloggad. Genom att kopiera denna cookie till sin egen webbläsare kan angriparen ta över offrets session utan att behöva veta lösenordet. Det kallas sessionskapning och ger omedelbar tillgång till allt offret har behörighet till i den aktiva sessionen.",
+            "tools_or_indicators": ["Cookie-stöld", "Ferret/Hamster", "Bettercap cookie sniffer", "Session token replay"],
+            "mitre_techniques": ["T1539", "T1550.004"]
+          },
+          "defender": {
+            "title": "Skydda sessionshantering",
+            "description": "Sessioner ska bindas till specifika egenskaper som IP-adress och webbläsarfingeravtryck, så att en stulen cookie inte fungerar från en annan enhet. Secure- och HttpOnly-flaggor på cookies förhindrar att de skickas över okrypterade anslutningar och att JavaScript kan läsa dem. Korta sessionstider och automatisk utloggning vid inaktivitet begränsar fönstret under vilket en stulen session kan utnyttjas.",
+            "tools_or_indicators": ["Secure/HttpOnly/SameSite-cookieflaggor", "Sessionsbindning till IP/enhet", "Kort sessionslivslängd", "Kontinuerlig sessionsvalidering"],
+            "mitre_techniques": ["T1539", "T1550.004"]
+          },
+          "victim": {
+            "title": "Sessionen kapas utan synliga tecken",
+            "description": "Offret kan fortfarande vara inloggad och använda tjänsten normalt, men angriparen har nu en parallell session med samma behörigheter. Allt offret kan göra kan angriparen också göra – läsa meddelanden, ändra inställningar, göra köp eller överföra pengar. Om tjänsten inte stöder samtidiga sessionsvarningar kan detta pågå helt obemärkt.",
+            "tools_or_indicators": ["Parallella sessioner som offret inte initierat", "Ovanlig aktivitet i kontot"],
+            "mitre_techniques": ["T1539"]
+          }
+        },
+        {
+          "name": "Datamanipulation",
+          "order": 5,
+          "attacker": {
+            "title": "Aktiv modifiering av trafik i realtid",
+            "description": "Angriparen går nu från passiv avlyssning till aktiv manipulation. Det innebär att ändra innehållet i kommunikationen medan den passerar genom angriparens enhet. Exempel inkluderar att byta ut bankkontonummer i en överföring, injicera skadlig JavaScript-kod i webbsidor som offret besöker, eller ändra nedladdningslänkar så att offret får skadlig programvara istället för det avsedda programmet. Bettercap har inbyggda moduler för att automatiskt injicera kod i HTTP-svar.",
+            "tools_or_indicators": ["Bettercap HTTP proxy-moduler", "mitmproxy", "JavaScript-injektion", "Nedladdningsmanipulation"],
+            "mitre_techniques": ["T1565.002", "T1189"]
+          },
+          "defender": {
+            "title": "Integritetsvalidering av data",
+            "description": "End-to-end-kryptering är det enda fullständiga skyddet mot datamanipulation. Subresource Integrity (SRI) i webbsidor validerar att externa skript inte har modifierats. Checksummor och digitala signaturer på nedladdningar gör det möjligt att verifiera att filer inte har ändrats under transport. Tvåkanalsverifiering – där en känslig transaktion bekräftas via en separat kanal – förhindrar att manipulerade bankuppdrag går igenom.",
+            "tools_or_indicators": ["End-to-end-kryptering", "Subresource Integrity (SRI)", "Checksummor på nedladdningar", "Tvåkanalsverifiering för transaktioner"],
+            "mitre_techniques": ["T1565.002"]
+          },
+          "victim": {
+            "title": "Informationen man ser och skickar kan vara förfalskad",
+            "description": "Offret kan nu inte lita på någonting som visas i webbläsaren eller skickas över nätverket. Webbsidor kan innehålla injicerad kod, nedladdade filer kan vara utbytta mot skadlig programvara, och data man skickar – som banköverföringar eller meddelanden – kan ha ändrats innan de når mottagaren. Allt ser normalt ut för offret, men verkligheten är helt förvrängd.",
+            "tools_or_indicators": ["Modifierade webbsidor", "Utbytta filer", "Manipulerade transaktioner"],
+            "mitre_techniques": ["T1565.002"]
+          }
+        },
+        {
+          "name": "Spårröjning",
+          "order": 6,
+          "attacker": {
+            "title": "Återställning av nätverket och radering av spår",
+            "description": "När angriparen är klar återställs nätverkskonfigurationen till det normala. ARP-tabellerna uppdateras tillbaka till sina korrekta värden och trafikflödet normaliseras. Angriparen rensar loggar på sin egen utrustning och eventuella spår som lämnats på nätverksenheter. Målet är att det ska se ut som om ingenting har hänt – offret och administratörerna ska aldrig få reda på att kommunikationen var avlyssnad.",
+            "tools_or_indicators": ["ARP-tabell-återställning", "Loggradering", "Borttagning av verktyg och artefakter"],
+            "mitre_techniques": ["T1070", "T1070.004"]
+          },
+          "defender": {
+            "title": "Loggning och forensisk beredskap",
+            "description": "Centraliserad loggning till en SIEM-plattform som angriparen inte kan nå gör att bevis bevaras även om lokala loggar raderas. Nätverksövervakning som kontinuerligt analyserar ARP-trafik kan retroaktivt identifiera perioder med spoofing. Full paketfångst (PCAP) på kritiska nätverkssegment ger möjlighet till detaljerad forensisk analys efter en misstänkt incident.",
+            "tools_or_indicators": ["Centraliserad SIEM-loggning", "ARP-övervakningsverktyg (arpwatch)", "Full paketfångst (PCAP)", "Forensisk analys av nätverkstrafik"],
+            "mitre_techniques": ["T1070", "T1070.004"]
+          },
+          "victim": {
+            "title": "Attacken är över men skadan är redan skedd",
+            "description": "Nätverket fungerar åter normalt och offret märker ingen förändring. Men lösenord har redan fångats upp, sessioner har kapats, data kan ha manipulerats och känslig kommunikation har avlyssnats. Utan retroaktiv analys av nätverksloggar och trafikmönster förblir attacken helt osynlig, och offret lever vidare utan vetskap om vad som har hänt.",
+            "tools_or_indicators": ["Inga direkta indikationer kvar", "Historiska loggdata kan avslöja incidenten"],
+            "mitre_techniques": ["T1070"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ransomware",
+      "name": "Utpressningsprogram",
+      "slug": "ransomware",
+      "short_description": "Förödande skadlig programvara som krypterar offrets filer och kräver betalning för dekryptering, ofta med spridning över hela nätverk.",
+      "icon": "🔒",
+      "severity": 5,
+      "mitre_id": "T1486",
+      "related_attacks": ["phishing", "lateral-movement", "supply-chain-attack"],
+      "phases": [
+        {
+          "name": "Initial åtkomst",
+          "order": 1,
+          "attacker": {
+            "title": "Första intrånget i organisationens nätverk",
+            "description": "Ransomware-attacker börjar nästan alltid med att angriparen tar sig in i nätverket genom en annan sårbarhet. De vanligaste metoderna är nätfiske-e-post med skadliga bilagor, exponerade RDP-tjänster (Remote Desktop Protocol) med svaga lösenord, eller utnyttjande av kända sårbarheter i internetexponerade system. Många ransomware-grupper köper tillgång från så kallade access brokers – kriminella aktörer som specialiserat sig på att sälja initial åtkomst till komprometterade nätverk.",
+            "tools_or_indicators": ["Nätfiske-e-post med makron", "Exponerade RDP-tjänster", "Access brokers på darknet", "Exploatering av VPN-sårbarheter", "Komprometterade inloggningsuppgifter"],
+            "mitre_techniques": ["T1566.001", "T1133", "T1190", "T1078"]
+          },
+          "defender": {
+            "title": "Förhindra initial åtkomst",
+            "description": "Organisationen bör stänga alla onödiga externa åtkomstpunkter – särskilt RDP som aldrig ska vara direkt exponerat mot internet. Regelbunden patchning av alla internetexponerade system täpper till kända sårbarheter. E-postfiltrering med sandboxanalys av bilagor, och MFA på alla fjärråtkomsttjänster, eliminerar de vanligaste intrångsvägarna för ransomware-grupper.",
+            "tools_or_indicators": ["Stängning av extern RDP", "Regelbunden patchhantering", "E-postsäkerhet med sandboxing", "MFA på alla fjärrtjänster", "Sårbarhetsskanning"],
+            "mitre_techniques": ["T1133", "T1190"]
+          },
+          "victim": {
+            "title": "En anställd eller ett system komprometteras",
+            "description": "Intrånget kan ske genom att en anställd öppnar en skadlig bilaga, eller genom att ett exponerat system med en känd sårbarhet utnyttjas automatiskt. I detta skede påverkas vanligtvis bara en enda dator eller ett enda konto – men detta är tillräckligt för att ge angriparen den fotfäste som behövs för resten av attacken.",
+            "tools_or_indicators": ["Skadlig bilaga öppnad", "Komprometterat användarkonto", "Sårbart externt system"],
+            "mitre_techniques": ["T1566.001", "T1078"]
+          }
+        },
+        {
+          "name": "Etablering av fotfäste",
+          "order": 2,
+          "attacker": {
+            "title": "Installation av kommando- och kontrollkanal",
+            "description": "Angriparen installerar nu en bakdörr för pålitlig fjärråtkomst. Cobalt Strike är ett kommersiellt penetrationstestverktyg som ofta missbrukas av ransomware-grupper – det installerar en beacon som regelbundet kontaktar angriparens server, exekverar kommandon och kan ladda ned ytterligare verktyg. Kommunikationen är krypterad och designad för att smälta in i normal webbtrafik, vilket gör den svår att upptäcka.",
+            "tools_or_indicators": ["Cobalt Strike Beacon", "Sliver C2", "SystemBC", "PowerShell-nedladdare", "Schemalagda uppgifter för persistens"],
+            "mitre_techniques": ["T1059.001", "T1071.001", "T1053.005", "T1105"]
+          },
+          "defender": {
+            "title": "Detektera och blockera C2-kommunikation",
+            "description": "EDR-lösningar på alla endpoints kan upptäcka installation av kända C2-ramverk och misstänkta processer. Nätverksbaserad detektion genom att analysera DNS-förfrågningar och HTTP-trafik efter kända C2-mönster kompletterar endpointskyddet. Blockering av utgående trafik till okategoriserade domäner och nyregistrerade domäner försvårar angriparens kommunikation med sin infrastruktur.",
+            "tools_or_indicators": ["EDR med C2-detektion", "DNS-filtering", "Nätverksflödesanalys", "JA3/JA3S-fingerprinting"],
+            "mitre_techniques": ["T1071.001", "T1059.001"]
+          },
+          "victim": {
+            "title": "En bakdörr har installerats",
+            "description": "Den komprometterade datorn har nu en aktiv bakdörr som ger angriparen fjärrstyrning. Datorn fungerar normalt för användaren – prestanda och funktionalitet påverkas inte märkbart. Beacon-kommunikationen sker i bakgrunden, ofta med långa intervall (exempelvis var tionde minut), för att minimera risken att upptäckas.",
+            "tools_or_indicators": ["Ovanliga utgående nätverksanslutningar", "Nya schemalagda uppgifter", "Okända processer i bakgrunden"],
+            "mitre_techniques": ["T1071.001"]
+          }
+        },
+        {
+          "name": "Privilegieeskalering",
+          "order": 3,
+          "attacker": {
+            "title": "Eskalering till administratörsbehörigheter",
+            "description": "Angriparen behöver högre behörigheter för att kunna röra sig fritt i nätverket. Mimikatz är det mest kända verktyget för detta – det kan extrahera lösenord och lösenordshashar direkt ur datorns minne (processen LSASS), inklusive domänkonton som nyligen loggat in. Med dessa uppgifter kan angriparen autentisera sig som administratörer och tjänstekonton med höga privilegier.",
+            "tools_or_indicators": ["Mimikatz", "LaZagne", "Rubeus", "PrintNightmare-exploits", "Kerberoasting"],
+            "mitre_techniques": ["T1003.001", "T1068", "T1558.003"]
+          },
+          "defender": {
+            "title": "Begränsa privilegieeskalering",
+            "description": "Credential Guard i Windows skyddar LSASS-processen så att Mimikatz inte kan extrahera lösenord ur minnet. Minsta-privilegieprincipen innebär att domänadministratörer aldrig loggar in på vanliga arbetsstationer – deras uppgifter finns därmed inte i minnet att stjäla. LAPS (Local Administrator Password Solution) ger varje dator ett unikt lokalt administratörslösenord, så att kompromiss av en dator inte ger tillgång till alla.",
+            "tools_or_indicators": ["Credential Guard", "LAPS", "Privileged Access Workstations (PAW)", "Övervakning av LSASS-åtkomst"],
+            "mitre_techniques": ["T1003.001", "T1068"]
+          },
+          "victim": {
+            "title": "Administratörskonton komprometteras",
+            "description": "Angriparen har nu tillgång till konton med omfattande behörigheter i hela nätverket. Kontoinnehavarna själva märker inget ovanligt – deras lösenord har extraherats ur minnet utan att kontot låses eller att lösenordet ändras. Det är som om någon kopierat nyckeln till hela byggnaden utan att originalet försvunnit.",
+            "tools_or_indicators": ["Stulna domänadministratörsuppgifter", "Extraherade lösenordshashar", "Komprometterade tjänstekonton"],
+            "mitre_techniques": ["T1003.001"]
+          }
+        },
+        {
+          "name": "Nätverkskartläggning",
+          "order": 4,
+          "attacker": {
+            "title": "Kartläggning av hela nätverkets struktur",
+            "description": "Med administratörsbehörigheter kartlägger angriparen hela den interna nätverksstrukturen. BloodHound är ett specialverktyg som analyserar Active Directory-relationer och grafiskt visar den kortaste vägen till domänadministratör. AdFind och PowerView samlar in detaljerad information om domäncontrollers, servrar, arbetsstation och användarkonton. Angriparen letar specifikt efter filservrar, säkerhetskopieringsservrar och kritiska affärssystem.",
+            "tools_or_indicators": ["BloodHound", "AdFind", "PowerView", "Intern Nmap-skanning", "Net-kommandon"],
+            "mitre_techniques": ["T1018", "T1069", "T1087.002", "T1482"]
+          },
+          "defender": {
+            "title": "Detektera intern spaning",
+            "description": "Ovanliga LDAP-frågor mot Active Directory, breda portskannor från arbetsplatsdatorer och användning av nätverksspanningsverktyg ska generera larm. Honeypots – falska servrar och konton som legitima användare aldrig kontaktar – kan avslöja angripare som utforskar nätverket. Nätverkssegmentering begränsar vilka delar av nätverket som är synliga från varje segment.",
+            "tools_or_indicators": ["SIEM-larm för ovanliga LDAP-frågor", "Honeypots och honungskonton", "Nätverkssegmentering", "Övervakning av interna skanningar"],
+            "mitre_techniques": ["T1018", "T1087.002"]
+          },
+          "victim": {
+            "title": "Hela nätverket är kartlagt",
+            "description": "Angriparen har nu en fullständig bild av organisationens IT-infrastruktur – vilka servrar som finns, vad de används till, var säkerhetskopiorna lagras och vilka vägar som leder till de mest värdefulla systemen. Denna kunskap gör den kommande attacken betydligt mer effektiv och förödande. Användarna i nätverket märker ingenting av denna fas.",
+            "tools_or_indicators": ["Kartlagd nätverksstruktur", "Identifierade säkerhetskopieringsservrar", "Fullständig Active Directory-översikt"],
+            "mitre_techniques": ["T1018", "T1482"]
+          }
+        },
+        {
+          "name": "Lateral förflyttning",
+          "order": 5,
+          "attacker": {
+            "title": "Spridning genom nätverket",
+            "description": "Angriparen rör sig nu från system till system med de stulna administratörsuppgifterna. PsExec och WMI (Windows Management Instrumentation) används för att fjärrexekvera kommandon och installera bakdörrar på servrar. RDP med stulna uppgifter ger full grafisk åtkomst. Målet är att nå alla kritiska system – särskilt domäncontrollers, filservrar och säkerhetskopieringsservrar – innan krypteringen startar.",
+            "tools_or_indicators": ["PsExec", "WMI-fjärrexekvering", "RDP med stulna uppgifter", "SMB-fildelning", "PowerShell Remoting"],
+            "mitre_techniques": ["T1021.002", "T1021.001", "T1021.003", "T1047"]
+          },
+          "defender": {
+            "title": "Begränsa lateral förflyttning",
+            "description": "Mikrosegmentering delar upp nätverket i isolerade zoner så att kompromiss av ett segment inte automatiskt ger åtkomst till andra. Windows Firewall ska konfigureras på varje maskin för att blockera onödig inkommande trafik – särskilt SMB och RDP från arbetsplatsdatorer. Övervakning av laterala autentiseringsförsök och ovanliga administrativa sessioner möjliggör tidig detektering.",
+            "tools_or_indicators": ["Mikrosegmentering", "Windows Firewall-policyer", "Blockering av SMB/RDP mellan arbetsstationer", "Lateral movement-detektering i EDR"],
+            "mitre_techniques": ["T1021.002", "T1021.001"]
+          },
+          "victim": {
+            "title": "Server efter server komprometteras",
+            "description": "Angriparen tar nu kontroll över allt fler system i nätverket. Filservrar, e-postservrar, databaser och säkerhetskopieringslösningar – alla besöks och förbereds. Enskilda användare märker fortfarande ingenting, men administratörer som aktivt övervakar systemloggar kan se ovanliga inloggningar och fjärrexekveringar.",
+            "tools_or_indicators": ["Ovanliga administratörsinloggningar", "Fjärrexekvering av kommandon", "Installation av verktyg på servrar"],
+            "mitre_techniques": ["T1021.002"]
+          }
+        },
+        {
+          "name": "Datastaging och exfiltrering",
+          "order": 6,
+          "attacker": {
+            "title": "Stöld av data före kryptering – dubbel utpressning",
+            "description": "Moderna ransomware-grupper använder dubbel utpressning – de stjäl känslig data innan de krypterar den. Om offret vägrar betala hotar de med att publicera datan. Angriparen samlar ihop de mest känsliga filerna – affärshemligheter, kunduppgifter, finansiella dokument – och laddar upp dem till sina egna servrar. Verktyg som Rclone (en kommandoradsbaserad molnsynkroniseringsklient) och Mega.io används ofta för att snabbt och diskret överföra stora datamängder.",
+            "tools_or_indicators": ["Rclone", "Mega.io", "WinSCP", "7-Zip för komprimering", "Exfiltrering via HTTPS"],
+            "mitre_techniques": ["T1567.002", "T1048", "T1560.001"]
+          },
+          "defender": {
+            "title": "Upptäck och förhindra dataexfiltrering",
+            "description": "DLP-system övervakar nätverkstrafiken efter stora utgående dataöverföringar till ovanliga destinationer. Blockering av molnlagringstjänster som inte är godkända av organisationen förhindrar enkel exfiltrering. Nätverksövervakning som larmar vid ovanligt stora uppladdningar – särskilt utanför arbetstid – kan ge tidiga varningssignaler. Segmentering som förhindrar att servrar kommunicerar direkt med internet är ett grundläggande skydd.",
+            "tools_or_indicators": ["DLP-system", "Blockering av otillåtna molntjänster", "Bandbreddsövervakning", "Proxy med SSL-inspektion"],
+            "mitre_techniques": ["T1567.002", "T1048"]
+          },
+          "victim": {
+            "title": "Känsliga filer kopieras ut ur nätverket",
+            "description": "Stora mängder data lämnar nu organisationens nätverk. Kundregister, personalfiler, affärsavtal och teknisk dokumentation kopieras till angriparens infrastruktur. Denna stulna data kommer att användas som ytterligare hävstång i utpressningen – även om organisationen kan återställa sina system från säkerhetskopior hotas de med publicering av känslig information.",
+            "tools_or_indicators": ["Ovanligt stor utgående nätverkstrafik", "Komprimerade arkivfiler på servrar", "Åtkomst till fildelningar som sällan används"],
+            "mitre_techniques": ["T1567.002"]
+          }
+        },
+        {
+          "name": "Kryptering och lösenkrav",
+          "order": 7,
+          "attacker": {
+            "title": "Massiv kryptering och leverans av lösenkrav",
+            "description": "Nu startar den synliga fasen av attacken. Ransomware-programmet distribueras till alla komprometterade system och börjar kryptera filer med stark asymmetrisk kryptering – varje fil krypteras med en unik nyckel som i sin tur krypteras med angriparens publika nyckel. Angriparen raderar säkerhetskopior, inaktiverar säkerhetsprogramvara och tar bort Volume Shadow Copies. En lösenanteckning lämnas med instruktioner för betalning i kryptovaluta och en tidsfrist, ofta med hot om att dubbla beloppet eller publicera stulen data.",
+            "tools_or_indicators": ["AES/RSA-kryptering av filer", "Radering av Volume Shadow Copies", "Inaktivering av Windows Defender", "Lösenanteckning på skrivbordet", "Tor-baserad betalningsportal"],
+            "mitre_techniques": ["T1486", "T1490", "T1489", "T1562.001"]
+          },
+          "defender": {
+            "title": "Sista linjens försvar och återhämtning",
+            "description": "Isolerade och oföränderliga säkerhetskopior (immutable backups) som inte kan raderas eller krypteras av angriparen är den viktigaste återhämtningsmekanismen. EDR-regler som upptäcker masskryptering och automatiskt isolerar drabbade maskiner kan stoppa spridningen. En förberedd och regelbundet övad incidentresponsplan gör att organisationen snabbt kan koordinera sin reaktion – kommunikation, isolering, forensisk analys och återställning.",
+            "tools_or_indicators": ["Immutable backups", "EDR med ransomware-detektion", "Incidentresponsplan", "Nätverksisolering av drabbade segment", "Kommunikationsplan"],
+            "mitre_techniques": ["T1486", "T1490"]
+          },
+          "victim": {
+            "title": "Alla filer är krypterade och otillgängliga",
+            "description": "Anställda kan inte öppna sina filer, servrar är nere och en lösenanteckning möter dem på skärmarna. Hela organisationens verksamhet kan stå still – fakturering, kundtjänst, produktion och kommunikation. Beslutet om huruvida lösensumman ska betalas är komplext – brottsbekämpande myndigheter avråder generellt, men utan fungerande säkerhetskopior kan det vara det enda alternativet. Även med betalning finns ingen garanti att dekrypteringsnyckeln levereras eller fungerar.",
+            "tools_or_indicators": ["Krypterade filer med ändrad filändelse", "Lösenanteckning på alla drabbade system", "Total verksamhetsavbrott", "Krav på betalning i Bitcoin eller Monero"],
+            "mitre_techniques": ["T1486"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "lateral-movement",
+      "name": "Lateral förflyttning",
+      "slug": "lateral-movement",
+      "short_description": "Teknik efter intrång där angripare rör sig genom ett nätverk från system till system, eskalerar privilegier och utökar sin åtkomst för att nå värdefulla mål.",
+      "icon": "🕸️",
+      "severity": 4,
+      "mitre_id": "T1021",
+      "related_attacks": ["brute-force", "ransomware", "man-in-the-middle"],
+      "phases": [
+        {
+          "name": "Initial kompromiss",
+          "order": 1,
+          "attacker": {
+            "title": "Etablering av det första fotfästet",
+            "description": "Lateral förflyttning börjar alltid med att angriparen redan har tillgång till minst en enhet i nätverket. Det kan ha skett genom nätfiske, en sårbar tjänst eller stulna inloggningsuppgifter. Denna första komprometterade enhet fungerar som angriparens brygghuvud – en säker utgångspunkt från vilken resten av nätverket utforskas och angrips.",
+            "tools_or_indicators": ["Komprometterad arbetsstation", "Cobalt Strike Beacon", "Meterpreter-session", "Webshell på exponerad server"],
+            "mitre_techniques": ["T1078", "T1190", "T1566.001"]
+          },
+          "defender": {
+            "title": "Detektera den initiala komprometteringen",
+            "description": "Ju snabbare den initiala komprometteringen upptäcks, desto mindre skada kan angriparen orsaka. EDR-lösningar på alla endpoints ger visibilitet i processer, nätverksanslutningar och filsystemändringar. Segmentering av nätverket innebär att även om en enhet komprometteras har angriparen begränsad räckvidd. Varningar vid ovanliga processer, utgående anslutningar eller eskaleringsförsök är kritiska tidiga indikatorer.",
+            "tools_or_indicators": ["EDR på alla endpoints", "SIEM-korrelation", "Nätverkssegmentering", "Varningar vid kompromissindikatorer (IoC)"],
+            "mitre_techniques": ["T1078", "T1190"]
+          },
+          "victim": {
+            "title": "En enhet i nätverket är komprometterad",
+            "description": "En enda komprometterad arbetsstation eller server räcker som utgångspunkt. Användaren av den drabbade enheten kan märka att datorn är långsammare eller att nya processer körs, men ofta är de första tecknen så subtila att de avfärdas. Resten av organisationen har ingen aning om att ett intrång har skett.",
+            "tools_or_indicators": ["Subtila prestandaförändringar", "Ovanliga processer", "Oväntade nätverksanslutningar"],
+            "mitre_techniques": ["T1078"]
+          }
+        },
+        {
+          "name": "Intern spaning",
+          "order": 2,
+          "attacker": {
+            "title": "Kartläggning av nätverkets interna struktur",
+            "description": "Från det komprometterade systemet börjar angriparen utforska det interna nätverket. BloodHound samlar in data från Active Directory och visualiserar relationer mellan användare, grupper, datorer och behörigheter – det kan automatiskt beräkna den kortaste attackvägen till domänadministratör. PowerView är en PowerShell-modul som kan fråga Active Directory efter information om domäner, användare, grupper och förtroendeförhållanden utan att installera extern programvara.",
+            "tools_or_indicators": ["BloodHound med SharpHound-insamlare", "PowerView", "AdFind", "Nmap intern skanning", "Net view/net user-kommandon"],
+            "mitre_techniques": ["T1018", "T1069.001", "T1069.002", "T1087.002", "T1482"]
+          },
+          "defender": {
+            "title": "Identifiera och larma vid intern spaning",
+            "description": "SharpHound:s datainsamling genererar stora mängder LDAP-förfrågningar som skiljer sig från normala mönster – SIEM-regler kan larma vid detta. Honeypots i form av falska administratörskonton och servrar avslöjar angripare som utforskar nätverket. Begränsning av vilken Active Directory-information som vanliga användarkonton kan se minskar angriparens förmåga att kartlägga infrastrukturen.",
+            "tools_or_indicators": ["SIEM-larm för massiva LDAP-frågor", "Honeypot-konton och servrar", "Begränsning av AD-läsbehörigheter", "Övervakning av administratörsverktyg"],
+            "mitre_techniques": ["T1018", "T1087.002"]
+          },
+          "victim": {
+            "title": "Nätverkets hemligheter kartläggs",
+            "description": "Angriparen bygger nu en detaljerad karta över hela organisationens IT-miljö. Varje server, varje delad mapp, varje administratörskonto och varje förtroendeförhållande dokumenteras. Denna information avslöjar var de mest värdefulla målen finns och vilka vägar som leder dit. Allt detta sker med legitimt utseende Active Directory-förfrågningar som sällan väcker misstanke.",
+            "tools_or_indicators": ["Kartlagda Active Directory-relationer", "Identifierade högt privilegierade konton", "Dokumenterade nätverkstopologier"],
+            "mitre_techniques": ["T1018", "T1482"]
+          }
+        },
+        {
+          "name": "Insamling av inloggningsuppgifter",
+          "order": 3,
+          "attacker": {
+            "title": "Extraktion av lösenord och autentiseringsuppgifter",
+            "description": "Angriparen samlar nu in så många inloggningsuppgifter som möjligt. Mimikatz kan dumpa lösenord och lösenordshashar från LSASS-processen – Windows lagrar autentiseringsuppgifter för nyligen inloggade användare i minnet för att möjliggöra Single Sign-On. Kerberoasting utnyttjar Kerberos-protokollet genom att begära tjänstbiljetter för tjänstekonton och sedan knäcka deras lösenord offline. DCSync-attacken simulerar en domäncontroller och begär lösenordsreplikering för alla domänkonton.",
+            "tools_or_indicators": ["Mimikatz (sekurlsa::logonpasswords)", "LSASS-minnesdump", "Kerberoasting (Rubeus)", "DCSync-attack", "Pass-the-Hash"],
+            "mitre_techniques": ["T1003.001", "T1003.006", "T1558.003", "T1550.002"]
+          },
+          "defender": {
+            "title": "Skydda autentiseringsuppgifter i nätverket",
+            "description": "Credential Guard isolerar LSASS-processen i en virtualiserad miljö som inte kan nås av administratörsverktyg som Mimikatz. Tiered administration innebär att högt privilegierade konton aldrig används på lägre betrodda system – en domänadministratör ska aldrig logga in på en vanlig arbetsstation. Övervakning av DCSync-mönster i nätverkstrafiken och begränsning av Kerberos-delegering minskar angriparens möjligheter att samla in uppgifter.",
+            "tools_or_indicators": ["Credential Guard", "Tiered administration-modell", "DCSync-detektering", "LSASS-skydd och minnesintegritetsövervakning"],
+            "mitre_techniques": ["T1003.001", "T1003.006"]
+          },
+          "victim": {
+            "title": "Lösenord stjäls utan att kontona påverkas",
+            "description": "Kontoinnehavare märker ingenting – deras lösenord extraheras ur datorns minne utan att lösenordet ändras eller kontot låses. Angriparen kan nu logga in som dessa användare var som helst i nätverket. Särskilt farligt är det om tjänstekonton med höga behörigheter komprometteras, eftersom dessa ofta har obegränsad åtkomst till kritiska system.",
+            "tools_or_indicators": ["Stulna lösenordshashar", "Komprometterade tjänstekonton", "Extraherade Kerberos-biljetter"],
+            "mitre_techniques": ["T1003.001", "T1558.003"]
+          }
+        },
+        {
+          "name": "Pivotering till angränsande system",
+          "order": 4,
+          "attacker": {
+            "title": "Förflyttning till nya system med stulna uppgifter",
+            "description": "Med insamlade inloggningsuppgifter börjar angriparen flytta sig till andra system i nätverket. PsExec är ett Sysinternals-verktyg som kör kommandon på fjärrdatorer via SMB – med stulna administratörsuppgifter kan angriparen installera bakdörrar på valfri maskin. WMI (Windows Management Instrumentation) tillhandahåller samma funktionalitet men på ett sätt som genererar färre loggar. RDP med stulna uppgifter ger fullständig grafisk fjärråtkomst och används ofta för att interagera med servrar manuellt.",
+            "tools_or_indicators": ["PsExec", "WMI/WMIC", "RDP med stulna uppgifter", "PowerShell Remoting (WinRM)", "Pass-the-Hash och Pass-the-Ticket"],
+            "mitre_techniques": ["T1021.002", "T1021.001", "T1021.006", "T1047", "T1550.002"]
+          },
+          "defender": {
+            "title": "Detektera och blockera lateral rörelse",
+            "description": "Windows Firewall bör blockera inkommande SMB (port 445) och RDP (port 3389) från arbetsplatsdatorer till andra arbetsplatsdatorer – det finns sällan en legitim anledning för denna trafik. Övervaka PsExec-användning och WMI-fjärrexekvering centralt. Nätverkssegmentering med strikta brandväggsregler mellan segment tvingar angriparen att korsa kontrollpunkter, vilket ökar sannolikheten för detektering.",
+            "tools_or_indicators": ["Brandväggsregler mellan segment", "Blockering av arbetsstation-till-arbetsstation-trafik", "PsExec/WMI-övervakning", "RDP-sessionsloggning"],
+            "mitre_techniques": ["T1021.002", "T1021.001"]
+          },
+          "victim": {
+            "title": "Fler och fler system komprometteras",
+            "description": "Angriparen sprider sig nu genom nätverket som ringar på vattnet. Varje nytt komprometterat system kan innehålla ytterligare inloggningsuppgifter som öppnar dörrar till ännu fler system. Användarna på de drabbade maskinerna märker oftast ingenting – anslutningarna sker med legitima administratörsverktyg och giltiga uppgifter, vilket gör att allt ser normalt ut i standardloggar.",
+            "tools_or_indicators": ["Inloggningar från oväntat håll", "Administrativa verktyg körda vid ovanliga tider", "Ny programvara installerad på servrar"],
+            "mitre_techniques": ["T1021.002", "T1021.001"]
+          }
+        },
+        {
+          "name": "Privilegieeskalering",
+          "order": 5,
+          "attacker": {
+            "title": "Uppnående av domänadministratörsbehörigheter",
+            "description": "Angriparen eskalerar nu till den högsta nivån av åtkomst – domänadministratör. Med DCSync-attacken kan angriparen replikera hela Active Directorys lösenordsdatabas, inklusive krbtgt-kontot som används för att skapa Kerberos-biljetter. Med kontroll över krbtgt kan angriparen skapa Golden Tickets – förfalskade Kerberos-biljetter som ger obegränsad åtkomst till alla resurser i domänen under mycket lång tid, potentiellt år.",
+            "tools_or_indicators": ["DCSync-attack", "Golden Ticket-skapande", "Mimikatz (lsadump::dcsync)", "Kerberos krbtgt-kompromiss"],
+            "mitre_techniques": ["T1003.006", "T1558.001"]
+          },
+          "defender": {
+            "title": "Skydda domänens högsta behörigheter",
+            "description": "Antalet domänadministratörskonton ska vara minimalt och deras användning strikt övervakad. Regelbundet byte av krbtgt-lösenordet (två gånger, med 12 timmars mellanrum) invaliderar befintliga Golden Tickets. Protected Users-gruppen i Active Directory ger extra skydd för högt privilegierade konton genom att förhindra att deras uppgifter cachas. Red Forest-modellen isolerar administratörskonton i en separat, hårdad skog.",
+            "tools_or_indicators": ["Regelbundet krbtgt-lösenordsbyte", "Protected Users-grupp", "Red Forest / ESAE-arkitektur", "Övervakning av domänadmin-inloggningar"],
+            "mitre_techniques": ["T1003.006", "T1558.001"]
+          },
+          "victim": {
+            "title": "Angriparen har total kontroll över domänen",
+            "description": "Med domänadministratörsbehörigheter och potentiellt en Golden Ticket har angriparen obegränsad åtkomst till alla system, filer och resurser i hela Active Directory-domänen. Varje dator, varje server, varje användares e-post och filer – allt är tillgängligt. Detta är det absolut mest kritiska tillståndet för en organisation, och återhämtning kräver ofta en fullständig ombyggnad av Active Directory-infrastrukturen.",
+            "tools_or_indicators": ["Total åtkomst till alla system", "Möjlighet att skapa och radera konton", "Fullständig kontroll över säkerhetspolicyer"],
+            "mitre_techniques": ["T1558.001"]
+          }
+        },
+        {
+          "name": "Etablering av domändominans",
+          "order": 6,
+          "attacker": {
+            "title": "Permanenta persistensmekanismer på domännivå",
+            "description": "Angriparen säkrar sin kontroll med persistensmekanismer som överlever lösenordsbyten och systemåterställningar. Utöver Golden Tickets kan Skeleton Key injiceras i domäncontrollern för att lägga till ett universellt lösenord som fungerar för alla konton. AdminSDHolder-manipulation ändrar behörigheter som automatiskt tillämpas på alla privilegierade konton. GPO-baserad persistens distribuerar bakdörrar via grupppolicyer som körs på alla domänanslutna datorer.",
+            "tools_or_indicators": ["Golden Ticket/Silver Ticket", "Skeleton Key-injektion", "AdminSDHolder-manipulation", "GPO-baserade bakdörrar", "DCShadow-attack"],
+            "mitre_techniques": ["T1558.001", "T1556.001", "T1484.001", "T1098"]
+          },
+          "defender": {
+            "title": "Detektera och avbryt domänpersistens",
+            "description": "Regelbunden granskning av Active Directory-ändringar med verktyg som Purple Knight eller PingCastle identifierar oauktoriserade modifieringar av kritiska objekt. Övervakning av AdminSDHolder-ändringar, nya GPO:er och ovanliga replikeringsmönster är essentiellt. Vid bekräftad domänkompromiss krävs ofta fullständig återuppbyggnad av Active Directory – inklusive alla domäncontrollers – för att garantera att alla persistensmekanismer elimineras.",
+            "tools_or_indicators": ["Purple Knight / PingCastle", "Granskning av AdminSDHolder", "GPO-övervakning", "Full AD-återuppbyggnad vid behov"],
+            "mitre_techniques": ["T1558.001", "T1484.001"]
+          },
+          "victim": {
+            "title": "Angriparen har permanentat sin kontroll",
+            "description": "Även om organisationen upptäcker intrånget och byter alla lösenord kan angriparen potentiellt behålla åtkomsten genom sina persistensmekanismer. En Golden Ticket kan vara giltig i upp till tio år om krbtgt-lösenordet inte byts. Skeleton Key överlevervstarter av domäncontrollern. Organisationen befinner sig i en situation där halva åtgärder inte räcker – endast en grundlig och metodisk sanering av hela domänen kan garantera att angriparen inte kommer tillbaka.",
+            "tools_or_indicators": ["Persistent angriparåtkomst trots lösenordsbyten", "Bakdörrar i grupppolicyer", "Manipulerade Active Directory-objekt"],
+            "mitre_techniques": ["T1558.001", "T1098"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "supply-chain-attack",
+      "name": "Leveranskedjeattack",
+      "slug": "supply-chain-attack",
+      "short_description": "Sofistikerad attack som komprometterar en betrodd leverantör, mjukvarupaket eller uppdateringsmekanism för att distribuera skadlig programvara till alla nedströmsanvändare och organisationer.",
+      "icon": "📦",
+      "severity": 5,
+      "mitre_id": "T1195",
+      "related_attacks": ["ransomware", "sql-injection", "lateral-movement"],
+      "phases": [
+        {
+          "name": "Identifiering av leverantör/beroenden",
+          "order": 1,
+          "attacker": {
+            "title": "Kartläggning av mjukvaruleveranskedjan",
+            "description": "Angriparen analyserar vilka mjukvarupaket, bibliotek och leverantörer som målet förlitar sig på. Istället för att angripa målet direkt – som kanske har starkt skydd – letar man efter svagare länkar i leveranskedjan. Historiska exempel inkluderar SolarWinds-attacken där angripare komprometterade en populär nätverksövervakningsprodukt som användes av tusentals organisationer, och attacker mot npm- och PyPI-paketregister där skadlig kod injicerades i populära open source-bibliotek.",
+            "tools_or_indicators": ["Analys av beroendeträd (package.json, requirements.txt)", "Kartläggning av tredjepartsintegrationer", "Identifiering av CI/CD-leverantörer", "SolarWinds Orion som historiskt exempel"],
+            "mitre_techniques": ["T1195.001", "T1195.002"]
+          },
+          "defender": {
+            "title": "Inventera och riskbedöm leverantörsberoenaden",
+            "description": "Organisationen behöver en fullständig bild av alla mjukvaruberoenden – inklusive transitiva beroenden (beroenden av beroenden). Software Bill of Materials (SBOM) skapar denna inventering formellt. Varje leverantör bör riskbedömas baserat på deras säkerhetsmognad. Verktyg som Dependabot och Snyk skannar automatiskt efter kända sårbarheter i använda bibliotek och föreslår uppdateringar.",
+            "tools_or_indicators": ["SBOM (Software Bill of Materials)", "Dependabot / Snyk / Renovate", "Leverantörssäkerhetsbedömningar", "Inventering av tredjepartsintegrationer"],
+            "mitre_techniques": ["T1195.001", "T1195.002"]
+          },
+          "victim": {
+            "title": "Ovetande beroende av sårbar leverantör",
+            "description": "Organisationen förlitar sig dagligen på hundratals mjukvarukomponenter utan att nödvändigtvis veta vilka de är. Varje npm-paket kan ha dussintals egna beroenden, och varje beroende utgör en potentiell attackvektor. De flesta organisationer har inte fullständig insyn i sitt beroendeträd, vilket gör dem sårbara utan att de ens vet om det.",
+            "tools_or_indicators": ["Hundratals transitiva beroenden", "Automatiska uppdateringar utan granskning", "Implicerat förtroende för leverantörer"],
+            "mitre_techniques": ["T1195.002"]
+          }
+        },
+        {
+          "name": "Kompromiss av byggpipeline",
+          "order": 2,
+          "attacker": {
+            "title": "Infiltrering av leverantörens utvecklingsmiljö",
+            "description": "Angriparen tar sig in i leverantörens byggsystem – den infrastruktur som kompilerar källkod till färdig programvara. Detta kan ske genom att kompromittera en utvecklares konto, utnyttja en sårbarhet i CI/CD-plattformen (Continuous Integration/Continuous Delivery) eller genom social manipulation av en betrodd bidragsgivare i ett open source-projekt. I SolarWinds-fallet modifierades byggsystemet så att skadlig kod automatiskt injicerades vid varje kompilering utan att synas i källkoden.",
+            "tools_or_indicators": ["Komprometterade utvecklarkonton", "CI/CD-pipline-manipulation (GitHub Actions, Jenkins)", "Komprometterade signeringsnycklar", "Insider-hot"],
+            "mitre_techniques": ["T1195.002", "T1199"]
+          },
+          "defender": {
+            "title": "Härda byggsystem och leveranspipeline",
+            "description": "Byggsystem ska behandlas som högkritisk infrastruktur med strikt åtkomstkontroll och fullständig loggning. Sigillerad (hermetic) build innebär att byggprocessen är helt reproducerbar och inte kan påverkas av externa faktorer. Kodgranskning av alla ändringar – inklusive från betrodda bidragsgivare – och krävande av signerade commits minskar risken för injicerad skadlig kod. Skydda CI/CD-hemligheter och signeringsnycklar med hårdvarusäkerhetsmoduler (HSM).",
+            "tools_or_indicators": ["Sigillerade builds", "Obligatorisk kodgranskning", "Signerade commits och artefakter", "HSM för signeringsnycklar", "SLSA-ramverket"],
+            "mitre_techniques": ["T1195.002"]
+          },
+          "victim": {
+            "title": "Leverantörens byggsystem är komprometterat",
+            "description": "Nedströmsanvändare har ingen möjlighet att se att leverantörens byggsystem har manipulerats. All programvara som produceras ser legitim ut, är korrekt signerad och distribueras via normala kanaler. Det finns inga varningssignaler i slutprodukten – den skadliga koden är designad för att vara osynlig vid normal inspektion.",
+            "tools_or_indicators": ["Ingen synlig indikation för slutanvändare", "Korrekt signerad programvara med dold bakdörr"],
+            "mitre_techniques": ["T1195.002"]
+          }
+        },
+        {
+          "name": "Injektion av skadlig payload",
+          "order": 3,
+          "attacker": {
+            "title": "Inbäddning av bakdörr i programvaran",
+            "description": "Angriparen injicerar nu sin skadliga kod i leverantörens produkt. Koden designas för att vara så diskret som möjligt – den kan vara obfuskerad, fördröjd (aktiveras inte förrän efter en viss tid) och begränsad till specifika mål. I SolarWinds-fallet låg bakdörren vilande i två veckor efter installation, kommunicerade via DNS-förfrågningar som såg ut som normal trafik, och kontrollerade vilken organisation den befann sig i innan den aktiverades. Denna sofistikeringsnivå gör detektering extremt svår.",
+            "tools_or_indicators": ["Obfuskerad skadlig kod i källkoden", "Fördröjd aktivering (dormant period)", "Målselektiv aktivering", "DNS-baserad C2-kommunikation"],
+            "mitre_techniques": ["T1195.002", "T1027", "T1071.004"]
+          },
+          "defender": {
+            "title": "Granska programvaruintegritet",
+            "description": "Reproducerbara builds gör det möjligt att verifiera att den kompilerade programvaran faktiskt motsvarar den publicerade källkoden – eventuella avvikelser avslöjar manipulation. Statisk kodanalys och binäranalys kan upptäcka ovanliga kodmönster, obfuskering och misstänkta funktionsanrop. In-toto-ramverket kryptografiskt verifierar varje steg i byggsprocessen och säkerställer att inga steg har hoppats över eller manipulerats.",
+            "tools_or_indicators": ["Reproducerbara builds", "Statisk kodanalys", "Binäranalys", "In-toto supply chain integrity framework"],
+            "mitre_techniques": ["T1195.002", "T1027"]
+          },
+          "victim": {
+            "title": "Programvaran innehåller nu en dold bakdörr",
+            "description": "Den programvara som organisationen förlitar sig på innehåller nu skadlig kod som angriparen kontrollerar. Koden ser ut som en del av den normala produkten och har passerats genom alla kvalitets- och säkerhetskontroller som leverantören har. Ingen mängd intern granskning av den egna koden kan upptäcka problemet – hotet kommer inifrån en betrodd extern komponent.",
+            "tools_or_indicators": ["Betrodd programvara med dold bakdörr", "Signerade uppdateringspaket som innehåller skadlig kod"],
+            "mitre_techniques": ["T1195.002"]
+          }
+        },
+        {
+          "name": "Distribution via betrodda kanaler",
+          "order": 4,
+          "attacker": {
+            "title": "Spridning genom officiella uppdateringskanaler",
+            "description": "Den komprometterade programvaran distribueras nu till alla användare genom leverantörens egna, betrodda uppdateringsmekanismer. Automatiska uppdateringar installerar den skadliga versionen utan manuell inblandning. Kodsigneringscertifikat bekräftar att programvaran är äkta – eftersom den faktiskt kompilerats av leverantörens system är signaturen giltig. Detta är det som gör leveranskedjeattacker så effektiva – offren installerar skadlig programvara frivilligt eftersom den kommer från en betrodd källa.",
+            "tools_or_indicators": ["Automatiska uppdateringsmekanismer", "Giltiga kodsigneringscertifikat", "CDN/paketregister som distributionskanal", "Officiella releaseanteckningar"],
+            "mitre_techniques": ["T1195.002", "T1072"]
+          },
+          "defender": {
+            "title": "Kontrollera och fördröj uppdateringar",
+            "description": "Organisationer bör inte automatiskt installera alla uppdateringar i produktionsmiljöer. En stagingmiljö där uppdateringar först testas och observeras under en period ger möjlighet att upptäcka avvikande beteende innan det drabbar produktion. Övervakning av nätverkstrafiken efter uppdateringar kan avslöja ny och oväntad kommunikation. Pinning av specifika versioner av bibliotek och manuell granskning innan uppgradering ger ytterligare kontroll.",
+            "tools_or_indicators": ["Stagingmiljö för uppdateringar", "Nätverksövervakning efter uppdatering", "Versionspinning av beroenden", "Fördröjd utrullning av uppdateringar"],
+            "mitre_techniques": ["T1195.002", "T1072"]
+          },
+          "victim": {
+            "title": "Uppdateringen installeras som vilken annan som helst",
+            "description": "Organisationens system laddar ner och installerar den komprometterade uppdateringen genom den normala processen. IT-avdelningen kan ha godkänt den, automatiska system kan ha installerat den, eller enskilda utvecklare kan ha uppgraderat paketet via sin pakethanterare. Ur varje perspektiv ser detta ut som en helt normal, rutinmässig uppdatering. Det finns ingen anledning att misstänka att något är fel.",
+            "tools_or_indicators": ["Automatiskt installerad uppdatering", "Godkänd genom normala processer", "Korrekt signerad och verifierad"],
+            "mitre_techniques": ["T1195.002"]
+          }
+        },
+        {
+          "name": "Nedströmsexploatering",
+          "order": 5,
+          "attacker": {
+            "title": "Aktivering och utnyttjande hos nedströmsoffren",
+            "description": "Bakdörren aktiveras nu hos de drabbade organisationerna. Angriparen kan selektivt välja vilka organisationer som angrips vidare – i SolarWinds-fallet riktades den djupare attacken mot ett fåtal högvärdiga mål av de 18 000 som installerat den komprometterade uppdateringen. Väl aktiverad ger bakdörren samma möjligheter som en vanlig initial åtkomst – angriparen kan ladda ned ytterligare verktyg, eskalera privilegier och röra sig lateralt genom målets nätverk.",
+            "tools_or_indicators": ["Selektiv aktivering hos utvalda mål", "Nedladdning av ytterligare verktyg", "Lateral förflyttning i offrets nätverk", "Dataexfiltrering"],
+            "mitre_techniques": ["T1195.002", "T1105", "T1071.001"]
+          },
+          "defender": {
+            "title": "Detektera och respondera på aktiveringen",
+            "description": "Beteendebaserad detektion är nyckeln – även om den skadliga koden är ny och okänd för signaturer kommer dess beteende att avvika från det normala. Ovanliga DNS-förfrågningar, nya utgående anslutningar från servrar som normalt inte kommunicerar externt, och oväntad processaktivitet är alla varningssignaler. Threat hunting – proaktiv sökning efter kompromissindikatorer – bör initieras omedelbart när en leverantörskompromiss rapporteras i branschen.",
+            "tools_or_indicators": ["Beteendebaserad EDR-detektion", "DNS-analys av ovanliga mönster", "Proaktiv threat hunting", "Branschvarningar och CERT-rapporter"],
+            "mitre_techniques": ["T1195.002", "T1071.001"]
+          },
+          "victim": {
+            "title": "Bakdörren är aktiv i organisationens nätverk",
+            "description": "Den betrodda programvaran har nu blivit angriparens fotfäste i organisationen. Eftersom bakdörren lever inuti en legitim, signerad applikation som körs med berättigade behörigheter, är den extremt svår att upptäcka. Organisationen står nu inför samma hot som vid vilket annat intrång som helst – med den avgörande skillnaden att intrånget skedde genom en kanal som alla litade på. Saneringen kräver inte bara incidenthantering utan också en omvärdering av hela leverantörsstrategin.",
+            "tools_or_indicators": ["Aktiv bakdörr i betrodd programvara", "C2-kommunikation från intern server", "Potentiellt tusentals drabbade organisationer globalt"],
+            "mitre_techniques": ["T1195.002"]
+          }
+        }
+      ]
+    }
+  ]
+}

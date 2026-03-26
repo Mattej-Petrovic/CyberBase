@@ -242,6 +242,14 @@ def load_devsecops() -> Any:
     return load_json("devsecops.json")
 
 
+def load_attack_flows() -> Any:
+    if _current_locale_code() == "sv":
+        sv_path = os.path.join(DATA_DIR, "attack_flows_sv.json")
+        if os.path.exists(sv_path):
+            return load_json("attack_flows_sv.json")
+    return load_json("attack_flows.json")
+
+
 def _current_locale_code() -> str:
     if not has_request_context():
         return "en"
@@ -920,6 +928,7 @@ def home():
     defend = load_defend()
     devsecops = load_devsecops()
     commands = load_commands()
+    attack_flows_data = load_attack_flows()
 
     cli = tools.get("cliTools", []) or []
     gui = tools.get("guiTools", []) or []
@@ -1093,7 +1102,25 @@ def home():
                     }
                 )
 
+    if isinstance(attack_flows_data, dict):
+        for atk in attack_flows_data.get("attacks", []) or []:
+            if not isinstance(atk, dict):
+                continue
+            slug = atk.get("slug")
+            if not slug:
+                continue
+            candidates.append(
+                {
+                    "kind": _("Attack Flow"),
+                    "title": atk.get("name") or _("Attack Flow"),
+                    "desc": atk.get("short_description") or "",
+                    "href": f"/attack-flows/{slug}",
+                }
+            )
+
     quick_picks = _pick_n(candidates, 3)
+
+    attack_flows_count = len(attack_flows_data.get("attacks", [])) if isinstance(attack_flows_data, dict) else 0
 
     return render_template(
         "home.html",
@@ -1101,6 +1128,7 @@ def home():
         commands_count=commands_count,
         concepts_count=concepts_count,
         defend_count=defend_count,
+        attack_flows_count=attack_flows_count,
         quick_picks=quick_picks,
     )
 
@@ -1174,7 +1202,7 @@ def api_commands():
 @app.route("/api/search")
 def api_search():
     q = (request.args.get("q") or "").strip()
-    empty = {"commands": [], "tools": [], "concepts": [], "ports": [], "devsecops": [], "defend": []}
+    empty = {"commands": [], "tools": [], "concepts": [], "ports": [], "devsecops": [], "defend": [], "attack_flows": []}
     if not q:
         return jsonify(empty)
 
@@ -1196,6 +1224,7 @@ def api_search():
         "ports": [],
         "devsecops": [],
         "defend": [],
+        "attack_flows": [],
     }
 
     try:
@@ -1339,6 +1368,22 @@ def api_search():
                             }
                         )
 
+        attack_flows_data = load_attack_flows()
+        if isinstance(attack_flows_data, dict):
+            for atk in attack_flows_data.get("attacks", []) or []:
+                if not isinstance(atk, dict):
+                    continue
+                title = atk.get("name") or ""
+                if match_any(title, atk.get("short_description"), atk.get("mitre_id")):
+                    results["attack_flows"].append(
+                        {
+                            "title": title,
+                            "category": _("Attack Flows"),
+                            "href": f"/attack-flows/{atk.get('slug')}",
+                            "snippet": _snippet(str(atk.get("short_description") or "")),
+                        }
+                    )
+
     except Exception:
         return jsonify(empty)
 
@@ -1348,6 +1393,7 @@ def api_search():
     results["ports"] = _limit(results["ports"], 10)
     results["devsecops"] = _limit(results["devsecops"], 10)
     results["defend"] = _limit(results["defend"], 10)
+    results["attack_flows"] = _limit(results["attack_flows"], 10)
 
     return jsonify(results)
 
@@ -1874,6 +1920,40 @@ def defend_detail(section: str, topic: str):
         item=item,
         title=item.get("title", _("Defend")),
         category=title_section,
+        not_found=False,
+    )
+
+
+@app.route("/attack-flows")
+def attack_flows_hub():
+    data = load_attack_flows()
+    attacks = data.get("attacks", []) if isinstance(data, dict) else []
+    return render_template("attack_flows_hub.html", attacks=attacks)
+
+
+@app.route("/attack-flows/<slug>")
+def attack_flow_detail(slug: str):
+    data = load_attack_flows()
+    attacks = data.get("attacks", []) if isinstance(data, dict) else []
+    attack = next((a for a in attacks if str(a.get("slug")) == str(slug)), None)
+
+    if not attack:
+        return (
+            render_template(
+                "attack_flow_detail.html",
+                attack={},
+                title=_("Not found"),
+                not_found=True,
+            ),
+            404,
+        )
+
+    attacks_map = {a.get("slug"): {"name": a.get("name", ""), "icon": a.get("icon", "")} for a in attacks}
+    return render_template(
+        "attack_flow_detail.html",
+        attack=attack,
+        attacks_map=attacks_map,
+        title=attack.get("name", _("Attack Flows")),
         not_found=False,
     )
 

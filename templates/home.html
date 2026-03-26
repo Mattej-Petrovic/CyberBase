@@ -233,29 +233,30 @@
         {{ _('Your personal cybersecurity command center.') }}
       </p>
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
-        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent p-5 shadow-none">
-          <div class="text-xs uppercase tracking-widest text-slate-400">{{ _('Commands') }}</div>
-          <div class="mt-2 text-3xl font-bold text-white">{{ commands_count }}</div>
-          <div class="mt-1 text-sm text-slate-200/85">{{ _('Syntax and examples') }}</div>
+      <div class="grid grid-cols-5 gap-3 pt-2">
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-4 py-4 shadow-none">
+          <div class="text-[10px] uppercase tracking-widest text-slate-400">{{ _('Commands') }}</div>
+          <div class="mt-1.5 text-2xl font-bold text-white">{{ commands_count }}</div>
         </div>
 
-        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent p-5 shadow-none">
-          <div class="text-xs uppercase tracking-widest text-slate-400">{{ _('Tools') }}</div>
-          <div class="mt-2 text-3xl font-bold text-white">{{ tools_count }}</div>
-          <div class="mt-1 text-sm text-slate-200/85">{{ _('CLI, GUI, detection') }}</div>
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-4 py-4 shadow-none">
+          <div class="text-[10px] uppercase tracking-widest text-slate-400">{{ _('Tools') }}</div>
+          <div class="mt-1.5 text-2xl font-bold text-white">{{ tools_count }}</div>
         </div>
 
-        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent p-5 shadow-none">
-          <div class="text-xs uppercase tracking-widest text-slate-400">{{ _('Concepts') }}</div>
-          <div class="mt-2 text-3xl font-bold text-white">{{ concepts_count }}</div>
-          <div class="mt-1 text-sm text-slate-200/85">{{ _('Models and foundations') }}</div>
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-4 py-4 shadow-none">
+          <div class="text-[10px] uppercase tracking-widest text-slate-400">{{ _('Concepts') }}</div>
+          <div class="mt-1.5 text-2xl font-bold text-white">{{ concepts_count }}</div>
         </div>
 
-        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent p-5 shadow-none">
-          <div class="text-xs uppercase tracking-widest text-slate-400">{{ _('Defend topics') }}</div>
-          <div class="mt-2 text-3xl font-bold text-white">{{ defend_count }}</div>
-          <div class="mt-1 text-sm text-slate-200/85">{{ _('Hardening and detection') }}</div>
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-4 py-4 shadow-none">
+          <div class="text-[10px] uppercase tracking-widest text-slate-400">{{ _('Defend') }}</div>
+          <div class="mt-1.5 text-2xl font-bold text-white">{{ defend_count }}</div>
+        </div>
+
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-4 py-4 shadow-none">
+          <div class="text-[10px] uppercase tracking-widest text-slate-400">{{ _('Attack Flows') }}</div>
+          <div class="mt-1.5 text-2xl font-bold text-white">{{ attack_flows_count }}</div>
         </div>
       </div>
 
@@ -381,6 +382,18 @@
               <div class="text-white font-semibold text-base">{{ _('Defend') }}</div>
               <p class="mt-1 ov-desc">
                 {{ _('Action driven checklists for logging, detection, and hardening in real environments.') }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ov-tile rounded-2xl border border-slate-700/55 bg-slate-900/18 p-5">
+          <div class="flex items-start gap-4">
+            <div class="ov-icon"><span class="ov-emoji">⚡</span></div>
+            <div class="min-w-0">
+              <div class="text-white font-semibold text-base">{{ _('Attack Flows') }}</div>
+              <p class="mt-1 ov-desc">
+                {{ _('See how real attacks unfold step by step, from reconnaissance to impact, through the eyes of attacker, defender, and victim.') }}
               </p>
             </div>
           </div>

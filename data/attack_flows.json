@@ -1,0 +1,996 @@
+{
+  "_fileVersion": {
+    "version": 1,
+    "buildsOn": 0,
+    "updated": "2026-03-26",
+    "notes": "Attack Flows v1 – seven common attack patterns with multi-perspective phases"
+  },
+  "attacks": [
+    {
+      "id": "phishing",
+      "name": "Phishing",
+      "slug": "phishing",
+      "short_description": "Social engineering attack that tricks victims into revealing credentials or installing malware through deceptive emails, messages, or websites.",
+      "icon": "🎣",
+      "severity": 4,
+      "mitre_id": "T1566",
+      "related_attacks": ["brute-force", "ransomware", "man-in-the-middle"],
+      "phases": [
+        {
+          "name": "Reconnaissance",
+          "order": 1,
+          "attacker": {
+            "title": "Gathering Intelligence on the Target",
+            "description": "The attacker begins by collecting publicly available information about the target organization and its employees. This process, known as OSINT (Open Source Intelligence), involves scraping LinkedIn profiles, corporate websites, social media accounts, and even data breach dumps to learn names, job titles, email formats, and internal tools. The goal is to build a detailed profile so the eventual phishing message feels authentic and personally relevant. The more an attacker knows about a target, the more convincing the lure becomes.",
+            "tools_or_indicators": ["theHarvester, an email and subdomain enumeration tool that queries search engines and public data sources", "Maltego, a visual link-analysis tool that maps relationships between people, domains, and organizations", "LinkedIn and social media scraping", "Hunter.io for discovering corporate email formats", "Recon-ng, a modular reconnaissance framework"],
+            "mitre_techniques": ["T1589", "T1591", "T1598"]
+          },
+          "defender": {
+            "title": "Monitoring for Reconnaissance Activity",
+            "description": "Defenders should watch for signs that their organization is being profiled. Unusual spikes in visits to employee directory pages, repeated failed login attempts from unknown IPs, or unexpected queries to public-facing APIs can all indicate an attacker in the reconnaissance phase. Proactively reducing the amount of publicly available information, such as hiding email addresses on the corporate website or training employees not to overshare on social media, makes the attacker's job harder.",
+            "tools_or_indicators": ["Web application firewalls (WAFs) to detect scraping patterns", "Google Alerts configured for company name and key employee names", "DNS query monitoring for unusual lookups against company domains", "Social media monitoring services"],
+            "mitre_techniques": ["T1590", "T1592"]
+          },
+          "victim": {
+            "title": "Unknowingly Exposing Information",
+            "description": "The victim, typically an employee, has no idea they are being studied. Their publicly visible LinkedIn profile, conference talks, social media posts, and even out-of-office auto-replies all feed the attacker's intelligence picture. Information that seems harmless in isolation, like mentioning the company uses Microsoft 365 or that a team is working on a specific project, gives the attacker exactly the details needed to craft a believable phishing email.",
+            "tools_or_indicators": ["Public LinkedIn profiles", "Social media posts with work details", "Out-of-office auto-reply messages", "Conference speaker bios and presentations"],
+            "mitre_techniques": ["T1589.002", "T1591.004"]
+          }
+        },
+        {
+          "name": "Weaponization",
+          "order": 2,
+          "attacker": {
+            "title": "Crafting the Phishing Lure",
+            "description": "With intelligence gathered, the attacker now builds the phishing weapon. This typically involves creating a convincing fake login page that mirrors the real one pixel-for-pixel, registering a look-alike domain (like 'micr0soft-login.com'), and drafting an email that mimics the tone, formatting, and branding of legitimate corporate communications. Advanced attackers use tools like Evilginx2, a reverse proxy tool that sits between the victim and the real login page, capturing credentials and session cookies in real time, making it effective even against multi-factor authentication.",
+            "tools_or_indicators": ["GoPhish, an open-source phishing framework that manages campaigns, tracks clicks, and harvests credentials", "Evilginx2, a reverse proxy phishing tool that intercepts real-time authentication sessions including MFA tokens", "SET (Social Engineering Toolkit), a framework for crafting social engineering attacks", "Look-alike domain registration (typosquatting)", "HTML/CSS cloning of legitimate login pages"],
+            "mitre_techniques": ["T1566.001", "T1566.002", "T1608.005"]
+          },
+          "defender": {
+            "title": "Detecting Weaponization Indicators",
+            "description": "Defenders can proactively detect phishing weaponization by monitoring for newly registered domains that resemble their organization's domain. Domain monitoring services and certificate transparency logs can reveal when an attacker registers a look-alike domain or obtains an SSL certificate for it. Additionally, maintaining DMARC, DKIM, and SPF records helps ensure that spoofed emails are flagged or rejected by receiving mail servers.",
+            "tools_or_indicators": ["Certificate Transparency log monitoring", "Domain monitoring services (e.g., DNSTwist) that detect typosquatting", "DMARC/DKIM/SPF email authentication configuration", "Phishing URL databases and threat intelligence feeds"],
+            "mitre_techniques": ["T1583.001", "T1584.001"]
+          },
+          "victim": {
+            "title": "Unaware of the Threat Being Built",
+            "description": "During this phase the victim is completely unaware that an attack is being prepared specifically for them. The phishing page may already exist, perfectly replicating the login portal they use every day, but until the email arrives in their inbox they have no indication anything is wrong. This is why proactive security awareness training is so important: victims need to be suspicious before an attack arrives, not just after.",
+            "tools_or_indicators": ["No direct indicators visible to the victim at this stage", "Security awareness training can prepare employees to question unexpected communications"],
+            "mitre_techniques": ["T1566.001"]
+          }
+        },
+        {
+          "name": "Delivery",
+          "order": 3,
+          "attacker": {
+            "title": "Sending the Phishing Message",
+            "description": "The attacker delivers the phishing email or message to the victim. To bypass email security, the attacker may send the email from a compromised legitimate account, use a trusted email service like SendGrid, or exploit misconfigured SPF/DKIM records that allow spoofed sender addresses. The email is carefully timed, often sent during busy work hours when recipients are less likely to scrutinize each message. Some attackers also use SMS (smishing) or voice calls (vishing) as alternative delivery channels.",
+            "tools_or_indicators": ["Compromised email accounts for sending from trusted domains", "Bulk email services (SendGrid, Mailgun) abused for delivery", "SPF/DKIM bypass techniques", "SMS-based phishing (smishing)", "QR code phishing (quishing) embedded in documents"],
+            "mitre_techniques": ["T1566.001", "T1566.002", "T1566.003"]
+          },
+          "defender": {
+            "title": "Filtering and Quarantining Malicious Messages",
+            "description": "Email security gateways are the primary defense at this stage. These systems analyze incoming messages for known phishing indicators such as suspicious URLs, mismatched sender domains, malicious attachments, and language patterns associated with social engineering. Advanced solutions use machine learning to detect zero-day phishing attempts that do not match known signatures. Defenders should also ensure that email authentication protocols (SPF, DKIM, DMARC) are strictly enforced to reject spoofed messages.",
+            "tools_or_indicators": ["Secure Email Gateways (Proofpoint, Mimecast, Microsoft Defender for Office 365)", "SPF/DKIM/DMARC enforcement to reject spoofed senders", "URL sandboxing and rewriting to analyze links before users click", "Machine learning-based email threat detection"],
+            "mitre_techniques": ["T1566.001", "T1566.002"]
+          },
+          "victim": {
+            "title": "Receiving the Phishing Message",
+            "description": "The phishing email lands in the victim's inbox, possibly bypassing spam filters. It looks legitimate, perhaps appearing to come from IT support, a manager, or a trusted vendor. The message creates urgency, claiming the victim's password is expiring, their account has been compromised, or an important document needs immediate review. At this moment the victim must decide whether to trust the message or investigate further, and that split-second decision is exactly what the attacker is counting on.",
+            "tools_or_indicators": ["Email appears in inbox with familiar branding", "Urgent subject lines designed to trigger immediate action", "Sender address that closely resembles a trusted contact"],
+            "mitre_techniques": ["T1566.001"]
+          }
+        },
+        {
+          "name": "Exploitation",
+          "order": 4,
+          "attacker": {
+            "title": "Triggering the Victim's Action",
+            "description": "The exploitation phase begins the moment the victim clicks the malicious link or opens the weaponized attachment. If the lure is a fake login page, the victim's browser navigates to an attacker-controlled site that looks identical to the real one. If it is a malicious document, opening it may trigger a macro or exploit that downloads malware silently in the background. The attacker has now transitioned from passive preparation to active exploitation of the victim's trust.",
+            "tools_or_indicators": ["Malicious URLs redirecting to credential harvesting pages", "Weaponized Office documents with VBA macros", "HTML smuggling, a technique that assembles malware payloads inside the browser to evade email scanning", "Browser exploit kits that target unpatched vulnerabilities"],
+            "mitre_techniques": ["T1204.001", "T1204.002", "T1059.005"]
+          },
+          "defender": {
+            "title": "Blocking Exploitation Attempts",
+            "description": "Even if a phishing email reaches the inbox, defenders have multiple layers to prevent exploitation. Web proxies and DNS filtering can block access to known phishing domains when the victim clicks the link. Endpoint detection and response (EDR) tools monitor for suspicious process behavior, like a Word document spawning a PowerShell process. Disabling Office macros by default and enforcing browser isolation for untrusted URLs are highly effective preventive measures.",
+            "tools_or_indicators": ["DNS filtering (Cisco Umbrella, Pi-hole) to block malicious domains", "Endpoint Detection and Response (EDR) solutions like CrowdStrike or SentinelOne", "Microsoft Attack Surface Reduction rules to block Office macro execution", "Web proxy solutions that inspect and block suspicious URLs"],
+            "mitre_techniques": ["T1204.001", "T1204.002"]
+          },
+          "victim": {
+            "title": "Falling for the Deception",
+            "description": "The victim clicks the link or opens the attachment, genuinely believing it is legitimate. The fake login page looks exactly like the real one, or the document appears to be a normal business file. Victims are not foolish for falling for these attacks; modern phishing is extremely sophisticated and designed to exploit the way humans naturally process information under time pressure. This is why layered technical defenses are essential, because relying solely on human judgment is not enough.",
+            "tools_or_indicators": ["Clicking a malicious link in the email", "Opening an attachment and enabling macros", "Entering credentials into a fake login page"],
+            "mitre_techniques": ["T1204.001", "T1204.002"]
+          }
+        },
+        {
+          "name": "Credential Harvesting",
+          "order": 5,
+          "attacker": {
+            "title": "Capturing the Victim's Credentials",
+            "description": "As the victim types their username and password into the fake login page, the attacker's server captures every keystroke in real time. With tools like Evilginx2, the attacker does not just capture the password but also intercepts the session cookie that the real authentication server returns, effectively bypassing multi-factor authentication. The attacker can now use this session cookie to impersonate the victim without ever needing their password again. The stolen credentials are typically stored in a database and may be sold on dark web marketplaces or used immediately.",
+            "tools_or_indicators": ["Evilginx2 capturing session tokens and MFA cookies in real time", "GoPhish dashboard recording submitted credentials", "Modlishka, another reverse proxy tool for real-time credential interception", "Server-side logging of all form submissions on the fake page"],
+            "mitre_techniques": ["T1556", "T1539", "T1111"]
+          },
+          "defender": {
+            "title": "Detecting Credential Theft",
+            "description": "Defenders should monitor for impossible travel alerts, where a user appears to log in from two geographically distant locations in a short time, which often indicates stolen credentials. Implementing hardware-based MFA tokens (like FIDO2/WebAuthn security keys) that are bound to the legitimate domain makes Evilginx2-style proxy attacks ineffective because the key will refuse to authenticate with a fake domain. Conditional access policies that restrict logins to managed devices and known networks add additional protection.",
+            "tools_or_indicators": ["FIDO2/WebAuthn hardware security keys that resist phishing proxies", "Impossible travel detection in identity management systems", "Conditional access policies requiring managed devices", "Dark web monitoring for leaked corporate credentials"],
+            "mitre_techniques": ["T1556", "T1539"]
+          },
+          "victim": {
+            "title": "Credentials Compromised Without Awareness",
+            "description": "After entering their credentials, the victim is typically redirected to the real website and may even be logged in normally, making the attack completely invisible. The victim has no idea that their username, password, and session cookie have just been captured. They continue their workday as usual while the attacker now has full access to their account. This seamless experience is what makes modern phishing so dangerous: there is often zero indication that anything went wrong.",
+            "tools_or_indicators": ["Seamless redirect to the legitimate site after credential capture", "No visible error or warning to the victim", "Normal login experience masks the theft"],
+            "mitre_techniques": ["T1539", "T1556"]
+          }
+        },
+        {
+          "name": "Persistence",
+          "order": 6,
+          "attacker": {
+            "title": "Maintaining Long-Term Access",
+            "description": "With valid credentials or session tokens in hand, the attacker works quickly to establish persistent access that survives a password change. This may involve registering a new MFA device on the compromised account, creating OAuth application grants that provide ongoing access to email and files, setting up email forwarding rules to silently copy all incoming messages, or creating a new backdoor admin account. The attacker's goal is to ensure they do not lose access even if the phishing attack is eventually discovered.",
+            "tools_or_indicators": ["Registering rogue MFA devices on the compromised account", "Creating OAuth app consents for persistent email/file access", "Setting up hidden email forwarding or inbox rules", "Creating new accounts or service principals for backup access", "Installing remote access trojans (RATs) on the victim's device"],
+            "mitre_techniques": ["T1098", "T1137", "T1136", "T1078"]
+          },
+          "defender": {
+            "title": "Hunting for Persistence Mechanisms",
+            "description": "After a phishing incident is confirmed, defenders must hunt for all persistence mechanisms the attacker may have established. This means auditing MFA device registrations for unauthorized additions, reviewing OAuth application consents for suspicious grants, checking email forwarding rules across all mailboxes, and scanning for newly created accounts. Time is critical: the faster defenders identify and remove persistence, the less damage the attacker can cause. Automated playbooks in SOAR platforms can accelerate this response.",
+            "tools_or_indicators": ["Azure AD / Entra ID audit logs for MFA and OAuth changes", "Exchange Online mail flow rule auditing", "SOAR platforms (Splunk SOAR, Palo Alto XSOAR) for automated incident response", "Revoking all active sessions and forcing re-authentication"],
+            "mitre_techniques": ["T1098", "T1137", "T1136"]
+          },
+          "victim": {
+            "title": "Living with a Compromised Account",
+            "description": "The victim continues using their account normally, unaware that the attacker has established multiple backdoors. They may not notice the new MFA device registered on their account or the hidden email forwarding rule sending copies of their messages to an external address. Even if the victim eventually changes their password after a routine security reminder, the attacker's persistence mechanisms may still grant access. The victim only learns about the compromise when the security team notifies them, which could be days, weeks, or even months later.",
+            "tools_or_indicators": ["Unfamiliar MFA device registrations in account settings", "Hidden inbox rules forwarding email externally", "OAuth apps with broad permissions the victim did not authorize"],
+            "mitre_techniques": ["T1098", "T1137"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "brute-force",
+      "name": "Brute Force",
+      "slug": "brute-force",
+      "short_description": "Systematic attack that tries every possible password combination or uses common password lists to gain unauthorized access to accounts and systems.",
+      "icon": "🔨",
+      "severity": 3,
+      "mitre_id": "T1110",
+      "related_attacks": ["phishing", "lateral-movement"],
+      "phases": [
+        {
+          "name": "Target Identification",
+          "order": 1,
+          "attacker": {
+            "title": "Locating Login Portals and Services",
+            "description": "The attacker begins by scanning the target's infrastructure to find services that require authentication. This includes web login pages, SSH servers, RDP endpoints, VPN gateways, and API endpoints. Tools like Nmap, a network scanner that probes ports and identifies running services, help the attacker map out every possible entry point. The attacker also checks for exposed admin panels (like WordPress wp-admin, phpMyAdmin, or cPanel) that are often left accessible on the public internet.",
+            "tools_or_indicators": ["Nmap, a network scanner that identifies open ports and running services across target systems", "Shodan, a search engine that indexes internet-connected devices and reveals exposed services", "Dirb or Gobuster, directory brute-forcing tools that discover hidden web paths like admin panels", "Google dorking to find exposed login pages"],
+            "mitre_techniques": ["T1046", "T1595.001"]
+          },
+          "defender": {
+            "title": "Reducing the Attack Surface",
+            "description": "Defenders should minimize the number of login portals exposed to the internet. Services like SSH and RDP should be placed behind a VPN or Zero Trust network, not directly accessible from the public internet. Web admin panels should be restricted to specific IP addresses or require VPN access. Regularly scanning your own infrastructure with the same tools attackers use helps identify accidentally exposed services before an attacker finds them.",
+            "tools_or_indicators": ["External attack surface management tools (Censys, Shodan monitoring)", "VPN or Zero Trust Network Access (ZTNA) to hide internal services", "Firewall rules restricting access to admin portals", "Regular external penetration testing"],
+            "mitre_techniques": ["T1046", "T1595.001"]
+          },
+          "victim": {
+            "title": "Using Services That May Be Exposed",
+            "description": "The victim, usually an employee or system administrator, uses login portals daily without realizing they are visible to the entire internet. An RDP server set up for remote work convenience, a VPN gateway with a web login, or a cloud application admin panel all represent potential brute force targets. The victim's everyday convenience of accessing these services from anywhere is exactly what makes them available for an attacker to target as well.",
+            "tools_or_indicators": ["Publicly accessible RDP or SSH services", "Web-based email login portals", "Cloud application login pages without IP restrictions"],
+            "mitre_techniques": ["T1133", "T1078"]
+          }
+        },
+        {
+          "name": "Credential List Preparation",
+          "order": 2,
+          "attacker": {
+            "title": "Building Password Lists and Username Databases",
+            "description": "Before launching the actual attack, the attacker prepares their ammunition: lists of usernames and passwords to try. The famous rockyou.txt wordlist contains over 14 million real passwords leaked from a 2009 data breach and remains one of the most commonly used starting points. For targeted attacks, CeWL (Custom Word List generator) crawls the target's website to build a company-specific wordlist using words found on their pages, which often includes product names, locations, and terminology employees might use in passwords. The attacker may also harvest usernames from LinkedIn, email patterns, or previous data breaches.",
+            "tools_or_indicators": ["rockyou.txt, a massive password wordlist containing over 14 million real passwords from data breaches", "CeWL, a tool that crawls websites to generate custom wordlists based on words found on the target's pages", "SecLists, a curated collection of wordlists for usernames, passwords, URLs, and other security testing data", "Credential dumps from previous data breaches found on dark web forums", "Username enumeration through email harvesting or LDAP queries"],
+            "mitre_techniques": ["T1589.001", "T1110.002"]
+          },
+          "defender": {
+            "title": "Enforcing Strong Password Policies",
+            "description": "The best defense against wordlist attacks is ensuring that no employee password appears in any known breach list. Modern password policies should check new passwords against databases of compromised passwords (like the Have I Been Pwned API) and reject any match. Password managers should be provided and encouraged so employees can use long, unique, randomly generated passwords without needing to remember them. Banning common password patterns like 'Company2024!' is also critical since CeWL-generated wordlists will include these variations.",
+            "tools_or_indicators": ["Have I Been Pwned API integration for password screening", "Password managers (1Password, Bitwarden) deployed organization-wide", "Azure AD / Entra ID custom banned password lists", "Minimum password length of 14+ characters with complexity requirements"],
+            "mitre_techniques": ["T1110.002", "T1110.003"]
+          },
+          "victim": {
+            "title": "Potentially Using Weak or Reused Passwords",
+            "description": "The victim may be using a password that is already in an attacker's wordlist without knowing it. Common patterns like a capital letter followed by a word and numbers (e.g., 'Summer2024!') feel secure but are among the first combinations attackers try. Even worse, if the victim reuses passwords across personal and work accounts, a breach at any one service exposes them everywhere. Many victims are unaware that their credentials from old breaches are freely available in compilation databases used by attackers.",
+            "tools_or_indicators": ["Reused passwords across multiple services", "Passwords based on predictable patterns (season + year, company name + numbers)", "Credentials exposed in previous data breaches"],
+            "mitre_techniques": ["T1078.001", "T1110.001"]
+          }
+        },
+        {
+          "name": "Automated Attack Execution",
+          "order": 3,
+          "attacker": {
+            "title": "Launching the Brute Force Attack",
+            "description": "With targets identified and wordlists prepared, the attacker launches automated tools to try thousands or millions of password combinations. Hydra, a fast network login cracker, can target dozens of protocols including SSH, RDP, FTP, HTTP forms, and more simultaneously. For attacking password hashes obtained from a database breach, Hashcat leverages the massive parallel processing power of GPUs to try billions of hash combinations per second, while John the Ripper provides flexible rule-based password mutation. The attacker may also use credential stuffing, taking username/password pairs from one breach and trying them on other services.",
+            "tools_or_indicators": ["Hydra (THC-Hydra), a parallelized network login cracker supporting over 50 protocols", "Hashcat, a GPU-accelerated password hash cracker capable of billions of attempts per second", "John the Ripper, a flexible password cracker with intelligent word-mangling rules", "Burp Suite Intruder for brute-forcing web application login forms", "Credential stuffing tools that automate trying leaked credentials across multiple services"],
+            "mitre_techniques": ["T1110.001", "T1110.002", "T1110.003", "T1110.004"]
+          },
+          "defender": {
+            "title": "Detecting and Throttling Brute Force Attempts",
+            "description": "Account lockout policies and rate limiting are the first line of defense against automated attacks. After a configurable number of failed attempts (typically 5-10), the account should be temporarily locked or the source IP should be throttled. However, sophisticated attackers use 'low and slow' techniques, trying only a few passwords per account across thousands of accounts to avoid lockouts. SIEM systems should correlate failed login attempts across the entire organization to detect these distributed patterns. CAPTCHAs on login pages also slow automated tools significantly.",
+            "tools_or_indicators": ["Account lockout policies after consecutive failed attempts", "SIEM correlation rules detecting distributed brute force patterns", "CAPTCHAs or progressive delays on login pages", "Fail2ban, a tool that automatically bans IP addresses after repeated failed login attempts", "Web Application Firewalls (WAFs) with bot detection capabilities"],
+            "mitre_techniques": ["T1110.001", "T1110.003"]
+          },
+          "victim": {
+            "title": "Account Under Automated Assault",
+            "description": "The victim's account is being bombarded with login attempts, though they typically have no idea this is happening. They might notice their account getting locked out unexpectedly, or they may receive a flurry of MFA push notifications they did not initiate (a technique called 'MFA fatigue' where attackers hope the victim eventually approves one just to stop the notifications). If the attack is distributed across many IP addresses and uses slow timing, even the account lockout mechanism may not trigger, leaving the victim completely unaware.",
+            "tools_or_indicators": ["Unexpected account lockouts", "Multiple MFA push notifications the victim did not request", "Password reset emails the victim did not initiate"],
+            "mitre_techniques": ["T1110.001", "T1621"]
+          }
+        },
+        {
+          "name": "Authentication Bypass",
+          "order": 4,
+          "attacker": {
+            "title": "Overcoming Additional Security Layers",
+            "description": "Even when the correct password is found, modern systems often have additional defenses like multi-factor authentication. Attackers have developed several bypass techniques: MFA fatigue attacks send repeated push notifications until the exhausted victim approves one; SIM swapping convinces a mobile carrier to transfer the victim's phone number to the attacker's SIM card, intercepting SMS-based MFA codes; and session token theft reuses valid authentication cookies captured through other means. Pass-the-hash attacks allow authentication using stolen password hashes without ever knowing the actual password.",
+            "tools_or_indicators": ["MFA fatigue/push bombing attacks that overwhelm the victim with approval requests", "SIM swapping to intercept SMS-based two-factor codes", "Pass-the-hash attacks using tools like Mimikatz to authenticate with stolen NTLM hashes", "Token theft from compromised machines to bypass MFA entirely"],
+            "mitre_techniques": ["T1621", "T1111", "T1550.002"]
+          },
+          "defender": {
+            "title": "Hardening Multi-Factor Authentication",
+            "description": "Not all MFA methods are equally secure. SMS-based codes are vulnerable to SIM swapping, and push notifications are vulnerable to fatigue attacks. Defenders should deploy phishing-resistant MFA like FIDO2 hardware security keys or certificate-based authentication that cannot be intercepted or socially engineered. Number matching in push notifications (where the user must type a number shown on screen rather than just tapping 'approve') significantly reduces MFA fatigue attacks. Monitoring for unusual MFA patterns, like dozens of denied push requests, should trigger automatic alerts.",
+            "tools_or_indicators": ["FIDO2/WebAuthn hardware security keys for phishing-resistant MFA", "Number matching or additional context in push notifications", "Alerts on excessive MFA denials indicating fatigue attacks", "Conditional access policies restricting login to compliant devices"],
+            "mitre_techniques": ["T1621", "T1111"]
+          },
+          "victim": {
+            "title": "Facing Pressure to Approve Unauthorized Access",
+            "description": "If the attacker cracks the password and launches an MFA fatigue attack, the victim's phone begins buzzing repeatedly with authentication requests they did not initiate. This is deliberately annoying and disorienting. Some victims approve the request just to stop the notifications, especially if they receive them during the night. Others may think the system is malfunctioning. Victims should be trained to never approve MFA prompts they did not initiate and to report the activity immediately, as it means their password has already been compromised.",
+            "tools_or_indicators": ["Repeated unsolicited MFA push notifications", "Phone calls from 'IT support' asking the victim to approve the prompt (social engineering combined with brute force)", "Confusion about whether the prompts are system errors"],
+            "mitre_techniques": ["T1621"]
+          }
+        },
+        {
+          "name": "Post-Access Exploitation",
+          "order": 5,
+          "attacker": {
+            "title": "Leveraging Compromised Access",
+            "description": "Once inside, the attacker moves quickly to maximize the value of the compromised account. They search mailboxes for sensitive information, access shared drives and cloud storage, and look for opportunities to escalate privileges. If the compromised account has administrative rights, the attacker may create additional backdoor accounts, modify security settings, or begin lateral movement to other systems. The attacker also looks for stored credentials, API keys, and connection strings that might provide access to databases, cloud infrastructure, or other high-value targets.",
+            "tools_or_indicators": ["Mailbox searching for keywords like 'password', 'credentials', 'API key'", "Accessing shared drives and cloud storage for sensitive documents", "Creating backdoor accounts for persistent access", "Harvesting stored credentials and API keys from files and configurations", "Pivoting to internal systems using the compromised account's network access"],
+            "mitre_techniques": ["T1114", "T1083", "T1136", "T1552"]
+          },
+          "defender": {
+            "title": "Detecting and Containing the Breach",
+            "description": "User and Entity Behavior Analytics (UEBA) systems are critical for detecting post-compromise activity. If a user who normally accesses three SharePoint sites suddenly downloads files from dozens of sites at 3 AM, that behavioral anomaly should trigger an alert. Defenders should implement the principle of least privilege so that compromising one account provides minimal access. Immediate response actions include disabling the account, revoking all sessions, resetting credentials, and hunting for any persistence mechanisms the attacker may have established.",
+            "tools_or_indicators": ["UEBA systems detecting anomalous user behavior patterns", "Data Loss Prevention (DLP) tools alerting on unusual data access or download volumes", "Privileged Access Management (PAM) solutions limiting admin access", "Automated incident response playbooks for rapid containment"],
+            "mitre_techniques": ["T1114", "T1136", "T1552"]
+          },
+          "victim": {
+            "title": "Account Being Misused Without Knowledge",
+            "description": "The victim's account is now being actively misused by the attacker. Emails may be sent from their account to colleagues containing further phishing links, sensitive files may be downloaded, or their identity may be used to request wire transfers or other fraudulent actions. The victim may not notice anything unusual, especially if the attacker is careful to delete sent messages and cover their tracks. Colleagues who receive messages from the compromised account trust them because they appear to come from a known and trusted coworker.",
+            "tools_or_indicators": ["Emails sent from the account that the victim did not write", "Files accessed or downloaded that the victim did not open", "Login activity from unfamiliar locations or devices"],
+            "mitre_techniques": ["T1534", "T1114"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "sql-injection",
+      "name": "SQL Injection",
+      "slug": "sql-injection",
+      "short_description": "Code injection technique that exploits vulnerabilities in database-connected applications to manipulate, extract, or destroy data by inserting malicious SQL statements.",
+      "icon": "💉",
+      "severity": 5,
+      "mitre_id": "T1190",
+      "related_attacks": ["supply-chain-attack"],
+      "phases": [
+        {
+          "name": "Application Reconnaissance",
+          "order": 1,
+          "attacker": {
+            "title": "Mapping the Web Application",
+            "description": "The attacker begins by systematically exploring the target web application to understand its structure, technology stack, and potential entry points. They browse every page, submit forms, and observe how URLs and parameters change. Tools like Burp Suite, an intercepting proxy that captures and modifies every HTTP request between the browser and the server, allow the attacker to see exactly what data is being sent and how the application responds. The attacker is looking for any input field, URL parameter, or API endpoint that might interact with a backend database.",
+            "tools_or_indicators": ["Burp Suite, an intercepting proxy that captures, inspects, and modifies all HTTP/HTTPS traffic between the browser and server", "OWASP ZAP (Zed Attack Proxy), a free security testing tool that automatically discovers web application endpoints", "Wappalyzer, a browser extension that identifies the technologies (frameworks, databases, servers) a website uses", "Manual browsing and spidering to discover all application pages and forms"],
+            "mitre_techniques": ["T1190", "T1595.002"]
+          },
+          "defender": {
+            "title": "Hardening the Application Surface",
+            "description": "Defenders should assume attackers will map every endpoint and act accordingly. Removing verbose error messages that reveal database types or query structures is essential, as these details help attackers craft their injection payloads. Custom error pages should display friendly messages without technical details. HTTP response headers that reveal server software versions should be stripped. Web Application Firewalls (WAFs) can detect and block automated scanning tools, though they should be considered a supplementary defense, not a primary one.",
+            "tools_or_indicators": ["Custom error pages that hide technical details from users", "HTTP header hardening to remove server version information", "Web Application Firewalls (WAFs) like ModSecurity or Cloudflare WAF", "Rate limiting on API endpoints to slow automated scanning"],
+            "mitre_techniques": ["T1190", "T1595.002"]
+          },
+          "victim": {
+            "title": "Users of a Potentially Vulnerable Application",
+            "description": "The victims in a SQL injection attack are primarily the users whose data is stored in the application's database. During reconnaissance, these users are completely unaware that an attacker is probing the application they trust with their personal information, payment details, or login credentials. The application's developers and administrators are also victims, as their systems are being evaluated for weaknesses. Every user who has ever entered data into the application is at risk if an injection vulnerability exists.",
+            "tools_or_indicators": ["Personal data stored in the application's database", "Trust in the application's security", "No visibility into attacker reconnaissance activity"],
+            "mitre_techniques": ["T1190"]
+          }
+        },
+        {
+          "name": "Injection Point Discovery",
+          "order": 2,
+          "attacker": {
+            "title": "Finding Vulnerable Input Fields",
+            "description": "The attacker now tests each input field and parameter to determine if it passes user input directly into SQL queries without proper sanitization. The simplest test is entering a single quote character (') into a field and observing whether the application returns a database error, which indicates the input is being inserted directly into a SQL query. More sophisticated tests use time-based techniques: injecting a command like 'SLEEP(5)' that causes a deliberate delay tells the attacker the injection is working even when no visible error appears. Each vulnerable parameter is a potential doorway into the entire database.",
+            "tools_or_indicators": ["Single quote (') test to trigger SQL syntax errors", "sqlmap, an automated SQL injection detection and exploitation tool that tests parameters and identifies injection types", "Boolean-based blind testing by injecting conditions like 'AND 1=1' vs 'AND 1=2' and comparing responses", "Time-based blind testing using SLEEP() or WAITFOR DELAY commands", "Burp Suite Scanner for automated vulnerability detection"],
+            "mitre_techniques": ["T1190"]
+          },
+          "defender": {
+            "title": "Preventing Injection at the Code Level",
+            "description": "The only truly effective defense against SQL injection is parameterized queries (also called prepared statements), where user input is always treated as data, never as executable SQL code. This means even if a user enters a SQL command as input, the database treats it as a harmless text string rather than executing it. ORMs (Object-Relational Mappers) like SQLAlchemy, Hibernate, or Entity Framework use parameterized queries by default, making them safer than writing raw SQL. Code reviews and static analysis tools should flag any instance of string concatenation in SQL queries as a critical vulnerability.",
+            "tools_or_indicators": ["Parameterized queries / prepared statements in all database interactions", "ORM frameworks (SQLAlchemy, Hibernate, Entity Framework) that prevent raw SQL", "Static Application Security Testing (SAST) tools like SonarQube or Checkmarx", "Code review checklists that flag string concatenation in SQL", "Input validation and sanitization as a defense-in-depth measure"],
+            "mitre_techniques": ["T1190"]
+          },
+          "victim": {
+            "title": "Data at Risk from Vulnerable Code",
+            "description": "When the attacker finds an injection point, every piece of data in the connected database is potentially at risk. This includes usernames, passwords (often stored as hashes), email addresses, personal identification numbers, payment card details, medical records, and any other sensitive information the application stores. The victims whose data is in that database had no role in creating the vulnerability; it exists because of a coding error by the application's developers. This highlights why secure coding practices are so critically important.",
+            "tools_or_indicators": ["All data stored in the application's database is at risk", "Personal information, credentials, and financial data", "Data that users submitted trusting the application's security"],
+            "mitre_techniques": ["T1190"]
+          }
+        },
+        {
+          "name": "Payload Crafting",
+          "order": 3,
+          "attacker": {
+            "title": "Building Malicious SQL Statements",
+            "description": "With a confirmed injection point, the attacker crafts SQL payloads tailored to the specific database type and injection context. UNION-based injection appends additional SELECT statements to the original query, allowing the attacker to retrieve data from any table in the database. Error-based injection deliberately triggers detailed error messages that leak data within the error output. Blind injection extracts data one bit at a time by asking the database true/false questions. The tool sqlmap automates this entire process: given a vulnerable URL, it determines the database type, discovers tables and columns, and extracts data, all without the attacker writing a single SQL statement manually.",
+            "tools_or_indicators": ["UNION-based payloads that combine attacker queries with legitimate ones to extract data", "Error-based payloads that force the database to reveal information in error messages", "Blind injection payloads that infer data through true/false responses or time delays", "sqlmap with --dbs, --tables, and --dump flags for automated extraction", "Manual payload crafting for WAF evasion using encoding, comments, and alternate syntax"],
+            "mitre_techniques": ["T1190", "T1059"]
+          },
+          "defender": {
+            "title": "Detecting Injection Payloads",
+            "description": "Web Application Firewalls can detect common SQL injection patterns like UNION SELECT, OR 1=1, and comment sequences (--). However, determined attackers can bypass WAF rules using encoding techniques, inline comments, and alternate SQL syntax, so WAFs should be considered a detection layer, not a prevention guarantee. Runtime Application Self-Protection (RASP) tools sit inside the application itself and can detect SQL injection attempts at the exact moment they reach the database driver, providing much more accurate detection than pattern matching at the network level.",
+            "tools_or_indicators": ["WAF rules targeting UNION, SELECT, INSERT, DELETE, and comment syntax", "Runtime Application Self-Protection (RASP) tools like Contrast Security", "Database activity monitoring that flags unusual query patterns", "Intrusion Detection Systems (IDS) with SQL injection signature sets"],
+            "mitre_techniques": ["T1190"]
+          },
+          "victim": {
+            "title": "Database Being Queried by the Attacker",
+            "description": "At this stage, the attacker is effectively talking directly to the database through the application's vulnerable code. Every query the application legitimately runs can be hijacked to include the attacker's commands. The database faithfully executes these commands because they arrive through the application's trusted connection. The victims' data is being accessed, but from the database's perspective, these look like normal application queries. This is why SQL injection is so dangerous: it abuses the trust relationship between the application and its database.",
+            "tools_or_indicators": ["Database executing attacker-crafted queries through the application's trusted connection", "No distinction between legitimate and malicious queries from the database's perspective"],
+            "mitre_techniques": ["T1190"]
+          }
+        },
+        {
+          "name": "Data Extraction",
+          "order": 4,
+          "attacker": {
+            "title": "Retrieving Sensitive Data from the Database",
+            "description": "The attacker systematically extracts valuable data from the database. First, they enumerate all database names, then all tables within each database, then all columns within each table, building a complete map of the data structure. They then dump the contents of high-value tables: user credentials, personal information, financial records, and administrative data. Password hashes are extracted for offline cracking. In some cases, the attacker can read files from the server's filesystem through database functions like MySQL's LOAD_FILE() or write files using INTO OUTFILE, potentially planting a web shell for direct server access.",
+            "tools_or_indicators": ["sqlmap --dump to extract complete table contents", "INFORMATION_SCHEMA queries to enumerate database structure", "MySQL LOAD_FILE() to read server files through the database", "Database-specific functions to access the filesystem", "Exfiltrating data through DNS queries when direct output is blocked (out-of-band extraction)"],
+            "mitre_techniques": ["T1190", "T1005", "T1039"]
+          },
+          "defender": {
+            "title": "Limiting Data Exposure and Detecting Exfiltration",
+            "description": "Defense in depth means that even if injection occurs, the damage should be minimized. The database user account used by the application should have the absolute minimum permissions needed, typically only SELECT, INSERT, and UPDATE on specific tables, never FILE privileges or access to system tables. Database activity monitoring solutions can alert on unusual query patterns like bulk SELECT statements against the users table or queries against INFORMATION_SCHEMA. Encrypting sensitive columns (like credit card numbers) at the database level means that even extracted data is useless without the encryption keys.",
+            "tools_or_indicators": ["Principle of least privilege for database user accounts", "Database Activity Monitoring (DAM) solutions like Imperva or IBM Guardium", "Column-level encryption for sensitive data fields", "Database audit logging for all data access queries", "Network monitoring for large data transfers from database servers"],
+            "mitre_techniques": ["T1005", "T1039", "T1530"]
+          },
+          "victim": {
+            "title": "Personal Data Being Stolen",
+            "description": "The victims' personal data is now being extracted from the database in bulk. Names, email addresses, phone numbers, physical addresses, passwords (even if hashed), and potentially financial information are being copied to the attacker's systems. The victims have no way to know this is happening. Their data was entrusted to the application, and a coding flaw has now made it accessible to an unauthorized party. This data may end up sold on dark web marketplaces, used for identity theft, or leveraged in future targeted phishing campaigns.",
+            "tools_or_indicators": ["Personal data being extracted without any notification to affected users", "Credentials that may be cracked offline", "Data that may appear on dark web marketplaces"],
+            "mitre_techniques": ["T1005"]
+          }
+        },
+        {
+          "name": "Privilege Escalation",
+          "order": 5,
+          "attacker": {
+            "title": "Gaining Higher-Level Database and System Access",
+            "description": "Beyond data theft, the attacker attempts to escalate their privileges within the database and potentially onto the underlying server. If the database runs as a privileged system user (a common misconfiguration), the attacker may be able to execute operating system commands directly through database features like Microsoft SQL Server's xp_cmdshell, which provides a command shell interface through SQL queries. In MySQL, User Defined Functions (UDFs) can be loaded to execute arbitrary code. The attacker may also modify data to grant themselves administrative access within the application itself, such as changing their user role to 'admin' in the users table.",
+            "tools_or_indicators": ["xp_cmdshell in MSSQL to execute operating system commands through the database", "MySQL UDF (User Defined Functions) to load and execute arbitrary code on the server", "Modifying user roles or permissions directly in the database", "Writing web shells to the server's web directory via INTO OUTFILE", "PostgreSQL COPY command abuse for file system access"],
+            "mitre_techniques": ["T1190", "T1059", "T1548"]
+          },
+          "defender": {
+            "title": "Preventing Privilege Escalation from the Database",
+            "description": "Database servers should never run as root or SYSTEM; they should use dedicated low-privilege service accounts. Dangerous features like xp_cmdshell should be disabled and access to them audited. The database should run in a segmented network zone with strict firewall rules limiting what it can communicate with. File system permissions should prevent the database process from writing to web-accessible directories. Regular security configuration audits using tools like CIS Benchmarks for databases help ensure these hardening measures remain in place.",
+            "tools_or_indicators": ["Disabling xp_cmdshell and other dangerous database features", "Running database services under least-privilege service accounts", "Network segmentation isolating database servers", "CIS Benchmark hardening for MySQL, PostgreSQL, MSSQL", "File system permissions preventing web shell placement"],
+            "mitre_techniques": ["T1059", "T1548"]
+          },
+          "victim": {
+            "title": "Entire System Now at Risk",
+            "description": "If the attacker escalates from database access to operating system access, the scope of the breach expands dramatically. It is no longer just the application's data at risk but potentially every system on the network that the database server can reach. The attacker may now be able to access other databases on the same server, read configuration files containing additional credentials, or pivot to internal network resources. What started as a single vulnerable input field has now become a full system compromise.",
+            "tools_or_indicators": ["Complete server compromise beyond just the database", "Access to configuration files containing credentials for other systems", "Potential pivot point to internal network resources"],
+            "mitre_techniques": ["T1190", "T1548"]
+          }
+        },
+        {
+          "name": "Data Exfiltration or Destruction",
+          "order": 6,
+          "attacker": {
+            "title": "Stealing or Destroying the Data",
+            "description": "In the final phase, the attacker either exfiltrates the stolen data for profit or destroys it for disruption. Exfiltrated databases are packaged, compressed, and transferred to attacker-controlled servers, often through encrypted channels to avoid detection. The data may be sold on dark web forums, used for identity theft, or held for ransom. Alternatively, a destructive attacker may execute DROP TABLE or DELETE commands to destroy data, or encrypt database contents and demand payment for the decryption key, combining SQL injection with a ransomware-style extortion.",
+            "tools_or_indicators": ["Data exfiltration through encrypted channels to attacker servers", "DROP TABLE and DELETE statements to destroy data", "Ransom demands threatening to publish stolen data", "Dark web marketplace listings of stolen databases", "DNS tunneling or HTTP-based exfiltration to bypass network controls"],
+            "mitre_techniques": ["T1048", "T1485", "T1565.001"]
+          },
+          "defender": {
+            "title": "Preventing Data Loss and Ensuring Recovery",
+            "description": "Data Loss Prevention (DLP) systems monitor network traffic for patterns that indicate sensitive data leaving the organization, such as large numbers of credit card numbers or social security numbers in outbound traffic. Network monitoring should flag unusual outbound connections from database servers, which normally should only communicate with application servers. Most critically, maintaining regular, tested, offline backups ensures that even if data is destroyed, it can be recovered. Backups should be stored separately from the production network so an attacker who compromises the database cannot also destroy the backups.",
+            "tools_or_indicators": ["Data Loss Prevention (DLP) systems monitoring outbound traffic", "Network monitoring for unusual database server communications", "Regular automated backups stored offline and immutable", "Database transaction logs for forensic analysis and recovery", "Incident response plans specifically for data breach scenarios"],
+            "mitre_techniques": ["T1048", "T1485"]
+          },
+          "victim": {
+            "title": "Suffering the Consequences of the Breach",
+            "description": "The victims now face the real-world consequences of the breach. Their stolen credentials may be used to access other accounts (credential stuffing), their personal information may be used for identity theft, and their financial data may be used for fraudulent transactions. If the data is destroyed, users lose access to their accounts and any data they had stored in the application. Breach notification laws in most jurisdictions require the organization to notify affected users, but this notification often comes weeks or months after the actual theft occurred.",
+            "tools_or_indicators": ["Identity theft using stolen personal information", "Credential stuffing attacks on other services using stolen passwords", "Fraudulent transactions using stolen financial data", "Loss of access to accounts and stored data"],
+            "mitre_techniques": ["T1078", "T1110.004"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "man-in-the-middle",
+      "name": "Man-in-the-Middle",
+      "slug": "man-in-the-middle",
+      "short_description": "Interception attack where the attacker secretly positions themselves between two communicating parties, reading and potentially altering all traffic in real time.",
+      "icon": "👤",
+      "severity": 4,
+      "mitre_id": "T1557",
+      "related_attacks": ["phishing", "lateral-movement"],
+      "phases": [
+        {
+          "name": "Network Positioning",
+          "order": 1,
+          "attacker": {
+            "title": "Inserting into the Communication Path",
+            "description": "The attacker must first position themselves between the victim and the network gateway so that all traffic flows through their machine. The most common technique on local networks is ARP spoofing, where the attacker sends fake ARP (Address Resolution Protocol) messages to trick other devices into thinking the attacker's MAC address belongs to the router. Tools like Bettercap, a powerful network attack and monitoring framework, and Ettercap, a comprehensive suite for man-in-the-middle attacks, automate this process. On wireless networks, the attacker may set up an evil twin access point, a fake Wi-Fi hotspot with the same name as a legitimate one.",
+            "tools_or_indicators": ["Bettercap, a powerful Swiss Army knife for network attacks that automates ARP spoofing, DNS spoofing, and traffic interception", "Ettercap, a comprehensive MITM suite that handles ARP poisoning and packet filtering on local networks", "Evil twin access points that mimic legitimate Wi-Fi networks to lure victims", "ARP spoofing, which tricks devices into sending traffic through the attacker by falsifying network address mappings", "DHCP spoofing to become the default gateway for new network connections"],
+            "mitre_techniques": ["T1557.002", "T1557.001"]
+          },
+          "defender": {
+            "title": "Preventing Unauthorized Network Positioning",
+            "description": "Dynamic ARP Inspection (DAI) on network switches validates ARP packets against a trusted binding table, preventing ARP spoofing attacks. 802.1X network access control ensures that only authenticated devices can connect to the network, making it harder for an attacker to plug in and start spoofing. For wireless networks, wireless intrusion prevention systems (WIPS) can detect evil twin access points by identifying duplicate SSIDs with different MAC addresses. Network segmentation limits the blast radius by ensuring that even if an attacker gains a position on one segment, they cannot intercept traffic on others.",
+            "tools_or_indicators": ["Dynamic ARP Inspection (DAI) on managed switches", "802.1X Port-Based Network Access Control", "Wireless Intrusion Prevention Systems (WIPS)", "Network segmentation with VLANs", "Static ARP entries for critical infrastructure"],
+            "mitre_techniques": ["T1557.002", "T1557.001"]
+          },
+          "victim": {
+            "title": "Unknowingly Routing Traffic Through the Attacker",
+            "description": "The victim's device has been tricked into believing the attacker's machine is the network gateway. Every packet the victim sends, whether browsing the web, checking email, or accessing corporate resources, now passes through the attacker's system first. The victim's device shows no warning or indication that this has happened, because ARP spoofing operates at a network layer below what most users or even basic security tools can see. The victim continues using the network normally, completely unaware that an invisible intermediary is watching everything.",
+            "tools_or_indicators": ["All network traffic silently rerouted through the attacker", "No visible warnings or indicators on the victim's device", "Normal network performance may be maintained to avoid suspicion"],
+            "mitre_techniques": ["T1557.002"]
+          }
+        },
+        {
+          "name": "Traffic Interception",
+          "order": 2,
+          "attacker": {
+            "title": "Capturing All Network Communications",
+            "description": "With all victim traffic flowing through their machine, the attacker uses packet capture tools to record and analyze every byte. Wireshark, the world's most widely used network protocol analyzer, displays the traffic in real time with detailed protocol breakdowns, allowing the attacker to see DNS queries (revealing which websites the victim visits), HTTP traffic in plain text, and metadata about encrypted connections. For targeted capture, tcpdump can filter and record specific traffic types to disk for later analysis. Any unencrypted protocol, including HTTP, FTP, Telnet, and some email protocols, exposes everything including credentials.",
+            "tools_or_indicators": ["Wireshark, a network protocol analyzer that captures and displays all network traffic with detailed protocol decoding", "tcpdump, a command-line packet capture tool for recording specific traffic to disk", "NetworkMiner, a forensic network analysis tool that extracts files and images from captured traffic", "Bettercap's built-in sniffer modules for real-time credential extraction", "PCredz, a tool that automatically extracts credentials from captured network traffic"],
+            "mitre_techniques": ["T1040", "T1557"]
+          },
+          "defender": {
+            "title": "Ensuring Traffic Encryption",
+            "description": "The most effective defense against traffic interception is encrypting all communications. Enforcing HTTPS everywhere through HSTS (HTTP Strict Transport Security) headers ensures browsers never send data over unencrypted HTTP. VPNs encrypt all traffic between the user's device and the VPN server, making intercepted packets unreadable even if an attacker captures them. Network monitoring tools should alert on ARP table changes, which indicate potential spoofing. DNS-over-HTTPS (DoH) or DNS-over-TLS (DoT) prevents the attacker from seeing which websites users are visiting through DNS queries.",
+            "tools_or_indicators": ["HSTS (HTTP Strict Transport Security) enforcing HTTPS on all connections", "Corporate VPN for encrypting all traffic on untrusted networks", "DNS-over-HTTPS (DoH) or DNS-over-TLS (DoT) for encrypted DNS", "ARP monitoring tools that alert on table changes", "Network monitoring for duplicate MAC addresses"],
+            "mitre_techniques": ["T1040", "T1557"]
+          },
+          "victim": {
+            "title": "Communications Being Silently Recorded",
+            "description": "Every website the victim visits, every file they download, every email they send over an unencrypted connection is being captured and recorded by the attacker. Even for encrypted HTTPS connections, the attacker can see the destination domains through DNS queries and TLS handshake metadata. If the victim accesses any service over plain HTTP, which still exists on many internal corporate applications and IoT device interfaces, their credentials and data are fully visible. The victim's browsing patterns, communication habits, and daily routines are all being cataloged.",
+            "tools_or_indicators": ["Unencrypted HTTP traffic fully visible to the attacker", "DNS queries revealing browsing patterns", "Email content exposed if using unencrypted protocols", "File transfers captured including documents and images"],
+            "mitre_techniques": ["T1040"]
+          }
+        },
+        {
+          "name": "SSL/TLS Downgrade",
+          "order": 3,
+          "attacker": {
+            "title": "Stripping Encryption from Secure Connections",
+            "description": "Since most sensitive traffic is encrypted with HTTPS, the attacker attempts to downgrade these connections to plain HTTP so the content becomes readable. The tool sslstrip, created by security researcher Moxie Marlinspike, works by intercepting the redirect from HTTP to HTTPS that most websites use, keeping the victim on the unencrypted HTTP version while the attacker maintains a separate encrypted connection to the real server. The victim thinks they are browsing normally, but their browser shows 'http://' instead of 'https://', a subtle difference most users never notice. More advanced attacks may use forged SSL certificates to impersonate the target site entirely.",
+            "tools_or_indicators": ["sslstrip, a tool that transparently downgrades HTTPS connections to HTTP by intercepting redirect responses", "Bettercap's hstshijack module that attempts to bypass HSTS protections", "Forged SSL certificates generated by tools like mitmproxy", "DNS spoofing combined with SSL stripping for more convincing attacks", "WPAD (Web Proxy Auto-Discovery) exploitation to redirect traffic through attacker's proxy"],
+            "mitre_techniques": ["T1557", "T1040", "T1565.002"]
+          },
+          "defender": {
+            "title": "Enforcing Encryption That Cannot Be Downgraded",
+            "description": "HSTS preloading is the definitive defense against SSL stripping. When a domain is on the HSTS preload list, browsers are hardcoded to only use HTTPS for that domain, making it impossible for sslstrip to downgrade the connection because the browser will never attempt an HTTP connection in the first place. Certificate pinning in mobile apps ensures the app only trusts specific certificates, rejecting forged ones. For internal applications, certificate-based mutual TLS (mTLS) authentication makes MITM attacks detectable because the attacker cannot present the correct client certificate.",
+            "tools_or_indicators": ["HSTS preloading to ensure browsers never attempt HTTP connections", "Certificate pinning in mobile and desktop applications", "Mutual TLS (mTLS) for internal service-to-service communication", "Certificate Transparency monitoring to detect forged certificates", "Browser warnings for certificate errors that users should never bypass"],
+            "mitre_techniques": ["T1557", "T1565.002"]
+          },
+          "victim": {
+            "title": "Browsing Without Encryption Protection",
+            "description": "The victim is now browsing what they believe are secure websites, but the lock icon in their browser may be missing or showing HTTP instead of HTTPS. Most users do not actively check the URL bar for the protocol, especially when focused on their work. When the victim enters their password on what appears to be their bank's website or corporate email login, the credentials travel in plain text through the attacker's machine. Modern browsers are getting better at warning users about insecure connections, but these warnings can be subtle and are often dismissed by users accustomed to clicking through security prompts.",
+            "tools_or_indicators": ["Missing padlock icon in browser address bar", "URL showing http:// instead of https://", "Browser security warnings that may be subtle or ignored", "Credentials transmitted in plain text without the victim's knowledge"],
+            "mitre_techniques": ["T1557", "T1040"]
+          }
+        },
+        {
+          "name": "Session Hijacking",
+          "order": 4,
+          "attacker": {
+            "title": "Stealing Authentication Sessions",
+            "description": "Even if the attacker cannot decrypt the actual password, they can steal session tokens, which are small pieces of data (cookies) that a website sends to the browser after successful login to maintain the authenticated session. By capturing these session cookies from the traffic, the attacker can inject them into their own browser and instantly become logged in as the victim without ever knowing the password. This technique, known as session hijacking or sidejacking, is particularly effective against services that do not properly secure their session cookies with flags like Secure, HttpOnly, and SameSite.",
+            "tools_or_indicators": ["Ferret and Hamster, tools for capturing and replaying session cookies", "Cookie injection into the attacker's browser using browser developer tools", "Bettercap's cookie sniffer module for real-time session token capture", "Wireshark filters targeting HTTP Cookie headers in captured traffic"],
+            "mitre_techniques": ["T1539", "T1550.004"]
+          },
+          "defender": {
+            "title": "Protecting Session Integrity",
+            "description": "Session cookies must be configured with security flags: 'Secure' ensures cookies are only sent over HTTPS, 'HttpOnly' prevents JavaScript from reading them (defending against XSS-based theft), and 'SameSite' restricts cross-origin requests. Sessions should be bound to the client's IP address and user agent, so stolen cookies fail when used from a different machine. Short session lifetimes and re-authentication for sensitive actions (like changing passwords or transferring money) limit the damage from a hijacked session. Token rotation, where the session ID changes after each request, makes captured tokens quickly obsolete.",
+            "tools_or_indicators": ["Secure, HttpOnly, and SameSite cookie flags on all session cookies", "Session binding to IP address and user agent", "Short session timeouts requiring frequent re-authentication", "Token rotation to invalidate captured session IDs", "Re-authentication requirements for sensitive operations"],
+            "mitre_techniques": ["T1539", "T1550.004"]
+          },
+          "victim": {
+            "title": "Active Session Stolen by the Attacker",
+            "description": "The victim is logged into their email, banking, or corporate application, and their active session has just been stolen. The attacker can now perform any action the victim can: read emails, transfer funds, access confidential documents, or change account settings. The victim may remain logged in simultaneously with the attacker, noticing nothing unusual unless the service detects concurrent sessions from different locations. Some victims only discover the hijacking when they notice unauthorized transactions, sent messages they did not write, or settings they did not change.",
+            "tools_or_indicators": ["Attacker accessing the victim's accounts simultaneously", "Unauthorized actions performed using the victim's session", "Possible concurrent session alerts from security-aware services"],
+            "mitre_techniques": ["T1539"]
+          }
+        },
+        {
+          "name": "Data Manipulation",
+          "order": 5,
+          "attacker": {
+            "title": "Altering Communications in Transit",
+            "description": "Beyond passive eavesdropping, the attacker can actively modify data as it passes through their machine. This could mean changing the recipient account number in a wire transfer instruction, injecting malicious JavaScript into web pages the victim is viewing, modifying DNS responses to redirect the victim to fake websites, or altering email contents before they reach the recipient. Bettercap's proxy modules allow the attacker to write custom scripts that automatically modify specific content in real time. This active manipulation is what elevates a man-in-the-middle attack from surveillance to direct harm.",
+            "tools_or_indicators": ["Bettercap proxy modules for real-time content modification", "mitmproxy, a scriptable HTTPS proxy that allows attackers to modify requests and responses programmatically", "DNS spoofing to redirect victims to attacker-controlled websites", "JavaScript injection into unencrypted web pages", "Email content modification before delivery"],
+            "mitre_techniques": ["T1565.002", "T1557"]
+          },
+          "defender": {
+            "title": "Ensuring Data Integrity",
+            "description": "End-to-end encryption ensures that even a positioned attacker cannot read or modify the actual message content, only the sender and recipient can decrypt it. Digital signatures on emails (using S/MIME or PGP) allow recipients to verify that the message was not altered in transit and truly came from the stated sender. For financial transactions, out-of-band verification (like confirming account details via phone call) prevents manipulation of payment instructions. Content Security Policy (CSP) headers prevent injected JavaScript from executing in the browser.",
+            "tools_or_indicators": ["End-to-end encryption for messaging and email", "S/MIME or PGP digital signatures for email integrity verification", "Out-of-band verification for high-value transactions", "Content Security Policy (CSP) headers preventing script injection", "Subresource Integrity (SRI) tags verifying loaded resources"],
+            "mitre_techniques": ["T1565.002"]
+          },
+          "victim": {
+            "title": "Receiving Altered Information Without Knowing",
+            "description": "The victim is now receiving modified data and has no way to distinguish it from legitimate content. A web page may contain injected malicious code, an email may have altered instructions, or a financial transaction may have been redirected to a different account. The victim acts on this false information in good faith, potentially transferring money to the wrong account, downloading malware from an injected link, or making decisions based on falsified data. This manipulation of trust in digital communications represents one of the most dangerous aspects of MITM attacks.",
+            "tools_or_indicators": ["Altered web page content including injected scripts or modified text", "Modified financial instructions with changed account numbers", "Fake DNS responses leading to impersonation websites"],
+            "mitre_techniques": ["T1565.002"]
+          }
+        },
+        {
+          "name": "Covering Tracks",
+          "order": 6,
+          "attacker": {
+            "title": "Removing Evidence of the Attack",
+            "description": "After extracting valuable data or completing their manipulation, the attacker carefully removes all traces of their presence. This means stopping the ARP spoofing to restore normal network routing, deleting any packet capture files stored locally, clearing logs on any systems they accessed, and restoring the network's ARP tables to their legitimate state. A skilled attacker ensures that the network returns to its normal state so seamlessly that neither users nor administrators ever realize an interception occurred. The stolen data and credentials are securely transferred to the attacker's infrastructure for later use.",
+            "tools_or_indicators": ["Stopping ARP spoofing to restore legitimate network routing", "Clearing packet capture files and local logs", "Restoring ARP tables to normal state", "Secure exfiltration of captured data to external infrastructure", "Timestomping, altering file timestamps to hide when attack tools were used"],
+            "mitre_techniques": ["T1070", "T1070.004", "T1070.003"]
+          },
+          "defender": {
+            "title": "Preserving Forensic Evidence",
+            "description": "Defenders should implement centralized logging where copies of all network and system logs are sent to a separate, hardened SIEM (Security Information and Event Management) system that the attacker cannot access. Network flow data (NetFlow/IPFIX) records connection metadata even after the actual traffic is gone, providing evidence of unusual traffic patterns. ARP table monitoring with historical logging can reveal past spoofing even after the attacker stops. Retaining DHCP logs, switch port logs, and wireless access point associations helps forensic investigators reconstruct who was connected where and when.",
+            "tools_or_indicators": ["Centralized SIEM logging to a hardened, separate system", "NetFlow/IPFIX records of all network connections", "ARP table change logging and historical records", "DHCP and switch port access logs", "Wireless access point association logs"],
+            "mitre_techniques": ["T1070", "T1070.003"]
+          },
+          "victim": {
+            "title": "Unaware the Attack Ever Happened",
+            "description": "Once the attacker cleans up, the victim's network connection returns to normal with no trace of the interception. The victim has no indication that their passwords were captured, their sessions were hijacked, or their communications were modified. Any consequences of the attack, such as unauthorized account access or fraudulent transactions, may not surface for days or weeks. The victim may never connect these later incidents back to the MITM attack, especially if the attacker used the stolen credentials gradually and carefully to avoid triggering security alerts.",
+            "tools_or_indicators": ["No residual indicators visible to the victim", "Delayed consequences that are hard to trace back to the attack", "Stolen credentials used gradually to avoid detection"],
+            "mitre_techniques": ["T1070"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ransomware",
+      "name": "Ransomware",
+      "slug": "ransomware",
+      "short_description": "Devastating malware attack that encrypts the victim's files and demands payment for decryption, often spreading laterally across entire networks.",
+      "icon": "🔒",
+      "severity": 5,
+      "mitre_id": "T1486",
+      "related_attacks": ["phishing", "lateral-movement", "supply-chain-attack"],
+      "phases": [
+        {
+          "name": "Initial Access",
+          "order": 1,
+          "attacker": {
+            "title": "Gaining the First Foothold",
+            "description": "Ransomware operators gain initial access to the target network through one of several common entry vectors. Phishing emails with malicious attachments remain the most prevalent method, followed by exploiting exposed Remote Desktop Protocol (RDP) services that are either unpatched or protected with weak passwords. Some groups purchase access from Initial Access Brokers (IABs), specialized cybercriminals who compromise organizations and sell the access to the highest bidder. Exploiting VPN vulnerabilities and unpatched public-facing servers are also common entry points, particularly for enterprise-targeted ransomware operations.",
+            "tools_or_indicators": ["Phishing emails with macro-enabled documents or malicious links", "Exposed RDP services with weak or compromised credentials", "Initial Access Brokers (IABs) selling pre-established network access on dark web forums", "Exploitation of unpatched VPN appliances (e.g., Fortinet, Pulse Secure vulnerabilities)", "Compromised valid credentials purchased from dark web marketplaces"],
+            "mitre_techniques": ["T1566.001", "T1133", "T1078", "T1190"]
+          },
+          "defender": {
+            "title": "Blocking Initial Entry Points",
+            "description": "Defenders must secure every potential entry point since ransomware operators only need one to succeed. RDP should never be directly exposed to the internet; it should be accessible only through VPN or a Zero Trust solution with MFA. Email security gateways should block executable attachments and scan documents for malicious macros. All public-facing systems, especially VPN appliances and web servers, must be patched promptly since ransomware groups actively scan for newly disclosed vulnerabilities. Regular external penetration testing helps identify overlooked exposure before attackers do.",
+            "tools_or_indicators": ["VPN or Zero Trust access replacing direct RDP exposure", "Email security gateways blocking malicious attachments", "Rapid patching program for all public-facing systems", "External attack surface monitoring", "Dark web monitoring for compromised credentials"],
+            "mitre_techniques": ["T1566.001", "T1133", "T1190"]
+          },
+          "victim": {
+            "title": "The Organization Under Initial Attack",
+            "description": "A single employee clicking a phishing link or a forgotten RDP server with a weak password is all it takes for the ransomware operation to begin. At this point, the organization has no idea an attacker is inside. The compromised machine, whether it belongs to an executive, an intern, or is a neglected server in the corner of a data center, becomes the staging ground for everything that follows. The entire attack timeline from this point to encryption can be as short as a few hours or span several weeks, depending on the attacker's methodology.",
+            "tools_or_indicators": ["A single compromised endpoint serving as the attacker's entry point", "No immediate visible indicators to the organization", "The initial compromise may have occurred through routine employee actions"],
+            "mitre_techniques": ["T1566.001", "T1078"]
+          }
+        },
+        {
+          "name": "Establishing Foothold",
+          "order": 2,
+          "attacker": {
+            "title": "Setting Up Command and Control",
+            "description": "Once inside, the attacker installs a command and control (C2) implant that maintains persistent communication with their infrastructure. Cobalt Strike, originally designed as a legitimate penetration testing tool, is the most widely used C2 framework by ransomware groups because its 'beacons' blend in with normal network traffic by communicating over HTTPS. Other popular C2 frameworks include Sliver (an open-source alternative) and Brute Ratel (designed specifically to evade EDR solutions). The implant phones home at regular intervals, allowing the attacker to remotely execute commands, upload tools, and download stolen data.",
+            "tools_or_indicators": ["Cobalt Strike, a commercial penetration testing tool widely abused by ransomware groups for its stealthy C2 beacons", "Sliver, an open-source C2 framework that generates unique implants to evade signature detection", "Brute Ratel C4, a C2 framework specifically designed to bypass endpoint detection and response (EDR) tools", "Living-off-the-land binaries (LOLBins) like PowerShell and certutil used to download additional tools", "Scheduled tasks or registry run keys for persistence across reboots"],
+            "mitre_techniques": ["T1219", "T1059.001", "T1053.005", "T1547.001"]
+          },
+          "defender": {
+            "title": "Detecting C2 Communications",
+            "description": "Network Detection and Response (NDR) solutions analyze network traffic patterns to identify C2 beacons, which typically show regular intervals between communications (known as 'beaconing behavior'). EDR tools on endpoints monitor for suspicious process chains, like a Word document spawning PowerShell which then connects to an external server. Blocking known-bad IP addresses and domains through threat intelligence feeds catches some C2 traffic, but advanced operators use cloud-hosted redirectors that change frequently. Application whitelisting prevents unauthorized executables from running in the first place.",
+            "tools_or_indicators": ["Network Detection and Response (NDR) solutions identifying beaconing patterns", "EDR tools monitoring for suspicious process execution chains", "Threat intelligence feeds blocking known C2 infrastructure", "Application whitelisting (AppLocker, Windows Defender Application Control)", "DNS monitoring for suspicious domain lookups"],
+            "mitre_techniques": ["T1219", "T1059.001", "T1053.005"]
+          },
+          "victim": {
+            "title": "A Compromised Machine Calling Home",
+            "description": "One of the organization's machines is now silently communicating with the attacker's infrastructure. The C2 implant is designed to be invisible, hiding among normal network traffic and using encrypted channels that look like regular HTTPS browsing. The affected machine continues to function normally for its user. Meanwhile, the attacker has established a reliable tunnel into the network that gives them remote access equivalent to sitting at the keyboard. This is the last point where detection and response can prevent the catastrophic phases that follow.",
+            "tools_or_indicators": ["Unusual outbound connections to unfamiliar domains", "Periodic network beaconing at regular intervals", "New scheduled tasks or services that the user did not create"],
+            "mitre_techniques": ["T1219", "T1053.005"]
+          }
+        },
+        {
+          "name": "Privilege Escalation",
+          "order": 3,
+          "attacker": {
+            "title": "Gaining Administrative Control",
+            "description": "The initial compromised account is usually a standard user without the administrative privileges needed to execute the full ransomware attack. The attacker uses Mimikatz, a tool that extracts plaintext passwords, password hashes, and Kerberos tickets from Windows memory, to harvest credentials from the compromised machine. They exploit unpatched local vulnerabilities like PrintNightmare or misconfigured services to elevate to local administrator. From there, they target domain credentials, looking for service accounts with excessive privileges, cached domain admin credentials, or Kerberos ticket-granting tickets that can be abused in Golden Ticket attacks.",
+            "tools_or_indicators": ["Mimikatz, a tool that extracts passwords, hashes, and authentication tokens directly from Windows memory", "PrintNightmare and other local privilege escalation exploits", "Kerberoasting, an attack that requests Kerberos service tickets and cracks them offline to reveal service account passwords", "Token impersonation to assume the identity of higher-privileged processes", "Exploiting misconfigured Group Policy Preferences that store encrypted passwords"],
+            "mitre_techniques": ["T1003.001", "T1068", "T1558.003", "T1134"]
+          },
+          "defender": {
+            "title": "Limiting Privilege Escalation Opportunities",
+            "description": "Implementing the principle of least privilege drastically limits privilege escalation opportunities. Local administrator passwords should be unique per machine using LAPS (Local Administrator Password Solution), which automatically rotates and secures local admin passwords. Credential Guard on Windows prevents Mimikatz from reading credentials from memory. Service accounts should use Group Managed Service Accounts (gMSAs) with automatically rotated, complex passwords that resist Kerberoasting. Promptly patching known privilege escalation vulnerabilities and monitoring for tools like Mimikatz through EDR are essential defensive measures.",
+            "tools_or_indicators": ["LAPS (Local Administrator Password Solution) for unique local admin passwords", "Windows Credential Guard to protect credentials in memory", "Group Managed Service Accounts (gMSAs) with automatic password rotation", "Rapid patching of privilege escalation vulnerabilities", "EDR detection rules for Mimikatz and similar credential dumping tools"],
+            "mitre_techniques": ["T1003.001", "T1068", "T1558.003"]
+          },
+          "victim": {
+            "title": "Administrative Credentials Being Stolen",
+            "description": "The organization's most powerful credentials are now being harvested by the attacker. Domain administrator accounts, service accounts with broad access, and backup operator accounts are all targets. Each credential the attacker captures expands their control over the network. IT administrators who have logged into the initially compromised machine may have left cached credentials that the attacker can now extract. The organization's Active Directory, which controls access to everything, is being systematically compromised from the inside.",
+            "tools_or_indicators": ["Domain admin credentials extracted from memory", "Service account passwords cracked through Kerberoasting", "Cached credentials from previous admin logins being harvested"],
+            "mitre_techniques": ["T1003.001", "T1558.003"]
+          }
+        },
+        {
+          "name": "Network Discovery",
+          "order": 4,
+          "attacker": {
+            "title": "Mapping the Entire Network",
+            "description": "With elevated privileges, the attacker conducts thorough reconnaissance of the internal network to understand its structure, identify high-value targets, and plan the encryption strategy. Active Directory is queried using tools like BloodHound, which maps trust relationships and attack paths to identify the shortest route to domain admin. Network scanning with tools like Advanced IP Scanner reveals all connected systems, file servers, backup servers, and database servers. The attacker specifically looks for backup infrastructure because destroying backups before encryption ensures the victim cannot recover without paying the ransom.",
+            "tools_or_indicators": ["BloodHound, a tool that maps Active Directory relationships and identifies attack paths to high-value targets", "Advanced IP Scanner and Nmap for discovering all network-connected systems", "PowerView, a PowerShell tool for querying Active Directory objects, permissions, and group memberships", "Net commands (net view, net group) for enumerating shares and domain groups", "Identifying backup servers, NAS devices, and cloud backup solutions for later destruction"],
+            "mitre_techniques": ["T1018", "T1069", "T1082", "T1016"]
+          },
+          "defender": {
+            "title": "Detecting Internal Reconnaissance",
+            "description": "Internal network scanning and Active Directory enumeration generate distinctive patterns that security monitoring should detect. Unusual LDAP queries, especially those requesting information about all computers, all users, or all group memberships, are a strong indicator of attacker reconnaissance. Honeypots, fake systems placed on the network that no legitimate user should ever access, provide high-confidence alerts when an attacker's scanning touches them. Monitoring for BloodHound's characteristic SharpHound data collection and large LDAP queries helps catch this phase before the attacker completes their network map.",
+            "tools_or_indicators": ["SIEM alerts on unusual LDAP enumeration queries", "Honeypots and honey accounts that trigger alerts when accessed", "Network monitoring for broad port scanning from internal hosts", "Detection of SharpHound (BloodHound's data collector) execution", "Alerts on enumeration of backup infrastructure"],
+            "mitre_techniques": ["T1018", "T1069", "T1082"]
+          },
+          "victim": {
+            "title": "Network Being Mapped by the Attacker",
+            "description": "The attacker now has a complete map of the organization's network: every server, every workstation, every file share, every database, and critically, every backup system. They know which systems hold the most valuable data, which accounts have the most access, and where the organization's recovery capabilities reside. This level of internal knowledge, often rivaling what the IT department itself knows, is what makes the coming encryption so devastating. The attacker has identified every target they need to hit and every recovery mechanism they need to neutralize.",
+            "tools_or_indicators": ["Complete internal network topology mapped by the attacker", "All file servers, databases, and backup systems identified", "Active Directory structure and trust relationships documented"],
+            "mitre_techniques": ["T1018", "T1082"]
+          }
+        },
+        {
+          "name": "Lateral Movement",
+          "order": 5,
+          "attacker": {
+            "title": "Spreading Across the Network",
+            "description": "Using harvested domain administrator credentials, the attacker moves from the initially compromised machine to other systems throughout the network. PsExec, a legitimate Microsoft tool for remote command execution, allows the attacker to run commands on any machine they have admin credentials for. Windows Management Instrumentation (WMI) and PowerShell Remoting provide additional remote execution capabilities that blend in with normal administrative activity. The attacker deploys their tools to file servers, domain controllers, and backup servers, positioning for maximum impact. RDP may be used for hands-on interaction with critical systems.",
+            "tools_or_indicators": ["PsExec, a Microsoft Sysinternals tool abused for remote command execution across the network", "WMI (Windows Management Instrumentation) for stealthy remote command execution", "PowerShell Remoting for executing scripts on remote machines", "RDP connections to critical servers for interactive access", "Deploying C2 beacons on multiple machines for redundant access"],
+            "mitre_techniques": ["T1021.002", "T1021.001", "T1021.006", "T1047"]
+          },
+          "defender": {
+            "title": "Restricting Lateral Movement",
+            "description": "Network segmentation is the most effective defense against lateral movement. Critical systems like domain controllers, backup servers, and financial systems should be in separate network segments with strict access controls. Implementing a tiered administration model ensures that domain admin accounts are only used on domain controllers, never on regular workstations where they could be captured. Disabling unnecessary remote access protocols (like WMI and PowerShell Remoting on workstations) reduces the attacker's options. EDR solutions should alert on unusual remote execution patterns, like PsExec being used from a workstation that has never used it before.",
+            "tools_or_indicators": ["Network segmentation isolating critical systems", "Tiered administration model for privileged accounts", "Disabling WMI and PowerShell Remoting where not needed", "EDR alerts on unusual PsExec or remote execution activity", "Just-In-Time (JIT) access requiring approval for admin privileges"],
+            "mitre_techniques": ["T1021.002", "T1021.001", "T1047"]
+          },
+          "victim": {
+            "title": "Attacker Spreading Through the Organization",
+            "description": "The attacker is now present on numerous systems throughout the network. File servers that store critical business documents, database servers with customer data, email servers with years of communication, and backup systems that represent the organization's recovery lifeline are all under the attacker's control. The IT team may notice occasional anomalies, a service restarting unexpectedly, a brief spike in CPU usage, but these signs are subtle and easily dismissed as normal operational issues. The organization is now just one command away from catastrophe.",
+            "tools_or_indicators": ["Attacker present on multiple critical systems simultaneously", "Subtle anomalies in system behavior that may go unnoticed", "Backup systems compromised and ready to be destroyed"],
+            "mitre_techniques": ["T1021.002", "T1021.001"]
+          }
+        },
+        {
+          "name": "Data Staging & Exfiltration",
+          "order": 6,
+          "attacker": {
+            "title": "Stealing Data Before Encryption (Double Extortion)",
+            "description": "Modern ransomware operations practice 'double extortion': they steal sensitive data before encrypting it, giving them two forms of leverage. If the victim has backups and can recover from encryption, the attacker threatens to publish the stolen data publicly, causing reputational damage, regulatory fines, and legal liability. The attacker identifies and collects the most damaging data: financial records, customer databases, intellectual property, legal documents, and employee personal information. This data is compressed and exfiltrated to attacker-controlled servers, often using legitimate cloud storage services like Mega.nz or rclone to avoid detection.",
+            "tools_or_indicators": ["rclone, a command-line program for syncing files to cloud storage, abused for data exfiltration to services like Mega.nz", "7-Zip or WinRAR for compressing stolen data before exfiltration", "Legitimate cloud storage services abused as exfiltration destinations", "FTP or SFTP transfers to attacker infrastructure", "Data staged in temporary directories before bulk transfer"],
+            "mitre_techniques": ["T1048", "T1560.001", "T1567.002"]
+          },
+          "defender": {
+            "title": "Detecting Data Theft in Progress",
+            "description": "Data Loss Prevention (DLP) systems should alert on large volumes of data being transferred to external destinations, especially cloud storage services and unknown IP addresses. Monitoring for unusual use of compression tools like 7-Zip or rclone on servers that normally do not use them is a strong indicator. Network monitoring should flag large outbound transfers from file servers, especially outside business hours. Even if the ransomware encryption is ultimately successful, detecting exfiltration early may allow defenders to understand what was stolen and prepare for the extortion component.",
+            "tools_or_indicators": ["DLP systems monitoring for bulk data transfers", "Network monitoring for unusual outbound traffic volumes", "Alerts on rclone, 7-Zip, or WinRAR execution on servers", "Cloud access security broker (CASB) detecting uploads to unauthorized cloud services", "NetFlow analysis identifying large data flows to external IPs"],
+            "mitre_techniques": ["T1048", "T1560.001", "T1567.002"]
+          },
+          "victim": {
+            "title": "Sensitive Data Being Stolen",
+            "description": "The organization's most sensitive data is being copied to attacker-controlled servers. Customer records, financial data, trade secrets, employee personal information, and confidential business communications are all being exfiltrated. This theft represents a separate crisis from the coming encryption: even if the organization successfully recovers all its data from backups, the stolen information can be published, sold, or used for further extortion. Many organizations that refuse to pay the ransom for decryption end up negotiating to prevent data publication, giving the attacker leverage regardless of the victim's backup strategy.",
+            "tools_or_indicators": ["Sensitive data being copied to external attacker infrastructure", "Customer records, financial data, and intellectual property at risk", "Data theft creating leverage independent of the encryption attack"],
+            "mitre_techniques": ["T1048", "T1567.002"]
+          }
+        },
+        {
+          "name": "Encryption & Ransom Demand",
+          "order": 7,
+          "attacker": {
+            "title": "Encrypting Everything and Demanding Payment",
+            "description": "With data exfiltrated and backup systems already compromised, the attacker executes the encryption simultaneously across all targeted systems. The ransomware uses strong encryption (typically AES-256 combined with RSA for key management) that is mathematically impossible to break without the decryption key. Shadow copies and local backups are deleted first using commands like 'vssadmin delete shadows /all' to prevent easy recovery. Each encrypted file receives a new extension (like .locked, .encrypted, or a random string), and a ransom note is placed on every desktop and in every directory, providing instructions for contacting the attacker and paying the ransom, typically in Bitcoin or Monero cryptocurrency.",
+            "tools_or_indicators": ["AES-256 encryption with RSA key wrapping making decryption without the key impossible", "vssadmin delete shadows /all to destroy Windows Volume Shadow Copies", "bcdedit commands to disable Windows recovery boot options", "Ransom notes (README.txt or similar) placed in every directory", "Encryption executed simultaneously across hundreds of machines via Group Policy or PsExec", "Tor-based payment portal for anonymous ransom negotiations"],
+            "mitre_techniques": ["T1486", "T1490", "T1489"]
+          },
+          "defender": {
+            "title": "Responding to Active Encryption",
+            "description": "Once encryption begins, speed is everything. Network isolation should be triggered immediately: disconnecting affected segments from the network can prevent the ransomware from reaching systems it has not yet encrypted. Pre-planned incident response procedures should activate, including contacting law enforcement, engaging a specialized incident response firm, and notifying the organization's cyber insurance carrier. Immutable, offline backups that the attacker could not reach are the primary recovery mechanism. Organizations should never assume they need to pay; many ransomware variants have known decryptors, and law enforcement operations sometimes recover decryption keys.",
+            "tools_or_indicators": ["Network isolation to contain the encryption spread", "Immutable offline backups for recovery without paying", "Incident response retainer with a specialized IR firm", "Law enforcement notification (FBI IC3, local CERT)", "No More Ransom project (nomoreransom.org) for free decryptors", "Cyber insurance activation for incident response support"],
+            "mitre_techniques": ["T1486", "T1490"]
+          },
+          "victim": {
+            "title": "Organization Crippled by Encryption",
+            "description": "The organization wakes up to discover that every file server, every workstation, every database, and every application has been encrypted and is completely unusable. Operations grind to a halt. Employees cannot access their files, customers cannot be served, and critical business processes stop. A ransom note demands payment, often hundreds of thousands to millions of dollars in cryptocurrency, with a deadline after which the price increases or the stolen data is published. The organization faces an agonizing decision: pay the ransom with no guarantee of recovery, or attempt to rebuild from backups, which could take weeks and may not be complete if backups were also compromised.",
+            "tools_or_indicators": ["All files encrypted with new file extensions", "Ransom notes on every desktop and in every folder", "Complete operational shutdown affecting all business functions", "Ransom demands ranging from hundreds of thousands to millions of dollars", "Threat of publishing stolen data if ransom is not paid"],
+            "mitre_techniques": ["T1486", "T1490"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "lateral-movement",
+      "name": "Lateral Movement",
+      "slug": "lateral-movement",
+      "short_description": "Post-compromise technique where attackers move through a network from one system to another, escalating privileges and expanding their access to reach high-value targets.",
+      "icon": "🕸️",
+      "severity": 4,
+      "mitre_id": "T1021",
+      "related_attacks": ["brute-force", "ransomware", "man-in-the-middle"],
+      "phases": [
+        {
+          "name": "Initial Compromise",
+          "order": 1,
+          "attacker": {
+            "title": "Establishing the First Foothold",
+            "description": "Lateral movement begins after an attacker has already gained access to a single machine in the target network through any initial access vector, whether phishing, exploiting a vulnerability, or using stolen credentials. This first compromised machine is often a regular employee workstation with limited privileges, not the attacker's ultimate target. The attacker stabilizes their access by deploying a persistent backdoor and begins evaluating the network context of the compromised machine: what domain it belongs to, what network segment it sits on, what users have logged into it, and what other systems it can reach.",
+            "tools_or_indicators": ["Persistent backdoor installed via scheduled task, registry key, or startup folder", "Initial foothold typically on a standard employee workstation", "Reconnaissance commands: whoami, ipconfig, systeminfo, net user", "C2 implant established for reliable remote access"],
+            "mitre_techniques": ["T1078", "T1059.001", "T1053.005", "T1547.001"]
+          },
+          "defender": {
+            "title": "Detecting the Initial Compromise Early",
+            "description": "The best defense against lateral movement is detecting and containing the initial compromise before the attacker can spread. EDR solutions on every endpoint monitor for suspicious process execution, unauthorized persistence mechanisms, and C2 communications. The earlier this first foothold is detected, the less damage occurs. Security teams should prioritize alerts involving new scheduled tasks, unusual PowerShell execution, and processes making outbound connections to unfamiliar destinations. Rapid containment of a single compromised machine prevents the exponentially worse scenario of an attacker moving freely through the network.",
+            "tools_or_indicators": ["EDR on all endpoints detecting suspicious process chains", "SIEM correlation of authentication events across the network", "Alerts on new scheduled tasks and unusual persistence mechanisms", "Network monitoring for C2 beacon patterns"],
+            "mitre_techniques": ["T1078", "T1053.005", "T1547.001"]
+          },
+          "victim": {
+            "title": "One Machine Compromised, Many at Risk",
+            "description": "A single employee's workstation has been compromised, and from the organization's perspective, every system that workstation can communicate with is now at risk. The affected employee continues working normally, unaware that their machine is now a staging platform for a much larger attack. The trust relationships that make the corporate network function, shared file servers, single sign-on, domain authentication, are about to be exploited. What seems like an isolated endpoint compromise is actually the beginning of a network-wide threat.",
+            "tools_or_indicators": ["Single workstation serving as the attacker's network entry point", "All systems reachable from that workstation are at risk", "Normal user activity masking the attacker's presence"],
+            "mitre_techniques": ["T1078"]
+          }
+        },
+        {
+          "name": "Internal Reconnaissance",
+          "order": 2,
+          "attacker": {
+            "title": "Mapping the Internal Network and Domain",
+            "description": "From the initial foothold, the attacker maps the internal network to identify high-value targets and plan their movement path. BloodHound, a tool that visualizes Active Directory trust relationships and attack paths, is invaluable here because it can automatically identify the shortest path from the current compromised user to domain admin access. PowerView, a PowerShell-based Active Directory enumeration tool, queries group memberships, computer objects, and access control lists without triggering most security alerts because it uses native Windows protocols. The attacker identifies where domain admins log in, which servers hold sensitive data, and what trust relationships exist between domains.",
+            "tools_or_indicators": ["BloodHound with SharpHound collector, which maps Active Directory attack paths and identifies the fastest route to domain admin", "PowerView, a PowerShell tool that enumerates Active Directory objects, permissions, and group memberships using native LDAP queries", "ADRecon, a tool that generates detailed Active Directory reports for attackers to analyze offline", "Nmap or Advanced IP Scanner for network host discovery", "Net commands: net group 'Domain Admins' /domain, net view, net share"],
+            "mitre_techniques": ["T1018", "T1069.002", "T1087.002", "T1082"]
+          },
+          "defender": {
+            "title": "Detecting Internal Enumeration Activity",
+            "description": "Monitoring Active Directory query patterns is crucial for detecting internal reconnaissance. BloodHound's SharpHound collector generates a distinctive burst of LDAP queries that request information about all users, groups, computers, and sessions in the domain, a pattern no legitimate application typically produces. Deploying honeypot accounts (fake accounts that appear to be high-value targets like service accounts or admins) provides high-confidence alerting because any authentication attempt against them is guaranteed to be malicious. Monitoring for unusual net.exe and PowerShell usage on workstations helps catch manual enumeration.",
+            "tools_or_indicators": ["LDAP query monitoring for bulk enumeration patterns", "Honeypot accounts and computers that alert when queried or accessed", "PowerShell script block logging to capture enumeration commands", "Detection rules for SharpHound data collection patterns", "Monitoring net.exe usage on non-admin workstations"],
+            "mitre_techniques": ["T1018", "T1069.002", "T1087.002"]
+          },
+          "victim": {
+            "title": "Network Architecture Being Analyzed",
+            "description": "The attacker now understands the organization's network better than most of its own employees do. They know which servers hold the company's most critical data, which accounts have the most powerful access, and exactly which path through the network leads from their current position to their ultimate target. Active Directory, the backbone of Windows enterprise networks that manages authentication and authorization for every user and computer, has revealed its complete structure to the attacker. Every trust relationship, every group membership, and every administrative delegation is now known.",
+            "tools_or_indicators": ["Complete Active Directory structure mapped by the attacker", "High-value targets identified including domain controllers and file servers", "Administrative account locations and login patterns discovered"],
+            "mitre_techniques": ["T1018", "T1069.002"]
+          }
+        },
+        {
+          "name": "Credential Harvesting",
+          "order": 3,
+          "attacker": {
+            "title": "Dumping Credentials from Memory and Storage",
+            "description": "The attacker harvests credentials from the compromised machine using multiple techniques. Mimikatz extracts plaintext passwords, NTLM hashes, and Kerberos tickets directly from the LSASS (Local Security Authority Subsystem Service) process memory, which Windows uses to manage user authentication. LSASS contains credentials for every user who has logged into the machine, so a compromised workstation where an IT admin once logged in to troubleshoot yields their domain admin credentials. The attacker also searches for credentials in configuration files, scripts, browser saved passwords, and Windows Credential Manager, often finding service account passwords, database connection strings, and API keys.",
+            "tools_or_indicators": ["Mimikatz sekurlsa::logonpasswords to dump all credentials from LSASS memory", "LSASS memory dump using procdump or comsvcs.dll for offline extraction", "Dumping SAM database for local account hashes", "Searching files for stored passwords (findstr /si password *.txt *.xml *.config)", "LaZagne, a tool that recovers passwords stored by dozens of applications including browsers, email clients, and databases"],
+            "mitre_techniques": ["T1003.001", "T1003.002", "T1003.003", "T1552.001"]
+          },
+          "defender": {
+            "title": "Protecting Credentials from Extraction",
+            "description": "Windows Credential Guard uses virtualization-based security to isolate the LSASS process so that even administrator-level code cannot read credentials from it, making Mimikatz ineffective on protected systems. Enabling LSA protection (RunAsPPL) adds another layer that prevents unauthorized processes from accessing LSASS memory. Tiered administration ensures that privileged accounts never log into regular workstations, eliminating the scenario where admin credentials are cached on compromised machines. Regular credential rotation for service accounts and implementing gMSAs (Group Managed Service Accounts) limits the window of usefulness for any stolen credentials.",
+            "tools_or_indicators": ["Windows Credential Guard isolating LSASS from unauthorized access", "LSA Protection (RunAsPPL) preventing LSASS memory dumps", "Tiered administration model keeping admin credentials off workstations", "gMSAs for automatic service account password rotation", "Monitoring for LSASS access attempts through EDR"],
+            "mitre_techniques": ["T1003.001", "T1003.002", "T1003.003"]
+          },
+          "victim": {
+            "title": "Credentials Harvested from the Network",
+            "description": "Every user who has ever logged into the compromised machine has potentially had their credentials stolen. This includes not just the machine's primary user, but also IT support staff who logged in remotely, service accounts that run scheduled tasks, and any administrator who used the machine for troubleshooting. The most dangerous scenario occurs when a domain admin's credentials are found, because that single set of credentials grants the attacker unlimited access to every system in the domain. Many organizations discover during incident response that a single compromised workstation yielded credentials for dozens of accounts.",
+            "tools_or_indicators": ["All accounts that logged into the compromised machine have exposed credentials", "IT support and admin credentials from past troubleshooting sessions", "Service account credentials cached on the machine"],
+            "mitre_techniques": ["T1003.001", "T1552.001"]
+          }
+        },
+        {
+          "name": "Pivoting to Adjacent Systems",
+          "order": 4,
+          "attacker": {
+            "title": "Moving to Other Machines Using Stolen Credentials",
+            "description": "Armed with harvested credentials, the attacker begins moving to other systems on the network. PsExec allows the attacker to remotely execute commands on any machine where they have admin credentials, essentially giving them a command prompt on the target system. WMI (Windows Management Instrumentation) and WinRM (Windows Remote Management) provide similar remote execution capabilities but may be less likely to trigger security alerts because they are commonly used by legitimate administrators. Pass-the-hash attacks allow the attacker to authenticate using stolen NTLM hashes without knowing the actual password, and Pass-the-ticket attacks abuse stolen Kerberos tickets to access services as the ticket's owner.",
+            "tools_or_indicators": ["PsExec for remote command execution using admin credentials on target systems", "WMI (wmic /node:target process call create) for stealthy remote execution", "WinRM/PowerShell Remoting for executing scripts on remote machines", "Pass-the-hash using stolen NTLM hashes to authenticate without passwords", "Pass-the-ticket using stolen Kerberos tickets to impersonate users", "RDP for interactive access to critical servers"],
+            "mitre_techniques": ["T1021.002", "T1021.001", "T1021.006", "T1047", "T1550.002", "T1550.003"]
+          },
+          "defender": {
+            "title": "Blocking and Detecting Lateral Movement",
+            "description": "Microsegmentation restricts network communication between systems so that workstations cannot directly connect to each other or to sensitive servers except through approved paths. This dramatically limits lateral movement options. Monitoring for PsExec usage, especially from non-admin workstations, provides high-fidelity alerting. Windows Event Log forwarding should capture Event IDs 4624 (logon) and 4648 (explicit credential use) and correlate them to detect a single set of credentials being used across many machines in a short time. Disabling NTLM authentication where possible forces Kerberos-only authentication, making pass-the-hash attacks ineffective.",
+            "tools_or_indicators": ["Microsegmentation restricting workstation-to-workstation communication", "Windows Event Log monitoring for Event IDs 4624 and 4648", "PsExec detection through Sysmon and EDR", "Disabling NTLM to prevent pass-the-hash attacks", "Behavioral analytics detecting one account accessing many systems rapidly"],
+            "mitre_techniques": ["T1021.002", "T1550.002", "T1550.003"]
+          },
+          "victim": {
+            "title": "Attacker Spreading Through the Network",
+            "description": "The attacker is now hopping from system to system, each new machine providing additional credentials, data, and access to more of the network. What began as a single compromised workstation has expanded to file servers, database servers, and potentially domain controllers. Each pivot looks like legitimate administrative activity because the attacker is using real credentials and authorized tools like PsExec and WMI. The organization's centralized authentication system, which was designed for convenience and efficiency, is being turned against it, allowing a single compromised credential to unlock dozens of systems.",
+            "tools_or_indicators": ["Attacker present on multiple systems across the network", "Legitimate tools being used with stolen credentials", "Each compromised system yielding more credentials for further movement"],
+            "mitre_techniques": ["T1021.002", "T1550.002"]
+          }
+        },
+        {
+          "name": "Privilege Escalation",
+          "order": 5,
+          "attacker": {
+            "title": "Reaching Domain Administrator Access",
+            "description": "The attacker's ultimate goal in lateral movement is reaching domain administrator access, which provides complete control over the entire Active Directory environment. If they have not already obtained domain admin credentials through Mimikatz, they pursue advanced attacks: DCSync uses the domain replication protocol to request password hashes for any account directly from a domain controller, including the krbtgt account needed for Golden Ticket attacks. A Golden Ticket, forged using the krbtgt hash, is a Kerberos ticket-granting ticket that gives the attacker unlimited access to any resource in the domain for as long as they want, persisting even through password resets.",
+            "tools_or_indicators": ["DCSync attack using Mimikatz to replicate credentials directly from domain controllers", "Golden Ticket attack forging Kerberos tickets using the stolen krbtgt hash", "Silver Ticket attacks forging service tickets for specific services", "Exploiting Active Directory Certificate Services (AD CS) for privilege escalation", "Abusing Group Policy to push malicious configurations domain-wide"],
+            "mitre_techniques": ["T1003.006", "T1558.001", "T1558.002", "T1484.001"]
+          },
+          "defender": {
+            "title": "Protecting Domain Administrator Access",
+            "description": "Domain admin accounts should be protected with extreme measures: they should only be used on domain controllers accessed through Privileged Access Workstations (PAWs), never for routine administration. The krbtgt account password should be rotated twice regularly (twice because Kerberos remembers the current and previous password) to invalidate any Golden Tickets. Monitoring for DCSync activity is critical: the domain controller replication protocol should only be used between actual domain controllers, so any other source using it is highly suspicious. Microsoft's Advanced Threat Analytics (ATA) or Defender for Identity specifically detect these advanced Active Directory attacks.",
+            "tools_or_indicators": ["Privileged Access Workstations (PAWs) for domain admin activities", "Regular krbtgt password rotation to invalidate Golden Tickets", "Microsoft Defender for Identity detecting DCSync and Golden Ticket attacks", "Monitoring directory replication (DRS) protocol usage from non-DC sources", "Protected Users security group for high-privilege accounts"],
+            "mitre_techniques": ["T1003.006", "T1558.001", "T1558.002"]
+          },
+          "victim": {
+            "title": "Complete Domain Compromise",
+            "description": "With domain administrator access, the attacker has achieved total control over the organization's Windows environment. They can read anyone's email, access any file share, modify any system configuration, create or delete any account, and push software to any machine through Group Policy. A Golden Ticket attack is particularly devastating because it persists even if every user password in the organization is reset; only rotating the krbtgt password (twice) invalidates it. The organization is now completely compromised, and recovery may require rebuilding Active Directory from scratch, a process that can take weeks or months.",
+            "tools_or_indicators": ["Attacker has unlimited access to all domain resources", "Golden Tickets provide persistent access surviving password resets", "Any user account can be impersonated at will", "Group Policy can be used to push malware to all machines"],
+            "mitre_techniques": ["T1003.006", "T1558.001"]
+          }
+        },
+        {
+          "name": "Establishing Domain Dominance",
+          "order": 6,
+          "attacker": {
+            "title": "Ensuring Persistent Control Across the Domain",
+            "description": "With domain admin access secured, the attacker establishes multiple persistence mechanisms to maintain long-term control even if some are discovered and removed. They create additional admin accounts with innocuous names that blend in with legitimate service accounts. They install backdoors in Group Policy Objects (GPOs) that execute their payload on every machine at boot. They may compromise Active Directory Certificate Services to issue themselves certificates that provide authentication without passwords. The attacker's goal is redundancy: they want so many persistence mechanisms that removing one or even several does not eliminate their access.",
+            "tools_or_indicators": ["Creating backdoor admin accounts disguised as service accounts", "Modifying Group Policy Objects to execute malicious payloads at boot", "Compromising AD Certificate Services for certificate-based authentication persistence", "DCShadow attack to inject rogue objects directly into Active Directory replication", "Skeleton Key attack to create a master password that works for any account"],
+            "mitre_techniques": ["T1136.002", "T1484.001", "T1556.001", "T1207"]
+          },
+          "defender": {
+            "title": "Detecting and Removing Domain-Wide Persistence",
+            "description": "Recovering from a domain-level compromise requires systematic removal of all persistence mechanisms, a process that can be more complex than rebuilding from scratch. Defenders should audit all admin accounts against a known-good baseline, review every Group Policy Object for unauthorized modifications, and check Active Directory Certificate Services for rogue certificates. Microsoft Defender for Identity provides continuous monitoring for these persistence techniques. In severe cases, the recommended recovery is to rebuild Active Directory completely using Microsoft's forest recovery guidance, rotating all credentials including krbtgt, machine accounts, and trust relationships.",
+            "tools_or_indicators": ["Complete audit of all administrative accounts against baselines", "GPO review for unauthorized modifications", "AD Certificate Services audit for rogue certificates", "Microsoft Defender for Identity for continuous AD monitoring", "Active Directory forest recovery procedures for complete compromise"],
+            "mitre_techniques": ["T1136.002", "T1484.001", "T1207"]
+          },
+          "victim": {
+            "title": "Organization Under Persistent Control",
+            "description": "The attacker has achieved domain dominance: they control the organization's entire IT infrastructure through multiple redundant backdoors. Removing the attacker at this point is extraordinarily difficult because they have embedded themselves into the core identity and management systems. The organization may be forced into a complete Active Directory rebuild, which means extended downtime, re-provisioning every user account and machine, and re-establishing all trust relationships. This represents the worst-case scenario for lateral movement: a single compromised workstation has escalated to total organizational compromise.",
+            "tools_or_indicators": ["Multiple hidden persistence mechanisms throughout Active Directory", "Complete IT infrastructure under attacker control", "Recovery requiring potential full Active Directory rebuild"],
+            "mitre_techniques": ["T1136.002", "T1484.001"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "supply-chain-attack",
+      "name": "Supply Chain Attack",
+      "slug": "supply-chain-attack",
+      "short_description": "Sophisticated attack that compromises a trusted vendor, software package, or update mechanism to distribute malware to all downstream users and organizations.",
+      "icon": "📦",
+      "severity": 5,
+      "mitre_id": "T1195",
+      "related_attacks": ["ransomware", "sql-injection", "lateral-movement"],
+      "phases": [
+        {
+          "name": "Vendor/Dependency Identification",
+          "order": 1,
+          "attacker": {
+            "title": "Selecting the Supply Chain Target",
+            "description": "The attacker identifies a software vendor, open-source library, or update mechanism that is widely used by their intended victims. High-value targets include enterprise software vendors like SolarWinds (whose Orion platform was used by 18,000 organizations including US government agencies), popular package registries like npm (JavaScript) and PyPI (Python) where a single compromised package can affect millions of developers, and managed service providers (MSPs) whose tools have direct access to hundreds of client networks. The attacker evaluates targets based on reach (how many downstream users), access (what privileges the software has), and security posture (how easy the vendor is to compromise).",
+            "tools_or_indicators": ["Analyzing software bill of materials (SBOMs) to identify widely-used dependencies", "Researching popular packages on npm, PyPI, and other registries", "Identifying enterprise software vendors with privileged network access", "Evaluating managed service providers (MSPs) that manage multiple client environments", "Studying the target vendor's development and release processes"],
+            "mitre_techniques": ["T1195.001", "T1195.002"]
+          },
+          "defender": {
+            "title": "Understanding and Managing Supply Chain Risk",
+            "description": "Organizations must maintain a complete inventory of all third-party software, libraries, and services they depend on, commonly called a Software Bill of Materials (SBOM). Each dependency represents a potential attack vector and should be assessed for security risk. Vendor security assessments should evaluate not just what the software does but how the vendor secures their development pipeline. Reducing the number of dependencies, pinning specific versions (rather than automatically pulling the latest), and using private package registries that mirror and scan public packages all reduce supply chain risk. The key principle is that every piece of external software you use extends your trust boundary to include that vendor's security practices.",
+            "tools_or_indicators": ["Software Bill of Materials (SBOM) generation and management", "Vendor security assessment questionnaires and audits", "Private package registries mirroring and scanning public repositories", "Dependency pinning to specific reviewed versions", "Software Composition Analysis (SCA) tools like Snyk or Dependabot"],
+            "mitre_techniques": ["T1195.001", "T1195.002"]
+          },
+          "victim": {
+            "title": "Trusting External Software and Vendors",
+            "description": "Organizations depend on hundreds or thousands of external software components, from the operating system itself to tiny open-source libraries buried deep in their application dependencies. Each dependency is built on trust: trust that the vendor's code is not malicious, that their build pipeline is secure, and that their update mechanism has not been compromised. Most organizations have no visibility into how their vendors develop and distribute software. A single compromised component anywhere in this chain of trust can provide an attacker with direct access to the organization's systems, bypassing all perimeter defenses because the malicious code arrives through a trusted channel.",
+            "tools_or_indicators": ["Hundreds of external software dependencies in typical enterprise environments", "Automatic update mechanisms that pull new versions without review", "Trust in vendor code signing and distribution infrastructure"],
+            "mitre_techniques": ["T1195.002"]
+          }
+        },
+        {
+          "name": "Compromise of Build Pipeline",
+          "order": 2,
+          "attacker": {
+            "title": "Infiltrating the Development and Build Environment",
+            "description": "The attacker compromises the target vendor's software development infrastructure. This could involve phishing a developer to gain access to the source code repository, compromising the CI/CD (Continuous Integration/Continuous Deployment) pipeline that automatically builds and packages the software, or gaining access to the code signing certificates used to mark builds as legitimate. In the SolarWinds attack, the attackers (attributed to Russian intelligence) inserted malicious code into the build process itself so that the malicious version was compiled, signed with SolarWinds' legitimate certificate, and distributed through their normal update channels, making it virtually undetectable.",
+            "tools_or_indicators": ["Compromising developer accounts through phishing or credential theft", "Infiltrating CI/CD pipelines (Jenkins, GitHub Actions, GitLab CI) to modify the build process", "Stealing code signing certificates to sign malicious builds as legitimate", "Inserting backdoors directly into source code repositories", "Compromising build servers to inject code during compilation"],
+            "mitre_techniques": ["T1195.002", "T1199", "T1553.002"]
+          },
+          "defender": {
+            "title": "Securing the Software Development Pipeline",
+            "description": "Software vendors must treat their build pipeline as critical infrastructure. Implementing SLSA (Supply chain Levels for Software Artifacts) framework provides a graduated approach to build pipeline security. All source code changes should require multi-person review. Build environments should be ephemeral (created fresh for each build and destroyed afterward) to prevent persistent compromise. Code signing certificates should be stored in hardware security modules (HSMs) that require multi-party authorization. Reproducible builds, where the same source code always produces the same binary, allow independent verification that no unauthorized code was inserted during the build process.",
+            "tools_or_indicators": ["SLSA framework for supply chain security levels", "Multi-person code review requirements for all changes", "Ephemeral build environments created and destroyed for each build", "Hardware Security Modules (HSMs) for code signing key protection", "Reproducible builds for independent verification", "Sigstore for transparent code signing"],
+            "mitre_techniques": ["T1195.002", "T1553.002"]
+          },
+          "victim": {
+            "title": "Vendor's Build System Compromised",
+            "description": "The vendor that the organization trusts has had their build pipeline compromised. From this point forward, every software update the vendor produces may contain malicious code, and it will be signed with the vendor's legitimate certificate so it appears completely authentic. The downstream organizations, the ultimate victims, have no way to detect this compromise because they verify software integrity by checking the vendor's signature, and the signature is genuine. The vendor themselves may not know their pipeline is compromised for weeks or months, during which every customer who updates receives the backdoored version.",
+            "tools_or_indicators": ["Vendor's build pipeline producing backdoored software with legitimate signatures", "No way for downstream customers to distinguish malicious builds from clean ones", "Vendor potentially unaware of the compromise for extended periods"],
+            "mitre_techniques": ["T1195.002"]
+          }
+        },
+        {
+          "name": "Malicious Payload Injection",
+          "order": 3,
+          "attacker": {
+            "title": "Inserting the Backdoor into Legitimate Code",
+            "description": "The attacker carefully inserts malicious code into the legitimate software in a way that avoids detection during code review. The backdoor is typically designed to be stealthy: it may only activate under specific conditions, communicate with C2 servers using encrypted channels that mimic normal traffic, and lie dormant for a configurable period before activating to avoid immediate detection. In the SolarWinds case, the SUNBURST backdoor waited 12-14 days before activating, checked for security tools and sandboxes before running, and communicated through DNS queries that looked like normal SolarWinds telemetry. For open-source package attacks, techniques include typosquatting (publishing 'loadsh' instead of 'lodash') or dependency confusion (publishing a higher-version internal package name to a public registry).",
+            "tools_or_indicators": ["Dormant backdoors that activate only after a delay period", "C2 communication disguised as legitimate application traffic", "Typosquatting on package registries (e.g., publishing packages with names similar to popular libraries)", "Dependency confusion attacks exploiting how package managers resolve internal vs public packages", "Obfuscated code inserted to avoid detection during code review"],
+            "mitre_techniques": ["T1195.001", "T1195.002", "T1027"]
+          },
+          "defender": {
+            "title": "Detecting Malicious Code in Dependencies",
+            "description": "Static analysis tools can scan source code and compiled binaries for suspicious patterns like obfuscated code, unexpected network communications, or calls to sensitive system APIs. Package analysis tools like Socket.dev for npm specifically look for supply chain attack indicators such as install scripts that run arbitrary code, unexpected network access, or filesystem operations. Sandboxed execution of new software versions before deployment into production can reveal hidden behaviors like C2 communication. Comparing the vendor-provided binary against an independently compiled version (if source is available) can detect build pipeline compromises that insert code not present in the source repository.",
+            "tools_or_indicators": ["Static analysis scanning for suspicious patterns in dependencies", "Socket.dev analyzing npm packages for supply chain attack indicators", "Sandboxed execution of new versions before production deployment", "Binary analysis comparing vendor builds against independent compilations", "Runtime monitoring for unexpected network or filesystem behavior"],
+            "mitre_techniques": ["T1195.001", "T1195.002"]
+          },
+          "victim": {
+            "title": "Malicious Code Embedded in Trusted Software",
+            "description": "A trusted piece of software that the organization uses daily now contains a hidden backdoor. The malicious code is buried within thousands or millions of lines of legitimate code, signed with a valid certificate, and distributed through official channels. It passed the vendor's quality assurance, code signing, and distribution processes because the attacker compromised those very processes. The organization has no practical way to detect the backdoor through its normal software intake procedures because everything about the update appears legitimate. This represents the fundamental challenge of supply chain security: you cannot be more secure than your weakest trusted supplier.",
+            "tools_or_indicators": ["Backdoored software appears identical to legitimate versions", "Valid code signatures provide false sense of security", "Malicious code hidden among millions of lines of legitimate code"],
+            "mitre_techniques": ["T1195.002"]
+          }
+        },
+        {
+          "name": "Distribution via Trusted Channels",
+          "order": 4,
+          "attacker": {
+            "title": "Delivering Malware Through Legitimate Update Mechanisms",
+            "description": "The compromised software update is distributed through the vendor's official update servers, package registry, or app store, the exact same channel that delivers legitimate updates. Organizations that have automatic updates enabled receive the backdoored version without any human intervention. The update passes all integrity checks because it is genuinely signed by the vendor. The attacker benefits from massive scale: a single compromised update can reach thousands or millions of systems simultaneously. This distribution mechanism is what makes supply chain attacks so efficient; the attacker compromises one point but gains access to the vendor's entire customer base.",
+            "tools_or_indicators": ["Official update servers distributing the compromised version", "Automatic update mechanisms pulling the backdoored software", "Package registries (npm, PyPI, Maven) serving the malicious package", "Legitimate code signatures passing all integrity verification", "CDN distribution amplifying the reach to all global users"],
+            "mitre_techniques": ["T1195.002", "T1072"]
+          },
+          "defender": {
+            "title": "Controlling Software Deployment and Updates",
+            "description": "Organizations should never allow automatic updates from any vendor directly to production systems. A staged deployment model where updates first go to an isolated testing environment, then to a small pilot group, and only then to the broader organization provides time to detect anomalies before mass deployment. Network monitoring should baseline normal software update traffic patterns so that unusual behaviors in newly deployed versions (like unexpected outbound connections or DNS queries) trigger alerts. For critical software, maintaining the ability to quickly roll back to a previous known-good version is essential.",
+            "tools_or_indicators": ["Staged deployment model: test, pilot, then production", "Network baselining to detect unusual behavior in new software versions", "Ability to quickly roll back to previous known-good versions", "Software whitelisting preventing unauthorized applications", "Change management processes requiring approval for all software updates"],
+            "mitre_techniques": ["T1195.002", "T1072"]
+          },
+          "victim": {
+            "title": "Receiving the Compromised Update",
+            "description": "The organization's automated update system downloads and installs the backdoored software version, or a developer runs 'npm install' and pulls the compromised package into their project. The update appears completely normal: it comes from the correct server, passes signature verification, and may even include legitimate bug fixes and features alongside the hidden backdoor. If automatic updates are enabled, the compromised software may be running on every relevant system in the organization within hours. The organization's own update infrastructure, designed to keep systems secure and current, has become the delivery mechanism for the attack.",
+            "tools_or_indicators": ["Automatic updates installing the compromised version across the organization", "Package managers pulling the backdoored dependency", "All standard integrity checks passing despite the embedded malware"],
+            "mitre_techniques": ["T1195.002"]
+          }
+        },
+        {
+          "name": "Downstream Exploitation",
+          "order": 5,
+          "attacker": {
+            "title": "Exploiting Access in Target Organizations",
+            "description": "With the backdoor deployed across thousands of organizations, the attacker selectively activates it in their chosen targets. Not every infected organization is exploited; the attacker prioritizes high-value targets like government agencies, defense contractors, and major corporations. The backdoor provides initial access that the attacker then expands through standard post-exploitation techniques: credential harvesting, lateral movement, privilege escalation, and data exfiltration. Because the backdoor exists within trusted software that typically has elevated privileges and network access, the attacker starts from a much stronger position than a typical phishing-based compromise would provide.",
+            "tools_or_indicators": ["Selective activation of the backdoor in high-value target organizations", "C2 communication established through the compromised software's network access", "Credential harvesting and lateral movement from the privileged position of trusted software", "Data exfiltration using the software's existing network permissions", "Long-term persistent access through the trusted software's ongoing presence"],
+            "mitre_techniques": ["T1195.002", "T1078", "T1021", "T1048"]
+          },
+          "defender": {
+            "title": "Detecting and Responding to Supply Chain Compromise",
+            "description": "Detecting a supply chain compromise requires monitoring for behavioral anomalies in trusted software: unexpected network connections, unusual process spawning, file system access outside the software's normal scope, and DNS queries to previously unseen domains. Threat intelligence sharing is critical because supply chain attacks affect many organizations simultaneously; participating in ISACs (Information Sharing and Analysis Centers) and monitoring vendor security advisories helps organizations learn about compromises discovered by others. When a supply chain compromise is confirmed, the response must include isolating all systems running the affected software, conducting a full investigation to determine if the backdoor was activated in your environment, and planning for the possibility that the attacker has already established independent persistence.",
+            "tools_or_indicators": ["Behavioral monitoring for anomalies in trusted software", "Threat intelligence sharing through ISACs and industry groups", "Vendor security advisory monitoring", "Network traffic analysis for unexpected C2 communication", "Full forensic investigation of all systems running affected software", "Assuming breach and hunting for independent persistence mechanisms"],
+            "mitre_techniques": ["T1195.002", "T1078", "T1021"]
+          },
+          "victim": {
+            "title": "Compromised Through a Trusted Vendor",
+            "description": "The organization has been compromised not through any failure of their own security but through the trust they placed in a vendor. Their firewalls, endpoint protection, email filtering, and security training were all irrelevant because the attack came through an officially sanctioned software update. The backdoor may have been active for weeks or months before discovery, during which the attacker had access to the organization's most sensitive systems and data. Recovery is complex because the organization must not only remove the compromised software but also investigate and remediate any additional access the attacker established during the period of compromise. Supply chain attacks represent the most challenging threat in modern cybersecurity because they undermine the fundamental trust model that organizations depend on.",
+            "tools_or_indicators": ["Compromise bypassed all perimeter and endpoint security controls", "Backdoor potentially active for weeks or months before discovery", "Recovery requires removing compromised software AND all attacker persistence", "Fundamental trust in vendor relationship has been violated"],
+            "mitre_techniques": ["T1195.002", "T1078"]
+          }
+        }
+      ]
+    }
+  ]
+}
