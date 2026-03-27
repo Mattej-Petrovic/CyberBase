@@ -552,7 +552,15 @@ class AFRenderer {
   _drawNodes(nodes, state, perspective, colors) {
     this.ngGroup.innerHTML = '';
     const NS = this.NS;
-    const W = 72, H = 52, RX = 4;
+    const W = 110, H = 64, RX = 4;
+
+    // Unique clipPath id counter per render pass (reset each call)
+    let clipIdx = 0;
+    const defs = this.svg?.querySelector('defs') || (() => {
+      const d = document.createElementNS(NS, 'defs'); this.svg?.prepend(d); return d;
+    })();
+    // Remove stale node clipPaths
+    defs.querySelectorAll('[id^="nc-"]').forEach(el => el.remove());
 
     nodes.forEach(node => {
       const isDefNode = !!node._isDefender;
@@ -564,7 +572,7 @@ class AFRenderer {
 
       const g = document.createElementNS(NS, 'g');
       g.setAttribute('transform', `translate(${node.x - W/2},${node.y - H/2})`);
-      g.style.opacity    = isGhost ? '0.1' : isDim ? '0.2' : '1';
+      g.style.opacity    = isGhost ? '0.25' : isDim ? '0.2' : '1';
       g.style.transition = 'opacity .35s';
       g.style.cursor     = 'default';
 
@@ -596,26 +604,40 @@ class AFRenderer {
         fill:bgColor,stroke:borderColor,'stroke-width':isAct||isDet||isComp?'1.5':'1'});
       g.appendChild(box);
 
+      // clipPath for text — prevents label/sublabel overflow beyond node rect
+      const clipId = `nc-${node.id}-${clipIdx++}`;
+      const cp = document.createElementNS(NS, 'clipPath');
+      cp.setAttribute('id', clipId);
+      const cpr = document.createElementNS(NS, 'rect');
+      this._attrs(cpr, {x:'3',y:'28',width:String(W-6),height:String(H-30)});
+      cp.appendChild(cpr);
+      defs.appendChild(cp);
+
       const iconId = AF_ICONS[node.type] || 'ic-server';
       const ic = document.createElementNS(NS, 'use');
-      this._attrs(ic, {href:`#${iconId}`,x:String(W/2-10),y:'6',width:'20',height:'20'});
+      this._attrs(ic, {href:`#${iconId}`,x:String(W/2-10),y:'7',width:'20',height:'20'});
       ic.style.color = iconColor;
       g.appendChild(ic);
 
+      const textG = document.createElementNS(NS, 'g');
+      textG.setAttribute('clip-path', `url(#${clipId})`);
+
       const lbl = document.createElementNS(NS, 'text');
-      this._attrs(lbl, {x:String(W/2),y:'36','text-anchor':'middle',
-        'font-size':'7.5','font-family':'ui-monospace,monospace',
+      this._attrs(lbl, {x:String(W/2),y:'42','text-anchor':'middle',
+        'font-size':'8','font-family':'ui-monospace,monospace',
         fill:isAct||isDet||isComp?'#e2e8f0':'#4a5568','font-weight':'600','letter-spacing':'0.3'});
       lbl.textContent = (node.label || '').toUpperCase();
-      g.appendChild(lbl);
+      textG.appendChild(lbl);
 
       if (node.sublabel) {
         const sub = document.createElementNS(NS, 'text');
-        this._attrs(sub, {x:String(W/2),y:'47','text-anchor':'middle',
+        this._attrs(sub, {x:String(W/2),y:'54','text-anchor':'middle',
           'font-size':'7','font-family':'ui-monospace,monospace',fill:'#8b949e'});
         sub.textContent = node.sublabel;
-        g.appendChild(sub);
+        textG.appendChild(sub);
       }
+
+      g.appendChild(textG);
 
       if (isComp) {
         const bg = document.createElementNS(NS, 'g');
@@ -642,6 +664,14 @@ class AFRenderer {
         bt.textContent = 'DETECT';
         bg.append(br, bt);
         g.appendChild(bg);
+      }
+
+      if (isGhost) {
+        const ht = document.createElementNS(NS, 'text');
+        this._attrs(ht, {x:String(W/2),y:String(H+14),'text-anchor':'middle',
+          'font-size':'7','font-family':'ui-monospace,monospace',fill:'#6b7280','letter-spacing':'0.3'});
+        ht.textContent = '(hidden)';
+        g.appendChild(ht);
       }
 
       g.addEventListener('mouseenter', e => this._showTooltip(e, node, isAct, isDet, isComp, colors));
@@ -679,7 +709,7 @@ class AFRenderer {
         state.tools.slice(0, 3).forEach((tool, i) => {
           const tw = tool.length * 6 + 12;
           const tx = atkNode.x + (i - 1) * (BADGE_W + 4) - tw/2;
-          const ty = atkNode.y - 44;
+          const ty = atkNode.y - 52;
           const bg = document.createElementNS(this.NS, 'rect');
           this._attrs(bg, {x:String(tx),y:String(ty-10),width:String(tw),height:'14',rx:'3',
             fill:'rgba(239,68,68,.18)',stroke:'rgba(239,68,68,.4)','stroke-width':'1'});
