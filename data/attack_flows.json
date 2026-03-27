@@ -734,7 +734,7 @@
       "icon": "🕸️",
       "severity": 4,
       "mitre_id": "T1021",
-      "related_attacks": ["brute-force", "ransomware", "man-in-the-middle"],
+      "related_attacks": ["brute-force", "ransomware", "man-in-the-middle", "supply-chain-attack"],
       "phases": [
         {
           "name": "Initial Compromise",

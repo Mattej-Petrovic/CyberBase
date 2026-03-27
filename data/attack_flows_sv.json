@@ -1491,7 +1491,8 @@
       "related_attacks": [
         "brute-force",
         "ransomware",
-        "man-in-the-middle"
+        "man-in-the-middle",
+        "supply-chain-attack"
       ],
       "phases": [
         {
