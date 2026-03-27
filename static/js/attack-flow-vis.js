@@ -11,6 +11,26 @@
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Node type descriptions — shown in tooltip for zero-knowledge comprehension
+// ─────────────────────────────────────────────────────────────────────────────
+const AF_NODE_DESC = {
+  attacker:    'The threat actor performing the attack',
+  server:      'A networked computer providing services',
+  cloud:       'Internet or cloud infrastructure',
+  victim:      'The targeted user or device',
+  firewall:    'Security tool that filters network traffic',
+  siem:        'SIEM — Security Information & Event Management; collects and analyzes security logs',
+  edr:         'EDR — Endpoint Detection & Response; monitors devices for threats',
+  database:    'Stores application or user data',
+  c2:          'C2 — Command & Control; attacker\'s remote server for managing malware',
+  router:      'Network device that routes traffic between systems',
+  workstation: 'A user\'s desktop or laptop computer',
+  registry:    'Package or software repository',
+  browser:     'Web browser or web application',
+  envelope:    'Email server or mail gateway',
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Icon map: node type → symbol id
 // ─────────────────────────────────────────────────────────────────────────────
 const AF_ICONS = {
@@ -698,7 +718,7 @@ class AFRenderer {
     if (!tip) {
       tip = document.createElement('div');
       tip.id = 'af-tooltip';
-      tip.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;background:#0d1117;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:7px 11px;font-size:11px;color:#cbd5e1;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.6);opacity:0;transition:opacity .15s;max-width:160px;';
+      tip.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;background:#0d1117;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:7px 11px;font-size:11px;color:#cbd5e1;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.6);opacity:0;transition:opacity .15s;max-width:220px;';
       document.body.appendChild(tip);
     }
     return tip;
@@ -709,7 +729,8 @@ class AFRenderer {
       : isDet  ? `<span style="color:#3b82f6">● Monitoring</span>`
       : isAct  ? `<span style="color:${colors.accent}">● Active</span>`
       : `<span style="color:#374151">○ Idle</span>`;
-    this._tooltip.innerHTML = `<div style="font-weight:600;color:#f1f5f9;margin-bottom:2px">${node.label}</div>${status}${node.sublabel?`<br><span style="color:#6b7280;font-size:10px">${node.sublabel}</span>`:''}`;
+    const desc = AF_NODE_DESC[node.type] || '';
+    this._tooltip.innerHTML = `<div style="font-weight:600;color:#f1f5f9;margin-bottom:2px">${node.label}</div>${status}${node.sublabel?`<br><span style="color:#6b7280;font-size:10px">${node.sublabel}</span>`:''}${desc?`<br><span style="color:#64748b;font-size:10px;display:block;margin-top:3px">${desc}</span>`:''}`;
     this._tooltip.style.opacity = '1';
     this._moveTooltip(e);
     document.addEventListener('mousemove', this._boundMove = ev => this._moveTooltip(ev), {passive:true});
