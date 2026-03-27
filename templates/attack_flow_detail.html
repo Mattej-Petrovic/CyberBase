@@ -221,15 +221,15 @@ const _AF = {
             <line x1="20" y1="4" x2="14" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             <line x1="20" y1="4" x2="26" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </symbol>
+          <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+            <stop offset="0%" stop-color="transparent"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,.45)"/>
+          </radialGradient>
         </defs>
 
         <!-- Background grid -->
         <rect width="1100" height="520" fill="url(#af-grid)"/>
         <!-- Subtle vignette -->
-        <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
-          <stop offset="0%" stop-color="transparent"/>
-          <stop offset="100%" stop-color="rgba(0,0,0,.45)"/>
-        </radialGradient>
         <rect width="1100" height="520" fill="url(#vignette)"/>
 
         <!-- Rendering target groups -->

@@ -234,7 +234,7 @@ class AFRenderer {
       this._attrs(lbl, {x:String(W/2),y:'36','text-anchor':'middle',
         'font-size':'7.5','font-family':'ui-monospace,monospace',
         fill:isAct||isDet||isComp?'#e2e8f0':'#4a5568','font-weight':'600','letter-spacing':'0.3'});
-      lbl.textContent = node.label.toUpperCase();
+      lbl.textContent = (node.label || '').toUpperCase();
       g.appendChild(lbl);
 
       if (node.sublabel) {
@@ -281,8 +281,8 @@ class AFRenderer {
 
   // ── draw overlays ─────────────────────────────────────────────────────────
   _drawOverlays(state, perspective, colors, nmap) {
-    this.ogGroup.innerHTML = '';
     this._stopScanBeam();
+    this.ogGroup.innerHTML = '';
 
     if (perspective === 'defender' && state.activeNodes.size > 0) {
       this._startScanBeam(colors.accent);
@@ -303,9 +303,10 @@ class AFRenderer {
         .map(id => nmap[id]).filter(Boolean)
         .find(n => n.type === 'attacker');
       if (atkNode) {
+        const BADGE_W = 70; // fixed badge slot width for consistent spacing
         state.tools.slice(0, 3).forEach((tool, i) => {
           const tw = tool.length * 6 + 12;
-          const tx = atkNode.x - tw/2 + (i - 1) * (tw + 4);
+          const tx = atkNode.x + (i - 1) * (BADGE_W + 4) - tw/2;
           const ty = atkNode.y - 44;
           const bg = document.createElementNS(this.NS, 'rect');
           this._attrs(bg, {x:String(tx),y:String(ty-10),width:String(tw),height:'14',rx:'3',
