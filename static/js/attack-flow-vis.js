@@ -58,17 +58,17 @@ const AF_TOPOLOGIES = {};
 AF_TOPOLOGIES['phishing'] = {
   nodes: {
     base: [
-      { id:'atk',  type:'attacker', label:'Attacker',           sublabel:'Kali Linux',     x:90,  y:260 },
-      { id:'mail', type:'envelope', label:'Mail Server',        sublabel:'SMTP/587',       x:290, y:260 },
-      { id:'inet', type:'cloud',    label:'Internet',           sublabel:'Public Routing', x:510, y:260 },
-      { id:'usr',  type:'victim',   label:'Victim Workstation', sublabel:'Windows 11',     x:730, y:260 },
-      { id:'fake', type:'browser',  label:'Fake Login Page',    sublabel:'Evilginx2',      x:730, y:420 },
-      { id:'c2',   type:'c2',       label:'C2 Server',          sublabel:'VPS/TOR',        x:960, y:260 },
+      { id:'atk',  type:'attacker', label:'Attacker',           sublabel:'Kali Linux',     x:100, y:300 },
+      { id:'mail', type:'envelope', label:'Mail Server',        sublabel:'SMTP/587',       x:310, y:300 },
+      { id:'inet', type:'cloud',    label:'Internet',           sublabel:'Public Routing', x:530, y:300 },
+      { id:'usr',  type:'victim',   label:'Victim Workstation', sublabel:'Windows 11',     x:760, y:300 },
+      { id:'fake', type:'browser',  label:'Fake Login Page',    sublabel:'Evilginx2',      x:760, y:480 },
+      { id:'c2',   type:'c2',       label:'C2 Server',          sublabel:'VPS/TOR',        x:980, y:300 },
     ],
     defender: [
-      { id:'fw',   type:'firewall', label:'Email Gateway', sublabel:'Proofpoint',  x:400, y:120, _isDefender:true },
-      { id:'siem', type:'siem',     label:'SIEM',          sublabel:'Splunk',      x:730, y:120, _isDefender:true },
-      { id:'edr',  type:'edr',      label:'EDR Agent',     sublabel:'CrowdStrike', x:960, y:420, _isDefender:true },
+      { id:'fw',   type:'firewall', label:'Email Gateway', sublabel:'Proofpoint',  x:420, y:120, _isDefender:true },
+      { id:'siem', type:'siem',     label:'SIEM',          sublabel:'Splunk',      x:760, y:120, _isDefender:true },
+      { id:'edr',  type:'edr',      label:'EDR Agent',     sublabel:'CrowdStrike', x:980, y:480, _isDefender:true },
     ],
   },
   edges: [
@@ -107,16 +107,16 @@ AF_TOPOLOGIES['phishing'] = {
 AF_TOPOLOGIES['brute-force'] = {
   nodes: {
     base: [
-      { id:'atk',  type:'attacker',  label:'Attacker',       sublabel:'Kali Linux',  x:90,  y:260 },
-      { id:'lst',  type:'database',  label:'Credential List',sublabel:'rockyou.txt', x:90,  y:420 },
-      { id:'lgn',  type:'browser',   label:'Login Portal',   sublabel:'Target App',  x:380, y:260 },
-      { id:'auth', type:'server',    label:'Auth Server',    sublabel:'LDAP/AD',     x:650, y:160 },
+      { id:'atk',  type:'attacker',  label:'Attacker',       sublabel:'Kali Linux',  x:100, y:260 },
+      { id:'lst',  type:'database',  label:'Credential List',sublabel:'rockyou.txt', x:100, y:460 },
+      { id:'lgn',  type:'browser',   label:'Login Portal',   sublabel:'Target App',  x:370, y:360 },
+      { id:'auth', type:'server',    label:'Auth Server',    sublabel:'LDAP/AD',     x:640, y:200 },
       { id:'db',   type:'database',  label:'User Database',  sublabel:'PostgreSQL',  x:900, y:260 },
-      { id:'acc',  type:'victim',    label:'Victim Account', sublabel:'Compromised', x:900, y:420 },
+      { id:'acc',  type:'victim',    label:'Victim Account', sublabel:'Compromised', x:900, y:460 },
     ],
     defender: [
-      { id:'waf',  type:'firewall', label:'WAF',          sublabel:'ModSecurity', x:380, y:100, _isDefender:true },
-      { id:'rate', type:'firewall', label:'Rate Limiter', sublabel:'Nginx',       x:650, y:380, _isDefender:true },
+      { id:'waf',  type:'firewall', label:'WAF',          sublabel:'ModSecurity', x:370, y:100, _isDefender:true },
+      { id:'rate', type:'firewall', label:'Rate Limiter', sublabel:'Nginx',       x:640, y:460, _isDefender:true },
       { id:'siem', type:'siem',     label:'SIEM',         sublabel:'Splunk',      x:900, y:100, _isDefender:true },
     ],
   },
@@ -153,17 +153,17 @@ AF_TOPOLOGIES['brute-force'] = {
 AF_TOPOLOGIES['sql-injection'] = {
   nodes: {
     base: [
-      { id:'atk', type:'attacker', label:'Attacker',        sublabel:'sqlmap/manual', x:90,  y:260 },
-      { id:'web', type:'browser',  label:'Web Application', sublabel:'Target Site',   x:320, y:260 },
-      { id:'srv', type:'server',   label:'Web Server',      sublabel:'Apache/Nginx',  x:560, y:160 },
-      { id:'app', type:'server',   label:'App Server',      sublabel:'Python/PHP',    x:560, y:380 },
-      { id:'db',  type:'database', label:'Database',        sublabel:'MySQL/MSSQL',   x:820, y:260 },
-      { id:'exf', type:'c2',       label:'Exfil Target',    sublabel:'Attacker Host', x:960, y:420 },
+      { id:'atk', type:'attacker', label:'Attacker',        sublabel:'sqlmap/manual', x:100, y:300 },
+      { id:'web', type:'browser',  label:'Web Application', sublabel:'Target Site',   x:320, y:300 },
+      { id:'srv', type:'server',   label:'Web Server',      sublabel:'Apache/Nginx',  x:580, y:160 },
+      { id:'app', type:'server',   label:'App Server',      sublabel:'Python/PHP',    x:580, y:440 },
+      { id:'db',  type:'database', label:'Database',        sublabel:'MySQL/MSSQL',   x:840, y:300 },
+      { id:'exf', type:'c2',       label:'Exfil Target',    sublabel:'Attacker Host', x:1000,y:460 },
     ],
     defender: [
-      { id:'waf',  type:'firewall', label:'WAF',  sublabel:'Cloudflare', x:320, y:55,  _isDefender:true },
-      { id:'ids',  type:'edr',      label:'IDS',  sublabel:'Snort',      x:820, y:55,  _isDefender:true },
-      { id:'siem', type:'siem',     label:'SIEM', sublabel:'Splunk',     x:560, y:55,  _isDefender:true },
+      { id:'waf',  type:'firewall', label:'WAF',  sublabel:'Cloudflare', x:320, y:100, _isDefender:true },
+      { id:'siem', type:'siem',     label:'SIEM', sublabel:'Splunk',     x:580, y:100, _isDefender:true },
+      { id:'ids',  type:'edr',      label:'IDS',  sublabel:'Snort',      x:840, y:100, _isDefender:true },
     ],
   },
   edges: [
@@ -203,16 +203,16 @@ AF_TOPOLOGIES['sql-injection'] = {
 AF_TOPOLOGIES['man-in-the-middle'] = {
   nodes: {
     base: [
-      { id:'vic',  type:'victim',   label:'Victim Device',  sublabel:'Windows/Mac',   x:90,  y:260 },
-      { id:'rtr',  type:'router',   label:'Router / AP',    sublabel:'802.11',        x:350, y:390 },
-      { id:'atk',  type:'attacker', label:'Attacker',       sublabel:'MitM Position', x:560, y:260 },
-      { id:'srv',  type:'server',   label:'Target Server',  sublabel:'HTTPS',         x:870, y:260 },
-      { id:'cert', type:'browser',  label:'Fake Cert',      sublabel:'Self-Signed',   x:560, y:420 },
+      { id:'vic',  type:'victim',   label:'Victim Device',  sublabel:'Windows/Mac',   x:100, y:300 },
+      { id:'rtr',  type:'router',   label:'Router / AP',    sublabel:'802.11',        x:340, y:460 },
+      { id:'atk',  type:'attacker', label:'Attacker',       sublabel:'MitM Position', x:580, y:300 },
+      { id:'srv',  type:'server',   label:'Target Server',  sublabel:'HTTPS',         x:900, y:300 },
+      { id:'cert', type:'browser',  label:'Fake Cert',      sublabel:'Self-Signed',   x:580, y:480 },
     ],
     defender: [
-      { id:'ids',  type:'edr',     label:'IDS/IPS',      sublabel:'Suricata',    x:350, y:130, _isDefender:true },
-      { id:'ca',   type:'server',  label:'Cert Monitor', sublabel:'HSTS Preload',x:870, y:120, _isDefender:true },
-      { id:'siem', type:'siem',    label:'SIEM',         sublabel:'Splunk',      x:560, y:100, _isDefender:true },
+      { id:'ids',  type:'edr',     label:'IDS/IPS',      sublabel:'Suricata',    x:340, y:120, _isDefender:true },
+      { id:'siem', type:'siem',    label:'SIEM',         sublabel:'Splunk',      x:580, y:120, _isDefender:true },
+      { id:'ca',   type:'server',  label:'Cert Monitor', sublabel:'HSTS Preload',x:900, y:120, _isDefender:true },
     ],
   },
   edges: [
@@ -254,18 +254,18 @@ AF_TOPOLOGIES['man-in-the-middle'] = {
 AF_TOPOLOGIES['ransomware'] = {
   nodes: {
     base: [
-      { id:'atk', type:'attacker',  label:'Attacker',          sublabel:'Threat Actor',     x:90,  y:260 },
-      { id:'vic', type:'victim',    label:'Victim Workstation', sublabel:'Windows',         x:290, y:260 },
-      { id:'c2',  type:'c2',        label:'C2 Server',         sublabel:'TOR/VPS',          x:490, y:120 },
-      { id:'dc',  type:'server',    label:'Domain Controller', sublabel:'Active Directory', x:720, y:120 },
-      { id:'fs',  type:'database',  label:'File Server',       sublabel:'SMB Share',        x:720, y:260 },
-      { id:'bak', type:'server',    label:'Backup Server',     sublabel:'Network Backup',   x:720, y:420 },
-      { id:'enc', type:'database',  label:'Encrypted Files',   sublabel:'Locked Data',      x:960, y:260 },
+      { id:'atk', type:'attacker',  label:'Attacker',           sublabel:'Threat Actor',     x:100, y:300 },
+      { id:'vic', type:'victim',    label:'Victim Workstation', sublabel:'Windows',           x:310, y:300 },
+      { id:'c2',  type:'c2',        label:'C2 Server',          sublabel:'TOR/VPS',           x:520, y:140 },
+      { id:'dc',  type:'server',    label:'Domain Controller',  sublabel:'Active Directory',  x:740, y:140 },
+      { id:'fs',  type:'database',  label:'File Server',        sublabel:'SMB Share',         x:740, y:300 },
+      { id:'bak', type:'server',    label:'Backup Server',      sublabel:'Network Backup',    x:740, y:460 },
+      { id:'enc', type:'database',  label:'Encrypted Files',    sublabel:'Locked Data',       x:980, y:300 },
     ],
     defender: [
-      { id:'edr',  type:'edr',      label:'EDR Agent',      sublabel:'CrowdStrike', x:290, y:100, _isDefender:true },
-      { id:'siem', type:'siem',     label:'SIEM',           sublabel:'Splunk',      x:960, y:120, _isDefender:true },
-      { id:'bakm', type:'firewall', label:'Backup Monitor', sublabel:'Veeam',       x:960, y:420, _isDefender:true },
+      { id:'edr',  type:'edr',      label:'EDR Agent',      sublabel:'CrowdStrike', x:310, y:100, _isDefender:true },
+      { id:'siem', type:'siem',     label:'SIEM',           sublabel:'Splunk',      x:980, y:120, _isDefender:true },
+      { id:'bakm', type:'firewall', label:'Backup Monitor', sublabel:'Veeam',       x:980, y:460, _isDefender:true },
     ],
   },
   edges: [
@@ -310,17 +310,17 @@ AF_TOPOLOGIES['ransomware'] = {
 AF_TOPOLOGIES['lateral-movement'] = {
   nodes: {
     base: [
-      { id:'atk', type:'attacker',    label:'Attacker Foothold', sublabel:'Compromised PC', x:90,  y:260 },
-      { id:'h1',  type:'workstation', label:'Workstation A',     sublabel:'Internal PC',    x:310, y:260 },
-      { id:'ad',  type:'server',      label:'Active Directory',  sublabel:'AD Server',      x:550, y:140 },
-      { id:'dc',  type:'server',      label:'Domain Controller', sublabel:'DC',             x:780, y:140 },
-      { id:'h2',  type:'workstation', label:'Workstation B',     sublabel:'Target PC',      x:550, y:400 },
-      { id:'fs',  type:'database',    label:'File Server',       sublabel:'SMB',            x:960, y:260 },
+      { id:'atk', type:'attacker',    label:'Attacker Foothold', sublabel:'Compromised PC', x:100, y:300 },
+      { id:'h1',  type:'workstation', label:'Workstation A',     sublabel:'Internal PC',    x:320, y:300 },
+      { id:'ad',  type:'server',      label:'Active Directory',  sublabel:'AD Server',      x:560, y:160 },
+      { id:'dc',  type:'server',      label:'Domain Controller', sublabel:'DC',             x:800, y:160 },
+      { id:'h2',  type:'workstation', label:'Workstation B',     sublabel:'Target PC',      x:560, y:460 },
+      { id:'fs',  type:'database',    label:'File Server',       sublabel:'SMB',            x:1000,y:300 },
     ],
     defender: [
-      { id:'edr',  type:'edr',  label:'EDR Agent',    sublabel:'CrowdStrike', x:310, y:100, _isDefender:true },
-      { id:'ids',  type:'edr',  label:'Network IDS',  sublabel:'Suricata',    x:780, y:400, _isDefender:true },
-      { id:'siem', type:'siem', label:'SIEM',         sublabel:'Splunk',      x:960, y:100, _isDefender:true },
+      { id:'edr',  type:'edr',  label:'EDR Agent',    sublabel:'CrowdStrike', x:320, y:100, _isDefender:true },
+      { id:'ids',  type:'edr',  label:'Network IDS',  sublabel:'Suricata',    x:800, y:460, _isDefender:true },
+      { id:'siem', type:'siem', label:'SIEM',         sublabel:'Splunk',      x:1000,y:100, _isDefender:true },
     ],
   },
   edges: [
@@ -362,18 +362,18 @@ AF_TOPOLOGIES['lateral-movement'] = {
 AF_TOPOLOGIES['supply-chain-attack'] = {
   nodes: {
     base: [
-      { id:'atk',  type:'attacker', label:'Attacker',         sublabel:'Threat Actor',      x:90,  y:260 },
-      { id:'repo', type:'browser',  label:'OSS Repository',   sublabel:'GitHub',            x:310, y:260 },
-      { id:'ci',   type:'server',   label:'CI/CD Pipeline',   sublabel:'GitHub Actions',    x:560, y:260 },
-      { id:'pkg',  type:'registry', label:'Package Registry', sublabel:'npm/PyPI',          x:780, y:260 },
-      { id:'oa',   type:'victim',   label:'Org A',            sublabel:'Downstream Victim', x:960, y:140 },
-      { id:'ob',   type:'victim',   label:'Org B',            sublabel:'Downstream Victim', x:960, y:260 },
-      { id:'oc',   type:'victim',   label:'Org C',            sublabel:'Downstream Victim', x:960, y:400 },
+      { id:'atk',  type:'attacker', label:'Attacker',         sublabel:'Threat Actor',      x:100, y:300 },
+      { id:'repo', type:'browser',  label:'OSS Repository',   sublabel:'GitHub',            x:310, y:300 },
+      { id:'ci',   type:'server',   label:'CI/CD Pipeline',   sublabel:'GitHub Actions',    x:540, y:300 },
+      { id:'pkg',  type:'registry', label:'Package Registry', sublabel:'npm/PyPI',          x:770, y:300 },
+      { id:'oa',   type:'victim',   label:'Org A',            sublabel:'Downstream Victim', x:990, y:200 },
+      { id:'ob',   type:'victim',   label:'Org B',            sublabel:'Downstream Victim', x:990, y:340 },
+      { id:'oc',   type:'victim',   label:'Org C',            sublabel:'Downstream Victim', x:990, y:480 },
     ],
     defender: [
-      { id:'scan', type:'edr',      label:'Dep Scanner',  sublabel:'Snyk',     x:560, y:55,  _isDefender:true },
-      { id:'sign', type:'firewall', label:'Code Signing', sublabel:'Sigstore', x:780, y:55,  _isDefender:true },
-      { id:'siem', type:'siem',     label:'SIEM',         sublabel:'Splunk',   x:960, y:55,  _isDefender:true },
+      { id:'scan', type:'edr',      label:'Dep Scanner',  sublabel:'Snyk',     x:540, y:120, _isDefender:true },
+      { id:'sign', type:'firewall', label:'Code Signing', sublabel:'Sigstore', x:770, y:120, _isDefender:true },
+      { id:'siem', type:'siem',     label:'SIEM',         sublabel:'Splunk',   x:990, y:80,  _isDefender:true },
     ],
   },
   edges: [
@@ -552,7 +552,7 @@ class AFRenderer {
   _drawNodes(nodes, state, perspective, colors) {
     this.ngGroup.innerHTML = '';
     const NS = this.NS;
-    const W = 110, H = 64, RX = 4;
+    const W = 130, H = 72, RX = 4;
 
     // Unique clipPath id counter per render pass (reset each call)
     let clipIdx = 0;
@@ -601,7 +601,7 @@ class AFRenderer {
 
       const box = document.createElementNS(NS, 'rect');
       this._attrs(box, {x:'0',y:'0',width:String(W),height:String(H),rx:String(RX),
-        fill:bgColor,stroke:borderColor,'stroke-width':isAct||isDet||isComp?'1.5':'1'});
+        fill:bgColor,stroke:borderColor,'stroke-width':isAct||isDet||isComp?'2.5':'1'});
       g.appendChild(box);
 
       // clipPath for text — prevents label/sublabel overflow beyond node rect
@@ -609,13 +609,13 @@ class AFRenderer {
       const cp = document.createElementNS(NS, 'clipPath');
       cp.setAttribute('id', clipId);
       const cpr = document.createElementNS(NS, 'rect');
-      this._attrs(cpr, {x:'3',y:'28',width:String(W-6),height:String(H-30)});
+      this._attrs(cpr, {x:'3',y:'32',width:String(W-6),height:String(H-34)});
       cp.appendChild(cpr);
       defs.appendChild(cp);
 
       const iconId = AF_ICONS[node.type] || 'ic-server';
       const ic = document.createElementNS(NS, 'use');
-      this._attrs(ic, {href:`#${iconId}`,x:String(W/2-10),y:'7',width:'20',height:'20'});
+      this._attrs(ic, {href:`#${iconId}`,x:String(W/2-14),y:'7',width:'28',height:'28'});
       ic.style.color = iconColor;
       g.appendChild(ic);
 
@@ -623,16 +623,16 @@ class AFRenderer {
       textG.setAttribute('clip-path', `url(#${clipId})`);
 
       const lbl = document.createElementNS(NS, 'text');
-      this._attrs(lbl, {x:String(W/2),y:'42','text-anchor':'middle',
-        'font-size':'8','font-family':'ui-monospace,monospace',
+      this._attrs(lbl, {x:String(W/2),y:'48','text-anchor':'middle',
+        'font-size':'9','font-family':'ui-monospace,monospace',
         fill:isAct||isDet||isComp?'#e2e8f0':'#4a5568','font-weight':'600','letter-spacing':'0.3'});
       lbl.textContent = (node.label || '').toUpperCase();
       textG.appendChild(lbl);
 
       if (node.sublabel) {
         const sub = document.createElementNS(NS, 'text');
-        this._attrs(sub, {x:String(W/2),y:'54','text-anchor':'middle',
-          'font-size':'7','font-family':'ui-monospace,monospace',fill:'#8b949e'});
+        this._attrs(sub, {x:String(W/2),y:'61','text-anchor':'middle',
+          'font-size':'7.5','font-family':'ui-monospace,monospace',fill:'#8b949e'});
         sub.textContent = node.sublabel;
         textG.appendChild(sub);
       }
@@ -692,7 +692,7 @@ class AFRenderer {
 
     if (perspective === 'victim' && state.activeNodes.size > 0) {
       const svgW = this.svg?.viewBox.baseVal.width  || 1100;
-      const svgH = this.svg?.viewBox.baseVal.height || 520;
+      const svgH = this.svg?.viewBox.baseVal.height || 600;
       this._ensureVignetteGradient(svgW, svgH);
       const rect = document.createElementNS(this.NS, 'rect');
       this._attrs(rect, {x:'0',y:'0',width:String(svgW),height:String(svgH),
@@ -709,7 +709,7 @@ class AFRenderer {
         state.tools.slice(0, 3).forEach((tool, i) => {
           const tw = tool.length * 6 + 12;
           const tx = atkNode.x + (i - 1) * (BADGE_W + 4) - tw/2;
-          const ty = atkNode.y - 52;
+          const ty = atkNode.y - 60;
           const bg = document.createElementNS(this.NS, 'rect');
           this._attrs(bg, {x:String(tx),y:String(ty-10),width:String(tw),height:'14',rx:'3',
             fill:'rgba(239,68,68,.18)',stroke:'rgba(239,68,68,.4)','stroke-width':'1'});
@@ -727,7 +727,7 @@ class AFRenderer {
   _startScanBeam(color) {
     const svg = this.svg;
     if (!svg) return;
-    const svgH = svg.viewBox.baseVal.height || 520;
+    const svgH = svg.viewBox.baseVal.height || 600;
     const svgW = svg.viewBox.baseVal.width  || 1100;
     const beam = document.createElementNS(this.NS, 'rect');
     beam.id = 'af-scan-beam';
