@@ -866,21 +866,22 @@
           },
           "defender": {
             "title": "Skydda nätverksinfrastrukturen",
-            "description": "Dynamic ARP Inspection (DAI) är en switchfunktion som validerar ARP-meddelanden mot en betrodd databas och blockerar falska ARP-svar. DHCP Snooping bygger upp denna betrodda databas automatiskt. Port security på switchar begränsar vilka MAC-adresser som får kommunicera på varje port. Dessa funktioner måste aktiveras medvetet – de flesta switchar har dem avaktiverade som standard.",
+            "description": "Dynamic ARP Inspection (DAI) på nätverksswitchar validerar ARP-paket mot en betrodd bindningstabell och förhindrar ARP-spoofingattacker. 802.1X nätverksåtkomstkontroll säkerställer att bara autentiserade enheter kan ansluta till nätverket, vilket gör det svårare för en angripare att koppla in och börja spoofa. För trådlösa nätverk kan Wireless Intrusion Prevention Systems (WIPS) detektera evil twin-accesspunkter genom att identifiera duplikat-SSID med olika MAC-adresser. Nätverkssegmentering begränsar skadeomfånget: även om en angripare tar position på ett segment kan de inte avlyssna trafik på andra.",
             "tools_or_indicators": [
-              "Dynamic ARP Inspection (DAI)",
-              "DHCP Snooping",
-              "Port Security",
-              "802.1X nätverksautentisering",
-              "Trådlös intrångsdetektering"
+              "Dynamic ARP Inspection (DAI) på hanterade switchar",
+              "802.1X portbaserad nätverksåtkomstkontroll",
+              "Wireless Intrusion Prevention Systems (WIPS)",
+              "Nätverkssegmentering med VLAN",
+              "Statiska ARP-poster för kritisk infrastruktur"
             ],
             "mitre_techniques": [
+              "T1557.001",
               "T1557.002"
             ]
           },
           "victim": {
             "title": "Trafiken omdirigeras obemärkt",
-            "description": "Offrets dator uppdaterar sin ARP-tabell baserat på de falska svaren och börjar skicka all sin nätverkstrafik via angriparens enhet. Ur offrets perspektiv fungerar internet precis som vanligt – sidor laddas, e-post skickas och tas emot. Den enda möjliga indikationen kan vara marginellt långsammare anslutning, vilket de flesta avfärdar som normala nätverksfluktuationer.",
+            "description": "Offrets enhet har lurats att tro att angriparens maskin är nätverksgatewayen. Varje paket offret skickar – oavsett om det gäller webbsurfning, e-post eller åtkomst till företagsresurser – passerar nu genom angriparens system först. Offrets enhet visar ingen varning eller indikation på att detta hänt, eftersom ARP-spoofing opererar på ett nätverkslager som de flesta användare och till och med grundläggande säkerhetsverktyg inte kan se. Offret fortsätter använda nätverket normalt, helt ovetande om att en osynlig mellanhand ser allt.",
             "tools_or_indicators": [
               "Ingen märkbar skillnad för användaren",
               "Eventuellt något långsammare anslutning"
@@ -895,33 +896,37 @@
           "order": 2,
           "attacker": {
             "title": "Passiv avlyssning och analys av nätverkstrafik",
-            "description": "Nu kan angriparen se all trafik som passerar genom sin enhet. Wireshark är ett nätverksanalysverktyg som fångar upp och visuellt presenterar varje paket – man kan se webbsidor som besöks, e-postmeddelanden, DNS-förfrågningar och mycket mer. Okrypterad trafik (HTTP, FTP, Telnet) visas i klartext, inklusive lösenord och sessionstokens. Även krypterad trafik avslöjar metadata som vilka servrar offret kommunicerar med.",
+            "description": "Med all offertrafik som flödar genom sin maskin använder angriparen paketfångstverktyg för att spela in och analysera varje byte. Wireshark, världens mest använda nätverksprotokollanalysator, visar trafiken i realtid med detaljerade protokollnedbrytningar och låter angriparen se DNS-frågor (avslöjar vilka webbplatser offret besöker), HTTP-trafik i klartext och metadata om krypterade anslutningar. Okrypterade protokoll som HTTP, FTP, Telnet och vissa e-postprotokoll exponerar allt inklusive inloggningsuppgifter.",
             "tools_or_indicators": [
-              "Wireshark",
-              "tcpdump",
-              "NetworkMiner",
-              "Bettercap sniffer-modul"
+              "Wireshark – nätverksprotokollanalysator som fångar och visar all nätverkstrafik",
+              "tcpdump – kommandoradsbaserat paketfångstverktyg för att spela in specifik trafik till disk",
+              "NetworkMiner – forensiskt nätverksanalysverktyg som extraherar filer och bilder från fångad trafik",
+              "Bettercap sniffer-moduler för realtidsextraktion av inloggningsuppgifter",
+              "PCredz – extraherar automatiskt inloggningsuppgifter från fångad nätverkstrafik"
             ],
             "mitre_techniques": [
-              "T1040"
+              "T1040",
+              "T1557"
             ]
           },
           "defender": {
             "title": "Kryptera all nätverkstrafik",
-            "description": "Kryptering är det viktigaste försvaret mot avlyssning. HTTPS ska vara obligatoriskt för all webbtrafik, och HSTS (HTTP Strict Transport Security) förhindrar att webbläsare ens försöker kommunicera okrypterat. VPN-tunnlar krypterar all trafik från enheten, oavsett destination. Nätverksövervakning kan dessutom identifiera enheter som vidarebefordrar ovanligt stora mängder trafik.",
+            "description": "Det mest effektiva försvaret mot trafikavlyssning är att kryptera all kommunikation. Att tvinga HTTPS via HSTS-rubriker (HTTP Strict Transport Security) säkerställer att webbläsare aldrig skickar data via okrypterad HTTP. VPN:er krypterar all trafik mellan användarens enhet och VPN-servern. Nätverksövervakningsverktyg bör larma vid ARP-tabellsändringar som indikerar potentiell spoofing. DNS-over-HTTPS (DoH) eller DNS-over-TLS (DoT) förhindrar angriparen från att se vilka webbplatser användare besöker via DNS-frågor.",
             "tools_or_indicators": [
-              "HTTPS Everywhere / HSTS",
-              "VPN-klienter",
-              "Nätverksflödesanalys",
-              "IDS-signaturer för ARP-anomalier"
+              "HSTS (HTTP Strict Transport Security) som tvingar HTTPS på alla anslutningar",
+              "Företags-VPN för kryptering av all trafik på opålitliga nätverk",
+              "DNS-over-HTTPS (DoH) eller DNS-over-TLS (DoT) för krypterad DNS",
+              "ARP-övervakningsverktyg som larmar vid tabellsändringar",
+              "Nätverksövervakning för duplikat MAC-adresser"
             ],
             "mitre_techniques": [
-              "T1040"
+              "T1040",
+              "T1557"
             ]
           },
           "victim": {
             "title": "Varje webbsida och varje klick övervakas",
-            "description": "Allt offret gör på nätverket syns nu för angriparen – webbplatser som besöks, sökningar, inloggningar på okrypterade sidor och filöverföringar. Viktigt förbehåll för TLS-krypterad trafik: TLS 1.3 använder ECDHE (Elliptic Curve Diffie-Hellman Ephemeral) för nyckelutbyte, vilket ger forward secrecy. Det betyder att även om angriparen spelar in all krypterad trafik och senare får tag på serverns privata nyckel kan de INTE dekryptera den lagrade trafiken i efterhand – sessionsnycklarna genereras unikt per session och kastas direkt. För att komma åt innehållet i TLS 1.3-trafik måste angriparen aktivt befinna sig i mitten i realtid och presentera ett certifikat offret litar på.",
+            "description": "Det är värt att vara precis här. För okrypterad HTTP-trafik: angriparen ser allt – URL:er, förfrågningskroppar, svarskroppar, inloggningsuppgifter. För HTTPS-trafik: angriparen ser mål-IP och värdnamn (via TLS SNI) men kan inte läsa payloaden om certifikatet är giltigt. Om servern använder TLS 1.3 med forward secrecy (ECDHE-nyckelutbyte) kan fångade paket inte dekrypteras i efterhand även om serverns privata nyckel senare komprometteras – varje session använder efemera nycklar. TLS 1.2 med RSA-nyckelutbyte har inte den egenskapen. DNS-frågor förblir synliga om inte DNS-over-HTTPS används. DNS-destinationer är kända, HTTP-innehåll är fullt exponerat, och interna applikationer som fortfarande kör HTTP (IoT-enheter, äldre interna appar, skrivarhanterings-sidor) läcker allt.",
             "tools_or_indicators": [
               "All okrypterad data är synlig",
               "DNS-förfrågningar avslöjar besökta sidor",
@@ -937,7 +942,7 @@
           "order": 3,
           "attacker": {
             "title": "Nedgradering av krypterade anslutningar",
-            "description": "Eftersom de flesta moderna webbplatser använder HTTPS-kryptering försöker angriparen tvinga nedgradering till okrypterad HTTP. SSLstrip är ett verktyg som sitter mellan offret och servern och omvandlar HTTPS-länkar till HTTP – offret tror att anslutningen är säker medan trafiken i verkligheten är okrypterad. Angriparen kan också presentera falska SSL-certifikat, men detta genererar vanligtvis varningar i webbläsaren som uppmärksamma användare bör reagera på.",
+            "description": "Eftersom de flesta känsliga trafik krypteras med HTTPS försöker angriparen nedgradera dessa anslutningar till vanlig HTTP så att innehållet blir läsbart. Verktyget sslstrip, skapat av säkerhetsforskaren Moxie Marlinspike, fungerar genom att avlyssna omdirigeringen från HTTP till HTTPS som de flesta webbplatser använder, och håller kvar offret på den okrypterade HTTP-versionen medan angriparen håller en separat krypterad anslutning till den riktiga servern. Offret tror att de surfar normalt, men deras webbläsare visar 'http://' istället för 'https://' – en subtil skillnad de flesta användare aldrig lägger märke till.",
             "tools_or_indicators": [
               "SSLstrip",
               "Bettercap HSTS bypass",
@@ -945,8 +950,7 @@
               "WPAD-manipulation"
             ],
             "mitre_techniques": [
-              "T1557.002",
-              "T1040"
+              "T1557"
             ]
           },
           "defender": {
@@ -959,19 +963,21 @@
               "Utbildning om certifikatvarningar"
             ],
             "mitre_techniques": [
-              "T1557.002"
+              "T1557",
+              "T1565.002"
             ]
           },
           "victim": {
             "title": "Krypteringsskyddet försvinner obemärkt",
-            "description": "Om SSLstrip lyckas ser offret ingen hänglåsikon i webbläsaren, men många användare lägger inte märke till detta. Moderna webbläsare har blivit bättre på att varna, men äldre webbläsare och applikationer kan vara sårbara. Om ett falskt certifikat presenteras visas en varning – men studier visar att en stor andel användare klickar sig förbi varningar utan att läsa dem.",
+            "description": "Offret surfar nu på vad de tror är säkra webbplatser, men hänglåsikonen i webbläsaren kan saknas eller visa HTTP istället för HTTPS. De flesta användare kontrollerar inte aktivt URL-fältet för protokollet, särskilt inte när de är fokuserade på sitt arbete. När offret anger sitt lösenord på vad som verkar vara deras banks webbplats eller företagets e-postinloggning reser uppgifterna i klartext genom angriparens maskin. Moderna webbläsare blir bättre på att varna för osäkra anslutningar, men dessa varningar kan vara subtila och avfärdas ofta av användare.",
             "tools_or_indicators": [
               "Saknad hänglåsikon i webbläsaren",
               "Certifikatvarningar",
               "HTTP istället för HTTPS i adressfältet"
             ],
             "mitre_techniques": [
-              "T1557.002"
+              "T1040",
+              "T1557"
             ]
           }
         },
@@ -980,13 +986,12 @@
           "order": 4,
           "attacker": {
             "title": "Stöld av aktiva sessioner",
-            "description": "Med tillgång till okrypterad trafik kan angriparen fånga upp sessionscookies – små dataposter som webbplatser använder för att hålla reda på att en användare är inloggad. Genom att kopiera denna cookie till sin egen webbläsare kan angriparen ta över offrets session utan att behöva veta lösenordet. Det kallas sessionskapning och ger omedelbar tillgång till allt offret har behörighet till i den aktiva sessionen.",
+            "description": "Även om angriparen inte kan dekryptera det faktiska lösenordet kan de stjäla sessionstoken – små dataposter (kakor) som en webbplats skickar till webbläsaren efter lyckad inloggning. Genom att kopiera dessa sessionskakor till sin egen webbläsare kan angriparen omedelbart bli inloggad som offret utan att någonsin veta lösenordet. Denna teknik, känd som sessionskapning eller sidejacking, är särskilt effektiv mot tjänster som inte ordentligt skyddar sina sessionskakor med flaggor som Secure, HttpOnly och SameSite.",
             "tools_or_indicators": [
-              "Cookie-stöld",
-              "Bettercap http.proxy-modul",
-              "mitmproxy",
-              "Cookie-Editor webbläsartillägg",
-              "Session token replay"
+              "Bettercap http.proxy-modul – avlyssnar och loggar alla HTTP-kakor i realtid från offertraffik",
+              "Wireshark displayfilter: http.cookie – extraherar sessionstoken från fångade HTTP-frames",
+              "mitmproxy – skriptbar proxy som kan skripta för att extrahera och logga kakrubriker från varje svar",
+              "Cookie-Editor webbläsartillägg – injicerar stulna sessionskakevärden i angriparens webbläsare för sessionuppspelning"
             ],
             "mitre_techniques": [
               "T1539",
@@ -995,7 +1000,7 @@
           },
           "defender": {
             "title": "Skydda sessionshantering",
-            "description": "Sessioner ska bindas till specifika egenskaper som IP-adress och webbläsarfingeravtryck, så att en stulen cookie inte fungerar från en annan enhet. Secure- och HttpOnly-flaggor på cookies förhindrar att de skickas över okrypterade anslutningar och att JavaScript kan läsa dem. Korta sessionstider och automatisk utloggning vid inaktivitet begränsar fönstret under vilket en stulen session kan utnyttjas.",
+            "description": "Sessionskakor måste konfigureras med säkerhetsflaggor: 'Secure' säkerställer att kakor bara skickas via HTTPS, 'HttpOnly' förhindrar JavaScript från att läsa dem (försvarar mot XSS-baserad stöld), och 'SameSite' begränsar förfrågningar av korsande ursprung. Sessioner bör bindas till klientens IP-adress och user agent, så att stulna kakor misslyckas när de används från en annan maskin. Korta sessionstider och omautentisering för känsliga åtgärder (som att ändra lösenord eller överföra pengar) begränsar skadan från en kapad session.",
             "tools_or_indicators": [
               "Secure/HttpOnly/SameSite-cookieflaggor",
               "Sessionsbindning till IP/enhet",
@@ -1009,7 +1014,7 @@
           },
           "victim": {
             "title": "Sessionen kapas utan synliga tecken",
-            "description": "Offret kan fortfarande vara inloggad och använda tjänsten normalt, men angriparen har nu en parallell session med samma behörigheter. Allt offret kan göra kan angriparen också göra – läsa meddelanden, ändra inställningar, göra köp eller överföra pengar. Om tjänsten inte stöder samtidiga sessionsvarningar kan detta pågå helt obemärkt.",
+            "description": "Offret är inloggat på sin e-post, sitt bankkonto eller sin företagsapplikation, och deras aktiva session har precis stulits. Angriparen kan nu utföra vilken åtgärd som helst som offret kan: läsa e-post, överföra medel, komma åt konfidentiella dokument eller ändra kontoinställningar. Offret kan förbli inloggat simultant med angriparen utan att märka något ovanligt om inte tjänsten detekterar parallella sessioner från olika platser.",
             "tools_or_indicators": [
               "Parallella sessioner som offret inte initierat",
               "Ovanlig aktivitet i kontot"
@@ -1032,8 +1037,8 @@
               "Nedladdningsmanipulation"
             ],
             "mitre_techniques": [
-              "T1565.002",
-              "T1189"
+              "T1557",
+              "T1565.002"
             ]
           },
           "defender": {
@@ -1051,7 +1056,7 @@
           },
           "victim": {
             "title": "Informationen man ser och skickar kan vara förfalskad",
-            "description": "Offret kan nu inte lita på någonting som visas i webbläsaren eller skickas över nätverket. Webbsidor kan innehålla injicerad kod, nedladdade filer kan vara utbytta mot skadlig programvara, och data man skickar – som banköverföringar eller meddelanden – kan ha ändrats innan de når mottagaren. Allt ser normalt ut för offret, men verkligheten är helt förvrängd.",
+            "description": "Offret tar nu emot modifierad data och kan inte skilja den från legitimt innehåll. En webbsida kan innehålla injicerad skadlig kod, ett e-postmeddelande kan ha ändrade instruktioner, eller en finansiell transaktion kan ha omdirigerats till ett annat konto. Offret agerar på denna falska information i god tro och kan potentiellt överföra pengar till fel konto, ladda ner skadlig kod från en injicerad länk, eller fatta beslut baserade på förfalskad data.",
             "tools_or_indicators": [
               "Modifierade webbsidor",
               "Utbytta filer",
@@ -1096,15 +1101,14 @@
           },
           "victim": {
             "title": "Nätverket är normalt – men skadan är redan gjord",
-            "description": "ARP-spoofingen avslutas och nätverket normaliseras omedelbart. Inget på offrets enheter har ändrats. Men angriparen lämnade med aktiva sessionskakor som fortfarande är giltiga i timmar, inloggningsuppgifter i klartext, och möjligen manipulerade transaktioner som redan har genomförts. Offret märker ingenting i realtid. Utan proaktiv nätverksövervakning – arpwatch, switch-loggning, AP-associationsloggar – förblir incidenten osynlig tills konsekvenserna visar sig: obehörig inloggning, finansiell förlust, eller dataintrång.",
+            "description": "När angriparen stänger av ARP-spoofingen normaliseras offrets anslutning på sekunder. Ingenting ser annorlunda ut. Om inloggningsuppgifter fångades kommer offret inte att veta förrän dessa används – vilket kan ske timmar, dagar eller veckor senare. Om angriparen var försiktig – loggade in från samma land, kom åt bara vad offret normalt kommer åt, gjorde inga dramatiska ändringar – kan anomalin aldrig trigga ett larm. Offrets första tecken är ofta att de hittar ett okänt konto på en tjänst, en betalning de inte auktoriserat, eller att en kollega vidarebefordrar ett mejl som verkar ha skickats från deras konto men inte av dem. I det läget är nätverkslagerattacken sedan länge avslutad och det forensiska spåret kräver noggrann rekonstruktion från infrastrukturloggar som de flesta organisationer inte sparar.",
             "tools_or_indicators": [
               "Stulna sessionskakor fortfarande giltiga",
               "Komprometterade inloggningsuppgifter",
               "Möjligen genomförda manipulerade transaktioner"
             ],
             "mitre_techniques": [
-              "T1048",
-              "T1539"
+              "T1070"
             ]
           }
         }
