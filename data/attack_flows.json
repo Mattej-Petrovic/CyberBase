@@ -26,15 +26,15 @@
             "mitre_techniques": ["T1589", "T1591", "T1598"]
           },
           "defender": {
-            "title": "Monitoring for Reconnaissance Activity",
-            "description": "Defenders should watch for signs that their organization is being profiled. Unusual spikes in visits to employee directory pages, repeated failed login attempts from unknown IPs, or unexpected queries to public-facing APIs can all indicate an attacker in the reconnaissance phase. Proactively reducing the amount of publicly available information, such as hiding email addresses on the corporate website or training employees not to overshare on social media, makes the attacker's job harder.",
-            "tools_or_indicators": ["Web application firewalls (WAFs) to detect scraping patterns", "Google Alerts configured for company name and key employee names", "DNS query monitoring for unusual lookups against company domains", "Social media monitoring services"],
-            "mitre_techniques": ["T1590", "T1592"]
+            "title": "Reducing Your Public Footprint and Detecting Profiling",
+            "description": "The most effective thing you can do during the reconnaissance phase is make the attacker's job harder before they even start. Conduct your own OSINT against your organization — run theHarvester or Hunter.io against your own domain and see what comes back. Anything an attacker can find, you can remove or obscure first. WAF logs will show automated scraping patterns: many requests in rapid succession, unusual User-Agent strings, or systematic traversal of employee directory pages. Proofpoint's Threat Intelligence and similar feeds also alert when your domain is queried from known threat infrastructure. Most importantly: your own employees are the biggest OSINT source. An out-of-office reply that says 'I'm at AWS re:Invent until Friday, contact Jane at jane@company.com' tells an attacker your email format, who the backup contact is, and when to strike.",
+            "tools_or_indicators": ["WAF access logs showing high-frequency scraping patterns against /about, /team, /contact pages", "Google Alerts and Mention.com monitoring for company name and executive names in new pages", "Proofpoint TAP (Threat and Attack Protection) or similar threat intelligence for early phishing infrastructure detection", "Employee OSINT awareness training — teach staff what their public footprint looks like to an attacker"],
+            "mitre_techniques": ["T1589", "T1591"]
           },
           "victim": {
-            "title": "Unknowingly Exposing Information",
-            "description": "The victim, typically an employee, has no idea they are being studied. Their publicly visible LinkedIn profile, conference talks, social media posts, and even out-of-office auto-replies all feed the attacker's intelligence picture. Information that seems harmless in isolation, like mentioning the company uses Microsoft 365 or that a team is working on a specific project, gives the attacker exactly the details needed to craft a believable phishing email.",
-            "tools_or_indicators": ["Public LinkedIn profiles", "Social media posts with work details", "Out-of-office auto-reply messages", "Conference speaker bios and presentations"],
+            "title": "Unknowingly Feeding the Attacker's Profile",
+            "description": "The employee has no idea they are being studied. Their LinkedIn profile shows their job title, team structure, what tools they use ('excited to be rolling out Salesforce'), and sometimes even internal project names. Their conference speaker bio lists what they work on. Their out-of-office message reveals email formats and who else to contact. None of this feels sensitive in isolation, but in aggregate it gives an attacker everything needed to craft a phishing email that reads like it came from someone inside the company. The victim won't remember any of this information sharing when the email arrives weeks later.",
+            "tools_or_indicators": ["LinkedIn profile showing job title, team, and technology stack", "Out-of-office auto-replies revealing email formats and colleague names", "Conference speaker bios and public presentations listing internal projects", "GitHub commits with corporate email address and internal repository names"],
             "mitre_techniques": ["T1589.002", "T1591.004"]
           }
         },
@@ -55,9 +55,9 @@
           },
           "victim": {
             "title": "Unaware of the Threat Being Built",
-            "description": "During this phase the victim is completely unaware that an attack is being prepared specifically for them. The phishing page may already exist, perfectly replicating the login portal they use every day, but until the email arrives in their inbox they have no indication anything is wrong. This is why proactive security awareness training is so important: victims need to be suspicious before an attack arrives, not just after.",
-            "tools_or_indicators": ["No direct indicators visible to the victim at this stage", "Security awareness training can prepare employees to question unexpected communications"],
-            "mitre_techniques": ["T1566.001"]
+            "description": "During this phase the victim is completely unaware that an attack is being prepared specifically for them. The phishing page may already exist, perfectly replicating the login portal they use every day, but until the email arrives in their inbox they have no indication anything is wrong. This is why proactive security awareness training matters before an attack arrives, not after. One practical habit: employees should know to hover over links before clicking and verify the domain character-by-character — 'micros0ft.com' with a zero looks identical at a glance.",
+            "tools_or_indicators": ["No direct indicators visible to the victim at this stage", "Phishing simulation platforms (KnowBe4, Proofpoint Security Awareness) build recognition before real attacks arrive"],
+            "mitre_techniques": []
           }
         },
         {
@@ -88,8 +88,8 @@
           "attacker": {
             "title": "Triggering the Victim's Action",
             "description": "The exploitation phase begins the moment the victim clicks the malicious link or opens the weaponized attachment. If the lure is a fake login page, the victim's browser navigates to an attacker-controlled site that looks identical to the real one. If it is a malicious document, opening it may trigger a macro or exploit that downloads malware silently in the background. The attacker has now transitioned from passive preparation to active exploitation of the victim's trust.",
-            "tools_or_indicators": ["Malicious URLs redirecting to credential harvesting pages", "Weaponized Office documents with VBA macros", "HTML smuggling, a technique that assembles malware payloads inside the browser to evade email scanning", "Browser exploit kits that target unpatched vulnerabilities"],
-            "mitre_techniques": ["T1204.001", "T1204.002", "T1059.005"]
+            "tools_or_indicators": ["Malicious URLs redirecting to credential harvesting pages", "Weaponized Office documents with VBA macros", "HTML smuggling (T1027.006): the malicious payload is assembled inside the browser using JavaScript blobs or data URIs, so it never exists as a file that email scanners can inspect", "Browser exploit kits that target unpatched vulnerabilities"],
+            "mitre_techniques": ["T1204.001", "T1204.002", "T1059.005", "T1027.006"]
           },
           "defender": {
             "title": "Blocking Exploitation Attempts",
@@ -108,22 +108,22 @@
           "name": "Credential Harvesting",
           "order": 5,
           "attacker": {
-            "title": "Capturing the Victim's Credentials",
-            "description": "As the victim types their username and password into the fake login page, the attacker's server captures every keystroke in real time. With tools like Evilginx2, the attacker does not just capture the password but also intercepts the session cookie that the real authentication server returns, effectively bypassing multi-factor authentication. The attacker can now use this session cookie to impersonate the victim without ever needing their password again. The stolen credentials are typically stored in a database and may be sold on dark web marketplaces or used immediately.",
-            "tools_or_indicators": ["Evilginx2 capturing session tokens and MFA cookies in real time", "GoPhish dashboard recording submitted credentials", "Modlishka, another reverse proxy tool for real-time credential interception", "Server-side logging of all form submissions on the fake page"],
-            "mitre_techniques": ["T1556", "T1539", "T1111"]
+            "title": "Capturing Credentials and Session Cookies",
+            "description": "This is where reverse-proxy phishing like Evilginx2 is categorically different from a basic credential harvester. A basic fake login page captures the username and password — useful, but easily defeated by MFA. Evilginx2 sits as a real-time proxy between the victim and the actual identity provider. The victim authenticates for real, MFA included, and the legitimate session cookie is issued. Evilginx intercepts that cookie before it reaches the browser. The attacker now has a valid, post-MFA session token that can be replayed in their own browser immediately — no password needed, no MFA prompt. The victim is logged into their account normally and has no idea anything happened. The session cookie is more valuable than the password at this point.",
+            "tools_or_indicators": ["Evilginx2 — reverse proxy that relays real authentication and steals the resulting session cookie, bypassing TOTP and push-based MFA", "Modlishka — similar reverse-proxy approach with different evasion characteristics", "GoPhish — classic credential harvester, captures username and password but not session cookies", "Server-side phishlet logs recording every submitted credential and intercepted token"],
+            "mitre_techniques": ["T1557", "T1539"]
           },
           "defender": {
-            "title": "Detecting Credential Theft",
-            "description": "Defenders should monitor for impossible travel alerts, where a user appears to log in from two geographically distant locations in a short time, which often indicates stolen credentials. Implementing hardware-based MFA tokens (like FIDO2/WebAuthn security keys) that are bound to the legitimate domain makes Evilginx2-style proxy attacks ineffective because the key will refuse to authenticate with a fake domain. Conditional access policies that restrict logins to managed devices and known networks add additional protection.",
-            "tools_or_indicators": ["FIDO2/WebAuthn hardware security keys that resist phishing proxies", "Impossible travel detection in identity management systems", "Conditional access policies requiring managed devices", "Dark web monitoring for leaked corporate credentials"],
-            "mitre_techniques": ["T1556", "T1539"]
+            "title": "Detecting Stolen Sessions and Making Proxy Attacks Impossible",
+            "description": "The most important detection signal here is impossible travel: a user who authenticated from Stockholm at 09:00 and then from a cloud provider IP in Amsterdam at 09:02 has had their session stolen. Entra ID and Okta both surface this natively — it should be a high-priority alert, not buried in a daily report. The structural fix is FIDO2/WebAuthn (hardware security keys or passkeys). These are cryptographically bound to the origin domain. When Evilginx proxies the authentication, the browser sends the assertion to 'evilginx-proxy.com', which does not match 'login.microsoft.com' — the key refuses to sign. Proxy phishing becomes physically impossible. SMS and TOTP codes do not provide this protection. Conditional Access policies requiring compliant devices and named locations are a secondary layer that catches session replay from unexpected infrastructure.",
+            "tools_or_indicators": ["Impossible travel alerts in Entra ID, Okta, or Ping Identity — flag any new session from an IP geographically inconsistent with prior auth", "FIDO2/WebAuthn hardware keys (YubiKey) or passkeys — origin-bound, defeat proxy interception entirely", "Microsoft Sentinel or Splunk: alert on 'New session from IPs with no prior auth history for this user'", "Dark web credential monitoring (SpyCloud, Flare) — find your credentials before the attacker uses them", "Conditional Access: require compliant device + named location for cloud app access"],
+            "mitre_techniques": ["T1557", "T1539"]
           },
           "victim": {
-            "title": "Credentials Compromised Without Awareness",
-            "description": "After entering their credentials, the victim is typically redirected to the real website and may even be logged in normally, making the attack completely invisible. The victim has no idea that their username, password, and session cookie have just been captured. They continue their workday as usual while the attacker now has full access to their account. This seamless experience is what makes modern phishing so dangerous: there is often zero indication that anything went wrong.",
-            "tools_or_indicators": ["Seamless redirect to the legitimate site after credential capture", "No visible error or warning to the victim", "Normal login experience masks the theft"],
-            "mitre_techniques": ["T1539", "T1556"]
+            "title": "Fully Compromised Account, Zero Visible Indication",
+            "description": "The victim enters their credentials, completes their MFA challenge, and is logged into their real account as normal. Everything looks correct. The attacker now holds a valid session cookie that works like a master key — it grants full access to every application and file the victim's account can reach, for as long as the session remains valid (often hours or days). The victim's password is irrelevant; MFA is bypassed. The victim will continue working, reading emails, accessing SharePoint — completely unaware that the attacker is doing exactly the same thing in parallel. The first indication is typically an alert from the security team days later, or worse, when colleagues start receiving phishing emails sent from the victim's own account.",
+            "tools_or_indicators": ["Legitimate-looking redirect to real application after credential entry — nothing appears wrong", "Attacker gains access to email, SharePoint, Teams, and any SSO-connected application", "Session cookie valid for hours to days — all protected data accessible without triggering additional MFA"],
+            "mitre_techniques": ["T1539", "T1557"]
           }
         },
         {
@@ -136,9 +136,9 @@
             "mitre_techniques": ["T1098", "T1137", "T1136", "T1078"]
           },
           "defender": {
-            "title": "Hunting for Persistence Mechanisms",
-            "description": "After a phishing incident is confirmed, defenders must hunt for all persistence mechanisms the attacker may have established. This means auditing MFA device registrations for unauthorized additions, reviewing OAuth application consents for suspicious grants, checking email forwarding rules across all mailboxes, and scanning for newly created accounts. Time is critical: the faster defenders identify and remove persistence, the less damage the attacker can cause. Automated playbooks in SOAR platforms can accelerate this response.",
-            "tools_or_indicators": ["Azure AD / Entra ID audit logs for MFA and OAuth changes", "Exchange Online mail flow rule auditing", "SOAR platforms (Splunk SOAR, Palo Alto XSOAR) for automated incident response", "Revoking all active sessions and forcing re-authentication"],
+            "title": "Hunting Every Persistence Mechanism the Attacker May Have Left",
+            "description": "Once a phishing compromise is confirmed, your first action is to revoke all active sessions for the affected account — in Entra ID this is a single PowerShell call: Revoke-AzureADUserAllRefreshToken. Then work through the persistence checklist systematically. MFA device registrations: check Entra ID audit log for 'Register security info' events in the compromise window — any device added in the last 24-48 hours that the user didn't register themselves is attacker-controlled. OAuth consents: query the app registrations and delegated permissions via Graph API or the Entra portal, looking for apps granted Mail.Read, Mail.Send, or Files.ReadWrite that the user didn't explicitly authorize. Mail rules: use Get-InboxRule in Exchange Online to list all rules for the affected mailbox — attackers routinely create 'forward to external address' or 'move to deleted items' rules to maintain surveillance. Finally, search the Entra audit log for 'Add member to role' and 'Create user' events originating from the compromised account session.",
+            "tools_or_indicators": ["Entra ID audit log: filter on 'Register security info', 'Consent to application', 'Add member to role' in the compromise timeframe", "Exchange Online: Get-InboxRule -Mailbox user@company.com | Where-Object {$_.ForwardTo -or $_.RedirectTo}", "Microsoft Graph: GET /users/{id}/oauth2PermissionGrants — enumerate all OAuth consents for the account", "SOAR playbook: auto-revoke sessions, disable account, snapshot audit logs, page the analyst — all within 5 minutes of alert trigger", "Revoking sessions alone is not enough — hunt persistence or the attacker walks back in"],
             "mitre_techniques": ["T1098", "T1137", "T1136"]
           },
           "victim": {
