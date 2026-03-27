@@ -1809,12 +1809,13 @@
           "order": 1,
           "attacker": {
             "title": "Kartläggning av mjukvaruleveranskedjan",
-            "description": "Angriparen analyserar vilka mjukvarupaket, bibliotek och leverantörer som målet förlitar sig på. Istället för att angripa målet direkt – som kanske har starkt skydd – letar man efter svagare länkar i leveranskedjan. Historiska exempel inkluderar SolarWinds-attacken där angripare komprometterade en populär nätverksövervakningsprodukt som användes av tusentals organisationer, och attacker mot npm- och PyPI-paketregister där skadlig kod injicerades i populära open source-bibliotek.",
+            "description": "Angriparen identifierar en programvaruleverantör, ett öppet källkodsbibliotek eller en uppdateringsmekanism som används i stor utsträckning av deras avsedda offer. Högt värderade mål inkluderar enterprise-programvaruleverantörer som SolarWinds (vars Orion-plattform användes av 18 000 organisationer inklusive amerikanska statliga myndigheter), populära paketregister som npm och PyPI där ett enda komprometterat paket kan påverka miljoner utvecklare, och hanterade tjänsteleverantörer (MSP:er) vars verktyg har direkt åtkomst till hundratals kundnätverk. Angriparen utvärderar mål baserat på räckvidd, åtkomst och säkerhetsläge.",
             "tools_or_indicators": [
-              "Analys av beroendeträd (package.json, requirements.txt)",
-              "Kartläggning av tredjepartsintegrationer",
-              "Identifiering av CI/CD-leverantörer",
-              "SolarWinds Orion som historiskt exempel"
+              "Analys av Software Bill of Materials (SBOM) för att identifiera allmänt använda beroenden",
+              "Forskning om populära paket på npm, PyPI och andra register",
+              "Identifiering av enterprise-programvaruleverantörer med privilegierad nätverksåtkomst",
+              "Utvärdering av MSP:er som hanterar flera kundmiljöer",
+              "Studie av målleverantörens utvecklings- och releaseprocesser"
             ],
             "mitre_techniques": [
               "T1195.001",
@@ -1823,13 +1824,13 @@
           },
           "defender": {
             "title": "Inventera och riskbedöm leverantörsberoenaden",
-            "description": "Organisationen behöver en fullständig bild av alla mjukvaruberoenden – inklusive transitiva beroenden. Software Bill of Materials (SBOM) skapar denna inventering formellt med verktyg som Syft, CycloneDX eller SPDX. Privata paketregister (Artifactory, Azure Artifacts) förhindrar dependency confusion-attacker genom att prioritera interna paket framför publika med samma namn. Viktigt versionspinning-förbehåll: att pinna till ett specifikt paket är bra – men om den pinnade versionen är den komprometterade är ni fast i den komprometterade versionen tills ni aktivt uppgraderar. Versionspinning är ett skydd mot oavsiktliga uppgraderingar, inte mot en riktad leveranskedjeattack.",
+            "description": "Organisationer måste upprätthålla ett komplett lager av all tredjepartsprogramvara, bibliotek och tjänster de är beroende av – ett Software Bill of Materials (SBOM). Varje beroende utvidgar din förtroendegräns till att inkludera den leverantörens säkerhetsnivå. Leverantörssäkerhetsbedömningar bör utvärdera inte bara vad programvaran gör utan hur leverantören säkrar sin utvecklingspipeline. Viktigt förbehåll om versionspinning: att pinna beroenden är bra praxis – men att pinna till en redan komprometterad version låser dig till den bakdörrsförsedda releasen. Rätt metod är att pinna till en specifik version som granskats och verifierats, och upprätthålla en process för att utvärdera och uppdatera pins när säkerhetsrådgivningar utfärdas. Automatiska uppdateringar utan granskning är riskabelt; permanenta pins utan granskning är lika riskabelt. Använd privata paketregister (Artifactory, Azure Artifacts) som speglar offentliga register och kör SCA-skanning på varje paket innan det når ditt interna flöde.",
             "tools_or_indicators": [
-              "SBOM (Syft, CycloneDX, SPDX)",
-              "Dependabot / Snyk / Renovate",
-              "Privata paketregister (Artifactory, Azure Artifacts)",
-              "Leverantörssäkerhetsbedömningar",
-              "Versionspinning med medvetenhet om begränsningar"
+              "SBOM-generering: Syft, CycloneDX eller SPDX-format – generera vid byggtid och lagra med varje release",
+              "Software Composition Analysis: Snyk, Dependabot eller OWASP Dependency-Check",
+              "Privat paketregister (Artifactory, Azure Artifacts) – spegla och skanna publika paket",
+              "Leverantörssäkerhetsenkät: fråga specifikt om MFA på källkodskontroll, CI/CD-åtkomstkontroller och kodsigneringsnycklar (HSM)",
+              "Versionspinning-strategi: pinna till granskade versioner + automatiserade PR:er vid säkerhetspatcher"
             ],
             "mitre_techniques": [
               "T1195.001",
@@ -1854,7 +1855,7 @@
           "order": 2,
           "attacker": {
             "title": "Infiltrering av leverantörens utvecklingsmiljö",
-            "description": "Angriparen tar sig in i leverantörens byggsystem – den infrastruktur som kompilerar källkod till färdig programvara. Detta kan ske genom att kompromittera en utvecklares konto, utnyttja en sårbarhet i CI/CD-plattformen (Continuous Integration/Continuous Delivery) eller genom social manipulation av en betrodd bidragsgivare i ett open source-projekt. I SolarWinds-fallet modifierades byggsystemet så att skadlig kod automatiskt injicerades vid varje kompilering utan att synas i källkoden.",
+            "description": "Angriparen komprometterar målleverantörens programvaruutvecklingsinfrastruktur. Detta kan innebära nätfiske av en utvecklare för att få åtkomst till källkodsarkivet, kompromittering av CI/CD-pipelinen som automatiskt bygger och paketerar programvaran, eller att få åtkomst till kodsigneringscertifikat. I SolarWinds-attacken infogade angriparna (tillskrivna rysk underrättelsetjänst) skadlig kod i själva byggprocessen, så att den skadliga versionen kompilerades, signerades med SolarWinds legitima certifikat och distribuerades via deras normala uppdateringskanaler – vilket gjorde den praktiskt taget oupptäckbar.",
             "tools_or_indicators": [
               "Komprometterade utvecklarkonton",
               "CI/CD-pipline-manipulation (GitHub Actions, Jenkins)",
@@ -1863,26 +1864,29 @@
             ],
             "mitre_techniques": [
               "T1195.002",
-              "T1199"
+              "T1199",
+              "T1553.002"
             ]
           },
           "defender": {
             "title": "Härda byggsystem och leveranspipeline",
-            "description": "Byggsystem ska behandlas som högkritisk infrastruktur med strikt åtkomstkontroll och fullständig loggning. Sigillerad (hermetic) build innebär att byggprocessen är helt reproducerbar och inte kan påverkas av externa faktorer. Kodgranskning av alla ändringar – inklusive från betrodda bidragsgivare – och krävande av signerade commits minskar risken för injicerad skadlig kod. Skydda CI/CD-hemligheter och signeringsnycklar med hårdvarusäkerhetsmoduler (HSM).",
+            "description": "Programvaruleverantörer måste behandla sin byggpipeline som kritisk infrastruktur. SLSA-ramverket (Supply chain Levels for Software Artifacts) ger ett gradvis tillvägagångssätt för byggpipelinesäkerhet. Alla källkodsändringar bör kräva granskning av flera personer. Byggmiljöer bör vara efemära (skapas nya för varje bygge och förstörs efteråt) för att förhindra persistent kompromiss. Kodsigneringscertifikat bör lagras i Hardware Security Modules (HSM:er) som kräver flerpartsauktorisering. Reproducerbara byggen, där samma källkod alltid producerar samma binär, möjliggör oberoende verifiering att ingen obehörig kod infogades under bygget.",
             "tools_or_indicators": [
-              "Sigillerade builds",
-              "Obligatorisk kodgranskning",
-              "Signerade commits och artefakter",
-              "HSM för signeringsnycklar",
-              "SLSA-ramverket"
+              "SLSA-ramverk för säkerhetsnivåer i leveranskedjan",
+              "Krav på granskning av flera personer för alla kodändringar",
+              "Efemära byggmiljöer som skapas och förstörs för varje bygge",
+              "Hardware Security Modules (HSM:er) för skydd av kodsigneringsnycklar",
+              "Reproducerbara byggen för oberoende verifiering",
+              "Sigstore för transparent kodsignering"
             ],
             "mitre_techniques": [
-              "T1195.002"
+              "T1195.002",
+              "T1553.002"
             ]
           },
           "victim": {
             "title": "Leverantörens byggsystem är komprometterat",
-            "description": "Nedströmsanvändare har ingen möjlighet att se att leverantörens byggsystem har manipulerats. All programvara som produceras ser legitim ut, är korrekt signerad och distribueras via normala kanaler. Det finns inga varningssignaler i slutprodukten – den skadliga koden är designad för att vara osynlig vid normal inspektion.",
+            "description": "Den leverantör som organisationen litar på har fått sin byggpipeline komprometterad. Från detta ögonblick kan varje programuppdatering som leverantören producerar innehålla skadlig kod, och den signeras med leverantörens legitima certifikat och ser helt autentisk ut. Nedströmsorganisationerna – de slutliga offren – kan inte detektera denna kompromiss eftersom de verifierar programvaruintegritet genom att kontrollera leverantörens signatur, och signaturen är äkta. Leverantören själv kanske inte vet att deras pipeline är komprometterad i veckor eller månader.",
             "tools_or_indicators": [
               "Ingen synlig indikation för slutanvändare",
               "Korrekt signerad programvara med dold bakdörr"
@@ -1897,22 +1901,23 @@
           "order": 3,
           "attacker": {
             "title": "Inbäddning av bakdörr i programvaran",
-            "description": "Det finns två distinkta attackvektorer här med väldigt olika krav på angriparen. Byggpipelinekompromiss (som SolarWinds/SUNBURST): angriparen modifierar leverantörens byggsystem. SUNBURST låg vilande i 12-14 dagar efter installation, kontrollerade 17 säkerhetsprodukters registernycklar och efterliknade legitima Orion-API-anrop i DNS-telemetri för att undvika detektion. Denna typ kräver initial åtkomst till leverantörens infrastruktur och avancerad OPSEC. Open-source-registerattacker kräver mycket lägre kapacitet: Dependency confusion – angriparen publicerar ett publikt paket med samma namn som ett internt men med högre versionsnummer, vilket gör att pakethanterare väljer det publika. Typosquatting – paketnamn som liknar populära: 'requets' (requests), 'colourama' (colorama). npm postinstall-skript kör automatiskt vid installation och kan exfiltrera miljövariabler och SSH-nycklar.",
+            "description": "Det är viktigt att förstå att 'injicering av leveranskedjepayload' täcker två mycket olika attacker som kräver mycket olika angriparkapaciteter. Byggpipelinekompromiss (nationalstatsnivå): angriparen modifierar själva byggprocessen så att bakdörren kompileras in i varje release. SUNBURST i SolarWinds-attacken är det kanoniska exemplet – bakdörren kontrollerade 17 olika säkerhetsprodukter och sandlådindikatorer innan aktivering, väntade 12-14 dagar efter första körning, kommunicerade sedan via DNS-frågor som perfekt imiterade SolarWinds' eget telemetriformat. Denna operativa säkerhetsnivå kräver månaders förberedelse. Open source-registerattacker (lägre hinder): Dependency confusion exploaterar hur pakethanterare löser namn – Alex Birsan demonstrerade 2021 att publicering av ett paket till PyPI/npm med samma namn som ett internt privat paket men ett högre versionsnummer gör att pip och npm hämtar den offentliga (skadliga) versionen istället. Ingen leverantörsåtkomst krävs. Typosquatting är ännu enklare: registrera 'requets' (requests) eller 'colourama' (colorama) och vänta på att utvecklare skriver fel. npm tillåter paket att köra godtycklig kod vid installation via package.json 'postinstall' – används flitigt i leveranskedjeattacker för att exfiltrera miljövariabler och SSH-nycklar.",
             "tools_or_indicators": [
-              "Obfuskerad skadlig kod i källkoden",
-              "Fördröjd aktivering (dormant period)",
-              "Målselektiv aktivering",
-              "DNS-baserad C2-kommunikation"
+              "Byggpipelineinjektion: ändra byggskript eller källfil för att inkludera bakdörr kompilerad i legitim binär",
+              "Dependency confusion: publicera paket till PyPI/npm med samma namn som ett internt paket men högre version",
+              "Typosquatting: 'requets' istället för 'requests', 'colourama' istället för 'colorama'",
+              "Installationsskriptmissbruk: npm postinstall kör godtycklig kod vid 'npm install'",
+              "SUNBURST-dvala: 12-14 dagar, kontroll av 100+ säkerhetsprodukts-registernycklar före aktivering"
             ],
             "mitre_techniques": [
+              "T1195.001",
               "T1195.002",
-              "T1027",
-              "T1071.004"
+              "T1027"
             ]
           },
           "defender": {
             "title": "Granska programvaruintegritet",
-            "description": "Reproducerbara builds gör det möjligt att verifiera att den kompilerade programvaran faktiskt motsvarar den publicerade källkoden – eventuella avvikelser avslöjar manipulation. Statisk kodanalys och binäranalys kan upptäcka ovanliga kodmönster, obfuskering och misstänkta funktionsanrop. In-toto-ramverket kryptografiskt verifierar varje steg i byggsprocessen och säkerställer att inga steg har hoppats över eller manipulerats.",
+            "description": "Statiska analysverktyg kan skanna källkod och kompilerade binärer för misstänkta mönster som obfuskerad kod, oväntade nätverkskommunikationer eller anrop till känsliga system-API:er. Paketanalysverktyg som Socket.dev för npm letar specifikt efter leveranskedjeattacksindikatorer som installationsskript som kör godtycklig kod, oväntad nätverksåtkomst eller filsystemsoperationer. Sandboxad körning av nya programvaruversioner innan driftsättning i produktion kan avslöja dolda beteenden som C2-kommunikation. Att jämföra leverantörens binär mot en oberoende kompilerad version kan detektera byggpipelinekompromisser som infogar kod som inte finns i källkodsarkivet.",
             "tools_or_indicators": [
               "Reproducerbara builds",
               "Statisk kodanalys",
@@ -1920,8 +1925,8 @@
               "In-toto supply chain integrity framework"
             ],
             "mitre_techniques": [
-              "T1195.002",
-              "T1027"
+              "T1195.001",
+              "T1195.002"
             ]
           },
           "victim": {
@@ -1941,7 +1946,7 @@
           "order": 4,
           "attacker": {
             "title": "Spridning genom officiella uppdateringskanaler",
-            "description": "Den komprometterade programvaran distribueras nu till alla användare genom leverantörens egna, betrodda uppdateringsmekanismer. Automatiska uppdateringar installerar den skadliga versionen utan manuell inblandning. Kodsigneringscertifikat bekräftar att programvaran är äkta – eftersom den faktiskt kompilerats av leverantörens system är signaturen giltig. Detta är det som gör leveranskedjeattacker så effektiva – offren installerar skadlig programvara frivilligt eftersom den kommer från en betrodd källa via officiella kanaler.",
+            "description": "Den komprometterade programvaruuppdateringen distribueras via leverantörens officiella uppdateringsservrar, paketregister eller appbutik – exakt samma kanal som levererar legitima uppdateringar. Organisationer med automatiska uppdateringar aktiverade tar emot den bakdörrsförsedda versionen utan någon mänsklig inblandning. Uppdateringen passerar alla integritetsverifieringar eftersom den faktiskt signeras av leverantören. Angriparen drar nytta av massiv skala: en enda komprometterad uppdatering kan nå tusentals eller miljontals system samtidigt.",
             "tools_or_indicators": [
               "Automatiska uppdateringsmekanismer",
               "Giltiga kodsigneringscertifikat",
@@ -1954,12 +1959,13 @@
           },
           "defender": {
             "title": "Kontrollera och fördröj uppdateringar",
-            "description": "Organisationer bör inte automatiskt installera alla uppdateringar i produktionsmiljöer utan teststeg. En stagingmiljö där uppdateringar observeras under en period ger möjlighet att upptäcka avvikande beteende. Övervaka nätverkstrafiken från programvaran efter uppdateringar – ny och oväntad extern kommunikation är ett larm. Privata paketregister (Artifactory, Azure Artifacts) med godkännandeprocess ger extra kontrollpunkt. Signaturverifiering av uppdateringspaket mot kända nycklar, kombinerat med SBOM-jämförelse, kan identifiera ändringar som inte finns i releasedokumentationen.",
+            "description": "Organisationer bör aldrig tillåta automatiska uppdateringar från någon leverantör direkt till produktionssystem. En stegrad driftsättningsmodell där uppdateringar först går till en isolerad testmiljö, sedan till en liten pilotgrupp och sedan till den bredare organisationen ger tid att detektera anomalier innan massdriftsättning. Nätverksövervakning bör baselinja normala programuppdateringstrafikanmönster så att ovanliga beteenden i nyligen driftsatta versioner triggar larm. För kritisk programvara är förmågan att snabbt återgå till en tidigare känd-bra version avgörande.",
             "tools_or_indicators": [
-              "Stagingmiljö för uppdateringar",
-              "Nätverksövervakning efter uppdatering",
-              "Versionspinning av beroenden",
-              "Fördröjd utrullning av uppdateringar"
+              "Stegrad driftsättningsmodell: test, pilot och sedan produktion",
+              "Nätverksbaseline för att detektera ovanligt beteende i nya programvaruversioner",
+              "Förmåga att snabbt återgå till tidigare känd-bra versioner",
+              "Programvaruvitlistning som förhindrar obehöriga applikationer",
+              "Ändringshanteringsprocesser som kräver godkännande för alla programvaruuppdateringar"
             ],
             "mitre_techniques": [
               "T1195.002"
@@ -1983,43 +1989,51 @@
           "order": 5,
           "attacker": {
             "title": "Aktivering och utnyttjande hos nedströmsoffren",
-            "description": "Bakdörren aktiveras nu hos de drabbade organisationerna. Angriparen kan selektivt välja vilka organisationer som angrips vidare – i SolarWinds-fallet riktades den djupare attacken mot ett fåtal högvärdiga mål av de 18 000 som installerat den komprometterade uppdateringen. Väl aktiverad ger bakdörren samma möjligheter som en vanlig initial åtkomst – angriparen kan ladda ned ytterligare verktyg, eskalera privilegier och röra sig lateralt genom målets nätverk.",
+            "description": "Med bakdörren driftsatt i tusentals organisationer aktiverar angriparen den selektivt i sina valda mål. Inte varje infekterad organisation exploateras – angriparen prioriterar högt värderade mål som statliga myndigheter, försvarsentreprenörer och stora företag. Bakdörren ger initial åtkomst som angriparen sedan expanderar via standardpostexploateringstekniker: uppgiftsskörden, lateral förflyttning, privilegieeskalering och dataexfiltrering. Eftersom bakdörren finns i betrodd programvara som typiskt har förhöjda privilegier och nätverksåtkomst börjar angriparen från en mycket starkare position än ett typiskt nätfiskebaserat kompromiss skulle ge.",
             "tools_or_indicators": [
-              "Selektiv aktivering hos utvalda mål",
-              "Nedladdning av ytterligare verktyg",
-              "Lateral förflyttning i offrets nätverk",
-              "Dataexfiltrering"
+              "Selektiv aktivering av bakdörren i högt värderade målorganisationer",
+              "C2-kommunikation etablerad via den komprometterade programvarans nätverksåtkomst",
+              "Uppgiftsskörden och lateral förflyttning från den privilegierade positionen av betrodd programvara",
+              "Dataexfiltrering med programvarans befintliga nätverksbehörigheter",
+              "Långsiktig persistent åtkomst via den betrodda programvarans pågående närvaro"
             ],
             "mitre_techniques": [
               "T1195.002",
-              "T1105",
-              "T1071.001"
+              "T1078",
+              "T1021",
+              "T1048"
             ]
           },
           "defender": {
             "title": "Detektera och respondera på aktiveringen",
-            "description": "Beteendebaserad detektion är nyckeln – även om den skadliga koden är ny och okänd för signaturer kommer dess beteende att avvika från det normala. Ovanliga DNS-förfrågningar, nya utgående anslutningar från servrar som normalt inte kommunicerar externt, och oväntad processaktivitet är alla varningssignaler. Threat hunting – proaktiv sökning efter kompromissindikatorer – bör initieras omedelbart när en leverantörskompromiss rapporteras i branschen.",
+            "description": "Detektion av en leveranskedjekompromiss kräver övervakning av beteendeanomaler i betrodd programvara: oväntade nätverksanslutningar, ovanlig processkapning, filsystemsåtkomst utanför programvarans normala omfång, och DNS-frågor till tidigare osedda domäner. Hotunderrättelsedelning är kritisk eftersom leveranskedjeattacker drabbar många organisationer samtidigt; deltagande i ISAC:er (Information Sharing and Analysis Centers) och övervakning av leverantörers säkerhetsrådgivningar hjälper organisationer att lära om kompromisser som upptäcks av andra. När en leveranskedjekompromiss bekräftas måste svaret inkludera isolering av alla system som kör den drabbade programvaran, genomförande av en fullständig utredning för att avgöra om bakdörren aktiverades i din miljö, och planering för möjligheten att angriparen redan etablerat oberoende persistens.",
             "tools_or_indicators": [
-              "Beteendebaserad EDR-detektion",
-              "DNS-analys av ovanliga mönster",
-              "Proaktiv threat hunting",
-              "Branschvarningar och CERT-rapporter"
+              "Beteendeövervakning för anomaler i betrodd programvara",
+              "Hotunderrättelsedelning via ISAC:er och branschgrupper",
+              "Övervakning av leverantörers säkerhetsrådgivningar",
+              "Nätverkstrafikanalys för oväntad C2-kommunikation",
+              "Fullständig forensisk utredning av alla system som kör drabbad programvara",
+              "Anta intrång och jaga oberoende persistensmekanismer"
             ],
             "mitre_techniques": [
               "T1195.002",
-              "T1071.001"
+              "T1078",
+              "T1021"
             ]
           },
           "victim": {
             "title": "Bakdörren är aktiv i organisationens nätverk",
-            "description": "Den betrodda programvaran har blivit angriparens fotfäste i organisationen. Eftersom bakdörren lever inuti en legitim, signerad applikation är den extremt svår att upptäcka. Juridiskt: om personuppgifter har exponerats gäller GDPR Artikel 33 – anmälan till Integritetsskyddsmyndigheten (IMY) inom 72 timmar efter kännedom om intrånget. Artikel 34 kräver dessutom individuell underrättelse till de registrerade om intrånget riskerar att allvarligt påverka deras rättigheter och friheter. Observera att ni som nedströmsoffret är ansvarig för denna anmälningsskyldighet – det räcker inte att leverantören anmäler. Aktivera cyber-incidentförsäkringen och engagera ett IR-företag parallellt med er interna utredning.",
+            "description": "Offrets organisation gjorde inget fel enligt konventionella säkerhetsstandarder. Perimeterkontroller, endpointskydd, e-postsäkerhet och säkerhetsmedvetenhetsträning – alla fungerade precis som designat. Inget av det spelade roll eftersom attacken kom via en officiellt sanktionerad programuppdatering signerad med ett legitimt certifikat. Bakdörren kan ha varit aktiv i 3-9 månader innan upptäckt – det var den faktiska dvälotiden i SolarWinds-fallet. Under det fönstret hade angriparen åtkomst likvärdig med en betrodd intern administratör. Den juridiska dimensionen är en kritisk punkt som ofta förbises: under GDPR och liknande regelverk minskar inte att ha komprometterats via en tredje part dina anmälningsskyldigheter. Om bakdörren kom åt personuppgifter i din miljö måste du anmäla till Integritetsskyddsmyndigheten (IMY) inom 72 timmar och potentiellt meddela berörda individer – även om du var ett nedströmsoffret och dina egna system inte direktbröts (GDPR Artikel 33/34). Det rättsliga ansvaret faller på den organisation som innehade datan, inte på leverantören som komprometterades. Återhämtning kräver två parallella arbetsflöden: borttagning av den komprometterade programvaran i hela din miljö, och genomförande av en fullständig kompromissbedömning för att avgöra om angriparen etablerade oberoende persistens som överlever borttagningen.",
             "tools_or_indicators": [
-              "Aktiv bakdörr i betrodd programvara",
-              "C2-kommunikation från intern server",
-              "Potentiellt tusentals drabbade organisationer globalt"
+              "Anta intrång från det ögonblick den komprometterade programvaruversionen identifieras – granska alla system",
+              "GDPR Artikel 33/34 gäller även som nedströmsoffret – börja 72-timmarsklockan vid bekräftad dataexponering",
+              "Engagera ett IR-företag omedelbart – försök inte genomföra forensik internt",
+              "Hotunderrättelsedelning: meddela din ISAC och kontrollera om andra organisationer i din sektor är drabbade",
+              "Komprometterad programvara måste isoleras, inte bara avinstalleras – persistensmekanismer kan överleva borttagning"
             ],
             "mitre_techniques": [
-              "T1195.002"
+              "T1195.002",
+              "T1078"
             ]
           }
         }
