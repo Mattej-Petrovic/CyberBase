@@ -582,26 +582,27 @@
           },
           "defender": {
             "title": "Minimera informationsläckage från applikationen",
-            "description": "Webbapplikationen bör konfigureras så att den avslöjar så lite som möjligt om sin interna struktur. Detaljerade felmeddelanden som visar databastyp, tabellnamn eller SQL-syntax ska aldrig visas för slutanvändare – istället ska generiska felmeddelanden returneras. WAF (Web Application Firewall) kan dessutom upptäcka och blockera skanningsverktyg baserat på deras trafikmönster.",
+            "description": "Försvarare bör anta att angripare kartlägger varje endpoint och agera därefter. Att ta bort utförliga felmeddelanden som avslöjar databastyper eller frågestrukturer är avgörande – dessa detaljer hjälper angripare att utforma sina injektionspayloads. Anpassade felsidor ska visa användarvänliga meddelanden utan tekniska detaljer. HTTP-svarsrubriker som avslöjar serverprogram versioner ska tas bort. Web Application Firewalls (WAFs) kan detektera och blockera automatiserade skanningsverktyg, men bör betraktas som ett kompletterande försvar, inte ett primärt.",
             "tools_or_indicators": [
-              "Generiska felmeddelanden",
-              "WAF (Web Application Firewall)",
-              "Döljande av serverversionsinformation",
-              "Begränsning av API-dokumentation"
+              "Anpassade felsidor som döljer tekniska detaljer",
+              "HTTP-rubrikhärdning för att ta bort serverversionsinfo",
+              "Web Application Firewalls (WAF) som ModSecurity eller Cloudflare WAF",
+              "Hastighetsbegränsning på API-endpoints för att bromsa automatiserad skanning"
             ],
             "mitre_techniques": [
-              "T1190"
+              "T1190",
+              "T1595.002"
             ]
           },
           "victim": {
             "title": "Applikationen kartläggs utan synliga effekter",
-            "description": "Användarna av webbapplikationen märker ingenting ovanligt. Angriparens spaning ser ut som vanlig webbsurfning – man besöker sidor, fyller i formulär och observerar svaren. Den enda ledtråden finns i serverloggar, där man eventuellt kan se systematiskt mönster i förfrågningarna.",
+            "description": "Offren i en SQL-injektionsattack är primärt de användare vars data lagras i applikationens databas. Under spaningen är dessa användare helt ovetande om att en angripare sonderar applikationen de litar på med sin personliga information, betalningsuppgifter eller inloggningsuppgifter. Applikationens utvecklare och administratörer är också offer, eftersom deras system utvärderas för svagheter. Varje användare som någonsin matat in data i applikationen riskerar att drabbas om en injektionssårbarhet finns.",
             "tools_or_indicators": [
               "Ovanliga trafikmönster i loggar",
               "Systematiska förfrågningar mot olika ändpunkter"
             ],
             "mitre_techniques": [
-              "T1595.002"
+              "T1190"
             ]
           }
         },
@@ -623,12 +624,13 @@
           },
           "defender": {
             "title": "Indatavalidering och preparerade frågor",
-            "description": "Det mest effektiva skyddet mot SQL-injektion är att använda preparerade frågor (prepared statements) med parameterbindning. Denna teknik separerar SQL-koden från användarinmatningen på en fundamental nivå, så att databasen aldrig tolkar inmatning som kommandon. Utöver detta bör all indata valideras mot förväntade format – om ett fält ska innehålla ett nummer ska allt annat avvisas direkt.",
+            "description": "Det enda verkligt effektiva försvaret mot SQL-injektion är parametriserade frågor (även kallade prepared statements), där användarinput alltid behandlas som data, aldrig som körbar SQL-kod. Det innebär att även om en användare anger ett SQL-kommando som input behandlar databasen det som en ofarlig textsträng snarare än att köra det. ORM-ramverk som SQLAlchemy, Hibernate eller Entity Framework använder parametriserade frågor som standard och är därmed säkrare än att skriva rå SQL. Kodgranskningar och statisk analys bör flagga varje instans av strängkonkatenering i SQL-frågor som en kritisk sårbarhet.",
             "tools_or_indicators": [
-              "Preparerade frågor (Prepared Statements)",
-              "ORM-ramverk med parameterbindning",
-              "Indatavalidering och vitlistning",
-              "WAF med SQL-injektionsregler"
+              "Parametriserade frågor / prepared statements i alla databasinteraktioner",
+              "ORM-ramverk (SQLAlchemy, Hibernate, Entity Framework) som förhindrar rå SQL",
+              "Statisk applikationssäkerhetstestning (SAST) med SonarQube eller Checkmarx",
+              "Kodgranskningslistor som flaggar strängkonkatenering i SQL",
+              "Indatavalidering och sanering som djupförsvar"
             ],
             "mitre_techniques": [
               "T1190"
@@ -636,7 +638,7 @@
           },
           "victim": {
             "title": "Konstiga tecken i formulär väcker sällan uppmärksamhet",
-            "description": "Om andra användare skulle se vad angriparen skriver i sökfält eller formulär skulle det se konstigt ut – strängar som ' OR 1=1-- eller UNION SELECT NULL. Men i praktiken syns dessa tester bara i serverloggar. Vanliga användare fortsätter använda applikationen utan att märka att den testas för sårbarheter.",
+            "description": "När angriparen hittar en injektionspunkt är potentiellt all data i den anslutna databasen i riskzonen. Det inkluderar användarnamn, lösenord (ofta lagrade som hashar), e-postadresser, personnummer, betalkortsuppgifter, medicinska journaler och annan känslig information applikationen lagrar. De användare vars data finns i databasen hade ingen roll i att skapa sårbarheten – den finns på grund av ett kodningsfel av applikationens utvecklare. Det är därför säkra kodningspraxis är så avgörande.",
             "tools_or_indicators": [
               "Onormala tecken i formulärinmatning",
               "Databasfelmeddelanden som visas för användare"
@@ -665,12 +667,12 @@
           },
           "defender": {
             "title": "Djupgående skydd i flera lager",
-            "description": "Utöver preparerade frågor bör organisationen implementera minsta-privilegieprincipen för databaskonton – applikationen ska aldrig köra med administratörsrättigheter i databasen. Lagrade procedurer med hårdkodade frågor begränsar vilka operationer som överhuvudtaget är möjliga. WAF-regler kan blockera kända injektionsmönster, men ska aldrig vara det enda skyddslagret.",
+            "description": "WAF:ar fångar kända mönster som UNION SELECT, OR 1=1 och SQL-kommentarsekvenser (-- och #). En bestämd angripare kringgår dem med URL-kodning (%27 för enkelt citattecken), inbyggda kommentarer (UN/**/ION SE/**/LECT) och databasspecifik alternativ syntax. Behandla WAF-blockeringar som signal, inte som prevention: varje blockerad förfrågan ska loggas och granskas. RASP (Runtime Application Self-Protection) instrumenterar applikationen på kodningsnivå – det avlyssnar SQL-frågan på databasdrivrutinsnivån, där det kan se hela den sammansatta satsen inklusive injekterad payload oavsett hur den kodades på nätverksnivå. Detta är mycket mer exakt. På databasnivå: alla frågor som läser från INFORMATION_SCHEMA.TABLES eller INFORMATION_SCHEMA.COLUMNS är en stark indikator – ingen legitim applikationsfunktion behöver räkna upp sitt eget schema vid körning. Flagga dessa i databasgransknungsloggen omedelbart. Sätt också upp en SIEM-regel: larm vid 10+ 500-felsvar från samma käll-IP till samma endpoint inom 60 sekunder – klassiskt injektionssondningsmönster.",
             "tools_or_indicators": [
-              "Minsta-privilegieprincipen för DB-konton",
-              "Lagrade procedurer",
-              "WAF-signaturer för injektionsmönster",
-              "Regelbunden säkerhetsgranskning av kod"
+              "WAF (ModSecurity, AWS WAF, Cloudflare) – logga alla blockerade förfrågningar för analytikergranskning",
+              "RASP (Contrast Security, Sqreen) – avlyssnar SQL på drivrutinsnivå; nära noll falsklarm jämfört med WAF-mönstermatchning",
+              "Databasgranskning: larm vid frågor med INFORMATION_SCHEMA, LOAD_FILE, INTO OUTFILE, xp_cmdshell eller SLEEP()",
+              "SIEM-regel: larm vid 10+ 500-felsvar från samma käll-IP till samma endpoint inom 60 sekunder"
             ],
             "mitre_techniques": [
               "T1190"
@@ -678,7 +680,7 @@
           },
           "victim": {
             "title": "Databasen börjar läcka information",
-            "description": "Applikationen kan börja visa oväntade resultat, laddas långsammare (vid tidsbaserade attacker) eller visa felmeddelanden. De flesta användare skulle avfärda detta som tekniska problem. I verkligheten extraherar angriparen systematiskt information från databasen – tabellnamn, kolumner och slutligen känsliga data som lösenord och personuppgifter.",
+            "description": "I detta skede talar angriparen i praktiken direkt med databasen via applikationens sårbara kod. Varje fråga applikationen kör legitimt kan kapas för att inkludera angriparens kommandon. Databasen kör troget dessa kommandon eftersom de anländer via applikationens betrodda anslutning. Offrets data nås, men från databasens perspektiv ser dessa ut som normala applikationsfrågor. Det är därför SQL-injektion är så farlig: den missbrukar förtroendeförhållandet mellan applikationen och dess databas.",
             "tools_or_indicators": [
               "Långsamma svarstider",
               "Ovanliga felmeddelanden",
@@ -694,35 +696,39 @@
           "order": 4,
           "attacker": {
             "title": "Systematisk utvinning av databasinnehåll",
-            "description": "Angriparen extraherar nu data i stor skala. Först kartläggs alla databaser, tabeller och kolumner med information_schema – en metadatatabell som finns i de flesta databassystem och beskriver databasens struktur. Sedan hämtas det faktiska innehållet: användarkonton, lösenord (ofta i hashad form), personuppgifter, affärshemligheter eller finansiell data. Sqlmap kan automatisera hela denna process och dumpa hela databaser med ett enda kommando.",
+            "description": "Angriparen extraherar systematiskt värdefull data från databasen. Först räknar de upp alla databasnamn, sedan alla tabeller inom varje databas, sedan alla kolumner inom varje tabell och bygger en komplett karta över datastrukturen. De dumpar sedan innehållet i högt värderade tabeller: användaruppgifter, personuppgifter, finansiella poster och administrativ data. Lösenordshashar extraheras för offline-knäckning. I vissa fall kan angriparen läsa filer från serverns filsystem via databasfunktioner som MySQLs LOAD_FILE() eller skriva filer med INTO OUTFILE och potentiellt plantera ett web shell.",
             "tools_or_indicators": [
-              "sqlmap --dump",
-              "information_schema-frågor",
-              "Uttag av lösenordshashar",
-              "Hämtning av kreditkortsuppgifter"
+              "sqlmap --dump för att extrahera kompletta tabellinnehåll",
+              "INFORMATION_SCHEMA-frågor för att räkna upp databasstruktur",
+              "MySQL LOAD_FILE() för att läsa serverfiler via databasen",
+              "Databasspecifika funktioner för filsystemåtkomst",
+              "Exfiltrering via DNS-frågor när direkt utdata blockeras (out-of-band-extraktion)"
             ],
             "mitre_techniques": [
+              "T1190",
               "T1005",
-              "T1213"
+              "T1039"
             ]
           },
           "defender": {
             "title": "Övervakning av databasaktivitet",
-            "description": "Database Activity Monitoring (DAM) loggar och analyserar alla frågor som körs mot databasen i realtid. Ovanliga frågemönster – som upprepade UNION SELECT-frågor eller åtkomst till information_schema – triggar larm. Kryptering av känsliga fält i databasen gör att även om data extraheras är den oläsbar utan dekrypteringsnycklarna, som bör förvaras separat från databasen.",
+            "description": "Djupförsvar innebär att även om injektion sker ska skadan minimeras. Databasanvändarkontot som applikationen använder bör ha absoluta minimibehörigheter – typiskt bara SELECT, INSERT och UPDATE på specifika tabeller, aldrig FILE-privilegier eller åtkomst till systemtabeller. Databasaktivitetsövervakning kan larma om ovanliga frågemönster, som bulkade SELECT-satser mot användartabellen eller frågor mot INFORMATION_SCHEMA. Kryptering av känsliga kolumner (som kreditkortsnummer) på databasnivå innebär att extraherad data är värdelös utan krypteringsnycklarna.",
             "tools_or_indicators": [
-              "Database Activity Monitoring (DAM)",
-              "Kryptering av känsliga fält",
-              "DLP-system (Data Loss Prevention)",
-              "Larm vid massuttag av data"
+              "Minsta-privilegieprincipen för databasanvändarkonton",
+              "Databasaktivitetsövervakning (DAM) som Imperva eller IBM Guardium",
+              "Kolumnnivåkryptering för känsliga datafält",
+              "Databasgranskning för alla dataåtkomstfrågor",
+              "Nätverksövervakning för stora dataöverföringar från databasservrar"
             ],
             "mitre_techniques": [
               "T1005",
-              "T1213"
+              "T1039",
+              "T1530"
             ]
           },
           "victim": {
             "title": "Känslig data hämtas utan användarnas vetskap",
-            "description": "Användarna märker ingenting medan deras personuppgifter, lösenord och annan känslig information kopieras från databasen. Processen kan ta allt från sekunder till timmar beroende på datamängd och injektionsmetod. Denna data kan sedan säljas på darknet, användas för identitetsstöld eller som utpressningsunderlag.",
+            "description": "Offrets personuppgifter extraheras nu från databasen i bulk. Namn, e-postadresser, telefonnummer, fysiska adresser, lösenord (även om de är hashade) och potentiellt finansiell information kopieras till angriparens system. Offret kan inte på något sätt veta att detta händer. Deras data anförtroddes applikationen, och ett kodningsfel har nu gjort den tillgänglig för en obehörig part. Denna data kan hamna till salu på darkweb-marknadsplatser, användas för identitetsstöld eller utnyttjas i framtida riktade nätfiskekampanjer.",
             "tools_or_indicators": [
               "Inga synliga tecken för slutanvändare",
               "Data finns redan hos angriparen"
@@ -766,14 +772,16 @@
           },
           "victim": {
             "title": "Hela servern kan vara komprometterad",
-            "description": "I detta skede handlar det inte längre bara om databasen. Om angriparen lyckas köra operativsystemkommandon via databasen är hela servern potentiellt komprometterad. Det kan innebära åtkomst till andra applikationer på samma server, interna nätverksresurser och i värsta fall möjlighet att installera persistent skadlig programvara.",
+            "description": "Det är i denna fas som innebörden av 'SQL-injektion' förändras helt. Det började som en databasfrågesårbarhet. Om xp_cmdshell ger angriparen ett SYSTEM-skal, eller om INTO OUTFILE planterar ett web shell, är det nu en fullständig serverkompromiss – inte bara applikationens data, utan alla filer på serverns disk, alla processer som körs på den, alla nätverksanslutningar den har. Angriparen kan läsa applikationens konfigurationsfiler, som typiskt innehåller databas-anslutningssträngar, API-nycklar, molnuppgifter och tredjepartstjänst-tokens. Varje sådan uppgift är en dörr in i ett annat system. Servern blir också en pivotpunkt: angriparen kan skanna interna nätverk inifrån brandväggsgränsen som tidigare blockade dem. En enda icke-parametriserad SQL-fråga kan kaskada från 'stulna e-postadresser' till 'full intern nätverksåtkomst'.",
             "tools_or_indicators": [
-              "Komprometterad databasserver",
-              "Åtkomst till filsystemet",
-              "Möjlighet till nätverkspivotering"
+              "Applikationskonfigurationsfiler (web.config, .env, appsettings.json) nu läsbara – innehåller uppgifter för varje integrerad tjänst",
+              "Servern agerar internt nätverkspivot – kan nå system bakom brandväggen som angriparen inte kunde nå utifrån",
+              "Alla filer på serverns filsystem: SSL-certifikatets privata nycklar, SSH-nycklar, säkerhetskopieringsarkiv",
+              "Alla körande processer synliga – kan dumpa uppgifter från minnet eller injicera i andra tjänster"
             ],
             "mitre_techniques": [
-              "T1068"
+              "T1190",
+              "T1505.003"
             ]
           }
         },
@@ -782,7 +790,7 @@
           "order": 6,
           "attacker": {
             "title": "Exfiltrering av data eller sabotage av databasen",
-            "description": "I den sista fasen flyttar angriparen ut all värdeful data från nätverket, eller förstör den för att orsaka maximal skada. Exfiltrering kan ske genom DNS-tunnlar, krypterade kanaler eller genom att helt enkelt ladda upp data till en molntjänst. Destruktiva attacker kan innebära DROP TABLE-kommandon som raderar hela tabeller, eller kryptering av databasen som del i en utpressningsattack.",
+            "description": "I den sista fasen exfiltrerar angriparen antingen den stulna datan för vinst eller förstör den för störning. Exfiltrerade databaser paketeras, komprimeras och överförs till angriparkontrollerade servrar, ofta via krypterade kanaler för att undvika detektion. Datan kan säljas på darkweb-forum, användas för identitetsstöld eller hållas som lösen. Alternativt kan en destruktiv angripare köra DROP TABLE- eller DELETE-kommandon för att förstöra data, eller kryptera databasinnehållet och kräva betalning för dekrypteringsnyckeln – en kombination av SQL-injektion och ransomware-utpressning.",
             "tools_or_indicators": [
               "DNS-tunnling för dataexfiltrering",
               "DROP TABLE/DATABASE-kommandon",
@@ -792,13 +800,12 @@
             "mitre_techniques": [
               "T1048",
               "T1485",
-              "T1486",
-              "T1070"
+              "T1565.001"
             ]
           },
           "defender": {
             "title": "Säkerhetskopiering och katastrofåterställning",
-            "description": "Regelbundna, testade säkerhetskopior som förvaras offline eller i en annan nätverkszon är det ultimata skyddet mot dataförstörelse. DLP-system övervakar nätverkstrafiken efter tecken på storskalig dataöverföring till okända destinationer. Databasloggning och integritetsövervakning kan upptäcka oauktoriserade ändringar och massraderingar innan skadan blir permanent.",
+            "description": "DLP-system (Data Loss Prevention) övervakar nätverkstrafiken efter mönster som indikerar att känslig data lämnar organisationen, t.ex. stora mängder kreditkortsnummer eller personnummer i utgående trafik. Nätverksövervakning bör flagga ovanliga utgående anslutningar från databasservrar, som normalt bara bör kommunicera med applikationsservrar. Viktigast av allt: att upprätthålla regelbundna, testade, offline-säkerhetskopior säkerställer att data kan återställas även om den förstörs. Säkerhetskopior bör lagras separat från produktionsnätverket så att en angripare som komprometterar databasen inte också kan förstöra säkerhetskopiorna.",
             "tools_or_indicators": [
               "Offline-säkerhetskopior",
               "DLP-system",
@@ -812,15 +819,15 @@
           },
           "victim": {
             "title": "Data är stulen eller förlorad",
-            "description": "Effekten drabbar nu alla användare av tjänsten. Personuppgifter kan vara läckta och spridas på internet, kontoinformation kan ha sålts, eller hela tjänsten kan vara otillgänglig på grund av databasförstörelse. Organisationen ställs inför juridiska konsekvenser under GDPR, förlorat kundförtroende och potentiellt enorma kostnader för återställning och hantering av dataintrånget.",
+            "description": "När användare meddelas om ett SQL-injektionsintrång har deras data typiskt funnits i angriparens händer i veckor eller månader. Meddelandet i sig orsakar omedelbar skada: användare panikslår, förtroendet för tjänsten rasar och organisationen möter rättsliga konsekvenser. De stulna uppgifterna används för credential stuffing mot varje annan tjänst offret använder – deras e-post, bank och sociala mediekonton är nu i spel. Personuppgifter säljs på darkweb-forum inom dagar och finns kvar där hur länge som helst. Om attacken inkluderade datadestruktion – DROP TABLE eller DELETE utan WHERE – går tjänsten ned och användare förlorar kanske år av data permanent. GDPR Artikel 33 kräver anmälan till tillsynsmyndigheten inom 72 timmar efter att ett intrång upptäckts, men att upptäcka intrånget kan ta månader utan databasövervakning på plats.",
             "tools_or_indicators": [
               "Läckta personuppgifter",
               "Otillgänglig tjänst",
               "GDPR-notifieringskrav"
             ],
             "mitre_techniques": [
-              "T1485",
-              "T1486"
+              "T1078",
+              "T1485"
             ]
           }
         }
