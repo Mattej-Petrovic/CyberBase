@@ -1499,22 +1499,23 @@
           "order": 1,
           "attacker": {
             "title": "Etablering av det första fotfästet",
-            "description": "Lateral förflyttning börjar alltid med att angriparen redan har tillgång till minst en enhet i nätverket. Det kan ha skett genom nätfiske, en sårbar tjänst eller stulna inloggningsuppgifter. Denna första komprometterade enhet fungerar som angriparens brygghuvud – en säker utgångspunkt från vilken resten av nätverket utforskas och angrips.",
+            "description": "Lateral förflyttning börjar efter att en angripare redan fått åtkomst till en enda maskin i målnätverket via valfri initial åtkomstvektor – nätfiske, sårbarhetsutnyttjande eller stulna uppgifter. Den första komprometterade maskinen är ofta en vanlig medarbetares arbetsstation med begränsade privilegier, inte angriparens slutliga mål. Angriparen stabiliserar sin åtkomst genom att driftsätta en persistent bakdörr och börjar utvärdera den komprometterade maskinens nätverkskontext: vilken domän den tillhör, vilket nätverkssegment den sitter på, vilka användare som loggat in på den och vilka andra system den kan nå.",
             "tools_or_indicators": [
-              "Komprometterad arbetsstation",
-              "Cobalt Strike Beacon",
-              "Meterpreter-session",
-              "Webshell på exponerad server"
+              "Persistent bakdörr installerad via schemalagd uppgift, registernyckel eller startmapp",
+              "Initialt fotfäste typiskt på en standardarbetsstation för en medarbetare",
+              "Spaningskommandon: whoami, ipconfig, systeminfo, net user",
+              "C2-implantat etablerat för pålitlig fjärråtkomst"
             ],
             "mitre_techniques": [
               "T1078",
-              "T1190",
-              "T1566.001"
+              "T1059.001",
+              "T1053.005",
+              "T1547.001"
             ]
           },
           "defender": {
             "title": "Detektera den initiala komprometteringen",
-            "description": "Ju snabbare den initiala komprometteringen upptäcks, desto mindre skada kan angriparen orsaka. EDR-lösningar på alla endpoints ger visibilitet i processer, nätverksanslutningar och filsystemändringar. Segmentering av nätverket innebär att även om en enhet komprometteras har angriparen begränsad räckvidd. Varningar vid ovanliga processer, utgående anslutningar eller eskaleringsförsök är kritiska tidiga indikatorer.",
+            "description": "Det bästa försvaret mot lateral förflyttning är att detektera och begränsa den initiala komprometteringen innan angriparen kan sprida sig. EDR-lösningar på varje endpoint övervakar misstänkt processkörning, obehöriga persistensmekanismer och C2-kommunikationer. Ju tidigare detta första fotfäste detekteras, desto mindre skada uppstår. Säkerhetsteam bör prioritera larm som involverar nya schemalagda uppgifter, ovanlig PowerShell-körning och processer som gör utgående anslutningar till okända destinationer.",
             "tools_or_indicators": [
               "EDR på alla endpoints",
               "SIEM-korrelation",
@@ -1523,12 +1524,13 @@
             ],
             "mitre_techniques": [
               "T1078",
-              "T1190"
+              "T1053.005",
+              "T1547.001"
             ]
           },
           "victim": {
             "title": "En enhet i nätverket är komprometterad",
-            "description": "En enda komprometterad arbetsstation eller server räcker som utgångspunkt. Användaren av den drabbade enheten kan märka att datorn är långsammare eller att nya processer körs, men ofta är de första tecknen så subtila att de avfärdas. Resten av organisationen har ingen aning om att ett intrång har skett.",
+            "description": "En enda medarbetares arbetsstation har komprometterats, och ur organisationens perspektiv är nu varje system som den arbetsstationen kan kommunicera med i riskzonen. Den drabbade medarbetaren fortsätter arbeta normalt, ovetande om att deras maskin nu är en uppmarschplats för en mycket större attack. De förtroendeförhållanden som får företagsnätverket att fungera – delade filservrar, single sign-on, domänautentisering – är på väg att exploateras. Det som verkar vara en isolerad endpointkompromiss är faktiskt början på ett nätverksomfattande hot.",
             "tools_or_indicators": [
               "Subtila prestandaförändringar",
               "Ovanliga processer",
@@ -1544,7 +1546,7 @@
           "order": 2,
           "attacker": {
             "title": "Kartläggning av nätverkets interna struktur",
-            "description": "Från det komprometterade systemet börjar angriparen utforska det interna nätverket. BloodHound samlar in data från Active Directory och visualiserar relationer mellan användare, grupper, datorer och behörigheter – det kan automatiskt beräkna den kortaste attackvägen till domänadministratör. PowerView är en PowerShell-modul som kan fråga Active Directory efter information om domäner, användare, grupper och förtroendeförhållanden utan att installera extern programvara.",
+            "description": "Från det initiala fotfästet kartlägger angriparen det interna nätverket för att identifiera högt värderade mål och planera sin förflyttningsväg. BloodHound, ett verktyg som visualiserar Active Directory-förtroendeförhållanden och attackvägar, är ovärderligt här – det kan automatiskt identifiera den kortaste vägen från den aktuella komprometterade användaren till domänadminåtkomst. PowerView, ett PowerShell-baserat AD-uppräkningsverktyg, frågar gruppmedlemskap, datorobjekt och åtkomstkontrollistor utan att trigga de flesta säkerhetslarm eftersom det använder inbyggda Windows-protokoll.",
             "tools_or_indicators": [
               "BloodHound med SharpHound-insamlare",
               "PowerView",
@@ -1554,15 +1556,14 @@
             ],
             "mitre_techniques": [
               "T1018",
-              "T1069.001",
               "T1069.002",
               "T1087.002",
-              "T1482"
+              "T1082"
             ]
           },
           "defender": {
             "title": "Identifiera och larma vid intern spaning",
-            "description": "SharpHound:s datainsamling genererar stora mängder LDAP-förfrågningar som skiljer sig från normala mönster – SIEM-regler kan larma vid detta. Honeypots i form av falska administratörskonton och servrar avslöjar angripare som utforskar nätverket. Begränsning av vilken Active Directory-information som vanliga användarkonton kan se minskar angriparens förmåga att kartlägga infrastrukturen.",
+            "description": "Att övervaka Active Directory-frågemönster är avgörande för att detektera intern spaning. BloodHounds SharpHound-insamlare genererar en distinkt burst av LDAP-frågor som begär information om alla användare, grupper, datorer och sessioner i domänen – ett mönster ingen legitim applikation typiskt producerar. Honeypot-konton (falska konton som verkar vara högt värderade mål som tjänstekonton eller administratörer) ger högt tillitslarm eftersom varje autentiseringsförsök mot dem garanterat är skadligt. Övervakning av ovanlig net.exe och PowerShell-användning på arbetsstationer hjälper till att fånga manuell uppräkning.",
             "tools_or_indicators": [
               "SIEM-larm för massiva LDAP-frågor",
               "Honeypot-konton och servrar",
@@ -1571,12 +1572,13 @@
             ],
             "mitre_techniques": [
               "T1018",
+              "T1069.002",
               "T1087.002"
             ]
           },
           "victim": {
             "title": "Nätverkets hemligheter kartläggs",
-            "description": "Angriparen bygger nu en detaljerad karta över hela organisationens IT-miljö. Varje server, varje delad mapp, varje administratörskonto och varje förtroendeförhållande dokumenteras. Denna information avslöjar var de mest värdefulla målen finns och vilka vägar som leder dit. Allt detta sker med legitimt utseende Active Directory-förfrågningar som sällan väcker misstanke.",
+            "description": "I detta ögonblick fungerar organisationen normalt. Anställda loggar in, IT-supporten svarar på ärenden. Undervattnet har varje arkitektoniskt beslut som IT-teamet fattade – var servrarna finns, vilka konton som har vilken åtkomst, hur förtroende delegeras – kartlagts och håller på att beväpnas. LDAP-frågor ser identiska ut med frågor som görs av legitima verktyg. BloodHounds SharpHound genererar samma trafik som en legitim AD-hanteringsplattform. Ingenting verkar fel. Organisationen är på väg att komprometteras mycket djupare på grund av bekvämlighetsbeslut fattade för år sedan: tjänstekontot med överdrivna AD-behörigheter, det delade adminlösenordet för arbetsstationer, backup-agenten som kör som domänadmin. Inget av dessa beslut kändes riskabelt när de fattades.",
             "tools_or_indicators": [
               "Kartlagda Active Directory-relationer",
               "Identifierade högt privilegierade konton",
@@ -1584,7 +1586,7 @@
             ],
             "mitre_techniques": [
               "T1018",
-              "T1482"
+              "T1069.002"
             ]
           }
         },
@@ -1593,38 +1595,39 @@
           "order": 3,
           "attacker": {
             "title": "Extraktion av lösenord och autentiseringsuppgifter",
-            "description": "Angriparen samlar nu in så många inloggningsuppgifter som möjligt. Mimikatz kan dumpa lösenord och lösenordshashar från LSASS-processen – Windows lagrar autentiseringsuppgifter för nyligen inloggade användare i minnet för att möjliggöra Single Sign-On. Kerberoasting utnyttjar Kerberos-protokollet genom att begära tjänstbiljetter för tjänstekonton och sedan knäcka deras lösenord offline. DCSync-attacken simulerar en domäncontroller och begär lösenordsreplikering för alla domänkonton.",
+            "description": "Angriparen skördar inloggningsuppgifter från den komprometterade maskinen med flera tekniker. Mimikatz extraherar klartextlösenord, NTLM-hashar och Kerberos-biljetter direkt från LSASS-processens minne (Local Security Authority Subsystem Service), som Windows använder för att hantera användarautentisering. LSASS innehåller uppgifter för varje användare som loggat in på maskinen, så en komprometterad arbetsstation där en IT-admin en gång loggade in för felsökning ger deras domänadminuppgifter. Angriparen söker också efter uppgifter i konfigurationsfiler, skript, webbläsares sparade lösenord och Windows Credential Manager – hittar ofta tjänstekontolösenord, databas-anslutningssträngar och API-nycklar.",
             "tools_or_indicators": [
-              "Mimikatz (sekurlsa::logonpasswords)",
-              "LSASS-minnesdump",
-              "Kerberoasting (Rubeus)",
-              "DCSync-attack",
-              "Pass-the-Hash"
+              "Mimikatz sekurlsa::logonpasswords för att dumpa alla uppgifter från LSASS-minnet",
+              "LSASS-minnesdump med procdump eller comsvcs.dll för offlineextraktion",
+              "Dumpa SAM-databas för lokala kontohashvärden",
+              "Söka filer efter lagrade lösenord (findstr /si password *.txt *.xml *.config)",
+              "LaZagne – återställer lösenord lagrade av dussintals applikationer inklusive webbläsare och e-postklienter"
             ],
             "mitre_techniques": [
               "T1003.001",
-              "T1003.006",
-              "T1558.003",
-              "T1550.002"
+              "T1003.002",
+              "T1552.001"
             ]
           },
           "defender": {
             "title": "Skydda autentiseringsuppgifter i nätverket",
-            "description": "Credential Guard isolerar LSASS-processen i en virtualiserad miljö som inte kan nås av administratörsverktyg som Mimikatz. Tiered administration innebär att högt privilegierade konton aldrig används på lägre betrodda system – en domänadministratör ska aldrig logga in på en vanlig arbetsstation. Övervakning av DCSync-mönster i nätverkstrafiken och begränsning av Kerberos-delegering minskar angriparens möjligheter att samla in uppgifter.",
+            "description": "Windows Credential Guard använder virtualiseringsbaserad säkerhet för att isolera LSASS-processen så att inte ens kod på administratörsnivå kan läsa uppgifter från den, vilket gör Mimikatz ineffektivt på skyddade system. Att aktivera LSA-skydd (RunAsPPL) lägger till ett annat lager som förhindrar obehöriga processer från att komma åt LSASS-minnet. Skiktad administration säkerställer att privilegierade konton aldrig loggar in på vanliga arbetsstationer, vilket eliminerar scenariot där adminuppgifter cachas på komprometterade maskiner. Regelbunden uppgiftsrotation för tjänstekonton och implementering av gMSA:er (Group Managed Service Accounts) begränsar användbarhetsperioden för stulna uppgifter.",
             "tools_or_indicators": [
-              "Credential Guard",
-              "Tiered administration-modell",
-              "DCSync-detektering",
-              "LSASS-skydd och minnesintegritetsövervakning"
+              "Windows Credential Guard som isolerar LSASS från obehörig åtkomst",
+              "LSA-skydd (RunAsPPL) som förhindrar LSASS-minnesdumpar",
+              "Skiktad administrationsmodell som håller adminuppgifter borta från arbetsstationer",
+              "gMSA:er för automatisk rotations av tjänstekontolösenord",
+              "Övervakning av LSASS-åtkomstförsök via EDR (Sysmon Event ID 10)"
             ],
             "mitre_techniques": [
               "T1003.001",
-              "T1003.006"
+              "T1003.002",
+              "T1003.003"
             ]
           },
           "victim": {
             "title": "Lösenord stjäls utan att kontona påverkas",
-            "description": "Kontoinnehavare märker ingenting – deras lösenord extraheras ur datorns minne utan att lösenordet ändras eller kontot låses. Angriparen kan nu logga in som dessa användare var som helst i nätverket. Särskilt farligt är det om tjänstekonton med höga behörigheter komprometteras, eftersom dessa ofta har obegränsad åtkomst till kritiska system.",
+            "description": "Varje användare som någonsin loggat in på den komprometterade maskinen kan potentiellt ha fått sina uppgifter stulna. Det inkluderar inte bara maskinens primära användare, utan också IT-supportpersonal som loggat in på distans, tjänstekonton som kör schemalagda uppgifter, och valfri administratör som använt maskinen för felsökning. Det farligaste scenariot uppstår när en domänadministratörs uppgifter hittas – det ger angriparen obegränsad åtkomst till varje system i domänen.",
             "tools_or_indicators": [
               "Stulna lösenordshashar",
               "Komprometterade tjänstekonton",
@@ -1632,7 +1635,7 @@
             ],
             "mitre_techniques": [
               "T1003.001",
-              "T1558.003"
+              "T1552.001"
             ]
           }
         },
@@ -1654,21 +1657,24 @@
               "T1021.001",
               "T1021.006",
               "T1047",
-              "T1550.002"
+              "T1550.002",
+              "T1550.003"
             ]
           },
           "defender": {
             "title": "Detektera och blockera lateral rörelse",
-            "description": "Windows Firewall bör blockera inkommande SMB (port 445) och RDP (port 3389) från arbetsplatsdatorer till andra arbetsplatsdatorer – det finns sällan en legitim anledning för denna trafik. Pass-the-Hash (PTH) och Pass-the-Ticket (PTT) är distinkta: PTH använder NTLM-protokollet och genererar Event ID 4624 (inloggning) med AuthenticationPackageName=NTLM och LogonType 3 – en domäninloggning via NTLM på ett Windows-system ska generera ett larm. PTT använder stulna Kerberos-biljetter och loggas annorlunda – Protected Users-gruppen i Active Directory tvingar Kerberos-autentisering och förhindrar NTLM-fallback, vilket blockerar PTH-attacker. GPO-sökvägen för att begränsa NTLM: Computer Configuration > Windows Settings > Security Settings > Local Policies > Security Options > 'Network security: Restrict NTLM'.",
+            "description": "Pass-the-hash och pass-the-ticket är distinkta attacker som kräver olika motåtgärder – att blanda ihop dem är ett vanligt misstag. Pass-the-hash (T1550.002) exploaterar NTLM-autentisering: angriparen använder en stulen NT-hash för att autentisera mot SMB, WMI eller andra NTLM-kapabla tjänster utan det faktiska lösenordet. Åtgärd: inaktivera NTLM där möjligt (Kerberos-only via GPO) eller tvinga NTLM-signering. Detektion: Event ID 4624 med Inloggningstyp 3 och NTLM-autentisering (AuthenticationPackageName = NTLM) från en källa som normalt använder Kerberos. GPO-sökväg: Datorkonfiguration → Windows-inställningar → Säkerhetsinställningar → Lokala policyer → Säkerhetsalternativ → 'Nätverkssäkerhet: Begränsa NTLM'. Pass-the-ticket (T1550.003) använder en stulen Kerberos-TGT eller tjänstbiljett. Åtgärd: Protected Users-säkerhetsgruppen tvingar Kerberos med AES-kryptering och förhindrar biljettcachning i äldre format – lägg till alla tier-0-konton. Detektion: biljetter med ovanliga livstider, fel krypteringstyp (RC4 när miljön använder AES), eller med ursprung från en maskin som inte borde ha utfärdat dem.",
             "tools_or_indicators": [
-              "Brandväggsregler mellan segment",
-              "Blockering av arbetsstation-till-arbetsstation-trafik",
-              "PsExec/WMI-övervakning",
-              "RDP-sessionsloggning"
+              "Windows Event ID 4624 Inloggningstyp 3 med AuthenticationPackageName=NTLM – flagga käll-IP:er som normalt autentiserar via Kerberos",
+              "Blockera NTLM via GPO: Datorkonfiguration → Säkerhetsinställningar → Lokala policyer → 'Nätverkssäkerhet: Begränsa NTLM'",
+              "Protected Users-säkerhetsgrupp – förhindrar Kerberos-biljettcachning, inaktiverar NTLM, tvingar AES-kryptering",
+              "Sysmon Event ID 10: klist.exe som öppnar lsass.exe – Kerberos-biljettdumpning pågår",
+              "Mikrosegmentering: brandväggsregel som nekar port 445 (SMB) mellan arbetsstationers subnät eliminerar de flesta PsExec-laterala rörelsealternativ"
             ],
             "mitre_techniques": [
               "T1021.002",
-              "T1021.001"
+              "T1550.002",
+              "T1550.003"
             ]
           },
           "victim": {
@@ -1681,7 +1687,7 @@
             ],
             "mitre_techniques": [
               "T1021.002",
-              "T1021.001"
+              "T1550.002"
             ]
           }
         },
@@ -1690,7 +1696,7 @@
           "order": 5,
           "attacker": {
             "title": "Uppnående av domänadministratörsbehörigheter",
-            "description": "Angriparen eskalerar nu till den högsta nivån – domänadministratör. DCSync-attacken kräver inte faktiskt domänadmin-medlemskap: det räcker med behörigheten DS-Replication-Get-Changes-All på domänobjektet. Med den kan angriparen simulera en domäncontroller och replikera lösenordshashar för valfritt konto med kommandot: 'Mimikatz lsadump::dcsync /domain:CORP /user:krbtgt'. Med krbtgt-hashen skapas ett Golden Ticket: 'kerberos::golden /user:Administrator /domain:CORP /sid:[SID] /krbtgt:[hash] /ptt'. Golden Ticket är en förfalskad TGT-biljett som ger obegränsad åtkomst till alla resurser i domänen. Kritiskt: Golden Ticket överlever alla användarlösenordsbyten – det invalideras bara om krbtgt-lösenordet byts två gånger med 12 timmars mellanrum (KDC-cachningsfönstret). ADCS (Active Directory Certificate Services) via Certify/Certipy (ESC1/ESC8) skapar certifikatbaserade inloggningsuppgifter som överlever även krbtgt-rotation.",
+            "description": "DCSync är en av de mest kraftfulla attackerna i Active Directory-miljöer och en kritisk nyans att förstå: den kräver inte domänadminrättigheter. Den kräver vilket konto som helst som beviljats behörigheten 'Replicating Directory Changes All' på domänobjektet – en behörighet som ibland delegeras till tjänstekonton av legitima skäl och som angripare aktivt letar efter under BloodHound-uppräkning. Med Mimikatz lsadump::dcsync /user:krbtgt simulerar angriparen DC-replikeringsprotokollet och begär lösenordshash för valfritt konto direkt från en domäncontroller utan att någonsin röra LSASS på DC:n. Med krbtgt-hashen skapar angriparen ett Golden Ticket via Mimikatz kerberos::golden – en Kerberos-TGT signerad med den riktiga krbtgt-nyckeln. DC:n validerar den som autentisk. Detta biljett ger åtkomst till varje Kerberos-skyddad tjänst i domänen under den tid som anges i biljetten (angripare sätter detta till 10 år). Golden Tickets överlever lösenordsbyten för varje konto utom krbtgt – den enda åtgärden är att rotera krbtgt-lösenordet två gånger. Silver Ticket förfalskar en tjänstbiljett för en specifik tjänst utan att röra DC:n – svårare att detektera eftersom det inte genererar KDC-händelser. ADCS (Active Directory Certificate Services) via Certify/Certipy (ESC1/ESC8) skapar certifikatbaserade inloggningsuppgifter som överlever alla lösenordsbyten.",
             "tools_or_indicators": [
               "Mimikatz (lsadump::dcsync)",
               "Golden Ticket via kerberos::golden",
@@ -1699,12 +1705,14 @@
             ],
             "mitre_techniques": [
               "T1003.006",
-              "T1558.001"
+              "T1558.001",
+              "T1558.002",
+              "T1484.001"
             ]
           },
           "defender": {
             "title": "Skydda domänens högsta behörigheter",
-            "description": "Antalet domänadministratörskonton ska vara minimalt och deras användning strikt övervakad. DCSync-anrop generar Event ID 4662 (objektåtkomst) med Operations: {1131f6aa-9c07-11d1-f79f-00c04fc2dcd2} (DS-Replication-Get-Changes-All) – sätt upp ett SIEM-larm på just detta. Rotera krbtgt-lösenordet två gånger med 12 timmars mellanrum för att invalidera befintliga Golden Tickets. Protected Users-säkerhetsgruppen förhindrar att Kerberos-biljetter cachas och blockerar NTLM-fallback. Övervaka åtkomst till AD CS (ADCS) med Certipy – ESC1/ESC8-sårbarheter är vanliga och möjliggör certifikatbaserad persistens som överlever lösenordsbyten.",
+            "description": "Domänadminkonton bör skyddas med extrema åtgärder: de ska bara användas på domäncontrollers som nås via PAW:ar (Privileged Access Workstations), aldrig för rutinmässig administration. DCSync-anrop genererar Event ID 4662 (objektåtkomst) med operationen {1131f6aa-9c07-11d1-f79f-00c04fc2dcd2} (DS-Replication-Get-Changes-All) – sätt upp ett SIEM-larm specifikt på detta. krbtgt-lösenordet bör roteras två gånger regelbundet (två gånger eftersom Kerberos minns aktuellt och föregående lösenord) för att ogiltigförklara befintliga Golden Tickets. Protected Users-säkerhetsgruppen ger extra skydd för högt privilegierade konton. Microsoft Defender for Identity detekterar DCSync och Golden Ticket-attacker specifikt. Övervaka åtkomst till ADCS – ESC1/ESC8-sårbarheter är vanliga och möjliggör certifikatbaserad persistens som överlever lösenordsbyten.",
             "tools_or_indicators": [
               "Regelbundet krbtgt-lösenordsbyte",
               "Protected Users-grupp",
@@ -1713,18 +1721,20 @@
             ],
             "mitre_techniques": [
               "T1003.006",
-              "T1558.001"
+              "T1558.001",
+              "T1558.002"
             ]
           },
           "victim": {
             "title": "Angriparen har total kontroll över domänen",
-            "description": "Med domänadministratörsbehörigheter och potentiellt en Golden Ticket har angriparen obegränsad åtkomst till alla system, filer och resurser i hela Active Directory-domänen. Varje dator, varje server, varje användares e-post och filer – allt är tillgängligt. Detta är det absolut mest kritiska tillståndet för en organisation, och återhämtning kräver ofta en fullständig ombyggnad av Active Directory-infrastrukturen.",
+            "description": "Med domänadministratörsåtkomst har angriparen uppnått total kontroll över organisationens Windows-miljö. De kan läsa vem som helsts e-post, komma åt vilken filresurs som helst, ändra vilken systemkonfiguration som helst, skapa eller radera vilket konto som helst, och distribuera programvara till valfri maskin via grupppolicy. En Golden Ticket-attack är särskilt förödande eftersom den kvarstår även om varje användarlösenord i organisationen återställs – bara rotation av krbtgt-lösenordet (två gånger) ogiltigförklarar det. Organisationen är nu fullständigt komprometterad, och återhämtning kan kräva att Active Directory byggs om från grunden – en process som kan ta veckor eller månader.",
             "tools_or_indicators": [
               "Total åtkomst till alla system",
               "Möjlighet att skapa och radera konton",
               "Fullständig kontroll över säkerhetspolicyer"
             ],
             "mitre_techniques": [
+              "T1003.006",
               "T1558.001"
             ]
           }
@@ -1734,7 +1744,7 @@
           "order": 6,
           "attacker": {
             "title": "Permanenta persistensmekanismer på domännivå",
-            "description": "Angriparen säkrar sin kontroll med persistensmekanismer som överlever lösenordsbyten och systemåterställningar. Skeleton Key (T1556.001): Mimikatz 'misc::skeleton' patchar LSASS på domäncontrollern och lägger till ett universellt bakdörrslösenord ('mimikatz') som fungerar för alla konton – men försvinner vid DC-omstart. DCShadow (T1207): registrerar en falsk domäncontroller i AD och synkroniserar ändringar direkt – detta kringgår standard-DC-händelseloggar eftersom ändringarna sker via replikering, inte normala DC-API:er. ADCS-persistens via .pfx-certifikatfil: ett certifikat utfärdat med Certify/Certipy överlever alla lösenordsbyten och kan användas för autentisering månader senare. GPO-persistens via Default Domain Policy distribuerar bakdörrar till alla domänanslutna datorer.",
+            "description": "Med domänadminåtkomst etablerar angriparen flera oberoende persistensmekanismer. Deras operativa princip är redundans: om försvarare hittar och tar bort två persistensmekanismer finns tre kvar. ADCS-persistens är den mest hållbara: med Certify eller Certipy begär angriparen ett certifikat för domänadminkontot. Certifikat ogiltigförklaras inte av lösenordsbyten, kan inte återkallas utan att hitta själva certifikatet, och möjliggör tyst autentisering i månader eller år. Angriparen begär en ADCS-certifikatregistrering, får en .pfx-fil, och kan autentisera som domänadmin för alltid. Skeleton Key (T1556.001) patchar LSASS-processen på en domäncontroller med Mimikatz misc::skeleton – efter patchning fungerar masterlösenordet 'mimikatz' för vilket konto som helst i domänen utöver deras riktiga lösenord. Det överlever tills DC:n startas om. DCShadow (T1207) registrerar tillfälligt en falsk domäncontroller och skjuter in godtyckliga ändringar i AD-replikeringen – kan ändra ACL:er, gruppmedlemskap och kontoegenskaper på sätt som inte loggas av standard-DC-händelseloggar. GPO-persistens: angriparen lägger till ett inloggnings- eller startskript i Default Domain Policy som laddar ner och kör en angriparpayload på varje maskin vid start.",
             "tools_or_indicators": [
               "Golden Ticket/Silver Ticket",
               "Skeleton Key-injektion",
@@ -1743,16 +1753,15 @@
               "DCShadow-attack"
             ],
             "mitre_techniques": [
-              "T1558.001",
-              "T1556.001",
+              "T1136.002",
               "T1484.001",
-              "T1098",
+              "T1556.001",
               "T1207"
             ]
           },
           "defender": {
             "title": "Detektera och avbryt domänpersistens",
-            "description": "Skeleton Key (misc::skeleton) syns inte i standard Windows-loggar – kräver Sysmon Event ID 10 (process access till LSASS) eller EDR-minnesskanning. DCShadow genererar ovanliga replikeringsanslutningar från icke-kända DC:er – övervaka Event ID 4929 (replikering borttagen) och nätverksanslutningar på port 135/389/636 från icke-DC-värdar. Granska AD regelbundet med Purple Knight eller PingCastle för att identifiera oauktoriserade modifieringar. Vid bekräftad domänkompromiss krävs ofta fullständig återuppbyggnad av Active Directory – inklusive rotation av krbtgt och alla tjänstekontolösenord.",
+            "description": "Att återhämta sig från en kompromiss på domännivå kräver systematisk borttagning av alla persistensmekanismer – en process som kan vara mer komplex än att bygga om från grunden. Skeleton Key (misc::skeleton) syns inte i standard Windows-loggar – kräver Sysmon Event ID 10 (processåtkomst till LSASS) eller EDR-minnesskanning. DCShadow genererar ovanliga replikeringsanslutningar från okända DC:er – övervaka Event ID 4929 och nätverksanslutningar på port 135/389/636 från icke-DC-värdar. Granska AD regelbundet med Purple Knight eller PingCastle för att identifiera obehöriga modifieringar av kritiska objekt. Granska alla GPO:er mot kända tillstånd, kontrollera ADCS för icke-auktoriserade certifikat. I allvarliga fall rekommenderas fullständig återuppbyggnad av Active Directory – inklusive rotation av krbtgt, maskinkonton och förtroendeförhållanden.",
             "tools_or_indicators": [
               "Purple Knight / PingCastle",
               "Granskning av AdminSDHolder",
@@ -1760,22 +1769,22 @@
               "Full AD-återuppbyggnad vid behov"
             ],
             "mitre_techniques": [
-              "T1558.001",
+              "T1136.002",
               "T1484.001",
               "T1207"
             ]
           },
           "victim": {
             "title": "Angriparen har permanentat sin kontroll",
-            "description": "Även om organisationen upptäcker intrånget och byter alla lösenord kan angriparen potentiellt behålla åtkomsten genom sina persistensmekanismer. En Golden Ticket kan vara giltig i upp till tio år om krbtgt-lösenordet inte byts. Skeleton Key överlevervstarter av domäncontrollern. Organisationen befinner sig i en situation där halva åtgärder inte räcker – endast en grundlig och metodisk sanering av hela domänen kan garantera att angriparen inte kommer tillbaka.",
+            "description": "Angriparen har uppnått domändominans: de kontrollerar organisationens hela IT-infrastruktur via flera redundanta bakdörrar. Att ta bort angriparen vid detta tillfälle är extraordinärt svårt eftersom de har bäddat in sig i kärn-identitets- och hanteringssystemen. Organisationen kan tvingas till en fullständig Active Directory-ombyggnad, vilket innebär förlängd driftstoppstid, omprovisioning av varje användarkonto och maskin, och återupprättande av alla förtroendeförhållanden. En enda komprometterad arbetsstation har eskalerat till total organisatorisk kompromiss.",
             "tools_or_indicators": [
               "Persistent angriparåtkomst trots lösenordsbyten",
               "Bakdörrar i grupppolicyer",
               "Manipulerade Active Directory-objekt"
             ],
             "mitre_techniques": [
-              "T1558.001",
-              "T1098"
+              "T1136.002",
+              "T1484.001"
             ]
           }
         }
