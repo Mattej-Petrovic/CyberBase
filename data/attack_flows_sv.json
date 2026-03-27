@@ -328,7 +328,7 @@
             ],
             "mitre_techniques": [
               "T1046",
-              "T1595"
+              "T1595.001"
             ]
           },
           "defender": {
@@ -340,14 +340,22 @@
               "Generiska felmeddelanden vid inloggning"
             ],
             "mitre_techniques": [
-              "T1046"
+              "T1046",
+              "T1595.001"
             ]
           },
           "victim": {
             "title": "Ingen direkt påverkan ännu",
-            "description": "Användaren märker inget i detta skede. Angriparen samlar information passivt eller genom automatiserade skanningar som inte syns för den enskilda användaren. Däremot kan organisationens säkerhetsteam eventuellt se ökad skanningsaktivitet i brandväggsloggar och IDS-system.",
-            "tools_or_indicators": [],
-            "mitre_techniques": []
+            "description": "Offret – vanligtvis en medarbetare eller systemadministratör – använder inloggningsportaler dagligen utan att inse att de är synliga för hela internet. En RDP-server som satts upp för distansarbetets bekvämlighet, en VPN-gateway med webbaserad inloggning, eller en molnapplikations adminpanel är alla potentiella brute force-mål. Offrets vardag – att kunna nå dessa tjänster varifrån som helst – är precis det som gör dem tillgängliga för en angripare att angripa.",
+            "tools_or_indicators": [
+              "Publikt tillgängliga RDP- eller SSH-tjänster",
+              "Webbaserade e-postinloggningsportaler",
+              "Molnapplikationers inloggningssidor utan IP-restriktioner"
+            ],
+            "mitre_techniques": [
+              "T1078",
+              "T1133"
+            ]
           }
         },
         {
@@ -355,13 +363,13 @@
           "order": 2,
           "attacker": {
             "title": "Framtagning av anpassade ordlistor",
-            "description": "Angriparen sammanställer listor med potentiella lösenord. RockYou.txt är en berömd läckt lösenordslista med miljontals riktiga lösenord som människor faktiskt har använt. CeWL är ett verktyg som crawlar en specifik webbplats och bygger en ordlista baserad på ord som finns på sidan – användbart för att skapa organisationsspecifika gissningar. Utöver detta kombineras vanliga lösenordsmönster med kända uppgifter om målet.",
+            "description": "Innan den faktiska attacken förbereder angriparen sin ammunition: listor med användarnamn och lösenord att prova. Den berömda rockyou.txt-ordlistan innehåller över 14 miljoner riktiga lösenord läckta från ett dataintrång 2009 och är fortfarande en av de mest använda utgångspunkterna. För riktade attacker crawlar CeWL (Custom Word List generator) målets webbplats för att bygga en företagsspecifik ordlista baserad på ord som hittas på sidorna – ofta produktnamn, platser och terminologi som anställda kan använda i lösenord. Angriparen kan också skörda användarnamn från LinkedIn, e-postmönster eller tidigare dataintrång.",
             "tools_or_indicators": [
-              "RockYou.txt",
-              "CeWL",
-              "Crunch",
-              "CUPP (Common User Password Profiler)",
-              "SecLists"
+              "rockyou.txt – massiv lösenordsordlista med över 14 miljoner riktiga lösenord från dataintrång",
+              "CeWL – crawlar webbplatser för att generera anpassade ordlistor baserade på ord på målsidorna",
+              "SecLists – kurerad samling ordlistor för användarnamn, lösenord och säkerhetstestning",
+              "Inloggningsdumpar från tidigare dataintrång på darkweb-forum",
+              "Användarnamnsuppräkning via e-postinsamling eller LDAP-frågor"
             ],
             "mitre_techniques": [
               "T1110.002",
@@ -370,25 +378,28 @@
           },
           "defender": {
             "title": "Implementera starka lösenordskrav",
-            "description": "Det bästa försvaret mot ordlisteattacker är att se till att organisationens lösenord inte finns på vanliga listor. Moderna riktlinjer rekommenderar långa lösenordsfraser istället för korta komplexa lösenord. Verktyg kan kontrollera nya lösenord mot kända läckta databaser – exempelvis HaveIBeenPwned-API:t – och blockera lösenord som redan förekommit i dataintrång.",
+            "description": "Det bästa försvaret mot ordlisteattacker är att säkerställa att inga medarbetarlösenord finns i kända intrångsdatabaser. Moderna lösenordspolicyer bör kontrollera nya lösenord mot databaser med komprometterade lösenord (som Have I Been Pwned API) och avvisa alla träffar. Lösenordshanterare bör tillhandahållas och uppmuntras så att medarbetare kan använda långa, unika, slumpmässigt genererade lösenord utan att behöva komma ihåg dem. Att förbjuda vanliga lösenordsmönster som 'Foretaget2024!' är också kritiskt eftersom CeWL-genererade ordlistor inkluderar sådana varianter.",
             "tools_or_indicators": [
-              "HaveIBeenPwned-kontroll vid lösenordsbyte",
-              "Blockeringslistor för vanliga lösenord",
-              "Policy för lösenordslängd och fraser"
+              "Have I Been Pwned API-integration för lösenordskontroll",
+              "Lösenordshanterare (1Password, Bitwarden) driftsatta i hela organisationen",
+              "Azure AD / Entra ID anpassade förbjudna lösenordslistor",
+              "Lägsta lösenordslängd på 14+ tecken med komplexitetskrav"
             ],
             "mitre_techniques": [
-              "T1110.002"
+              "T1110.002",
+              "T1110.003"
             ]
           },
           "victim": {
             "title": "Svaga lösenord utgör en tyst risk",
-            "description": "Användare som valt enkla eller återanvända lösenord löper störst risk. Många väljer lösenord baserade på personlig information – husdjursnamn, födelseår eller favoritlag – som är relativt enkla att gissa med anpassade ordlistor. Utan medvetenhet om riskerna fortsätter användaren med sina vanor ovetande om det förestående hotet.",
+            "description": "Offret kan använda ett lösenord som redan finns i angriparens ordlista utan att veta om det. Vanliga mönster som ett versalt tecken följt av ett ord och siffror (t.ex. 'Sommar2024!') känns säkra men är bland de första kombinationerna angripare provar. Ännu värre: om offret återanvänder lösenord mellan privata och jobbkonton exponeras de överallt vid ett intrång hos en enda tjänst. Många offer vet inte att deras uppgifter från gamla intrång finns fritt tillgängliga i samlingsdatabaser.",
             "tools_or_indicators": [
               "Återanvända lösenord",
               "Enkla lösenordsmönster",
               "Personlig information i lösenord"
             ],
             "mitre_techniques": [
+              "T1078",
               "T1110.001"
             ]
           }
@@ -398,23 +409,24 @@
           "order": 3,
           "attacker": {
             "title": "Systematisk testning av inloggningsuppgifter",
-            "description": "Nu startar den faktiska attacken. Hydra är ett nätverksbaserat verktyg som automatiskt testar kombinationer av användarnamn och lösenord mot inloggningstjänster som SSH, RDP, HTTP och FTP. Hashcat och John the Ripper används istället för att knäcka lösenordshashar offline – det vill säga om angriparen redan fått tag på en databas med krypterade lösenord. Hashcat utnyttjar grafikkortets beräkningskraft för att testa miljarder kombinationer per sekund.",
+            "description": "Det finns två fundamentalt olika scenarion här, och att blanda ihop dem är ett vanligt misstag. Online brute force skickar autentiseringsförfrågningar direkt till den aktiva tjänsten: Hydra skjuter SSH-inloggningsförsök mot målservern, Burp Suite Intruder spelar upp HTTP-förfrågningar mot inloggningsformuläret. Tjänsten hastighetsbegränsar eller låser konton, så angriparen måste gå långsamt. Hastighetstaket bestäms av nätverksfördröjning och serverns hastighetsgränser – typiskt hundratals försök per minut som mest. Offline hashknäckning är ett helt annat spel. Det gäller bara om angriparen redan har fått en databasdump med lösenordshashar – via SQL-injektion, ett intrång eller en komprometterad server. Nu knäcker de hasharna lokalt: Hashcat på ett modernt GPU-kluster kan testa 100 miljarder NTLM-hashar per sekund mot rockyou.txt – klart på sekunder. bcrypt med kostnadsfaktor 12 bromsar detta till ungefär 10 000 hashar per sekund – storleksordningar långsammare, vilket är exakt varför algoritmvalet spelar roll. Credential stuffing är ett tredje scenario: angriparen har klartextpar med användarnamn/lösenord från ett tidigare intrång och provar dem på andra tjänster i hopp om lösenordsåteranvändning.",
             "tools_or_indicators": [
-              "Hydra",
-              "Hashcat",
-              "John the Ripper",
-              "Medusa",
-              "Burp Suite Intruder"
+              "Hydra (THC-Hydra) – online-attack mot SSH, RDP, FTP, HTTP-formulär; begränsad av målets hastighetskontroller",
+              "Hashcat – offline GPU-hashknäckning; gäller bara efter att hashar erhållits från databasdump eller SAM-fil",
+              "John the Ripper – flexibel offline-knäckare med regelbaserade mutationer (t.ex. 'password' → 'P@ssw0rd')",
+              "Burp Suite Intruder – HTTP-inloggningsformulär brute force med anpassningsbara förfrågningsmallar",
+              "Credential stuffing via Sentry MBA eller anpassade skript – använder kända klartextpar från tidigare intrång"
             ],
             "mitre_techniques": [
               "T1110.001",
               "T1110.002",
-              "T1110.003"
+              "T1110.003",
+              "T1110.004"
             ]
           },
           "defender": {
             "title": "Detektera och bromsa automatiserade inloggningsförsök",
-            "description": "Försvararna behöver system som upptäcker och reagerar på stora mängder misslyckade inloggningsförsök. Kontolåsning efter ett visst antal misslyckade försök, progressiv fördröjning mellan inloggningsförsök och CAPTCHA-utmaningar bromsar automatiserade attacker kraftigt. SIEM-system kan korrelera loggar från flera tjänster och larma när samma IP-adress testar inloggning mot många konton samtidigt.",
+            "description": "Kontolåsningspolicyer och hastighetsbegränsning är den första försvarslinjen mot automatiserade attacker. Efter ett konfigurerbart antal misslyckade försök (typiskt 5-10) bör kontot tillfälligt låsas eller käll-IP-adressen begränsas. Men sofistikerade angripare använder 'låg och långsam'-tekniker och provar bara ett fåtal lösenord per konto över tusentals konton för att undvika låsningar. SIEM-system bör korrelera misslyckade inloggningsförsök i hela organisationen för att detektera dessa distribuerade mönster. CAPTCHA på inloggningssidor bromsar också automatiserade verktyg avsevärt.",
             "tools_or_indicators": [
               "Kontolåsningspolicyer",
               "Progressiv fördröjning (rate limiting)",
@@ -429,13 +441,15 @@
           },
           "victim": {
             "title": "Kontot utsätts för tusentals inloggningsförsök",
-            "description": "Beroende på organisationens konfiguration kan offret märka att kontot låses upprepade gånger, eller så sker attacken helt i bakgrunden. Vid lösenordsbespraying – där angriparen testar ett fåtal vanliga lösenord mot många konton – riskerar ingen enskild användare att bli utelåst, vilket gör attacken svårare att upptäcka.",
+            "description": "Offrets konto bombarderas med inloggningsförsök, men de har vanligtvis ingen aning om att det händer. De kan märka att kontot låses ut oväntat, eller att de får en störtflod av MFA-push-notifieringar de inte initierat – en teknik kallad 'MFA-utmattning' där angripare hoppas att offret godkänner en bara för att stoppa aviseringarna. Om attacken är distribuerad över många IP-adresser och använder långsam tajming kan inte ens kontolåsningsmekanismen triggas, vilket lämnar offret helt ovetande.",
             "tools_or_indicators": [
-              "Upprepade kontolåsningar",
-              "Inloggningsnotifikationer från okända platser"
+              "Oväntade kontolåsningar",
+              "Flera MFA-push-notifieringar som offret inte begärt",
+              "Lösenordsåterställningsmeddelanden som offret inte initierat"
             ],
             "mitre_techniques": [
-              "T1110.003"
+              "T1110.001",
+              "T1621"
             ]
           }
         },
@@ -444,7 +458,7 @@
           "order": 4,
           "attacker": {
             "title": "Kringgående av MFA efter lösenordsknäckning",
-            "description": "Att knäcka lösenordet är bara halva problemet när MFA är aktiverat. Push-notis-utmattning (MFA-bombing): angriparen loggar in med det giltiga lösenordet, vilket utlöser en Authenticator-push till offrets telefon. De upprepar detta dussintals gånger tills offret, förvirrat eller irriterat, godkänner en — ofta kl. 02.00. SIM-swapping: angriparen övertalar operatören socialt att flytta offrets telefonnummer, och mottar sedan SMS-koder. Pass-the-hash: om angriparen fått en NTLM-hash (snarare än ett klartextlösenord) kan verktyg som Mimikatz autentisera direkt med hashen mot NTLM-aktiverade tjänster — inget lösenord, ingen MFA-utmaning.",
+            "description": "Att knäcka lösenordet är bara halva problemet när MFA är aktiverat. Angripare använder flera metoder beroende på MFA-typ. Push-notifieringsutmattning (MFA-bombing): angriparen loggar in med det giltiga lösenordet, vilket triggar en Authenticator-push till offrets telefon. De upprepar detta dussintals gånger tills offret, förvirrat eller irriterat, godkänner en – ofta kl. 02:00. Microsoft och Oktas data visar att detta lyckas oftare än försvarare förväntar sig. SIM-byte: angriparen social-manipulerar offrets mobiloperatör att överföra deras telefonnummer, varefter de tar emot SMS-koder. Detta är en telekomiagerattack, inte en teknisk. Pass-the-hash: om angriparen fick tag på en NTLM-hash (inte ett klartextlösenord) gör verktyg som Mimikatz det möjligt att autentisera direkt med hashen mot NTLM-aktiverade tjänster – inget lösenord, ingen MFA triggas, eftersom MFA bara omsluter det initiala autentiseringsflödet.",
             "tools_or_indicators": [
               "MFA-push-bombing — upprepade inloggningsförsök som tvingar fram push-utmattning; kräver bara det knäckta lösenordet",
               "SIM-swap via operatörens social engineering — fångar upp SMS OTP utan skadlig kod på offrets enhet",
@@ -458,7 +472,7 @@
           },
           "defender": {
             "title": "Inte all MFA är likvärdig — förstå vad du försvarar med",
-            "description": "SMS OTP är den svagaste MFA-metoden: sårbar för SIM-swapping. Push-notiser är sårbara för utmattningsattacker — lösningen är nummermatchning, där användaren måste skriva en 2-siffrig kod som visas på inloggningsskärmen i appen innan godkännande. FIDO2/WebAuthn är den enda MFA som besegrar både nätfiske och utmattningsattacker; den är kryptografiskt bunden till ursprungsdomänen. För detektion: larm vid 5+ MFA-avvisanden från samma konto inom 10 minuter. Ett konto som push-bombas är ett lösenordsknäckt konto — behandla det som en bekräftad kompromiss.",
+            "description": "SMS OTP är svagaste MFA: sårbart för SIM-byte och SS7-avlyssning. TOTP (Google Authenticator-liknande koder) är bättre men fortfarande mottagligt för realtids-proxyangrepp. Push-notifieringar är sårbara för utmattningsattacker – lösningen är nummermatchning, där användaren måste skriva in ett 2-siffrigt tal som visas på inloggningsskärmen i appen innan godkännande. Detta bryter automatiserade utmattningsattacker eftersom angriparen inte vet vilket nummer de ska presentera. I Microsoft Authenticator aktiveras detta under: Autentiseringsmetoder → Microsoft Authenticator → Kräv nummermatchning. FIDO2/WebAuthn är den enda MFA som besegrar både nätfiske och utmattningsattacker. För detektion: larm vid 5+ MFA-nekningar från samma konto inom 10 minuter (Event ID 6273 i Windows NPS-loggar, eller motsvarande i Entra/Okta). Ett konto som push-bombas är ett konto med knäckt lösenord – behandla det som bekräftad kompromiss.",
             "tools_or_indicators": [
               "Entra ID / Okta: larm vid flera MFA-avvisanden för samma konto — tröskel på 5 på 10 minuter är en rimlig startpunkt",
               "Aktivera nummermatchning i Microsoft Authenticator (Entra ID-policy: Autentiseringsmetoder → Microsoft Authenticator → Kräv nummermatchning)",
@@ -472,7 +486,7 @@
           },
           "victim": {
             "title": "MFA-bombardemang och förvirring",
-            "description": "Offret kan plötsligt få upprepade förfrågningar om att godkänna en inloggning på sin telefon, trots att de inte försökt logga in. Många godkänner till slut av frustration eller för att de tror att det är ett systemfel. Detta enda misstag ger angriparen full tillgång till kontot trots att MFA var aktiverat.",
+            "description": "Om angriparen knäcker lösenordet och startar en MFA-utmattningsattack börjar offrets telefon vibrera upprepade gånger med autentiseringsförfrågningar de inte initierat. Det är avsiktligt irriterande och desorienterade. Vissa offer godkänner förfrågan bara för att stoppa aviseringarna, särskilt om de kommer mitt i natten. Medarbetare bör tränas att aldrig godkänna MFA-promptar de inte initierat och att omedelbart rapportera aktiviteten – det innebär att lösenordet redan är komprometterat.",
             "tools_or_indicators": [
               "Oväntade MFA-notiser",
               "Upprepade SMS-koder",
@@ -488,43 +502,49 @@
           "order": 5,
           "attacker": {
             "title": "Utnyttjande av den komprometterade åtkomsten",
-            "description": "Med giltig åtkomst utforskar angriparen vad kontot har tillgång till. Det kan innebära att läsa känsliga e-postmeddelanden, komma åt delade filer, eller använda kontot som utgångspunkt för att angripa andra system internt. Angriparen försöker också eskalera sina privilegier – till exempel genom att hitta tjänstekonton med högre behörigheter eller administratörsåtkomst.",
+            "description": "Det första en angripare gör efter en lyckad inloggning är inte att omedelbart ta data – det är att förstå vad de har. De kör 'whoami /all' för att se gruppmedlemskap, kontrollerar om kontot har adminrättigheter lokalt eller på domänen, och ser vilka nätverksresurser som är nåbara. I molnmiljöer räknar de upp IAM-roller och kopplade policyer. Om kontot saknar adminrättigheter letar de efter eskaleringsvägar: lagrade uppgifter i konfigurationsfiler, överprivilegierade tjänstekonton eller adminverktyg som kör under det komprometterade kontots kontext. När de vet vad de har skördar de systematiskt: e-postnyckelordssökningar efter 'lösenord', 'uppgifter', 'vpn', 'aws', 'hemlig' ger enorma resultat i de flesta företagsbrevlådor. SharePoint- och OneDrive-sökningar efter ekonomidokument, källkod och HR-data. Målet innan någon åtgärd vidtas är att undvika detektion – de läser tyst innan de skriver.",
             "tools_or_indicators": [
-              "Intern spaning",
-              "Privilegieeskalering",
-              "Dataexfiltration",
-              "Pivotering till andra system"
+              "whoami /all, net group 'Domain Admins' /domain – första kommandon för att förstå privilegienivå",
+              "Brevlådenyckelordssökning efter 'lösenord', 'uppgifter', 'API-nyckel', 'aws_access' via OWA eller Graph API",
+              "SharePoint/OneDrive-sökning efter 'konfidentiellt', 'lönelistor', 'källkod' – native-sökning lämnar inget särskilt fotavtryck",
+              "AWS CLI: aws iam get-user, aws iam list-attached-user-policies – räkna upp molnbehörigheter",
+              "Uppgiftsfiler: ~/.aws/credentials, web.config, appsettings.json, .env-filer – innehåller ofta hemligheter"
             ],
             "mitre_techniques": [
-              "T1078",
-              "T1087",
-              "T1021"
+              "T1114",
+              "T1083",
+              "T1136",
+              "T1552"
             ]
           },
           "defender": {
             "title": "Övervakning av kontobeteende efter inloggning",
-            "description": "Även efter en lyckad inloggning ska systemet övervaka vad kontot gör. UEBA (User and Entity Behavior Analytics) bygger en baslinje för varje användares normala beteende och larmar vid avvikelser – som plötslig åtkomst till ovanliga resurser, nedladdning av stora datamängder eller inloggning vid ovanliga tidpunkter. Tidig upptäckt kan begränsa skadan avsevärt.",
+            "description": "Nyckelinsikten är att angripare inte perfekt kan imitera normalt användarbeteende. En säljare kör inte LDAP-uppräkningsfrågor. En utvecklare söker inte igenom 10 000 SharePoint-filer kl. 03:00. UEBA (User and Entity Behaviour Analytics) bygger en baslinje för varje användare och larmar vid avvikelser – larmet är inte 'misstänkt fråga' utan 'den här användaren har aldrig gjort det här tidigare'. Microsoft Sentinel, Splunk UBA och Exabeam tillhandahåller alla denna förmåga. Specifika detektionsregler som fångar aktivitet efter kompromiss: larm vid Microsoft Graph API-anrop med scope Mail.Read eller Files.Read från en ny IP; larm vid fler än 50 SharePoint-filåtkomster inom 5 minuter från ett enda konto; larm vid nya undantag från villkorsstyrd åtkomst eller rolltilldelningar utanför kontorstid. Minsta privilegium förblir den viktigaste strukturella kontrollen: ett konto som bara kan läsa sin egen brevlåda och tre SharePoint-sidor orsakar långt mindre skada vid kompromiss än ett med bred åtkomst.",
             "tools_or_indicators": [
-              "UEBA-lösningar",
-              "Privileged Access Management (PAM)",
-              "Nätverkssegmentering",
-              "Övervakning av dataåtkomst"
+              "Microsoft Sentinel UEBA: larm vid första aktivitet från ny IP, enhet eller land för en användare",
+              "Unified Audit Log (UAL) i Microsoft 365: FileAccessed, FileSyncDownloadedFull-händelser – massivnedladdningar genererar hundratals händelser på sekunder",
+              "Graph API-granskning: larm vid nytt OAuth-appsamtycke eller Mail.Send-delegering – angripare sätter ofta upp detta för persistent åtkomst",
+              "Entra ID: larm vid 'Lägg till medlem i roll'-händelser från icke-adminkon ton",
+              "Minsta-privilegieutvärdering: använd Entra ID Access Reviews för att regelbundet ta bort onödiga behörigheter"
             ],
             "mitre_techniques": [
-              "T1078",
-              "T1087"
+              "T1114",
+              "T1136",
+              "T1552"
             ]
           },
           "victim": {
             "title": "Kontot används av någon annan",
-            "description": "Offrets konto används nu aktivt av angriparen. Om kontot har tillgång till känslig information kan den läsas eller kopieras. Kollegor kan få meddelanden från offrets konto som i verkligheten skickas av angriparen. Utan beteendeanalys kan denna situation vara svår att upptäcka, särskilt om angriparen är försiktig och agerar inom rimliga mönster.",
+            "description": "Offrets konto används samtidigt av angriparen, som läser e-post, söker filer och potentiellt sätter upp vidarebefordringsregler så att de får framtida post även efter att lösenordet återställts. Offret ser ingenting. Om angriparen skickar nätfiskemeddelanden från det komprometterade kontot tar offrets kollegor emot dem från en betrodd adress och är långt mer benägna att klicka – offrets rykte och professionella relationer är nu en attackvektor. Offret lär sig typiskt om komprometteringen antingen från säkerhetsteamet (bästa fall) eller från en kollega som frågar 'skickade du verkligen det här till mig?' Skadan på förtroendet i intern kommunikation kan överleva den tekniska komprometteringen med månader.",
             "tools_or_indicators": [
-              "Ovanlig aktivitet i kontot",
-              "Åtkomst till resurser man normalt inte använder",
-              "Meddelanden man inte skickat"
+              "Kollegor som tar emot oväntade e-postmeddelanden från offrets konto med ovanliga bilagor",
+              "Kontoinloggningshistorik som visar sessioner från okända IP-adresser eller länder",
+              "Filåtkomstloggar som visar dokument offret aldrig öppnade",
+              "Inkorgsregler som offret inte skapat och som vidarebefordrar all post till en extern adress"
             ],
             "mitre_techniques": [
-              "T1078"
+              "T1114",
+              "T1534"
             ]
           }
         }
