@@ -27,40 +27,44 @@
             "title": "Insamling av underrättelser om målet",
             "description": "Angriparen börjar med att kartlägga sin måltavla noggrant. Det handlar om att samla in så mycket offentligt tillgänglig information som möjligt – exempelvis namn, e-postadresser, organisationsstruktur och vilka tekniska plattformar som används. Denna fas kallas OSINT (Open Source Intelligence) och sker helt utan att offret märker något, eftersom all information redan finns fritt tillgänglig på internet.",
             "tools_or_indicators": [
-              "theHarvester",
-              "Maltego",
-              "LinkedIn-spaning",
-              "Hunter.io",
-              "Shodan"
+              "theHarvester – e-post- och subdomänuppräkning via sökmotorer och offentliga datakällor",
+              "Maltego – visuellt länkanalysverktyg som kartlägger relationer mellan personer, domäner och organisationer",
+              "LinkedIn- och sociala medier-spaning",
+              "Hunter.io – identifierar e-postformat för organisationer",
+              "Recon-ng – modulärt spaningsramverk"
             ],
             "mitre_techniques": [
               "T1589",
               "T1591",
-              "T1593"
+              "T1598"
             ]
           },
           "defender": {
             "title": "Begränsa den publika attackytan",
-            "description": "Försvararen behöver minska mängden information som är offentligt tillgänglig om organisationen. Det innebär att regelbundet granska vad som syns på sociala medier, webbplatser och i offentliga register. Ju mindre en angripare kan ta reda på utan att larma, desto svårare blir det att skapa trovärdiga nätfiskemeddelanden.",
+            "description": "Det mest effektiva du kan göra under spaningsfasen är att göra angriparens arbete svårare innan de ens börjat. Kör theHarvester eller Hunter.io mot din egen domän och se vad som dyker upp – allt en angripare kan hitta kan du ta bort eller skymma. WAF-loggar visar automatiserade skrapningsmönster: många förfrågningar i snabb följd, ovanliga User-Agent-strängar eller systematisk traversal av medarbetarkatalogsidor. Viktigast av allt: dina egna medarbetare är den största OSINT-källan. En frånvaroautosvarsmeddelande som säger 'Jag är på AWS re:Invent till fredag, kontakta Jane på jane@foretag.se' avslöjar e-postformatet, vem reservkontakten är och när du inte är tillgänglig – precis det en angripare behöver.",
             "tools_or_indicators": [
-              "OSINT-revisioner",
-              "Informationspolicy för anställda",
-              "Övervakning av domänexponering"
+              "WAF-åtkomstloggar för skrapningsmönster mot /om-oss, /team, /kontakt",
+              "Google Alerts och Mention.com för bevakning av företagsnamn och chefsnamn",
+              "Hotunderrättelseflöden (Proofpoint TAP) för tidig detektion av nätfiskeinfrastruktur",
+              "OSINT-medvetenhetsträning för anställda – visa hur deras publika fotavtryck ser ut för en angripare"
             ],
             "mitre_techniques": [
-              "T1589"
+              "T1589",
+              "T1591"
             ]
           },
           "victim": {
             "title": "Ovetande exponering av personlig information",
-            "description": "Offret har i detta skede ingen aning om att en attack förbereds. Ofta har personen utan att tänka på det delat information på LinkedIn, sociala medier eller i offentliga dokument som gör det enkelt för angriparen att bygga en trovärdig profil. Det kan vara allt från jobbtitel och e-postformat till vilka system man arbetar med dagligen.",
+            "description": "Medarbetaren har ingen aning om att de studeras. LinkedIn-profilen visar jobbtitel, teamstruktur och vilka verktyg man använder ('glad att vi nu rullar ut Salesforce'). Konferenstalarbiografin listar vad man arbetar med. Frånvarosvaret avslöjar e-postformat och vem annars man kan kontakta. Inget av detta känns känsligt isolerat, men sammantaget ger det en angripare allt som behövs för att skräddarsy ett nätfiskemeddelande som läses som om det kom från någon inuti företaget. Offret kommer inte att minnas något av detta informationsdelande när e-postmeddelandet anländer veckor senare.",
             "tools_or_indicators": [
-              "LinkedIn-profiler",
-              "Offentliga kontaktuppgifter",
-              "Metadata i delade dokument"
+              "LinkedIn-profil med jobbtitel, team och teknologistack",
+              "Frånvaroautosvar som avslöjar e-postformat och kollegors namn",
+              "Konferenstalarbiografier och offentliga presentationer som listar interna projekt",
+              "GitHub-commits med företagse-postadress och interna repositorynamn"
             ],
             "mitre_techniques": [
-              "T1589.002"
+              "T1589.002",
+              "T1591.004"
             ]
           }
         },
@@ -69,38 +73,41 @@
           "order": 2,
           "attacker": {
             "title": "Konstruktion av bedrägligt innehåll",
-            "description": "Nu skapar angriparen det faktiska nätfiskematerialet. Det kan vara ett e-postmeddelande som ser ut att komma från IT-avdelningen, en falsk inloggningssida som är en exakt kopia av den riktiga, eller ett dokument med inbäddad skadlig kod. GoPhish är ett ramverk med öppen källkod som gör det möjligt att bygga och hantera nätfiskekampanjer med realistiska e-postmallar och falska landningssidor.",
+            "description": "Med underrättelserna insamlade bygger angriparen nätfiskeverktyget. Det innebär typiskt att skapa en övertygande falsk inloggningssida som speglar den riktiga pixel för pixel, registrera en lookalike-domän (som 'micr0soft-inloggning.com') och formulera ett e-postmeddelande som imiterar tonen, formateringen och varumärket i legitima företagskommunikationer. Avancerade angripare använder verktyg som Evilginx2, en omvänd proxy som sitter mellan offret och den riktiga inloggningssidan och fångar sessionskakor i realtid – effektivt mot MFA.",
             "tools_or_indicators": [
-              "GoPhish",
-              "SET (Social Engineering Toolkit)",
-              "Evilginx2",
-              "Homoglyfdomäner",
-              "HTML-kloning av inloggningssidor"
+              "GoPhish – öppen källkod för nätfiskekampanjer med spårning av klick och insamling av uppgifter",
+              "Evilginx2 – omvänd proxy som fångar autentiseringssessioner inklusive MFA-tokens i realtid",
+              "SET (Social Engineering Toolkit) – ramverk för sociala ingenjörsattacker",
+              "Lookalike-domänregistrering (typosquatting)",
+              "HTML/CSS-kloning av legitima inloggningssidor"
             ],
             "mitre_techniques": [
               "T1566.001",
               "T1566.002",
-              "T1204.001"
+              "T1608.005"
             ]
           },
           "defender": {
             "title": "Proaktiv identifiering av nätfiskeinfrastruktur",
-            "description": "Försvaret kan försöka upptäcka förberedelserna genom att övervaka nyregistrerade domäner som liknar den egna organisationens. Verktyg som DNSTwist söker automatiskt efter domännamn med stavningsvarianter eller homoglyfer – tecken som ser likadana ut men tekniskt skiljer sig. Tidig upptäckt gör det möjligt att blockera domänen innan kampanjen ens startar.",
+            "description": "Försvarare kan proaktivt detektera nätfiskeförberedelser genom att övervaka nyregistrerade domäner som liknar organisationens domän. Domänövervakningstjänster och certificate transparency-loggar kan avslöja när en angripare registrerar en lookalike-domän eller skaffar ett SSL-certifikat för den. Att upprätthålla DMARC-, DKIM- och SPF-poster säkerställer att förfalskade e-postmeddelanden flaggas eller avvisas av mottagande e-postservrar.",
             "tools_or_indicators": [
-              "DNSTwist",
-              "Övervakning av nyregistrerade domäner",
-              "Sandboxanalys av bilagor",
-              "URLScan.io"
+              "Certificate Transparency-loggövervakning",
+              "Domänövervakningstjänster (DNSTwist) för att detektera typosquatting",
+              "DMARC/DKIM/SPF-e-postautentiseringskonfiguration",
+              "Nätfiske-URL-databaser och hotunderrättelseflöden"
             ],
             "mitre_techniques": [
-              "T1566.001",
-              "T1566.002"
+              "T1583.001",
+              "T1584.001"
             ]
           },
           "victim": {
             "title": "Ingen synlig påverkan ännu",
-            "description": "Offret påverkas fortfarande inte direkt i denna fas. Angriparen bygger upp sin infrastruktur i bakgrunden – registrerar domäner, konfigurerar e-postservrar och förbereder landningssidor. Det är först i nästa fas som offret kommer i kontakt med det bedrägliga materialet.",
-            "tools_or_indicators": [],
+            "description": "Under denna fas är offret helt ovetande om att en attack förbereds specifikt för dem. Nätfiskesidan kan redan existera och perfekt replikera den inloggningsportal de använder varje dag, men tills e-postmeddelandet anländer i inkorgen finns det ingen indikation på att något är fel. Det är därför proaktiv säkerhetsmedvetenhetsträning är viktig – innan en attack anländer, inte efter. En praktisk vana: medarbetare bör veta att hovra över länkar innan de klickar och verifiera domänen tecken för tecken – 'micros0ft.com' med en nolla ser identisk ut vid en snabb blick.",
+            "tools_or_indicators": [
+              "Inga direkta indikatorer synliga för offret i detta skede",
+              "Nätfiskesimulationsplattformar (KnowBe4, Proofpoint Security Awareness) bygger igenkänning inför riktiga attacker"
+            ],
             "mitre_techniques": []
           }
         },
@@ -109,17 +116,18 @@
           "order": 3,
           "attacker": {
             "title": "Utskick av nätfiskemeddelandet",
-            "description": "Angriparen skickar det bedrägliga meddelandet till offret. För att undvika att fastna i spamfilter försöker man kringgå skyddsmekanismer som SPF (Sender Policy Framework) och DKIM (DomainKeys Identified Mail) – protokoll som verifierar att avsändardomänen verkligen är den den utger sig för att vara. Vanliga tekniker inkluderar att använda komprometterade e-postkonton med giltiga autentiseringsposter, eller att utnyttja betrodda molntjänster som vidarebefordrar meddelandet.",
+            "description": "Angriparen levererar nätfiskemejlet eller meddelandet till offret. För att kringgå e-postsäkerhet kan angriparen skicka från ett komprometterat legitimt konto, använda en betrodd e-posttjänst som SendGrid eller utnyttja felkonfigurerade SPF/DKIM-poster. E-postmeddelandet är noggrant tajmat – ofta under sibyllinska arbetstider när mottagare är mindre benägna att granska varje meddelande. Vissa angripare använder också SMS (smishing) eller röstsamtal (vishing) som alternativa leveranskanaler, eller QR-koder inbäddade i dokument (quishing).",
             "tools_or_indicators": [
-              "Komprometterade SMTP-servrar",
-              "SPF/DKIM-förbigång",
-              "Betrodda molntjänster som vidarebefordrare",
-              "Tidsinställda utskick"
+              "Komprometterade e-postkonton för utskick från betrodda domäner",
+              "Bulk-e-posttjänster (SendGrid, Mailgun) för leverans",
+              "SPF/DKIM-förbigångstekniker",
+              "SMS-baserat nätfiske (smishing)",
+              "QR-kodsnätfiske (quishing) inbäddat i dokument"
             ],
             "mitre_techniques": [
               "T1566.001",
               "T1566.002",
-              "T1078"
+              "T1566.003"
             ]
           },
           "defender": {
@@ -138,7 +146,7 @@
           },
           "victim": {
             "title": "Mottagande av bedrägligt meddelande",
-            "description": "Offret får ett e-postmeddelande som ser legitimt ut – kanske från chefen, IT-avdelningen eller en välkänd tjänst. Meddelandet innehåller ofta en uppmaning att agera snabbt, till exempel att byta lösenord omedelbart eller bekräfta kontoinformation. Denna brådska är avsiktlig och syftar till att offret ska klicka utan att tänka efter.",
+            "description": "Nätfiskemejlet landar i offrets inkorg, möjligen utan att fastna i spamfilter. Det ser legitimt ut – kanske verkar det komma från IT-support, en chef eller en betrodd leverantör. Meddelandet skapar brådska: lösenordet håller på att gå ut, kontot har komprometterats, eller ett viktigt dokument kräver omedelbar granskning. I detta ögonblick måste offret avgöra om de ska lita på meddelandet eller undersöka det vidare – och den splitsekunden är precis vad angriparen räknar med.",
             "tools_or_indicators": [
               "E-post i inkorgen",
               "Brådskande ämnesrader",
@@ -154,17 +162,18 @@
           "order": 4,
           "attacker": {
             "title": "Aktivering av den skadliga payloaden",
-            "description": "När offret klickar på länken eller öppnar bilagan aktiveras den skadliga delen av attacken. Det kan innebära att offret omdirigeras till en falsk inloggningssida, att ett makro i ett Word-dokument kör skadlig kod, eller att en webbläsarexploit utnyttjar en sårbarhet. Angriparen förlitar sig helt på att offret utför en handling – detta kallas social ingenjörskonst.",
+            "description": "Exploateringsfasen börjar i det ögonblick offret klickar på den skadliga länken eller öppnar den beväpnade bilagan. Om lockvagnet är en falsk inloggningssida navigerar offrets webbläsare till en angriparkontrollerad sida som ser identisk ut med den riktiga. Om det är ett skadligt dokument kan öppningen trigga ett makro eller en exploit som tyst laddar ner skadlig kod. HTML-smuggling (T1027.006) är en sofistikerad variant: den skadliga payloaden sätts ihop inuti webbläsaren med JavaScript-blobs eller data-URI:er, så den finns aldrig som en fil som e-postskannrar kan inspektera.",
             "tools_or_indicators": [
-              "Skadliga makron i Office-dokument",
-              "Falska inloggningssidor",
-              "Drive-by-nedladdningar",
-              "Webbläsarexploits"
+              "Skadliga URL:er som omdirigerar till insamlingssidor för uppgifter",
+              "Beväpnade Office-dokument med VBA-makron",
+              "HTML-smuggling (T1027.006): payload sätts ihop i webbläsaren, kringgår e-postskannrar",
+              "Webbläsarexploitkits mot opatchade sårbarheter"
             ],
             "mitre_techniques": [
               "T1204.001",
               "T1204.002",
-              "T1059.005"
+              "T1059.005",
+              "T1027.006"
             ]
           },
           "defender": {
@@ -183,7 +192,7 @@
           },
           "victim": {
             "title": "Interaktion med det skadliga innehållet",
-            "description": "Offret klickar på länken eller öppnar bilagan, ofta utan att misstänka något. Den falska webbsidan ser identisk ut med den riktiga – samma logotyp, samma layout, samma färger. Eller så öppnas dokumentet och ber om att aktivera makron för att visa innehållet. I detta ögonblick har angriparen fått den åtkomst som behövs.",
+            "description": "Offret klickar på länken eller öppnar bilagan i tro att det är legitimt. Den falska inloggningssidan ser exakt ut som den riktiga – samma logotyp, samma layout, samma färger. Offren är inte dumma för att falla för dessa attacker; modernt nätfiske är extremt sofistikerat och utformat för att exploatera hur människor naturligt bearbetar information under tidsbrist. Det är därför skiktade tekniska försvar är nödvändiga – att enbart förlita sig på mänskligt omdöme räcker inte.",
             "tools_or_indicators": [
               "Klick på skadlig länk",
               "Aktivering av makron",
@@ -245,18 +254,19 @@
           "order": 6,
           "attacker": {
             "title": "Säkra långvarig åtkomst",
-            "description": "Med stulna inloggningsuppgifter i hand säkrar angriparen sin position. Det kan innebära att lägga till en ny MFA-enhet på offrets konto, skapa vidarebefordringsregler i e-posten som skickar kopior av alla meddelanden till angriparen, eller installera en bakdörr för fjärråtkomst. Målet är att behålla åtkomsten även om offret byter lösenord.",
+            "description": "Med giltiga inloggningsuppgifter eller sessionstoken i hand arbetar angriparen snabbt för att etablera persistent åtkomst som överlever ett lösenordsbyte. Det kan innebära att registrera en ny MFA-enhet på det komprometterade kontot, skapa OAuth-applikationssamtycken som ger löpande åtkomst till e-post och filer, sätta upp regler för e-postvidarebefordran som tyst kopierar alla inkommande meddelanden, eller skapa ett nytt bakdörrskonto. Angriparens mål är att säkerställa att de inte förlorar åtkomsten ens om nätfiskeattacken till slut upptäcks.",
             "tools_or_indicators": [
-              "Tillägg av ny MFA-enhet",
-              "Regler för e-postvidarebefordran",
-              "OAuth-applikationssamtycke",
-              "Bakdörrar och webshells"
+              "Registrering av obehöriga MFA-enheter på det komprometterade kontot",
+              "Skapande av OAuth-appsamtycken för persistent e-post-/filåtkomst",
+              "Dolda regler för e-postvidarebefordran",
+              "Skapande av nya konton eller tjänsthuvudmän som reservåtkomst",
+              "Installation av fjärråtkomsttrojaner (RAT) på offrets enhet"
             ],
             "mitre_techniques": [
               "T1098",
-              "T1114.003",
+              "T1137",
               "T1136",
-              "T1505.003"
+              "T1078"
             ]
           },
           "defender": {
@@ -276,14 +286,15 @@
           },
           "victim": {
             "title": "Kontot har kapats",
-            "description": "Offret kan fortfarande logga in normalt och märker kanske inte att kontot har komprometterats. Angriparen arbetar tyst i bakgrunden – läser e-post, skickar meddelanden i offrets namn och använder kontot som språngbräda för ytterligare attacker mot kollegor och organisationen. Utan proaktiv övervakning kan denna situation pågå i veckor eller månader.",
+            "description": "Offret fortsätter använda sitt konto normalt, ovetande om att angriparen har etablerat flera bakdörrar. De märker kanske inte den nya MFA-enheten registrerad på kontot, eller den dolda vidarebefordringsregeln som skickar kopior av deras meddelanden till en extern adress. Även om offret till slut byter lösenord efter en rutinmässig säkerhetspåminnelse kan angriparens persistensmekanismer fortfarande ge åtkomst. Offret får bara reda på komprometteringen när säkerhetsteamet meddelar dem – vilket kan ske dagar, veckor eller till och med månader senare.",
             "tools_or_indicators": [
-              "Okända MFA-enheter på kontot",
-              "Dolda vidarebefordringsregler",
-              "Ovanliga inloggningssessioner"
+              "Okända MFA-enhetsregistreringar i kontoinställningarna",
+              "Dolda inkorgsregler som vidarebefordrar e-post externt",
+              "OAuth-appar med breda behörigheter som offret inte auktoriserade"
             ],
             "mitre_techniques": [
-              "T1078"
+              "T1098",
+              "T1137"
             ]
           }
         }
