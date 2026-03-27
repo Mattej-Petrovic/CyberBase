@@ -141,9 +141,9 @@ AF_TOPOLOGIES['sql-injection'] = {
       { id:'exf', type:'c2',       label:'Exfil Target',    sublabel:'Attacker Host', x:960, y:420 },
     ],
     defender: [
-      { id:'waf',  type:'firewall', label:'WAF',  sublabel:'Cloudflare', x:320, y:100, _isDefender:true },
-      { id:'ids',  type:'edr',      label:'IDS',  sublabel:'Snort',      x:820, y:100, _isDefender:true },
-      { id:'siem', type:'siem',     label:'SIEM', sublabel:'Splunk',     x:560, y:100, _isDefender:true },
+      { id:'waf',  type:'firewall', label:'WAF',  sublabel:'Cloudflare', x:320, y:55,  _isDefender:true },
+      { id:'ids',  type:'edr',      label:'IDS',  sublabel:'Snort',      x:820, y:55,  _isDefender:true },
+      { id:'siem', type:'siem',     label:'SIEM', sublabel:'Splunk',     x:560, y:55,  _isDefender:true },
     ],
   },
   edges: [
@@ -351,9 +351,9 @@ AF_TOPOLOGIES['supply-chain-attack'] = {
       { id:'oc',   type:'victim',   label:'Org C',            sublabel:'Downstream Victim', x:960, y:400 },
     ],
     defender: [
-      { id:'scan', type:'edr',      label:'Dep Scanner',  sublabel:'Snyk',     x:560, y:100, _isDefender:true },
-      { id:'sign', type:'firewall', label:'Code Signing', sublabel:'Sigstore', x:780, y:100, _isDefender:true },
-      { id:'siem', type:'siem',     label:'SIEM',         sublabel:'Splunk',   x:960, y:100, _isDefender:true },
+      { id:'scan', type:'edr',      label:'Dep Scanner',  sublabel:'Snyk',     x:560, y:55,  _isDefender:true },
+      { id:'sign', type:'firewall', label:'Code Signing', sublabel:'Sigstore', x:780, y:55,  _isDefender:true },
+      { id:'siem', type:'siem',     label:'SIEM',         sublabel:'Splunk',   x:960, y:55,  _isDefender:true },
     ],
   },
   edges: [
