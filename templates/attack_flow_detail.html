@@ -108,7 +108,7 @@ const _AF = {
     <!-- SVG Canvas — managed by raw JS, x-ignore keeps Alpine out -->
     <div class="af-scanlines relative" x-ignore id="af-canvas">
       <svg id="af-diagram" viewBox="0 0 1100 600" class="w-full block"
-           style="min-height:520px;" preserveAspectRatio="xMidYMid meet">
+           style="height:600px;" preserveAspectRatio="xMidYMid meet">
         <defs>
           <!-- Grid pattern -->
           <pattern id="af-grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -228,9 +228,9 @@ const _AF = {
         </defs>
 
         <!-- Background grid -->
-        <rect width="1100" height="520" fill="url(#af-grid)"/>
+        <rect width="1100" height="600" fill="url(#af-grid)"/>
         <!-- Subtle vignette -->
-        <rect width="1100" height="520" fill="url(#vignette)"/>
+        <rect width="1100" height="600" fill="url(#vignette)"/>
 
         <!-- Rendering target groups -->
         <g id="af-g-edges"></g>

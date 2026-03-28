@@ -527,18 +527,18 @@ class AFRenderer {
 
       if (isAct && ed.label && !isDefOnly) {
         const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
-        const labelLen = ed.label.length * 5.5 + 8;
+        const labelLen = ed.label.length * 6 + 24;
         const lbg = document.createElementNS(NS, 'rect');
         this._attrs(lbg, {
-          x:String(mx - labelLen/2), y:String(my - 14),
-          width:String(labelLen), height:'13', rx:'3',
-          fill:'#0d1117', opacity:'.85',
+          x:String(mx - labelLen/2), y:String(my - 16),
+          width:String(labelLen), height:'18', rx:'3',
+          fill:'#0d1117', opacity:'.9',
         });
         const ltxt = document.createElementNS(NS, 'text');
         this._attrs(ltxt, {
           x:String(mx), y:String(my - 4),
-          'text-anchor':'middle','font-size':'9','font-family':'ui-monospace,monospace',
-          fill:colors.accent,'font-weight':'500',
+          'text-anchor':'middle','font-size':'10','font-family':'ui-monospace,monospace',
+          fill:colors.accent,'font-weight':'600',
         });
         ltxt.textContent = ed.label;
         g.append(lbg, ltxt);
@@ -624,15 +624,15 @@ class AFRenderer {
 
       const lbl = document.createElementNS(NS, 'text');
       this._attrs(lbl, {x:String(W/2),y:'48','text-anchor':'middle',
-        'font-size':'9','font-family':'ui-monospace,monospace',
-        fill:isAct||isDet||isComp?'#e2e8f0':'#4a5568','font-weight':'600','letter-spacing':'0.3'});
+        'font-size':'11','font-family':'ui-monospace,monospace',
+        fill:isAct||isDet||isComp?'#e2e8f0':'#4a5568','font-weight':'700','letter-spacing':'0.3'});
       lbl.textContent = (node.label || '').toUpperCase();
       textG.appendChild(lbl);
 
       if (node.sublabel) {
         const sub = document.createElementNS(NS, 'text');
-        this._attrs(sub, {x:String(W/2),y:'61','text-anchor':'middle',
-          'font-size':'7.5','font-family':'ui-monospace,monospace',fill:'#8b949e'});
+        this._attrs(sub, {x:String(W/2),y:'62','text-anchor':'middle',
+          'font-size':'9','font-family':'ui-monospace,monospace',fill:'#8b949e'});
         sub.textContent = node.sublabel;
         textG.appendChild(sub);
       }
@@ -705,17 +705,17 @@ class AFRenderer {
         .map(id => nmap[id]).filter(Boolean)
         .find(n => n.type === 'attacker');
       if (atkNode) {
-        const BADGE_W = 70; // fixed badge slot width for consistent spacing
+        const BADGE_W = 80; // fixed badge slot width for consistent spacing
         state.tools.slice(0, 3).forEach((tool, i) => {
-          const tw = tool.length * 6 + 12;
+          const tw = tool.length * 6.5 + 16;
           const tx = atkNode.x + (i - 1) * (BADGE_W + 4) - tw/2;
           const ty = atkNode.y - 60;
           const bg = document.createElementNS(this.NS, 'rect');
-          this._attrs(bg, {x:String(tx),y:String(ty-10),width:String(tw),height:'14',rx:'3',
+          this._attrs(bg, {x:String(tx),y:String(ty-10),width:String(tw),height:'20',rx:'3',
             fill:'rgba(239,68,68,.18)',stroke:'rgba(239,68,68,.4)','stroke-width':'1'});
           const txt = document.createElementNS(this.NS, 'text');
-          this._attrs(txt, {x:String(tx+tw/2),y:String(ty+1),'text-anchor':'middle',
-            'font-size':'8','font-family':'ui-monospace,monospace',fill:'#fca5a5'});
+          this._attrs(txt, {x:String(tx+tw/2),y:String(ty+4),'text-anchor':'middle',
+            'font-size':'10','font-family':'ui-monospace,monospace',fill:'#fca5a5','font-weight':'600'});
           txt.textContent = tool;
           this.ogGroup.append(bg, txt);
         });
