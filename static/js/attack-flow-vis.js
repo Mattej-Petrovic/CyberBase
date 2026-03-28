@@ -706,9 +706,13 @@ class AFRenderer {
         .find(n => n.type === 'attacker');
       if (atkNode) {
         const BADGE_W = 80; // fixed badge slot width for consistent spacing
-        state.tools.slice(0, 3).forEach((tool, i) => {
+        const tools = state.tools.slice(0, 3);
+        const totalW = tools.length * BADGE_W + (tools.length - 1) * 4;
+        const startX = Math.max(10, atkNode.x - totalW / 2);
+        tools.forEach((tool, i) => {
           const tw = tool.length * 6.5 + 16;
-          const tx = atkNode.x - 65 + i * (BADGE_W + 4);
+          const slotX = startX + i * (BADGE_W + 4);
+          const tx = slotX + (BADGE_W - tw) / 2;
           const ty = atkNode.y - 60;
           const bg = document.createElementNS(this.NS, 'rect');
           this._attrs(bg, {x:String(tx),y:String(ty-10),width:String(tw),height:'20',rx:'3',
