@@ -708,7 +708,7 @@ class AFRenderer {
         const BADGE_W = 80; // fixed badge slot width for consistent spacing
         state.tools.slice(0, 3).forEach((tool, i) => {
           const tw = tool.length * 6.5 + 16;
-          const tx = atkNode.x + (i - 1) * (BADGE_W + 4) - tw/2;
+          const tx = atkNode.x - 65 + i * (BADGE_W + 4);
           const ty = atkNode.y - 60;
           const bg = document.createElementNS(this.NS, 'rect');
           this._attrs(bg, {x:String(tx),y:String(ty-10),width:String(tw),height:'20',rx:'3',
