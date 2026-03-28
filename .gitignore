@@ -62,3 +62,7 @@ node_modules/
 *-service-account*.json
 *.key.json
 *private_key*.json
+
+# Other
+.claude
+docs/
