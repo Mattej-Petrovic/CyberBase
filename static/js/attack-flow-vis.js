@@ -483,7 +483,7 @@ class AFRenderer {
 
       const dx = b.x - a.x, dy = b.y - a.y;
       const len = Math.sqrt(dx*dx + dy*dy) || 1;
-      const pad = 72;
+      const pad = Math.min(72, len * 0.32);
       const x1 = a.x + dx/len*pad, y1 = a.y + dy/len*pad;
       const x2 = b.x - dx/len*pad, y2 = b.y - dy/len*pad;
 
