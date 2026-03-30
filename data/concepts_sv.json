@@ -2,8 +2,8 @@
   "_fileVersion": {
     "version": 3,
     "buildsOn": 2,
-    "updated": "2026-02-12",
-    "notes": "Removed Quick self test blocks from Networking and Protocols concepts and expanded Deep Dive sections for each page."
+    "updated": "2026-03-30",
+    "notes": "La till konceptsidan för OSI-modellen under Networking and Protocols och utökade den lokaliserade konceptkatalogen."
   },
   "frameworksAndStandards": [
     {
@@ -1050,6 +1050,109 @@
     }
   ],
   "networkingAndProtocols": [
+    {
+      "id": "osi-model",
+      "name": "OSI-modellen",
+      "summary": "Ett konceptuellt ramverk med sju lager som används för att förstå, analysera och felsöka hur nätverkskommunikation rör sig från applikationer ned till den fysiska länken.",
+      "intro": "OSI-modellen (Open Systems Interconnection) är ett konceptuellt ramverk som delar upp nätverkskommunikation i sju lager. Det är inte en protokollsvit som körs exakt som den är beskriven på dagens Internet. I stället ger den dig ett strukturerat sätt att förstå hur data rör sig från en applikation, genom transport och routning, över lokala nätverksmedier och till sist som fysiska signaler.",
+      "bullets": [
+        "Delar upp nätverkskommunikation i lager så att varje del av processen får ett tydligare ansvar.",
+        "Ger ett gemensamt språk för felsökning, paketanalys, protokollförståelse och säkerhetsarkitektur.",
+        "Hjälper dig att placera tekniker på rätt nivå även när verkliga protokoll inte passar perfekt i ett enda lager."
+      ],
+      "references": [
+        "IBM: What is the OSI model? https://www.ibm.com/think/topics/osi-model",
+        "Cloudflare Learning Center: OSI model https://www.cloudflare.com/learning/ddos/glossary/open-systems-interconnection-model-osi/",
+        "Cisco: OSI model overview https://www.cisco.com/c/en/us/products/switches/what-is-a-network-switch.html"
+      ],
+      "learn": {
+        "what": "OSI-modellen är en referensmodell med sju lager för nätverkskommunikation. Syftet är att dela upp en komplex process i begripliga delar så att du kan beskriva vilken typ av arbete som sker vid en viss punkt: användarnära applikationsbeteende, datarepresentation, sessionshantering, ändpunktskommunikation, IP-routning, lokal ramleverans eller den fysiska signaleringen på mediet. Modellen är konceptuell, och det är just därför den är användbar. Den hjälper dig att tänka klart utan att vara låst till en viss leverantör, ett visst protokoll eller ett visst operativsystem.",
+        "why": "OSI-modellen är viktig eftersom riktiga nätverksproblem sällan börjar med hela svaret. Ofta börjar du med symptom: en webbplats laddar inte, en DNS-fråga timeoutar, en TCP-handskakning fastnar, en switch vidarebefordrar fel eller en kabel introducerar fel. Modellen ger dig ett disciplinerat sätt att fråga var problemet hör hemma och vilken typ av bevis som passar på den nivån. Den är också ett starkt stöd i säkerhetsarbete, eftersom kontroller, attacker och telemetri verkar på olika lager. Brandväggar, portar, paket, DNS, HTTP, Ethernet och fysisk åtkomst blir mycket lättare att förstå när du kan placera dem i ett lagerindelat system.",
+        "how": [
+          "En applikation skapar nyttiga data, till exempel en webbförfrågan, en DNS-uppslagning eller ett e-postmeddelande. Högre lagerlogik definierar vad datan betyder.",
+          "Datan förbereds i ett format som båda sidor kan tolka, och sessionsinformation eller samtalskontext hålls samman så att utbytet förblir koherent.",
+          "Ett transportprotokoll som TCP eller UDP lägger till ändpunkt-till-ändpunkt-beteende och använder portar så att mottagande värd kan lämna trafiken till rätt process.",
+          "Nätverkslagret lägger till logisk adressering med IP och gör det möjligt för routrar att flytta paket mellan olika nät.",
+          "Datalänklagret kapslar in paketen i lokala ramar och använder tekniker som Ethernet, MAC-adresser och switching för att flytta data över en specifik länk.",
+          "Det fysiska lagret omvandlar ramarna till elektriska, optiska eller trådlösa signaler som kan färdas över koppar, fiber eller radio.",
+          "Hos mottagaren vänds processen när varje lager tar bort sina egna headers, tolkar sin del av kommunikationen och lämnar det återstående innehållet uppåt."
+        ],
+        "pitfalls": [
+          "Att behandla OSI-modellen som en bokstavlig beskrivning av hur varje modern protokollstack är byggd. Det är en undervisnings- och analysmodell, inte en perfekt ritning över Internet.",
+          "Att försöka tvinga in varje protokoll i exakt ett lager när många verkliga system spänner över flera lager eller suddar ut gränserna mellan dem.",
+          "Att memorera lagernamnen utan att lära sig vilka frågor varje lager hjälper dig att besvara under felsökning.",
+          "Att anta att framgång i ett övre lager bevisar att de lägre lagren är friska. Problem kan finnas långt under applikationen innan användaren förstår varför något går fel.",
+          "Att använda modellen för abstrakt och glömma att koppla den till konkreta artefakter som ramar, paket, portar, loggar och signaler."
+        ],
+        "security": [
+          "Modellen hjälper dig att placera kontroller rätt: applikationsvalidering, TLS och kodning, transportfiltrering, IP-baserad policy, switchskydd och fysiska skydd försvarar olika lager.",
+          "Angripare verkar också över flera lager. En phishing-sida, en DNS-manipulation, en TCP-reset-injektion, en ARP-förgiftning och en kabelavlyssning är olika problem som kräver olika telemetri och olika skydd.",
+          "När du läser paketfångster eller designar detektioner hjälper OSI-modellen dig att välja rätt bevis: applikationsnyttolaster, portbeteende, IP-vägar, MAC-avvikelser eller indikatorer på länknivå."
+        ],
+        "example": "Tänk dig att du laddar en HTTPS-webbplats. Webbläsaren skapar en HTTP-förfrågan, data representeras i format som båda sidor förstår, en session etableras och underhålls, TCP bär konversationen med hjälp av portar, IP routar paketen till rätt nät, Ethernet-ramar flyttar dem över varje lokal länk genom switchar och de faktiska bitarna färdas som elektriska, optiska eller trådlösa signaler. OSI-modellen ger dig namn på varje del av den resan så att du kan förstå vad som händer och var det kan gå fel."
+      },
+      "deepDive": {
+        "summary": "En detaljerad genomgång av OSI-modellens sju lager och hur de relaterar till verklig trafik, enheter och protokoll.",
+        "sections": [
+          {
+            "title": "Lager 7: Applikation",
+            "paragraphs": [
+              "Applikationslagret är den del av modellen som ligger närmast den programvara som en användare eller tjänst faktiskt bryr sig om. Det definierar det nätverksbeteende som applikationer exponerar, till exempel att hämta en webbsida, slå upp ett värdnamn, skicka e-post eller överföra en fil. Det är här protokoll som HTTP, HTTPS, DNS, SMTP och FTP är lättast att placera konceptuellt, eftersom lagret beskriver vad kommunikationen är till för ur applikationens perspektiv.",
+              "I verklig trafik är det på applikationslagret som utbytets betydelse blir synlig. En paketfångst kan visa en HTTP GET-förfrågan, en DNS-fråga efter en A-post eller ett API-svar i JSON. Säkerhetsteam tillbringar ofta mycket tid här eftersom applikationsdata avslöjar avsikt: vilken resurs som begärdes, vilket namn som slogs upp, vilken endpoint som svarade och om innehållet ser normalt eller misstänkt ut.",
+              "En bra mental modell är att applikationslagret besvarar frågan vilken tjänst konversationen försöker utföra. När en webbläsare talar HTTP, en resolver talar DNS eller en e-postklient talar SMTP bär de underliggande lagren fortfarande bitar och paket, men applikationslagret ger de lägre nivåerna ett syfte."
+            ]
+          },
+          {
+            "title": "Lager 6: Presentation",
+            "paragraphs": [
+              "Presentationslagret ansvarar för hur data representeras så att båda sidor kan tolka den konsekvent. Det omfattar format, struktur, teckenkodning, serialisering, komprimering och ibland kryptering. I ren läroboksform är det här man talar om att översätta data till en gemensam syntax, till exempel att göra text till UTF-8, komprimera en nyttolast eller representera strukturerad data som JSON eller XML.",
+              "Moderna TCP/IP-stackar implementerar inte alltid presentationslagret som en separat, tydlig komponent, vilket är varför många hoppar över det. Men själva uppgiften är fortfarande verklig. HTTPS bygger på TLS för att skydda applikationsdata, applikationer är beroende av kodningar och filformat för att tolka innehåll korrekt, och paketanalytiker behöver ständigt avgöra om bytes ska tolkas som text, binärdata, komprimerat innehåll eller krypterad trafik.",
+              "I praktiken påminner presentationslagret dig om att kommunikation inte bara handlar om leverans utan också om tolkning. En perfekt levererad nyttolast är värdelös om mottagaren inte kan parsa den, dekryptera den eller förstå dess representation. Därför är content types, certifikatstödd kryptering, kodningar och serialiseringsformat så viktiga i riktiga system."
+            ]
+          },
+          {
+            "title": "Lager 5: Session",
+            "paragraphs": [
+              "Sessionslagret handlar om att etablera, hantera och avsluta logiska konversationer mellan system. Dess uppgift är att koordinera dialogen: vem som talar, om utbytet fortfarande är aktivt, om konversationen kan återupptas och hur relaterade förfrågningar hör ihop inom samma interaktion. I läroboksexempel är detta lagret som håller ett utbyte samman i flera steg i stället för att behandla varje meddelande som isolerat.",
+              "I moderna nätverk är sessionslagret ofta mindre synligt som ett fristående protokollager, men själva begreppet är fortfarande viktigt. Webbapplikationer upprätthåller autentiserade sessioner, fjärranropssystem håller reda på pågående konversationer och säkra kanaler kan återuppta eller omförhandla tillstånd. Även när implementationen är invävd i applikationslogik eller transportbeteende behöver analytiker fortfarande sessionstänket, eftersom kommunikation ofta beror på mer än ett enskilt paket eller en enskild begäran.",
+              "För felsökning och säkerhet hjälper sessionstänkande dig att förstå varför tillstånd spelar roll. En användare kan nå en tjänst, men sessionen kan ha löpt ut, blivit återställd eller misslyckats med att återupptas korrekt. Det är också här du börjar fråga om en konversation är autentiserad, om en åtgärd hör ihop med ett tidigare utbyte och hur länge en betrodd interaktion bör förbli giltig."
+            ]
+          },
+          {
+            "title": "Lager 4: Transport",
+            "paragraphs": [
+              "Transportlagret ger ändpunkt-till-ändpunkt-beteende mellan värdar. Det avgör hur applikationsdata lämnas från ett system till en process på ett annat system och introducerar begrepp som portar, segmentering, tillförlitlighet, flödeskontroll och multiplexering. TCP och UDP är de klassiska exemplen. TCP erbjuder ordnad och tillförlitlig byteström, medan UDP skickar fristående datagram med mindre overhead och färre garantier.",
+              "Detta lager syns ständigt i verkligt arbete. Brandväggar filtrerar på TCP- eller UDP-portar. Paketfångster visar handskakningar, omsändningar, resets och portnummer. Lastbalanserare, NAT-enheter och skannrar är starkt beroende av beteende på transportnivå eftersom det är här tjänster blir nåbara som sockets på en värd. När du ser trafik på TCP 443 eller UDP 53 tittar du på en rendezvous-punkt i transportlagret som hjälper operativsystemet att lämna trafiken till rätt tjänst.",
+              "Transportanalys är ofta bron mellan nätverksgrunder och applikationsbeteende. Om DNS misslyckas frågar du om UDP-utbytet fick ett svar. Om en webbplats känns långsam frågar du om TCP-förlust, omsändningar eller fönsterstorlek begränsar prestandan. Transportlagret besvarar hur två ändpunkter flyttar applikationsdata mellan processer, inte bara om paket existerar."
+            ]
+          },
+          {
+            "title": "Lager 3: Nätverk",
+            "paragraphs": [
+              "Nätverkslagret ger logisk adressering och routning mellan nätverk. Dess kärnuppgift är att flytta paket bortom den lokala länken genom att använda adresser som routrar förstår, oftast IP-adresser. Det är här begrepp som subnät, default gateway, routningstabeller, hop-för-hop-vidarebefordran och vägval blir meningsfulla. IP är det centrala protokollet här, och routrar är de enheter som tydligast hör hemma på denna nivå.",
+              "I praktisk trafikanalys är nätverkslagret där du granskar käll- och destinations-IP, TTL-värden, fragmentering och vilken väg ett paket kan ta. Routrar arbetar här eftersom de inte behöver bry sig om trafikens fulla applikationsbetydelse. De bryr sig om vart paketet ska härnäst. Därför kan du transportera HTTP, DNS, SSH eller annan trafik över samma routade infrastruktur så länge IP-lagret kan nå destinationen.",
+              "Detta lager är oerhört viktigt både operativt och säkerhetsmässigt. Routningsfel skapar svarta hål, asymmetri eller oavsiktlig exponering. IP-baserad filtrering, VPN-design, segmentering och paketfångster beror alla på att du förstår nätverkslagret. När människor säger att en värd är nåbar eller inte nåbar gör de ofta ett Layer 3-påstående innan de ens vet om själva applikationen fungerar."
+            ]
+          },
+          {
+            "title": "Lager 2: Datalänk",
+            "paragraphs": [
+              "Datalänklagret hanterar lokal leverans över en specifik länk. Det tar nätverkslagrets paket och placerar dem i ramar som passar det lokala mediet, med lokal adressering och kontrollinformation på ramnivå. I Ethernet-nät betyder det Ethernet-ramar och MAC-adresser. Switchar arbetar främst här eftersom de vidarebefordrar ramar utifrån lokala länkadresser snarare än utifrån ändpunkt-till-ändpunkt-routning med IP.",
+              "Verkligt Layer 2-beteende förklarar mycket nätverkande som nybörjare upplever som mystiskt. Innan ett IP-paket når nästa hopp i Ethernet måste det bäras i en ram adresserad till rätt MAC-adress. Därför är begrepp som ARP, VLAN, switchportar och broadcastdomäner så viktiga. Paketet kan behålla samma IP-destination medan den omgivande Ethernet-ramen förändras vid varje hopp över olika lokala länkar.",
+              "Säkerhet och felsökning på detta lager är mycket praktisk. ARP-förgiftning, MAC-flooding, VLAN-felkonfigurationer, duplexproblem och switchportsfel lever nära Layer 2. Om en värd kan tala på ett lokalt segment men inte på ett annat, eller om trafik läcker över fel VLAN, är datalänklagret ofta där den verkliga förklaringen finns."
+            ]
+          },
+          {
+            "title": "Lager 1: Fysiskt",
+            "paragraphs": [
+              "Det fysiska lagret är det lägsta lagret i modellen och handlar om den faktiska överföringen av bitar över ett medium. Det beskriver hur signaler representeras och transporteras över kopparkabel, fiber eller radiovågor. Detta lager omfattar de fysiska egenskaperna hos kontakter, kablage, transceivers, signaleringsstandarder och själva länkens råa egenskaper.",
+              "Även om det kan kännas långt från applikationsfelsökning är det på det fysiska lagret som kommunikationen blir verklig. Paket och ramar rör sig inte bara genom abstraktioner; de är beroende av fungerande gränssnitt, ström, ljus, radiovillkor, hela kablar och frisk hårdvara. En skadad kabel, svag trådlös signal, defekt transceiver eller urkopplat interface kan bryta allt ovanför utan att några högre konfigurationer behöver ändras.",
+              "Bra ingenjörer respekterar det här lagret eftersom alla andra lager vilar på det. Om signalen inte kan färdas tillförlitligt kan switchen inte vidarebefordra ramen, routern kan inte flytta paketet, transportlagret kan inte hålla anslutningen vid liv och applikationen kan inte slutföra begäran. Det fysiska lagret är grunden som resten av modellen tyst står på."
+            ]
+          }
+        ]
+      }
+    },
     {
       "id": "tcp",
       "name": "TCP",

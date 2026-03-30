@@ -2,8 +2,8 @@
   "_fileVersion": {
     "version": 3,
     "buildsOn": 2,
-    "updated": "2026-02-12",
-    "notes": "Removed Quick self test blocks from Networking and Protocols concepts and expanded Deep Dive sections for each page."
+    "updated": "2026-03-30",
+    "notes": "Added the OSI Model concept page to Networking and Protocols and expanded the localized concept catalog."
   },
   "frameworksAndStandards": [
     {
@@ -1050,6 +1050,109 @@
     }
   ],
   "networkingAndProtocols": [
+    {
+      "id": "osi-model",
+      "name": "OSI Model",
+      "summary": "Conceptual seven layer framework used to understand, analyze, and troubleshoot how network communication moves from applications down to the wire.",
+      "intro": "The OSI Model (Open Systems Interconnection) is a conceptual framework that breaks network communication into seven layers. It is not a protocol suite that runs exactly as written on the modern Internet. Instead, it gives you a structured way to understand how data moves from an application, through transport and routing, across local network media, and finally as physical signals.",
+      "bullets": [
+        "Separates network communication into layers so each part of the process has a clearer responsibility.",
+        "Gives you a shared language for troubleshooting, packet analysis, protocol study, and security architecture.",
+        "Helps you reason about where technologies fit, even when real world protocols do not map perfectly to one layer."
+      ],
+      "references": [
+        "IBM: What is the OSI model? https://www.ibm.com/think/topics/osi-model",
+        "Cloudflare Learning Center: OSI model https://www.cloudflare.com/learning/ddos/glossary/open-systems-interconnection-model-osi/",
+        "Cisco: OSI model overview https://www.cisco.com/c/en/us/products/switches/what-is-a-network-switch.html"
+      ],
+      "learn": {
+        "what": "The OSI Model is a seven layer reference model for network communication. Its purpose is to split a complex process into understandable parts so you can describe what kind of job is happening at a given point: user facing application behavior, data formatting, session state, end to end transport, IP routing, local frame delivery, or the physical signaling on the medium. The model is conceptual, which is exactly why it is useful. It helps you think clearly without depending on one vendor, one protocol, or one operating system.",
+        "why": "The OSI Model matters because real networking problems rarely begin with the full answer. You usually start with symptoms: a website does not load, a DNS query times out, a TCP handshake stalls, a switch forwards incorrectly, or a cable introduces errors. The model gives you a disciplined way to ask where the problem lives and which evidence belongs to that layer. It is also a strong foundation for security work, because controls, attacks, and telemetry all operate at different layers. Firewalls, ports, packets, DNS, HTTP, Ethernet, and physical access all make more sense when you can place them in a layered system.",
+        "how": [
+          "An application creates useful data such as a web request, a DNS lookup, or an email message. Higher layer logic defines what that data means.",
+          "That data is prepared into a form both sides can interpret, and any session state or conversation context is maintained so the exchange stays coherent.",
+          "A transport protocol such as TCP or UDP adds end to end delivery behavior and uses ports so the receiving host can hand the traffic to the right process.",
+          "The network layer adds logical addressing with IP and allows routers to move packets between different networks.",
+          "The data link layer packages packets into local frames, using technologies like Ethernet, MAC addresses, and switching to move data across a specific link.",
+          "The physical layer turns those frames into electrical, optical, or radio signals that can travel over copper, fiber, or wireless media.",
+          "At the destination, the process is reversed as each layer removes its own headers, interprets its own part of the communication, and hands the remaining data upward."
+        ],
+        "pitfalls": [
+          "Treating the OSI Model as a literal description of how every modern protocol stack is implemented. It is a teaching and analysis model, not a perfect blueprint of the Internet.",
+          "Trying to force every protocol into exactly one layer when many real systems span layers or blur responsibilities.",
+          "Memorizing the layer names without learning what questions each layer helps you answer during troubleshooting.",
+          "Assuming upper layer success proves lower layers are healthy. A problem can exist below the application long before users understand why.",
+          "Using the model too abstractly and forgetting to connect it to concrete artifacts like frames, packets, ports, logs, and signals."
+        ],
+        "security": [
+          "The model helps you place controls correctly: application validation, TLS and encoding choices, transport filtering, IP routing policy, switch protections, and physical safeguards all defend different layers.",
+          "Attackers also operate across layers. A phishing page, a DNS manipulation, a TCP reset injection, an ARP spoof, and a cable tap are different problems that require different telemetry and controls.",
+          "When reading packet captures or designing detections, the OSI Model helps you choose the right evidence: application payloads, port behavior, IP paths, MAC level anomalies, or physical link indicators."
+        ],
+        "example": "Imagine loading an HTTPS website. The browser creates an HTTP request, data is represented in formats both sides understand, a session is established and maintained, TCP carries the conversation using ports, IP routes packets to the destination network, Ethernet frames move them across each local link through switches, and the actual bits travel as electrical, optical, or radio signals. The OSI Model gives you names for each part of that journey so you can understand what is happening and where it can fail."
+      },
+      "deepDive": {
+        "summary": "A detailed walkthrough of the seven OSI layers and how they relate to real traffic, devices, and protocols.",
+        "sections": [
+          {
+            "title": "Layer 7: Application",
+            "paragraphs": [
+              "The Application layer is the part of the model closest to the software a user or service actually cares about. It defines the network behavior that applications expose, such as requesting a webpage, resolving a hostname, sending mail, or transferring a file. This is where protocols like HTTP, HTTPS, DNS, SMTP, and FTP are easiest to place conceptually, because this layer describes what the communication is for from the application's point of view.",
+              "In real traffic, the Application layer is where the meaning of the exchange becomes visible. A packet capture may show an HTTP GET request, a DNS query for an A record, or an API response in JSON. Security teams often spend a lot of time here because application data reveals intent: what resource was requested, what name was looked up, which endpoint responded, and whether the content looks expected or suspicious.",
+              "A useful mental model is that the Application layer answers the question, what service is this conversation trying to perform. When a browser speaks HTTP, a resolver speaks DNS, or an email client speaks SMTP, the underlying lower layers are still carrying bits and packets, but the Application layer gives those lower level exchanges purpose."
+            ]
+          },
+          {
+            "title": "Layer 6: Presentation",
+            "paragraphs": [
+              "The Presentation layer is responsible for how data is represented so both sides can interpret it consistently. That includes format, structure, character encoding, serialization, compression, and sometimes encryption. In pure textbook form this is where you talk about translating data into a common syntax, such as turning text into UTF-8, compressing a payload, or representing structured data as JSON or XML.",
+              "Modern TCP/IP stacks do not always implement the Presentation layer as a separate obvious component, which is why people sometimes ignore it. But the underlying job is still real. HTTPS relies on TLS to protect application data, applications depend on encodings and file formats to interpret content correctly, and packet analysts constantly care about whether bytes should be decoded as text, binary, compressed data, or encrypted content.",
+              "In practice, the Presentation layer reminds you that communication is not only about delivery but also interpretation. A perfectly delivered payload is useless if the receiver cannot parse it, decrypt it, or understand its representation. That is why content types, certificate backed encryption, encodings, and serialization formats matter so much in real systems."
+            ]
+          },
+          {
+            "title": "Layer 5: Session",
+            "paragraphs": [
+              "The Session layer is about establishing, managing, and closing logical conversations between systems. Its job is to coordinate dialogue: who is talking, whether the exchange is still active, whether the conversation can resume, and how related requests belong to the same interaction. In textbook examples, this is the layer that keeps a multi step exchange coherent rather than treating every message as unrelated.",
+              "In modern networks, the Session layer is often less visible as a standalone protocol layer, but the concept remains important. Web applications maintain authenticated sessions, remote procedure systems track ongoing conversations, and secure channels can resume or renegotiate state. Even when the implementation is folded into application logic or transport behavior, analysts still need the Session layer idea because communication frequently depends on more than a single packet or a single request.",
+              "For troubleshooting and security, session thinking helps explain why state matters. A user might successfully reach a service, but the session may expire, be reset, or fail to resume correctly. This layer is also where you start asking whether a conversation is authenticated, whether one action belongs to an earlier exchange, and how long a trusted interaction should remain valid."
+            ]
+          },
+          {
+            "title": "Layer 4: Transport",
+            "paragraphs": [
+              "The Transport layer provides end to end delivery behavior between hosts. It decides how application data is handed from one system to another process on another system, and it introduces concepts such as ports, segmentation, reliability, flow control, and multiplexing. TCP and UDP are the classic examples. TCP offers ordered, reliable byte stream delivery, while UDP sends independent datagrams with less overhead and fewer guarantees.",
+              "This layer shows up constantly in real work. Firewalls filter by TCP or UDP ports. Packet captures show handshakes, retransmissions, resets, and port numbers. Load balancers, NAT devices, and scanners all depend heavily on transport level behavior because this is where services become reachable as sockets on a host. When you see traffic on TCP 443 or UDP 53, you are looking at a Transport layer rendezvous point that helps the operating system deliver the traffic to the correct service.",
+              "Transport analysis is often the bridge between network fundamentals and application behavior. If DNS fails, you ask whether the UDP exchange received a reply. If a website feels slow, you ask whether TCP loss, retransmissions, or window size are limiting performance. The Transport layer answers how two endpoints move application data between processes, not merely whether packets exist."
+            ]
+          },
+          {
+            "title": "Layer 3: Network",
+            "paragraphs": [
+              "The Network layer provides logical addressing and routing between networks. Its core job is to move packets beyond the local link by using addresses that routers understand, most commonly IP addresses. This is the layer where subnets, default gateways, route tables, hop by hop forwarding, and path selection make sense. IP is the key protocol here, and routers are the devices most strongly associated with this layer.",
+              "In practical traffic analysis, the Network layer is where you examine source and destination IP addresses, TTL values, fragmentation behavior, and the route a packet may take. Routers operate here because they do not need to care about the full application meaning of the traffic. They care about where the packet needs to go next. That is why you can move HTTP, DNS, SSH, or any other traffic across the same routed infrastructure as long as the IP layer can reach the destination.",
+              "This layer matters enormously for both operations and security. Routing mistakes create black holes, asymmetry, or unintended exposure. IP based filtering, VPN design, segmentation, and packet captures all depend on understanding the Network layer. When people say a host is reachable or unreachable, they are often making a Layer 3 claim before they even know whether the application itself works."
+            ]
+          },
+          {
+            "title": "Layer 2: Data Link",
+            "paragraphs": [
+              "The Data Link layer handles local delivery across a specific link. It takes Network layer packets and places them inside frames suitable for the local medium, adding link local addressing and frame level control information. On Ethernet networks, this means Ethernet frames and MAC addresses. Switches primarily operate here because they forward frames based on local link addresses rather than end to end IP routing decisions.",
+              "Real world Layer 2 behavior explains a large amount of networking that beginners find mysterious. Before an IP packet reaches a next hop on Ethernet, it must be carried inside a frame addressed to the correct MAC address. That is why concepts like ARP, VLANs, switch ports, and broadcast domains matter so much. The packet may keep the same IP destination while the surrounding Ethernet frame changes at every hop across different local links.",
+              "Security and troubleshooting at this layer are very practical. ARP spoofing, MAC flooding, VLAN misconfiguration, duplex mismatches, and switch port errors all live close to Layer 2. If a host can talk on one local segment but not another, or if traffic is leaking across the wrong VLAN, the Data Link layer is often where the real explanation sits."
+            ]
+          },
+          {
+            "title": "Layer 1: Physical",
+            "paragraphs": [
+              "The Physical layer is the lowest layer in the model and deals with the actual transmission of bits over a medium. It describes how signals are represented and carried across copper cables, fiber optic links, or radio waves. This layer includes the physical characteristics of connectors, cabling, transceivers, signaling standards, and the raw properties of the link itself.",
+              "Even though it feels far away from application troubleshooting, the Physical layer is where communication becomes real. Packets and frames do not move by abstraction alone; they depend on working interfaces, power, light, radio conditions, clean cabling, and functioning hardware. A damaged cable, weak wireless signal, faulty transceiver, or unplugged interface can break everything above it while leaving higher level configurations untouched.",
+              "Good engineers respect this layer because every other layer depends on it. If the signal cannot travel reliably, the switch cannot forward the frame, the router cannot move the packet, the transport cannot maintain the connection, and the application cannot complete the request. The Physical layer is the foundation the rest of the model quietly stands on."
+            ]
+          }
+        ]
+      }
+    },
     {
       "id": "tcp",
       "name": "TCP",
