@@ -1655,7 +1655,15 @@ msgstr ""
 "CTF-liknande wargames för att lära Linux, säkerhetskoncept och praktiska "
 "exploateringsgrunder."
 
-#: templates/resource_hub.html:225
+#: templates/resource_hub.html:222
+msgid ""
+"Wargame platform focused on binary exploitation, pwn challenges, and low-"
+"level security skills."
+msgstr ""
+"Wargame-plattform med fokus på binär exploatering, pwn-utmaningar och "
+"lågnivå säkerhetsfärdigheter."
+
+#: templates/resource_hub.html:232
 msgid ""
 "Interactive browser based simulator to practice git commands and branching "
 "workflows."
