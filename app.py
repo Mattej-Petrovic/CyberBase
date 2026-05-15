@@ -1031,6 +1031,7 @@ def home():
         "principlesAndIdentity": "principles-and-identity",
         "networkingAndProtocols": "networking-and-protocols",
         "ports": "ports",
+        "otSecurity": "ot-security",
     }
     if isinstance(concepts, dict):
         for key, cat_slug in concept_mapping.items():
@@ -1280,6 +1281,7 @@ def api_search():
             ("frameworksAndStandards", _("Concept - Frameworks"), "frameworks-and-standards", "id"),
             ("principlesAndIdentity", _("Concept - Principles"), "principles-and-identity", "id"),
             ("networkingAndProtocols", _("Concept - Networking"), "networking-and-protocols", "id"),
+            ("otSecurity", _("Concept - OT Security"), "ot-security", "id"),
         ]
         if isinstance(concepts, dict):
             for key, cat_label, cat_slug, id_field in mapping:
@@ -1731,6 +1733,7 @@ def concept_detail(cat: str, cid: str):
             "principles-and-identity": (_("Principles and Identity"), "principlesAndIdentity", "id"),
             "networking-and-protocols": (_("Networking and Protocols"), "networkingAndProtocols", "id"),
             "ports": (_("Ports"), "ports", "port"),
+            "ot-security": (_("OT Security"), "otSecurity", "id"),
         }
 
         if cat not in mapping:
@@ -1810,6 +1813,10 @@ def concept_detail(cat: str, cid: str):
             elif key == "networkingAndProtocols":
                 where_when = _(
                     "Shows up in packet captures, network diagrams, firewall rules, and system or network logs."
+                )
+            elif key == "otSecurity":
+                where_when = _(
+                    "Relevant in industrial environments, critical infrastructure, and wherever IT networks connect to operational technology systems."
                 )
 
         return render_template(

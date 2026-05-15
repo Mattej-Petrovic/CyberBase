@@ -196,6 +196,10 @@ msgstr "Begrepp - Principer"
 msgid "Concept - Networking"
 msgstr "Begrepp - Nätverk"
 
+#: app.py:1186
+msgid "Concept - OT Security"
+msgstr "Begrepp - OT-säkerhet"
+
 #: app.py:1217
 msgid "Concept - Ports"
 msgstr "Begrepp - Portar"
@@ -236,6 +240,14 @@ msgstr "Nätverk och protokoll"
 #: app.py:1571 templates/base.html:930 templates/concepts_hub.html:19
 msgid "Ports"
 msgstr "Portar"
+
+#: templates/concepts_hub.html:20
+msgid "OT Security"
+msgstr "OT Säkerhet"
+
+#: templates/concepts_hub.html:20
+msgid "Industrial systems, protocols, and the unique security challenges of operational technology environments."
+msgstr "Industriella system, protokoll och de unika säkerhetsutmaningarna i operational technology-miljöer."
 
 #: app.py:1579 app.py:1596 app.py:1686 app.py:1702
 #: templates/concept_detail.html:47 templates/defend_detail.html:140
@@ -297,6 +309,14 @@ msgid ""
 msgstr ""
 "Syns i paketfångster, nätverksdiagram, brandväggsregler samt system- och "
 "nätverksloggar."
+
+#: app.py:1818
+msgid ""
+"Relevant in industrial environments, critical infrastructure, and wherever "
+"IT networks connect to operational technology systems."
+msgstr ""
+"Relevant i industriella miljöer, kritisk infrastruktur och överallt där "
+"IT-nätverk ansluter till operationsteknologisystem."
 
 #: app.py:1677 templates/defend_hub.html:22
 msgid "Detection and Logging"

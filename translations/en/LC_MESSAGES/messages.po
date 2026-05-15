@@ -68,6 +68,10 @@ msgstr "Concept - Principles"
 msgid "Concept - Networking"
 msgstr "Concept - Networking"
 
+#: app.py:1186
+msgid "Concept - OT Security"
+msgstr "Concept - OT Security"
+
 #: app.py:1217
 msgid "Concept - Ports"
 msgstr "Concept - Ports"
@@ -108,6 +112,14 @@ msgstr ""
 #: app.py:1571 templates/base.html:930 templates/concepts_hub.html:19
 msgid "Ports"
 msgstr "Ports"
+
+#: templates/concepts_hub.html:20
+msgid "OT Security"
+msgstr "OT Security"
+
+#: templates/concepts_hub.html:20
+msgid "Industrial systems, protocols, and the unique security challenges of operational technology environments."
+msgstr "Industrial systems, protocols, and the unique security challenges of operational technology environments."
 
 #: app.py:1579 app.py:1596 app.py:1686 app.py:1702
 #: templates/concept_detail.html:47 templates/defend_detail.html:140
