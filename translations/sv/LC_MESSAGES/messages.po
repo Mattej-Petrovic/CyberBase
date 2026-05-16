@@ -642,6 +642,26 @@ msgstr "Kommandobibliotek"
 msgid "Toolbox"
 msgstr "Verktygslåda"
 
+#: templates/home.html
+msgid "AI Topics"
+msgstr "AI-ämnen"
+
+#: templates/home.html
+msgid "Quizzes"
+msgstr "Quiz"
+
+#: templates/home.html
+msgid "Resources"
+msgstr "Resurser"
+
+#: templates/home.html
+msgid "AI & Cybersecurity"
+msgstr "AI & cybersäkerhet"
+
+#: templates/home.html
+msgid "How AI is reshaping both sides of the security equation, offensive use, defensive tooling, and securing AI systems themselves."
+msgstr "Hur AI omformar båda sidor av säkerhetsekvationen – offensiv användning, defensiva verktyg och att skydda AI-system i sig."
+
 #: templates/base.html:823 templates/home.html:381
 #: templates/resource_hub.html:4 templates/resource_hub.html:11
 #: templates/resource_hub.html:12

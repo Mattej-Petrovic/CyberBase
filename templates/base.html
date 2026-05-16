@@ -901,6 +901,7 @@
                     <a href="/devsecops" class="{% if request.path.startswith('/devsecops') %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">{{ _('DevSecOps') }}</a>
                     <a href="/defend" class="{% if request.path.startswith('/defend') %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">{{ _('Defend') }}</a>
                     <a href="/attack-flows" class="{% if request.path.startswith('/attack-flows') %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">{{ _('Attack Flows') }}</a>
+                    <a href="/ai" class="{% if request.path.startswith('/ai') %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">{{ _('AI') }}</a>
                     <a href="{{ url_for('resource_hub') }}" class="{% if request.path.startswith(url_for('resource_hub')) %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">{{ _('Resource Hub') }}</a>
                     <a href="/quiz" class="{% if request.path.startswith('/quiz') %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">{{ _('Quiz') }}</a>
                     <a href="/analyze" class="{% if request.path == '/analyze' %}text-blue-400 border-b-2 border-blue-400{% else %}text-gray-300 hover:text-gray-100{% endif %} pb-2 smooth-hover whitespace-nowrap">{{ _('Log Analyzer') }}</a>
@@ -1003,7 +1004,7 @@
         return {
             query: '',
             open: false,
-            results: { commands: [], tools: [], concepts: [], ports: [], devsecops: [], defend: [], attack_flows: [] },
+            results: { commands: [], tools: [], concepts: [], ports: [], devsecops: [], defend: [], attack_flows: [], ai: [] },
             sections: [
                 { key: 'commands', label: {{ _('Command Library')|tojson }} },
                 { key: 'tools', label: {{ _('Toolbox')|tojson }} },
@@ -1011,7 +1012,8 @@
                 { key: 'ports', label: {{ _('Ports')|tojson }} },
                 { key: 'devsecops', label: {{ _('DevSecOps')|tojson }} },
                 { key: 'defend', label: {{ _('Defend')|tojson }} },
-                { key: 'attack_flows', label: {{ _('Attack Flows')|tojson }} }
+                { key: 'attack_flows', label: {{ _('Attack Flows')|tojson }} },
+                { key: 'ai', label: {{ _('AI & Cybersecurity')|tojson }} }
             ],
             get hasResults() {
                 return Object.values(this.results).some(arr => (arr || []).length > 0);

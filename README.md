@@ -40,12 +40,13 @@ The goal is not to replace official documentation or professional tooling. It is
 ## Project Snapshot
 
 - `121` command references
-- `16` tool pages across CLI, GUI, and detection tooling
-- `61` concept entries, including `36` common ports
+- `15` tool pages across CLI, GUI, and detection tooling
+- `34` concept entries across frameworks, principles, networking, and OT security, plus `36` common ports
 - `10` defend topics across detection/logging and hardening
-- `7` DevSecOps sections covering containers, orchestration, CI/CD, IaC, supply chain, and cloud security
+- `7` DevSecOps sections with `17` topic pages covering containers, orchestration, CI/CD, IaC, supply chain, and cloud security
+- `9` AI & Cybersecurity topics covering offensive AI, defensive tooling, and securing AI systems
 - `7` attack flows with phase-by-phase attacker, defender, and victim breakdowns
-- `13` quiz topics with randomized question sets
+- `16` quiz topics with randomized question sets, including AI, DevSecOps, and OT Security
 - `EN` and `SV` language support
 
 Representative content includes tools such as `nmap`, `curl`, `Wireshark`, `Burp Suite`, `OWASP ZAP`, `Suricata`, and `Zeek`, plus concepts such as Zero Trust, IAM, MFA, NIST CSF, DORA, MITRE ATT&CK, TCP, DNS, TLS, and common service ports.

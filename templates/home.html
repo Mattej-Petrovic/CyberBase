@@ -233,30 +233,50 @@
         {{ _('Your personal cybersecurity command center.') }}
       </p>
 
-      <div class="grid grid-cols-5 gap-3 pt-2">
-        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-4 py-4 shadow-none">
-          <div class="text-[10px] uppercase tracking-widest text-slate-400">{{ _('Commands') }}</div>
-          <div class="mt-1.5 text-2xl font-bold text-white">{{ commands_count }}</div>
+      <div class="grid grid-cols-9 gap-2 pt-2">
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-3 py-3 shadow-none">
+          <div class="text-[9px] uppercase tracking-widest text-slate-400 truncate">{{ _('Commands') }}</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ commands_count }}</div>
         </div>
 
-        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-4 py-4 shadow-none">
-          <div class="text-[10px] uppercase tracking-widest text-slate-400">{{ _('Tools') }}</div>
-          <div class="mt-1.5 text-2xl font-bold text-white">{{ tools_count }}</div>
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-3 py-3 shadow-none">
+          <div class="text-[9px] uppercase tracking-widest text-slate-400 truncate">{{ _('Tools') }}</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ tools_count }}</div>
         </div>
 
-        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-4 py-4 shadow-none">
-          <div class="text-[10px] uppercase tracking-widest text-slate-400">{{ _('Concepts') }}</div>
-          <div class="mt-1.5 text-2xl font-bold text-white">{{ concepts_count }}</div>
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-3 py-3 shadow-none">
+          <div class="text-[9px] uppercase tracking-widest text-slate-400 truncate">{{ _('Concepts') }}</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ concepts_count }}</div>
         </div>
 
-        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-4 py-4 shadow-none">
-          <div class="text-[10px] uppercase tracking-widest text-slate-400">{{ _('Defend') }}</div>
-          <div class="mt-1.5 text-2xl font-bold text-white">{{ defend_count }}</div>
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-3 py-3 shadow-none">
+          <div class="text-[9px] uppercase tracking-widest text-slate-400 truncate">{{ _('Defend') }}</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ defend_count }}</div>
         </div>
 
-        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-4 py-4 shadow-none">
-          <div class="text-[10px] uppercase tracking-widest text-slate-400">{{ _('Attack Flows') }}</div>
-          <div class="mt-1.5 text-2xl font-bold text-white">{{ attack_flows_count }}</div>
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-3 py-3 shadow-none">
+          <div class="text-[9px] uppercase tracking-widest text-slate-400 truncate">{{ _('Attack Flows') }}</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ attack_flows_count }}</div>
+        </div>
+
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-3 py-3 shadow-none">
+          <div class="text-[9px] uppercase tracking-widest text-slate-400 truncate">{{ _('DevSecOps') }}</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ devsecops_count }}</div>
+        </div>
+
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-3 py-3 shadow-none">
+          <div class="text-[9px] uppercase tracking-widest text-slate-400 truncate">{{ _('AI Topics') }}</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ ai_topics_count }}</div>
+        </div>
+
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-3 py-3 shadow-none">
+          <div class="text-[9px] uppercase tracking-widest text-slate-400 truncate">{{ _('Quizzes') }}</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ quiz_count }}</div>
+        </div>
+
+        <div class="stat-tile rounded-xl border border-slate-700/60 bg-transparent px-3 py-3 shadow-none">
+          <div class="text-[9px] uppercase tracking-widest text-slate-400 truncate">{{ _('Resources') }}</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ resources_count }}</div>
         </div>
       </div>
 
@@ -418,6 +438,18 @@
               <div class="text-white font-semibold text-base">{{ _('Quiz') }}</div>
               <p class="mt-1 ov-desc">
                 {{ _('Quick topic quizzes to test understanding and improve long term retention.') }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ov-tile rounded-2xl border border-slate-700/55 bg-slate-900/18 p-5">
+          <div class="flex items-start gap-4">
+            <div class="ov-icon"><span class="ov-emoji">🤖</span></div>
+            <div class="min-w-0">
+              <div class="text-white font-semibold text-base">{{ _('AI & Cybersecurity') }}</div>
+              <p class="mt-1 ov-desc">
+                {{ _('How AI is reshaping both sides of the security equation, offensive use, defensive tooling, and securing AI systems themselves.') }}
               </p>
             </div>
           </div>

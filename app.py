@@ -242,6 +242,14 @@ def load_devsecops() -> Any:
     return load_json("devsecops.json")
 
 
+def load_ai() -> Any:
+    if _current_locale_code() == "sv":
+        sv_path = os.path.join(DATA_DIR, "ai_sv.json")
+        if os.path.exists(sv_path):
+            return load_json("ai_sv.json")
+    return load_json("ai.json")
+
+
 def load_attack_flows() -> Any:
     if _current_locale_code() == "sv":
         sv_path = os.path.join(DATA_DIR, "attack_flows_sv.json")
@@ -929,6 +937,8 @@ def home():
     devsecops = load_devsecops()
     commands = load_commands()
     attack_flows_data = load_attack_flows()
+    ai_data = load_ai()
+    quiz_data = load_quiz()
 
     cli = tools.get("cliTools", []) or []
     gui = tools.get("guiTools", []) or []
@@ -949,6 +959,24 @@ def home():
         for v in defend.values():
             if isinstance(v, list):
                 defend_count += len(v)
+
+    devsecops_count = 0
+    if isinstance(devsecops, dict):
+        for s in devsecops.get("sections", []):
+            if isinstance(s, dict):
+                devsecops_count += len(s.get("topics", []))
+
+    ai_topics_count = 0
+    if isinstance(ai_data, dict):
+        for s in ai_data.get("sections", []):
+            if isinstance(s, dict):
+                ai_topics_count += len(s.get("topics", []))
+
+    quiz_count = 0
+    if isinstance(quiz_data, dict):
+        quiz_count = len(quiz_data.get("quizzes", []))
+    elif isinstance(quiz_data, list):
+        quiz_count = len(quiz_data)
 
     candidates: list[dict[str, Any]] = []
 
@@ -1123,6 +1151,15 @@ def home():
 
     attack_flows_count = len(attack_flows_data.get("attacks", [])) if isinstance(attack_flows_data, dict) else 0
 
+    resources_count = 0
+    try:
+        import re as _re
+        _rh = os.path.join(app.root_path, "templates", "resource_hub.html")
+        _rh_text = open(_rh, encoding="utf-8").read()
+        resources_count = len(_re.findall(r'href=["\']https?://', _rh_text))
+    except Exception:
+        pass
+
     return render_template(
         "home.html",
         tools_count=tools_count,
@@ -1130,6 +1167,10 @@ def home():
         concepts_count=concepts_count,
         defend_count=defend_count,
         attack_flows_count=attack_flows_count,
+        devsecops_count=devsecops_count,
+        ai_topics_count=ai_topics_count,
+        quiz_count=quiz_count,
+        resources_count=resources_count,
         quick_picks=quick_picks,
     )
 
@@ -1203,7 +1244,7 @@ def api_commands():
 @app.route("/api/search")
 def api_search():
     q = (request.args.get("q") or "").strip()
-    empty = {"commands": [], "tools": [], "concepts": [], "ports": [], "devsecops": [], "defend": [], "attack_flows": []}
+    empty = {"commands": [], "tools": [], "concepts": [], "ports": [], "devsecops": [], "defend": [], "attack_flows": [], "ai": []}
     if not q:
         return jsonify(empty)
 
@@ -1226,6 +1267,7 @@ def api_search():
         "devsecops": [],
         "defend": [],
         "attack_flows": [],
+        "ai": [],
     }
 
     try:
@@ -1386,6 +1428,25 @@ def api_search():
                         }
                     )
 
+        ai_data = load_ai()
+        if isinstance(ai_data, dict):
+            for section in ai_data.get("sections", []) or []:
+                if not isinstance(section, dict):
+                    continue
+                for it in section.get("topics", []) or []:
+                    if not isinstance(it, dict):
+                        continue
+                    title = it.get("title") or ""
+                    if match_any(title, it.get("summary"), it.get("intro"), section.get("title"), section.get("summary")):
+                        results["ai"].append(
+                            {
+                                "title": title,
+                                "category": _("AI & Cybersecurity"),
+                                "href": f"/ai/{it.get('id')}",
+                                "snippet": _snippet(str(it.get("summary") or it.get("intro") or section.get("summary") or "")),
+                            }
+                        )
+
     except Exception:
         return jsonify(empty)
 
@@ -1396,6 +1457,7 @@ def api_search():
     results["devsecops"] = _limit(results["devsecops"], 10)
     results["defend"] = _limit(results["defend"], 10)
     results["attack_flows"] = _limit(results["attack_flows"], 10)
+    results["ai"] = _limit(results["ai"], 10)
 
     return jsonify(results)
 
@@ -1882,6 +1944,66 @@ def devsecops_detail(section: str, topic: str):
         title=item.get("title", _("DevSecOps")),
         category=category_title,
         section_id=section,
+        not_found=False,
+    )
+
+
+@app.route("/ai")
+def ai_hub():
+    ai_data = load_ai()
+    return render_template("ai_hub.html", ai_data=ai_data)
+
+
+@app.route("/ai/<topic>")
+def ai_detail(topic: str):
+    ai_data = load_ai()
+    sections = ai_data.get("sections", []) if isinstance(ai_data, dict) else []
+
+    # Find which section this topic lives in, plus prev/next within section
+    found_item = None
+    found_section = None
+    prev_topic = None
+    next_topic = None
+
+    for section in sections:
+        if not isinstance(section, dict):
+            continue
+        topics = section.get("topics", []) or []
+        for idx, t in enumerate(topics):
+            if not isinstance(t, dict):
+                continue
+            if str(t.get("id")) == str(topic):
+                found_item = t
+                found_section = section
+                prev_topic = topics[idx - 1] if idx > 0 else None
+                next_topic = topics[idx + 1] if idx < len(topics) - 1 else None
+                break
+        if found_item:
+            break
+
+    if not found_item or not found_section:
+        return (
+            render_template(
+                "ai_detail.html",
+                item={},
+                title=_("Not found"),
+                section_title=_("AI & Cybersecurity"),
+                section_id="",
+                prev_topic=None,
+                next_topic=None,
+                not_found=True,
+            ),
+            404,
+        )
+
+    return render_template(
+        "ai_detail.html",
+        item=found_item,
+        title=found_item.get("title", _("AI & Cybersecurity")),
+        section_title=found_section.get("title", _("AI & Cybersecurity")),
+        section_id=found_section.get("id", ""),
+        prev_topic=prev_topic,
+        next_topic=next_topic,
         not_found=False,
     )
 
