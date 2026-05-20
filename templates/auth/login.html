@@ -57,7 +57,6 @@
     getAuth,
     GoogleAuthProvider,
     signInWithPopup,
-    signInWithRedirect,
     getRedirectResult,
     onAuthStateChanged,
     setPersistence,
@@ -108,7 +107,7 @@
     passwordNeedsReset: {{ _('Your password no longer meets the security requirements. Please reset your password to continue.')|tojson }},
     genericError: {{ _('Something went wrong. Please try again.')|tojson }},
     googleOperationNotAllowed: {{ _('Google sign-in is not enabled for this project.')|tojson }},
-    popupBlocked: {{ _('Your browser blocked the sign-in popup. We will use a redirect instead.')|tojson }},
+    popupBlocked: {{ _('Your browser blocked the sign-in popup. Please allow popups for this site and try again.')|tojson }},
     popupClosed: {{ _('The sign-in window was closed. Please try again.')|tojson }},
     popupCanceled: {{ _('Another sign-in attempt was canceled. Please try again.')|tojson }},
     invalidGoogleCredential: {{ _('Could not use the provided Google credential. Try again.')|tojson }},
@@ -311,34 +310,22 @@
     }
   }
 
-  // Helper to decide popup vs redirect: mobile or popup-blocked => redirect
-  function shouldUseRedirect() {
-    return /Mobi|Android/i.test(navigator.userAgent);
-  }
-
   btnGoogle.addEventListener('click', async (e) => {
     const btn = e.currentTarget; setLoading(btn, true);
     try {
-      if (shouldUseRedirect()) {
-        await signInWithRedirect(auth, googleProvider);
-        return; // browser navigates away
-      }
-      let usedFlow = 'popup';
       const result = await signInWithPopup(auth, googleProvider).catch(async (err) => {
         showDevErrorDetails(err, 'popup');
         if (err && (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request')) {
-          usedFlow = 'redirect-fallback';
-          await signInWithRedirect(auth, googleProvider);
+          setStatus('error', i18n.popupBlocked);
           return null;
         }
         if (err && err.code === 'auth/popup-closed-by-user') {
-          // Do not auto-redirect; user explicitly closed
           setStatus('error', mapGoogleError(err));
           return null;
         }
         throw err;
       });
-      if (!result) return; // redirect path already taken
+      if (!result) return;
 
       // For Google provider, email is verified by provider
       await exchangeForSession(result.user, 'popup');
