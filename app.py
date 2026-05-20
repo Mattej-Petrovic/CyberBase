@@ -7,6 +7,12 @@ app.py v14 builds on v13
 import random
 import json
 import os
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 import re
 import sys
 import hashlib

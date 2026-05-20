@@ -303,8 +303,10 @@
 
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.ok) {
-      const err = new Error(data.error || i18n.sessionLoginFailed);
+      const msg = data.error || i18n.sessionLoginFailed;
+      const err = new Error(msg);
       err.status = res.status;
+      err.serverError = msg;
       throw err;
     }
   }
@@ -350,6 +352,9 @@
           email,
           credential: GoogleAuthProvider.credentialFromError(e)
         };
+      } else if (e && e.serverError) {
+        // Server rejected the session (e.g. email not verified on server side)
+        setStatus('error', e.serverError);
       } else {
         setStatus('error', mapGoogleError(e));
       }
@@ -485,6 +490,10 @@
         window.location.assign(getNextUrl());
       } catch (e) {
         showDevErrorDetails(e, 'authstate');
+        // Show server-side errors (e.g. email not verified, session creation failed)
+        if (e && e.status) {
+          setStatus('error', e.message || i18n.googleSignInFailed);
+        }
       }
     });
   } catch {}
