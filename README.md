@@ -66,30 +66,6 @@ The content model is largely data-driven. Commands, tools, concepts, defend topi
 
 One deliberate implementation choice is the Log Analyzer: it is rule-based rather than AI-driven, so the output stays repeatable, explainable, and tied to matched evidence in the submitted log lines.
 
-## Running Locally
-
-CyberBase depends on Firebase configuration, MongoDB, and a Gemini API key. The repository already includes a `Dockerfile` and `docker-compose.yml` for local development.
-
-Run with Docker Compose:
-
-```bash
-docker compose up --build
-```
-
-Or run it directly with Flask:
-
-```bash
-pip install -r requirements.txt
-flask --app app.py run
-```
-
-Environment setup should provide:
-
-- Firebase Admin credentials via `FIREBASE_SERVICE_ACCOUNT_JSON` or `FIREBASE_SERVICE_ACCOUNT_PATH`
-- Firebase web config values such as `FIREBASE_API_KEY` and `FIREBASE_PROJECT_ID`
-- `MONGODB_URI`
-- `GEMINI_API_KEY`
-
 ## Notes
 
 CyberBase is best described as a practical cybersecurity hub for learning, reference, and lightweight analysis. It is not just a cheat sheet and not just a content site. The value of the project is in how those parts are combined into one consistent experience.
